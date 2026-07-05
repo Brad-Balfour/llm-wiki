@@ -1,10 +1,10 @@
 ## 1. Schema Foundation
 
-- [ ] 1.1 Create `schema/interest-profile.md` v1.4 from Claude v1.3 plus the agreed v1.4 fixes and Codex depth heuristics.
-- [ ] 1.2 Create `schema/classifier-instructions.md` with the two-axis output schema, thresholds, fail-closed validation rules, and validation methodology.
-- [ ] 1.3 Create `schema/routing-rules.md` with commute, wiki, stream-log, review, and discard derivations.
-- [ ] 1.4 Initialize `schema/compile-state.json` and `schema/model-config.example.yaml`.
-- [ ] 1.5 Add fixture directories for TLDR source text and expected parser, classifier, routing, queue, feedback, and wiki outputs.
+- [x] 1.1 Create `schema/interest-profile.md` v1.4 from Claude v1.3 plus the agreed v1.4 fixes and Codex depth heuristics.
+- [x] 1.2 Create `schema/classifier-instructions.md` with the two-axis output schema, thresholds, fail-closed validation rules, and validation methodology.
+- [x] 1.3 Create `schema/routing-rules.md` with commute, wiki, stream-log, review, and discard derivations.
+- [x] 1.4 Initialize `schema/compile-state.json` and `schema/model-config.example.yaml`.
+- [x] 1.5 Add fixture directories for TLDR source text and expected parser, classifier, routing, queue, feedback, and wiki outputs.
 
 ## 2. Project Runtime Setup
 
@@ -25,11 +25,11 @@
 
 ## 4. Classifier And Routing
 
-- [ ] 4.1 Implement provider-neutral LLM adapter interfaces with model ids and provider choice supplied by config.
-- [ ] 4.2 Implement one classification record per item with structured-output validation.
+- [ ] 4.1 Implement provider-neutral LLM adapter interfaces with model ids, provider choice, and classifier batch size supplied by config.
+- [ ] 4.2 Implement batch-capable classification with one score-first classification record per item and structured-output validation.
 - [ ] 4.3 Reject or quarantine outputs that include `voice_behavior`, route, wiki destination, or other downstream behavior.
 - [ ] 4.4 Derive route decisions in application code from `interest_level` and `consumption_depth`.
-- [ ] 4.5 Persist classification metadata, profile version, prompt version, provider, model, and derived route for auditability.
+- [ ] 4.5 Persist classification scores, derived labels, profile version, prompt version, provider, model, and derived route for auditability and threshold tuning.
 - [ ] 4.6 Route `maybe` items and validation-failed items to review when the safer destination is unclear.
 
 ## 5. Commute Queue
@@ -43,7 +43,7 @@
 
 ## 6. Feedback Labels
 
-- [ ] 6.1 Create JSONL feedback label storage with source item id, correction type, corrected interest, corrected depth, corrected route, reason, timestamp, profile version, prompt version, provider, and model.
+- [ ] 6.1 Create JSONL feedback label storage with source item id, correction type, original scores/labels, corrected interest, corrected depth, corrected route, reason, timestamp, profile version, prompt version, provider, and model.
 - [ ] 6.2 Add a command or documented file workflow for recording manual feedback.
 - [ ] 6.3 Load recent correction labels into the next day's classifier context as examples or lightweight routing overrides where appropriate.
 - [ ] 6.4 Keep canonical profile updates on a cadence from repeated or high-harm patterns, not from every one-off correction.

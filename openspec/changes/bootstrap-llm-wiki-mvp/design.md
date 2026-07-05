@@ -21,6 +21,8 @@ the classifier output.
 - Support connector-assisted Gmail/TLDR discovery and text-file fallback.
 - Parse confirmed TLDR editions into non-sponsor editorial items.
 - Classify each item on independent interest and depth axes.
+- Treat continuous interest/depth scores as the calibration values and enum
+  labels as threshold-derived routing labels.
 - Validate structured model output and fail closed to review.
 - Derive commute, wiki, stream-log, review, and discard behavior in code.
 - Generate a prepared commute queue for manual voice review.
@@ -65,18 +67,32 @@ the classifier output.
    - Alternative considered: one monolithic prompt/spec file. Rejected because it
      encourages coupling downstream behavior back into classification.
 
-4. **Classifier emits classification only.**
+4. **Classifier uses score-first classification and emits classification only.**
    - Decision: The model returns `interest_level`, `interest_score`,
      `consumption_depth`, `depth_score`, `signals`, and `reason`.
-   - Rationale: Commute behavior, wiki ingest, stream-log placement, and review
-     handling are consumers of classification, not classifier facts.
+   - Decision: `interest_score` and `depth_score` are the continuous calibration
+     values; `interest_level` and `consumption_depth` are labels derived from
+     configured score bands. Application validation SHALL reject, quarantine, or
+     normalize inconsistent score/label pairs according to the configured policy.
+   - Rationale: Scores preserve near-boundary information for queue ordering,
+     feedback review, blind validation, threshold tuning, and profile/prompt
+     updates. Labels give routing code stable categories without scattering
+     float-threshold logic through every consumer. Commute behavior, wiki ingest,
+     stream-log placement, and review handling are consumers of classification,
+     not classifier facts.
    - Alternative considered: let the model emit `voice_behavior`. Rejected
      because it couples one UX surface to the source-neutral classifier.
 
 5. **Use provider-neutral adapters with one default daily scorer.**
    - Decision: Configure provider and model ids outside parser and routing code.
+   - Decision: The classifier runtime SHALL support configurable batch size.
+     Batch size may default to `1` while validation is immature, but larger
+     batches are the planned cost/latency control once per-item validation and
+     quarantine behavior are stable.
    - Rationale: Runtime scoring provider and implementation provider are separate
-     choices.
+     choices. Batching reduces repeated profile/instruction tokens and request
+     overhead; single-item calls reduce retry/quarantine blast radius while the
+     schema is still proving itself.
    - Alternative considered: run Claude and OpenAI on every item and merge axes.
      Rejected for MVP because it doubles cost and introduces score-calibration
      complexity before product value is proven.
@@ -92,10 +108,13 @@ the classifier output.
      before the queue proves useful.
 
 7. **Store feedback labels as data.**
-   - Decision: Corrections append structured labels with source id and version
-     metadata.
+   - Decision: Corrections append structured labels with source id, original
+     predicted scores/labels, corrected labels/routes where applicable, and
+     version metadata.
    - Rationale: The `maybe` band is noisy, and per-item online profile edits
-     would chase one-off reactions.
+     would chase one-off reactions. Persisted scores let review distinguish
+     near-boundary disagreements from high-confidence misses and make future
+     threshold tuning possible without regenerating predictions.
    - Alternative considered: rewrite the profile after every correction.
      Rejected because it would destroy auditability and overfit unstable cases.
 
@@ -118,6 +137,10 @@ the classifier output.
 - [Risk] Model output may drift or include route-like fields. -> Mitigation:
   validate structured output, reject downstream behavior fields, and route
   invalid outputs to review.
+- [Risk] Larger classifier batches can make one malformed model output affect
+  several items. -> Mitigation: keep batch size configurable, start with small
+  batches if needed, validate each returned record independently, and quarantine
+  only the records or batch whose output cannot be reconciled to the input.
 - [Risk] Feedback labels can contain private context. -> Mitigation: keep
   sensitive freeform notes out of public files and use sanitized labels or review
   placeholders where needed.
@@ -131,8 +154,8 @@ the classifier output.
 
 1. Create the schema files, compile state, model config example, and fixture
    directories.
-2. Implement parser, classifier validation, routing, queue, feedback, and wiki
-   compile behavior against fixtures.
+2. Implement parser, batch-capable classifier validation, routing, queue,
+   feedback, and wiki compile behavior against fixtures.
 3. Run one real TLDR email end to end locally.
 4. Use one prepared queue in a real car session or equivalent manual voice test.
 5. Record at least one correction label.
@@ -151,4 +174,3 @@ to review without deleting raw correction history.
 - Whether Node 24 remains the default runtime or Node 26 becomes acceptable after
   the Phase 0 runtime check.
 - The exact OKF entry taxonomy for `wiki/` paths and frontmatter tags.
-
