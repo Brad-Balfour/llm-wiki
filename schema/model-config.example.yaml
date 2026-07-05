@@ -17,6 +17,12 @@ classifier:
   retries: 1
   structured_output: true
   batch_size: 1
+  thresholds:
+    interest:
+      maybe_min: 0.60
+      interested_min: 0.80
+    depth:
+      in_depth_min: 0.60
 
 providers:
   anthropic:

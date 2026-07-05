@@ -4,14 +4,16 @@ Version: `classifier-instructions.v1`
 Profile version: `1.4`
 Scope: Source-neutral classification of parsed TLDR editorial items.
 
-The classifier emits only interest and depth facts about the item. It must not
-emit commute behavior, routes, wiki destinations, stream-log placement, review
-queue placement, discard decisions, or other downstream behavior.
+The classifier emits only a source-neutral request reference plus interest and
+depth facts about the item. It must not emit commute behavior, routes, wiki
+destinations, stream-log placement, review queue placement, discard decisions,
+or other downstream behavior.
 
 ## Input
 
 The classifier receives sanitized item metadata only:
 
+- `classifier_item_id`
 - `source_item_id`
 - `newsletter`
 - `edition_date`
@@ -30,10 +32,11 @@ fields:
 
 ```json
 {
+  "classifier_item_id": "item-0001",
   "interest_level": "interested",
-  "interest_score": 0.0,
+  "interest_score": 0.91,
   "consumption_depth": "headline_only",
-  "depth_score": 0.0,
+  "depth_score": 0.28,
   "signals": ["example_signal"],
   "reason": "One concise source-neutral reason."
 }
@@ -41,6 +44,8 @@ fields:
 
 Allowed values:
 
+- `classifier_item_id`: non-empty string exactly matching one input
+  `classifier_item_id`.
 - `interest_level`: `interested`, `maybe`, or `uninterested`.
 - `interest_score`: number from `0.0` through `1.0`.
 - `consumption_depth`: `headline_only` or `in_depth`.
@@ -48,15 +53,15 @@ Allowed values:
 - `signals`: non-empty array of short source-neutral strings.
 - `reason`: non-empty concise string explaining the classification.
 
-Recommended score bands:
+Recommended score bands use gap-free numeric thresholds:
 
-| Field | Label | Score band |
+| Field | Label | Score threshold |
 | --- | --- | --- |
-| `interest_level` | `interested` | `0.80`-`1.00` |
-| `interest_level` | `maybe` | `0.60`-`0.79` |
-| `interest_level` | `uninterested` | `0.00`-`0.59` |
-| `consumption_depth` | `in_depth` | `0.60`-`1.00` |
-| `consumption_depth` | `headline_only` | `0.00`-`0.59` |
+| `interest_level` | `interested` | `score >= 0.80` |
+| `interest_level` | `maybe` | `score >= 0.60 && score < 0.80` |
+| `interest_level` | `uninterested` | `score < 0.60` |
+| `consumption_depth` | `in_depth` | `score >= 0.60` |
+| `consumption_depth` | `headline_only` | `score < 0.60` |
 
 `interest_score` and `depth_score` are the primary calibration values. The enum
 fields are stable routing labels derived from those scores so downstream code can
@@ -67,12 +72,12 @@ avoid duplicating threshold logic.
 The record shape above is per item. The runtime may classify one item per model
 call or classify a small batch in one call.
 
-For a batch, return an array of classification records in the same order as the
-input items:
+For a batch, return an array with one classification record for each input item:
 
 ```json
 [
   {
+    "classifier_item_id": "item-0001",
     "interest_level": "interested",
     "interest_score": 0.91,
     "consumption_depth": "headline_only",
@@ -84,9 +89,12 @@ input items:
 ```
 
 Application validation must verify the array length matches the input item count
-and each record validates independently. Application code attaches
-`source_item_id` from the corresponding input item; the model output still emits
-classification only.
+and each record validates independently. Every output record must include a
+`classifier_item_id` that matches exactly one input item, with no missing,
+duplicate, or unknown ids. Application code reconciles records by
+`classifier_item_id`, then attaches `source_item_id` from the matched input item.
+The model output remains source- and routing-neutral because
+`classifier_item_id` is an opaque request reference only.
 
 Batching is an optimization, not a schema change. Smaller batches are easier to
 retry and quarantine. Larger batches reduce per-request overhead but increase the
@@ -193,6 +201,8 @@ routing when any of these are true:
 
 - Required field is missing.
 - Extra field is present.
+- `classifier_item_id` is missing, empty, duplicated in a batch, or absent from
+  the input items for the classifier call.
 - Enum value is outside the allowed set.
 - Score is missing, non-numeric, `NaN`, infinite, below `0.0`, or above `1.0`.
 - `signals` is missing, empty, not an array, or contains non-string/empty values.
@@ -200,7 +210,7 @@ routing when any of these are true:
 - Any forbidden downstream field is present.
 - The result is not one classification object for a single-item call or an array
   of classification objects for a batch call.
-- Batch output length or ordering cannot be reconciled to the input items.
+- Batch output ids cannot be reconciled to the input items.
 
 Rejected or quarantined outputs go to review with validation error metadata.
 They must not be routed automatically to discard, stream log, commute queue, wiki

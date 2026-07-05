@@ -65,13 +65,15 @@ the classifier output.
    - Alternative considered: one monolithic prompt/spec file. Rejected because it
      encourages coupling downstream behavior back into classification.
 
-4. **Classifier uses score-first classification and emits classification only.**
+4. **Classifier uses score-first source-neutral output.**
    - Decision: The model returns `interest_level`, `interest_score`,
-     `consumption_depth`, `depth_score`, `signals`, and `reason`.
+     `consumption_depth`, `depth_score`, `signals`, `reason`, and an opaque
+     `classifier_item_id` used only to reconcile batched outputs.
    - Decision: `interest_score` and `depth_score` are the continuous calibration
      values; `interest_level` and `consumption_depth` are labels derived from
-     configured score bands. Application validation SHALL reject, quarantine, or
-     normalize inconsistent score/label pairs according to the configured policy.
+     configured, gap-free score bands. Application validation SHALL reject,
+     quarantine, or normalize inconsistent score/label pairs according to the
+     configured policy.
    - Rationale: Scores preserve near-boundary information for queue ordering,
      feedback review, blind validation, threshold tuning, and profile/prompt
      updates. Labels give routing code stable categories without scattering
@@ -85,8 +87,8 @@ the classifier output.
    - Decision: Configure provider and model ids outside parser and routing code.
    - Decision: The classifier runtime SHALL support configurable batch size.
      Batch size may default to `1` while validation is immature, but larger
-     batches are the planned cost/latency control once per-item validation and
-     quarantine behavior are stable.
+     batches are the planned cost/latency control once per-item validation,
+     source-neutral item-id reconciliation, and quarantine behavior are stable.
    - Rationale: Runtime scoring provider and implementation provider are separate
      choices. Batching reduces repeated profile/instruction tokens and request
      overhead; single-item calls reduce retry/quarantine blast radius while the
@@ -137,7 +139,8 @@ the classifier output.
   invalid outputs to review.
 - [Risk] Larger classifier batches can make one malformed model output affect
   several items. -> Mitigation: keep batch size configurable, start with small
-  batches if needed, validate each returned record independently, and quarantine
+  batches if needed, validate each returned record independently, reconcile by
+  source-neutral classifier item ids instead of array position, and quarantine
   only the records or batch whose output cannot be reconciled to the input.
 - [Risk] Feedback labels can contain private context. -> Mitigation: keep
   sensitive freeform notes out of public files and use sanitized labels or review
