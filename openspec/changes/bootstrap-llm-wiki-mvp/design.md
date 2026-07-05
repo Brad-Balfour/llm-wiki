@@ -1,10 +1,8 @@
 ## Context
 
-The implementation repo is the public project surface. The parent
-`/Users/brad/Documents/GitHub/llm-wiki` folder remains the exploration archive
-and private planning source. The repo already has OpenSpec initialized for
-Codex, GitHub Copilot, and Claude Code, but this change is the first real
-OpenSpec proposal pass for the MVP.
+The implementation repo is the public project surface. A separate local exploration archive remains private and is not part of this repository.
+
+The repo already has OpenSpec initialized for Codex, GitHub Copilot, and Claude Code, but this change is the first real OpenSpec proposal pass for the MVP.
 
 The planning sources converge on a TLDR-only first milestone. Claude's v1.3
 interest profile is the relevance base for production v1.4. The v1.4 profile
