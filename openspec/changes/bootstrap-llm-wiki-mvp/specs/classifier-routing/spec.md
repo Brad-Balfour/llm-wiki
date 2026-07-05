@@ -28,16 +28,43 @@ into distinct schema files.
 
 ### Requirement: Source-Neutral Classifier Output
 
-The classifier SHALL emit only interest and depth classification fields.
+The classifier SHALL emit only a source-neutral request reference plus interest
+and depth classification fields.
 
 #### Scenario: Accept valid classification output
 
 - **WHEN** the classifier returns a result for a parsed TLDR item
-- **THEN** the result SHALL include exactly one `interest_level` of
+- **THEN** the result SHALL include a source-neutral `classifier_item_id` that
+  matches one input item for the classifier call
+- **AND** the result SHALL include exactly one `interest_level` of
   `interested`, `maybe`, or `uninterested`
 - **AND** the result SHALL include `interest_score`, `consumption_depth`,
   `depth_score`, `signals`, and `reason`
 - **AND** `consumption_depth` SHALL be `headline_only` or `in_depth`.
+
+#### Scenario: Use score-first labels
+
+- **WHEN** classifier output is validated
+- **THEN** `interest_score` and `depth_score` SHALL be treated as continuous
+  calibration values
+- **AND** `interest_level` and `consumption_depth` SHALL be derived from
+  configured score bands or validated for consistency with those bands
+- **AND** configured score bands SHALL be gap-free numeric comparisons, using
+  half-open thresholds where ranges meet unless score precision is explicitly
+  constrained before validation
+- **AND** inconsistent score/label pairs SHALL be rejected, quarantined, or
+  normalized according to the configured validation policy before routing.
+
+#### Scenario: Return one record per item
+
+- **WHEN** the runtime classifies a batch of parsed TLDR items
+- **THEN** the classifier result SHALL contain one classification record per
+  input item
+- **AND** each record SHALL include the matching source-neutral
+  `classifier_item_id`
+- **AND** application validation SHALL verify that output ids are complete,
+  unique, and known before reconciling records to the input items
+- **AND** each record SHALL be validated independently before routing.
 
 #### Scenario: Reject downstream behavior fields
 
@@ -95,6 +122,15 @@ The classifier runtime SHALL keep provider and model selection in configuration.
 - **AND** parser, routing, queue, feedback, and wiki compile logic SHALL NOT
   hard-code a single LLM provider.
 
+#### Scenario: Configure classifier batch size
+
+- **WHEN** the MVP runs classification
+- **THEN** classifier batch size SHALL be supplied by configuration or explicit
+  runtime options
+- **AND** batch size `1` SHALL remain valid for early correctness testing
+- **AND** larger batch sizes SHALL be supported as a cost and latency control
+  once validation and quarantine behavior are stable.
+
 ### Requirement: Product-Harm Metrics
 
 Classifier evaluation SHALL prioritize product harm as well as exact label
@@ -105,5 +141,8 @@ match.
 - **WHEN** fixed predictions are compared with Brad's blind labels
 - **THEN** misses SHALL be categorized at least as false skips, false discusses,
   pacing errors, and lower-harm label disagreements
-- **AND** false skips SHALL be treated as the highest-priority product harm.
-
+- **AND** false skips SHALL be treated as the highest-priority product harm
+- **AND** analysis SHALL use original `interest_score` and `depth_score` values
+  to distinguish near-boundary disagreements from high-confidence misses
+- **AND** score distributions SHALL be available for future threshold tuning
+  without regenerating the original predictions.

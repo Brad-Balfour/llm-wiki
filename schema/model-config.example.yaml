@@ -1,0 +1,46 @@
+# Example only. Copy to an untracked local config path or pass equivalent runtime
+# options. Keep API keys in environment variables or secret stores, never here.
+version: 1
+
+profile:
+  version: "1.4"
+  path: "schema/interest-profile.md"
+
+classifier:
+  prompt_version: "classifier-instructions.v1"
+  instructions_path: "schema/classifier-instructions.md"
+  provider: "replace-with-provider"
+  model: "replace-with-provider-model-id"
+  temperature: 0
+  max_output_tokens: 1200
+  timeout_seconds: 60
+  retries: 1
+  structured_output: true
+  batch_size: 1
+  thresholds:
+    interest:
+      maybe_min: 0.60
+      interested_min: 0.80
+    depth:
+      in_depth_min: 0.60
+
+providers:
+  anthropic:
+    api_key_env: "ANTHROPIC_API_KEY"
+  openai:
+    api_key_env: "OPENAI_API_KEY"
+
+shadow_classification:
+  enabled: false
+  provider: "replace-with-provider"
+  model: "replace-with-provider-model-id"
+
+routing:
+  rules_version: "routing-rules.v1"
+  rules_path: "schema/routing-rules.md"
+
+paths:
+  sources_dir: "sources"
+  queues_dir: "queues"
+  wiki_dir: "wiki"
+  feedback_dir: "feedback"

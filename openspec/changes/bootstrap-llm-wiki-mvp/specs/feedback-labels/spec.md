@@ -11,10 +11,11 @@ rewriting the canonical profile after every correction.
 
 - **WHEN** Brad corrects an item's interest, depth, or route
 - **THEN** the system SHALL append a structured feedback label
-- **AND** the label SHALL include source item id, correction type, corrected
-  interest where applicable, corrected depth where applicable, corrected route
-  where applicable, reason, timestamp, profile version, prompt version, provider,
-  and model.
+- **AND** the label SHALL include source item id, correction type, original
+  predicted interest, original interest score, original predicted depth, original
+  depth score, corrected interest where applicable, corrected depth where
+  applicable, corrected route where applicable, reason, timestamp, profile
+  version, prompt version, provider, and model.
 
 ### Requirement: Distinct Correction Types
 
@@ -60,7 +61,9 @@ mutating the canonical profile immediately.
 - **THEN** selected corrections SHALL be available as examples or lightweight
   routing overrides
 - **AND** the underlying labels SHALL remain preserved for audit and profile
-  review.
+  review
+- **AND** original scores SHALL remain available to distinguish boundary
+  corrections from high-confidence misses.
 
 ### Requirement: Blind Validation Workflow
 
@@ -71,6 +74,8 @@ Validation labels SHALL be collected without exposing predictions to Brad.
 - **WHEN** predictions are generated for a future TLDR holdout batch
 - **THEN** predictions SHALL be saved to a fixed file before Brad labels the
   batch
+- **AND** the saved predictions SHALL include interest and depth scores as well
+  as derived labels
 - **AND** the label collection workflow SHALL NOT expose those predictions.
 
 #### Scenario: Protect July 3 plus holdout
@@ -92,7 +97,9 @@ Feedback review SHALL analyze corrections by product harm.
 - **THEN** the summary SHALL identify false skips, false discusses, pacing
   errors, and lower-harm disagreements
 - **AND** false skips SHALL receive the highest priority for profile or prompt
-  adjustment.
+  adjustment
+- **AND** score distance from the configured threshold SHALL be used to separate
+  near-boundary misses from high-confidence product-harm misses.
 
 ### Requirement: Sensitive Feedback Handling
 
@@ -105,4 +112,3 @@ Feedback storage SHALL avoid committing sensitive or private content.
 - **THEN** the sensitive content SHALL be kept out of public committed files
 - **AND** a sanitized label or review placeholder SHALL be used when a public
   artifact needs to reference the correction.
-
