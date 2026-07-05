@@ -126,6 +126,24 @@ the classifier output.
    - Alternative considered: build an Astro/Cloudflare review app now. Rejected
      as too much surface area for the TLDR MVP.
 
+9. **Use tests and independent pre-PR review as implementation gates.**
+   - Decision: For deterministic parser, validation, routing, queue, feedback,
+     and compiler behavior, implementation PRs SHOULD start from focused tests
+     or add tests alongside the production code when strict test-first sequencing
+     is not practical.
+   - Decision: Before opening or updating a PR for review, run the relevant
+     local checks and then run an independent review of the diff and OpenSpec
+     requirements using a separate Codex subagent or local Claude.
+   - Decision: GitHub Codex/Copilot review is the external PR review layer, not
+     the first review pass.
+   - Rationale: The project is prompt- and data-contract-heavy, so many failures
+     are integration or contract drift failures. Focused tests catch deterministic
+     behavior regressions, while a separate reviewer catches requirement misses
+     before the PR review cycle.
+   - Alternative considered: rely on GitHub Codex review after PR creation.
+     Rejected because review comments then become the first quality gate instead
+     of a final check.
+
 ## Risks / Trade-offs
 
 - [Risk] Manual Gmail connector steps are slower than automation. -> Mitigation:
@@ -150,6 +168,9 @@ the classifier output.
   unless Brad explicitly changes the plan.
 - [Risk] GitHub Pages publication can expose material too early. -> Mitigation:
   require approved source records and public-promotion review before compilation.
+- [Risk] GitHub PR review can catch avoidable issues late. -> Mitigation: require
+  local checks plus an independent Codex subagent or local Claude review before
+  opening the PR or requesting GitHub Codex review.
 
 ## Migration Plan
 
@@ -161,7 +182,9 @@ the classifier output.
 4. Use one prepared queue in a real car session or equivalent manual voice test.
 5. Record at least one correction label.
 6. Compile at least one approved source into the wiki.
-7. Configure GitHub Pages and manual CI only after local tests pass.
+7. Run local checks and an independent pre-PR review before opening or updating
+   each implementation PR for GitHub review.
+8. Configure GitHub Pages and manual CI only after local tests pass.
 
 Rollback is file-based: keep source records immutable, keep generated queues and
 wiki output reviewable, and revert generated output or route questionable items

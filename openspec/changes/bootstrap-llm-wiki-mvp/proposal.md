@@ -24,6 +24,9 @@ archive or superseded assumptions into the public implementation repo.
   GitHub Pages read path.
 - Preserve July 3, 2026 and later TLDR emails as the next clean validation
   holdout unless Brad explicitly changes that decision.
+- Require focused tests where behavior is deterministic and an independent
+  pre-PR review by a Codex subagent or local Claude before requesting GitHub
+  Codex review.
 - Defer RSS, YouTube, Cloudflare Workers, review UI, unattended Gmail automation,
   daily dual-provider ensembles, and custom Realtime voice.
 
@@ -55,9 +58,10 @@ None. This is the first OpenSpec proposal pass for the implementation repo.
 - Affects future TypeScript/Node application code for TLDR parsing,
   classification, routing, queues, feedback, and wiki compilation.
 - Adds no application code in this proposal pass.
+- Adds a quality gate for future implementation PRs: local checks, focused
+  tests/TDD where appropriate, and independent review before GitHub PR review.
 - Establishes privacy and safety constraints for public repo content: no API
   keys, raw Gmail bodies, private Range.com notes, sensitive voice-note content,
   or unreviewed public promotion.
 - Sets `openspec/changes/bootstrap-llm-wiki-mvp/` as the active planning contract
   until the change is implemented and archived.
-

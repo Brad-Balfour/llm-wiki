@@ -11,7 +11,7 @@
 - [ ] 2.1 Add the TypeScript/Node project files needed for scripts, source modules, tests, linting, and formatting.
 - [ ] 2.2 Record the Node runtime decision, defaulting to Node 24 unless the Phase 0 check promotes Node 26.
 - [ ] 2.3 Add CI-oriented npm scripts for install, test, build or compile, lint, and format.
-- [ ] 2.4 Add tests that verify parser output shape, classifier schema validation, rejected downstream behavior fields, and routing derivation.
+- [ ] 2.4 Add focused tests, preferably before or alongside production code, that verify parser output shape, classifier schema validation, rejected downstream behavior fields, and routing derivation.
 
 ## 3. TLDR Ingestion
 
@@ -64,3 +64,11 @@
 - [ ] 8.3 Enable scheduled nightly compile only after manual workflow runs are stable.
 - [ ] 8.4 Keep secrets in GitHub Actions configuration only, never in committed files.
 - [ ] 8.5 Keep RSS, YouTube, Cloudflare Workers, review UI, unattended Gmail automation, custom Realtime voice, and daily dual-provider ensembles deferred unless a later OpenSpec change promotes them.
+
+## 9. Implementation Quality Gate
+
+- [ ] 9.1 For each code-bearing implementation PR, write or update focused tests before or alongside production code when the behavior is deterministic and reasonably testable.
+- [ ] 9.2 Run the relevant local checks before PR creation or PR update, including tests, lint, format, build or compile, OpenSpec validation, and schema/fixture validation where applicable.
+- [ ] 9.3 Run an independent pre-PR review against the diff and OpenSpec requirements using either a separate Codex subagent or a local Claude review before requesting GitHub Codex review.
+- [ ] 9.4 Address material independent-review findings or document why they are intentionally deferred before opening the PR or requesting GitHub Codex review.
+- [ ] 9.5 Request GitHub Codex/Copilot review only after local checks and independent pre-PR review are complete.
