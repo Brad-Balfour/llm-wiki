@@ -1,0 +1,38 @@
+{
+  "name": "llm-wiki",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Personal LLM knowledge base and TLDR ingestion pipeline.",
+  "engines": {
+    "node": ">=24 <26",
+    "npm": ">=11"
+  },
+  "packageManager": "npm@11.6.1",
+  "scripts": {
+    "ci:install": "npm ci --prefer-offline --no-audit --no-fund",
+    "build": "tsc -p tsconfig.json",
+    "ci:build": "npm run build",
+    "compile": "npm run build",
+    "test": "npm run build && node --test dist/tests/*.test.js",
+    "ci:test": "npm run test",
+    "lint": "eslint .",
+    "ci:lint": "npm run lint",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write package.json tsconfig.json eslint.config.mjs .prettierrc README.md docs/runtime.md \"src/**/*.ts\" \"tests/**/*.ts\" \"tests/fixtures/**/*.json\"",
+    "format:check": "prettier --check package.json tsconfig.json eslint.config.mjs .prettierrc README.md docs/runtime.md \"src/**/*.ts\" \"tests/**/*.ts\" \"tests/fixtures/**/*.json\"",
+    "format:write": "npm run format",
+    "check": "npm run test && npm run lint && npm run format:check"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.1",
+    "@typescript-eslint/eslint-plugin": "^8.46.1",
+    "@typescript-eslint/parser": "^8.46.1",
+    "@types/node": "^24.0.10",
+    "eslint": "^9.39.1",
+    "eslint-config-prettier": "^10.1.8",
+    "globals": "^16.5.0",
+    "prettier": "^3.6.2",
+    "typescript": "^5.9.3"
+  }
+}

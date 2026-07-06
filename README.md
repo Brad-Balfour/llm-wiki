@@ -11,8 +11,29 @@ Phase 0 is in progress:
 
 - OpenSpec has been initialized for Codex, GitHub Copilot, and Claude Code.
 - The first OpenSpec change is `bootstrap-llm-wiki-mvp`.
-- No production ingest, classification, or compilation code has been implemented
-  yet.
+- The TypeScript/Node runtime skeleton is initialized with focused parser-output
+  contract, classifier-validation, and routing tests.
+- End-to-end TLDR ingestion, live LLM classification, queue generation, feedback
+  handling, and wiki compilation are not implemented yet.
+
+## Development
+
+Use Node 24 with npm 11. The runtime decision is recorded in `docs/runtime.md`,
+`.nvmrc`, `.node-version`, and `package.json`.
+
+Project tooling should borrow practical conventions from the local sibling repos
+`../bradbalfour-dot-com` and `../bradbalfour-photography` where they fit this
+Node/TLDR project. Avoid copying frontend-, Astro-, Playwright-, Cloudflare-, or
+browser-specific configuration unless a later OpenSpec change introduces that
+surface area.
+
+Common checks:
+
+```bash
+npm run ci:install
+npm run check
+openspec validate bootstrap-llm-wiki-mvp --type change --strict
+```
 
 ## MVP Direction
 

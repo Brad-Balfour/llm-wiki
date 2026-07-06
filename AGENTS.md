@@ -27,6 +27,13 @@ the active planning contract until the change is archived.
   it to review instead of publishing it automatically.
 - Use TypeScript/Node for MVP implementation unless an OpenSpec design update
   records a different decision.
+- When adding or revising runtime tooling, scripts, linting, formatting,
+  TypeScript options, ignore rules, or repo workflow conventions, first check
+  the sibling repos `../bradbalfour-dot-com` and
+  `../bradbalfour-photography` and borrow applicable patterns. Keep the borrowed
+  pieces practical for this repo; do not import frontend-, Astro-, Playwright-,
+  Cloudflare-, or browser-specific configuration unless a later OpenSpec change
+  introduces that surface area.
 - Prefer small, fixture-backed changes. Add or update tests when changing parser,
   classifier schema, routing, queue, feedback, or OKF compilation behavior.
 
@@ -37,6 +44,9 @@ the active planning contract until the change is archived.
 - Runtime stack: TypeScript/Node.
 - Default Node target: research Node 26 during Phase 0, but default to Node 24
   while Node 26 is still Current rather than Active LTS.
+- Tooling convention source: borrow practical Node/TypeScript, npm script,
+  ESLint, Prettier, TypeScript, and ignore-file patterns from local sibling repos
+  `../bradbalfour-dot-com` and `../bradbalfour-photography`.
 - Read path: GitHub Pages for MVP.
 - Cloudflare: deferred until review/admin UI or Workers are needed.
 

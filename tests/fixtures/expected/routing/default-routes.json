@@ -1,0 +1,87 @@
+[
+  {
+    "case": "uninterested/headline_only",
+    "classification": {
+      "interest_level": "uninterested",
+      "interest_score": 0.2,
+      "consumption_depth": "headline_only",
+      "depth_score": 0.2
+    },
+    "route": {
+      "route_version": "routing-rules.v1",
+      "commute_behavior": "skip",
+      "wiki_behavior": "discard",
+      "stream_log": "none",
+      "review": "none",
+      "discard": true
+    }
+  },
+  {
+    "case": "interested/headline_only",
+    "classification": {
+      "interest_level": "interested",
+      "interest_score": 0.84,
+      "consumption_depth": "headline_only",
+      "depth_score": 0.35
+    },
+    "route": {
+      "route_version": "routing-rules.v1",
+      "commute_behavior": "quick_read",
+      "wiki_behavior": "stream_log_only",
+      "stream_log": "write",
+      "review": "none",
+      "discard": false
+    }
+  },
+  {
+    "case": "interested/in_depth",
+    "classification": {
+      "interest_level": "interested",
+      "interest_score": 0.92,
+      "consumption_depth": "in_depth",
+      "depth_score": 0.76
+    },
+    "route": {
+      "route_version": "routing-rules.v1",
+      "commute_behavior": "discuss",
+      "wiki_behavior": "full_source_candidate",
+      "stream_log": "optional_summary",
+      "review": "none",
+      "discard": false
+    }
+  },
+  {
+    "case": "maybe/headline_only",
+    "classification": {
+      "interest_level": "maybe",
+      "interest_score": 0.67,
+      "consumption_depth": "headline_only",
+      "depth_score": 0.32
+    },
+    "route": {
+      "route_version": "routing-rules.v1",
+      "commute_behavior": "optional_quick_read",
+      "wiki_behavior": "stream_log_or_review",
+      "stream_log": "candidate_after_review",
+      "review": "classification_boundary",
+      "discard": false
+    }
+  },
+  {
+    "case": "maybe/in_depth",
+    "classification": {
+      "interest_level": "maybe",
+      "interest_score": 0.72,
+      "consumption_depth": "in_depth",
+      "depth_score": 0.7
+    },
+    "route": {
+      "route_version": "routing-rules.v1",
+      "commute_behavior": "optional_discuss_or_teaser",
+      "wiki_behavior": "review_required",
+      "stream_log": "none",
+      "review": "classification_boundary",
+      "discard": false
+    }
+  }
+]
