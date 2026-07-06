@@ -1,9 +1,34 @@
-.DS_Store
+# Node.js
+node_modules/
+
+# Build outputs
+dist/
+build/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Env files
 .env
 .env.*
 !.env.example
-node_modules/
-dist/
+
+# Coverage / test artifacts
 coverage/
+test-results/
 .cache/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+*.swp
+*.tmp
+.vscode/
+.idea/
+
+# Temp files
 .tmp/

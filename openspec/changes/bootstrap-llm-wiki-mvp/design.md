@@ -144,6 +144,22 @@ the classifier output.
      Rejected because review comments then become the first quality gate instead
      of a final check.
 
+10. **Borrow local repo conventions where practical.**
+   - Decision: When adding or revising implementation tooling, scripts, linting,
+     formatting, TypeScript settings, ignore rules, and repository workflow
+     conventions, prefer applicable patterns already used by the local sibling
+     repos `../bradbalfour-dot-com` and `../bradbalfour-photography`.
+   - Decision: Apply those conventions selectively. Keep this repo Node/TLDR
+     focused and do not import Astro, browser, Playwright, Cloudflare, image
+     pipeline, or other frontend-specific configuration unless a later OpenSpec
+     change promotes that surface area.
+   - Rationale: The sibling repos encode Brad's current working conventions for
+     JavaScript/TypeScript project maintenance. Reusing those patterns reduces
+     friction and avoids inventing a different house style for this project.
+   - Alternative considered: choose fresh defaults independently for `llm-wiki`.
+     Rejected because it creates needless inconsistency across Brad's local
+     projects.
+
 ## Risks / Trade-offs
 
 - [Risk] Manual Gmail connector steps are slower than automation. -> Mitigation:
@@ -178,13 +194,15 @@ the classifier output.
    directories.
 2. Implement parser, batch-capable classifier validation, routing, queue,
    feedback, and wiki compile behavior against fixtures.
-3. Run one real TLDR email end to end locally.
-4. Use one prepared queue in a real car session or equivalent manual voice test.
-5. Record at least one correction label.
-6. Compile at least one approved source into the wiki.
-7. Run local checks and an independent pre-PR review before opening or updating
+3. Reuse applicable local repo conventions from `../bradbalfour-dot-com` and
+   `../bradbalfour-photography` when adding or changing project tooling.
+4. Run one real TLDR email end to end locally.
+5. Use one prepared queue in a real car session or equivalent manual voice test.
+6. Record at least one correction label.
+7. Compile at least one approved source into the wiki.
+8. Run local checks and an independent pre-PR review before opening or updating
    each implementation PR for GitHub review.
-8. Configure GitHub Pages and manual CI only after local tests pass.
+9. Configure GitHub Pages and manual CI only after local tests pass.
 
 Rollback is file-based: keep source records immutable, keep generated queues and
 wiki output reviewable, and revert generated output or route questionable items

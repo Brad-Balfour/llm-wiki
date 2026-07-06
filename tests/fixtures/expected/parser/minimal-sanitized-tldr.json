@@ -1,0 +1,24 @@
+[
+  {
+    "source_item_id": "tldr_dcc750fbba35f0d8",
+    "newsletter": "TLDR AI",
+    "edition_date": "2026-07-02",
+    "section": "AI",
+    "title": "OpenAI adds evaluation hooks for agents",
+    "summary": "OpenAI released new evaluation hooks for agent workflows, with examples for scoring tool-use reliability before deployment.",
+    "url": "https://example.com/tldr/openai-agent-evals",
+    "extracted_at": "2026-07-06T00:00:00.000Z",
+    "parser_version": "tldr-parser.v1"
+  },
+  {
+    "source_item_id": "tldr_bfef4ae1e3df2643",
+    "newsletter": "TLDR AI",
+    "edition_date": "2026-07-02",
+    "section": "AI",
+    "title": "Smartphone maker previews a minor camera update",
+    "summary": "A device launch added a modest camera mode that is useful awareness but unlikely to need deeper follow-up.",
+    "url": "https://example.com/tldr/minor-camera-update",
+    "extracted_at": "2026-07-06T00:00:00.000Z",
+    "parser_version": "tldr-parser.v1"
+  }
+]

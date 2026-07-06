@@ -8,10 +8,10 @@
 
 ## 2. Project Runtime Setup
 
-- [ ] 2.1 Add the TypeScript/Node project files needed for scripts, source modules, tests, linting, and formatting.
-- [ ] 2.2 Record the Node runtime decision, defaulting to Node 24 unless the Phase 0 check promotes Node 26.
-- [ ] 2.3 Add CI-oriented npm scripts for install, test, build or compile, lint, and format.
-- [ ] 2.4 Add focused tests, preferably before or alongside production code, that verify parser output shape, classifier schema validation, rejected downstream behavior fields, and routing derivation.
+- [x] 2.1 Add the TypeScript/Node project files needed for scripts, source modules, tests, linting, and formatting.
+- [x] 2.2 Record the Node runtime decision, defaulting to Node 24 unless the Phase 0 check promotes Node 26.
+- [x] 2.3 Add CI-oriented npm scripts for install, test, build or compile, lint, and format.
+- [x] 2.4 Add focused tests, preferably before or alongside production code, that verify parser output shape, classifier schema validation, rejected downstream behavior fields, and routing derivation.
 
 ## 3. TLDR Ingestion
 
