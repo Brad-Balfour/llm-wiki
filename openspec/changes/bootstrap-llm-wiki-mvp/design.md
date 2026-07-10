@@ -98,14 +98,19 @@ the classifier output.
      complexity before product value is proven.
 
 6. **Start with prepared commute queue, not custom voice.**
-   - Decision: Generate a queue that Brad can use manually with ChatGPT, Claude,
-     or equivalent voice review.
+   - Decision: Generate a sanitized queue that Brad can use manually with
+     ChatGPT Voice, preferring GPT Live when it is available to the current
+     consumer account, Claude, or an equivalent voice workflow. The first car
+     validation SHALL work with a Tesla Model 3 phone-based workflow and SHALL
+     not assume a specific in-dash integration.
    - Rationale: The product question is whether classified TLDR items and
-     deliberate notes are useful in the car. Custom realtime voice is a later
-     integration question.
+     deliberate notes are useful in the car. GPT Live improves the manual
+     ChatGPT experience, but its API is not an MVP dependency; custom realtime
+     voice remains a later integration question.
    - Alternative considered: build a custom realtime agent immediately. Rejected
      because it adds API, latency, turn-taking, tool-call, and privacy complexity
-     before the queue proves useful.
+     before the queue proves useful. Reconsider a GPT Live API integration only
+     in a later OpenSpec change after its public API contract is available.
 
 7. **Store feedback labels as data.**
    - Decision: Corrections append structured labels with source id, original

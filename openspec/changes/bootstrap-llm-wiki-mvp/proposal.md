@@ -16,8 +16,9 @@ archive or superseded assumptions into the public implementation repo.
   classification, never downstream behavior such as `voice_behavior`.
 - Derive commute, wiki, stream-log, review, and discard behavior in application
   routing code.
-- Generate a prepared commute queue for manual ChatGPT/Claude voice review before
-  any custom Realtime voice agent.
+- Generate a prepared, sanitized commute queue for manual ChatGPT Voice
+  (prefer GPT Live when available), Claude, or equivalent review before any
+  custom voice agent.
 - Store feedback corrections as labels and use cadenced profile patches instead
   of rewriting the profile from each correction.
 - Compile approved source material into OKF-style markdown with provenance and a
@@ -28,7 +29,7 @@ archive or superseded assumptions into the public implementation repo.
   pre-PR review by a Codex subagent or local Claude before requesting GitHub
   Codex review.
 - Defer RSS, YouTube, Cloudflare Workers, review UI, unattended Gmail automation,
-  daily dual-provider ensembles, and custom Realtime voice.
+  daily dual-provider ensembles, and custom Realtime or GPT Live API voice.
 
 ## Capabilities
 

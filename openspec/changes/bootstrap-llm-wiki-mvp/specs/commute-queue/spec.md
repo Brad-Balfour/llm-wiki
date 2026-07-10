@@ -44,15 +44,35 @@ The queue SHALL make quick-read awareness items distinct from discussion items.
 
 ### Requirement: Manual Voice Review First
 
-The MVP SHALL use manual ChatGPT or Claude voice review before custom realtime
-voice infrastructure.
+The MVP SHALL use manually initiated ChatGPT Voice, preferring GPT Live when it
+is available to the current consumer account, Claude, or an equivalent voice
+workflow before custom voice infrastructure. GPT Live SHALL be treated as a
+ChatGPT surface enhancement, not as an available API dependency.
 
 #### Scenario: Use queue in manual voice session
 
-- **WHEN** Brad uses ChatGPT, Claude, or an equivalent manual voice workflow with
-  a prepared commute queue
+- **WHEN** Brad uses ChatGPT Voice, Claude, or an equivalent manual voice
+  workflow with a prepared commute queue
 - **THEN** the queue SHALL provide the input for quick reads and discussion
-- **AND** the MVP SHALL NOT require a custom Realtime API agent for completion.
+- **AND** the queue SHALL be loaded manually as sanitized conversation input
+  before the session rather than retrieved from the repository or a connected
+  application
+- **AND** the MVP SHALL NOT require a custom Realtime or GPT Live API agent for
+  completion.
+
+### Requirement: Tesla-Compatible Voice Validation
+
+The first real-car validation SHALL work with a Tesla Model 3 through the
+phone-based workflow selected for the test. It SHALL NOT assume a particular
+in-dash integration.
+
+#### Scenario: Prepare a car session
+
+- **WHEN** Brad prepares a real-car voice validation session
+- **THEN** the selected phone-based workflow and queue SHALL be ready before the
+  vehicle is in motion
+- **AND** the test record SHALL identify the selected voice surface without
+  storing raw audio or a full conversation transcript in the repository.
 
 ### Requirement: Voice Notes Route To Review
 
@@ -77,5 +97,6 @@ The MVP SHALL record that at least one prepared queue was used.
 - **WHEN** Brad completes a real car session or equivalent manual voice test
   with a prepared queue
 - **THEN** the project SHALL record the queue date, source batch, and any
-  corrections or notes produced by the session
+  corrections or notes produced by the session, plus the selected voice surface
+  and any material interruption or recognition issue
 - **AND** those corrections SHALL be stored as feedback labels or review notes.
