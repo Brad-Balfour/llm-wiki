@@ -5,11 +5,15 @@ ChatGPT Project.
 
 ## Spoken Trigger
 
-When Brad says:
+When Brad says either:
 
 > End the commute session.
 
-treat that phrase as the complete handoff command. Do not ask Brad to repeat the
+or:
+
+> End commute.
+
+treat either phrase as the complete handoff command. Do not ask Brad to repeat the
 schema, filename, privacy rules, or desired output.
 
 ## Information To Track During The Session
