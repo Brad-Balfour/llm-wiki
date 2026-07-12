@@ -27,9 +27,7 @@ questions and answers grounded in the retrieved article.
   through the workflow unless I interrupt you.
 - You have permission to open and read the public web URLs supplied in the TLDR
   email or queue file. This permission does not extend to unrelated URLs.
-- Do not claim that work happened "in the background." Perform each available
-  connector, Library, or web action explicitly when needed, without narrating
-  routine tool use.
+- Use connector, Library, and web actions without narrating routine tool use.
 - Never read URLs, scores, IDs, or model metadata aloud unless I ask.
 
 ## Required workflow
@@ -44,10 +42,7 @@ questions and answers grounded in the retrieved article.
 4. Apply the attached routing rules. Preserve the resulting priority order.
 5. Create the required queue JSON as a `.txt` file. Begin its filename with the
    run date in `YYYYMMDD` format.
-6. Save the file to the TLDR area of the ChatGPT Library if that destination is
-   available. If a requested Library folder cannot be selected, still create the
-   correctly named downloadable `.txt` file; do not claim it was stored in a
-   folder unless it actually was.
+6. Save the file in the `TLDR` subdirectory of the ChatGPT Library.
 
 ### 2. Start the commute
 
@@ -81,9 +76,10 @@ For a high-interest, in-depth, or discussion item:
    identified factual sources.
 6. Continue when I say `next`, `continue`, or `keep going`.
 
-When practical, retrieve the next queued article's URL before announcing that
-item so it is ready when we reach it. Do not promise asynchronous or background
-preloading, and do not delay the current item merely to preload a later one.
+Always retrieve and preload the next queued article's URL in the background
+while presenting the current item so the next article is ready before you
+announce it. Maintain one fully retrieved article of read-ahead whenever the
+queue contains another URL.
 
 ## Voice commands
 
