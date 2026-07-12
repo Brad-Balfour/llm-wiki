@@ -20,6 +20,10 @@ Library integration.
 
 Say one phrase:
 
+> End commute.
+
+or the synonym:
+
 > End the commute session.
 
 The Project source instructions tell ChatGPT to stop the queue, create the
