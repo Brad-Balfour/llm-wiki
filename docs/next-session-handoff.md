@@ -7,29 +7,28 @@ Date: 2026-07-12
 - Work is on branch `bootstrap-tldr-ingestion`.
 - The active OpenSpec change remains `bootstrap-llm-wiki-mvp`.
 - Schema foundation, runtime setup, and TLDR ingestion tasks are implemented.
-- The current dirty working tree contains the TLDR ingestion implementation plus
-  the incremental ChatGPT Voice replan, commute-handoff importer, and OKF/Pages
-  scaffold. Preserve all of it; do not discard or reset unrelated changes.
+- The TLDR ingestion implementation, incremental ChatGPT Voice replan,
+  commute-handoff importer, and OKF/Pages scaffold are committed as `e0ddb5a`.
 - The manual ChatGPT Project workflow has successfully used the Gmail connector
   to classify a TLDR newsletter, created a JSON queue in a `.txt` Library file,
   and played that queue in ChatGPT Voice.
 - The private `commute-handoff.v1` importer has passed a synthetic at-home dry
   run. The first real post-commute import is still pending.
-- The public GitHub Pages setting is not enabled, no approved source has been
-  compiled into a real wiki entry, and no changes from this pass have been
-  committed or pushed.
+- The approved-source compiler, provenance-preserving update behavior, and
+  compile-state tracking are implemented and fixture-tested. No real approved
+  source has been compiled yet.
+- The public GitHub Pages setting is not enabled.
 
 ## Current Priority
 
 1. Use the prepared queue and structured handoff in Monday's real commute.
 2. Download the generated `YYYYMMDD-tldr-commute-handoff.txt` at home and run
    `npm run import:commute-handoff -- --input <downloaded-file>`.
-3. Review and finish the current ingestion branch, then use the normal quality
-   gate before commit/PR work.
-4. Implement the minimum compiler path for one explicitly approved source,
-   including provenance and idempotence fixtures.
-5. Enable the GitHub Pages read path only after the local wiki output and branch
-   are reviewed.
+3. Use the normal quality gate to review and merge the current branch.
+4. Run the documented first real wiki ingestion test in
+   `docs/wiki-ingestion-test.md`.
+5. Enable the GitHub Pages read path only after the real local wiki output and
+   branch are reviewed.
 6. Resume provider-neutral classifier and deterministic queue automation after
    the Monday manual loop is proven.
 
@@ -39,8 +38,11 @@ Date: 2026-07-12
 - `docs/replan-2026-07-12.md`
 - `docs/commute-voice-handoff.md`
 - `schema/commute-handoff-v1.schema.json`
+- `schema/approved-wiki-source-v1.schema.json`
 - `src/commute/handoff.ts`
 - `src/commute/import-handoff.ts`
+- `src/wiki/`
+- `docs/wiki-ingestion-test.md`
 - `wiki/`
 - `index.md`
 - `_config.yml`
@@ -59,9 +61,12 @@ openspec validate bootstrap-llm-wiki-mvp --type change --strict
 npm run import:commute-handoff -- \
   --input tests/fixtures/commute/valid-handoff.txt \
   --output-dir /tmp/llm-wiki-handoff-dryrun-20260712
+npm run compile:wiki -- \
+  --repo-root /tmp/llm-wiki-compile-test-20260712b \
+  --input sources/tldr/2026-07-12-context-engineering.txt
 ```
 
-All checks passed. OpenSpec progress after the replan is 19/52 tasks complete;
+All checks passed. OpenSpec progress after the compiler block is 24/52 tasks complete;
 the real commute/import task remains pending.
 
 ## Guardrails
@@ -72,7 +77,7 @@ the real commute/import task remains pending.
   notes out of the public repo.
 - Treat ChatGPT-generated queues as a manual adapter, not classifier ground
   truth.
-- Do not mark compiler or public Pages tasks complete merely because the local
-  scaffold exists.
+- Do not mark the real-source ingestion or public Pages tasks complete merely
+  because the compiler and local scaffold exist.
 - Keep custom Realtime/GPT Live API voice, unattended Gmail, RSS, YouTube,
   Cloudflare Workers, review UI, and daily dual-provider scoring deferred.

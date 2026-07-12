@@ -7,9 +7,13 @@ created: YYYY-MM-DD
 updated: YYYY-MM-DD
 confidence: low
 provenance:
-  - source_item_id: 'stable-source-id'
-    source_path: 'sources/tldr/YYYY-MM-DD/source.json'
-    url: 'https://example.com/source'
+  [
+    {
+      'source_item_id': 'stable-source-id',
+      'source_path': 'sources/tldr/YYYY-MM-DD-source.txt',
+      'url': 'https://example.com/source',
+    },
+  ]
 ---
 
 # Entry title

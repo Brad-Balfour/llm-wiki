@@ -1,0 +1,31 @@
+{
+  "schema_version": "approved-wiki-source.v1",
+  "approval": {
+    "status": "approved",
+    "public": true,
+    "approved_at": "2026-07-13T16:00:00Z"
+  },
+  "source": {
+    "source_item_id": "tldr-dev-2026-07-13-context-debugging",
+    "source_path": "sources/tldr/2026-07-13-context-debugging.txt",
+    "source_type": "tldr",
+    "title": "Debugging agent context",
+    "url": "https://example.com/context-debugging",
+    "newsletter": "TLDR Dev",
+    "edition_date": "2026-07-13"
+  },
+  "entry": {
+    "type": "concept",
+    "slug": "context-engineering",
+    "title": "Context Engineering",
+    "aliases": ["context design"],
+    "tags": ["agents", "debugging"],
+    "confidence": "high",
+    "summary": "Context failures can be debugged by tracing what information was available at each agent decision.",
+    "key_ideas": [
+      "Inspect the context available at the moment of a failed decision.",
+      "Treat context assembly as observable application logic."
+    ],
+    "related": ["agent-observability"]
+  }
+}

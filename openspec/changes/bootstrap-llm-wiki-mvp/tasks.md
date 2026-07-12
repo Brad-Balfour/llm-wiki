@@ -64,11 +64,11 @@ of concept changes execution order without removing the automated runtime work:
 ## 7. Wiki Compilation
 
 - [x] 7.0 Create the review-safe `wiki/` index, taxonomy directories, and OKF entry template without claiming compiler completion.
-- [ ] 7.1 Compile approved full-source candidates into OKF-style markdown under `wiki/`.
-- [ ] 7.2 Require frontmatter with type, title, aliases or tags where applicable, created date, updated date, confidence, and provenance.
-- [ ] 7.3 Preserve prior sources when updating an existing wiki entry.
-- [ ] 7.4 Track processed source hashes and output state in the compile-state manifest.
-- [ ] 7.5 Add fixture tests for create, update, provenance, and idempotent compile behavior.
+- [x] 7.1 Compile approved full-source candidates into OKF-style markdown under `wiki/`.
+- [x] 7.2 Require frontmatter with type, title, aliases or tags where applicable, created date, updated date, confidence, and provenance.
+- [x] 7.3 Preserve prior sources when updating an existing wiki entry.
+- [x] 7.4 Track processed source hashes and output state in the compile-state manifest.
+- [x] 7.5 Add fixture tests for create, update, provenance, and idempotent compile behavior.
 
 ## 8. Read Path And Deferred Work
 

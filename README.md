@@ -17,10 +17,10 @@ Phase 0 is in progress:
   including manual Gmail connector handoff via confirmed body text.
 - A manual ChatGPT Project + Gmail connector + Library + Voice workflow has
   produced and played a real commute queue as a proof of concept.
-- The review-safe OKF wiki scaffold and private commute-handoff importer now
-  exist. Live repo-backed classification, deterministic queue generation,
-  feedback-label promotion, wiki compilation, and public Pages enablement are
-  not implemented yet.
+- The review-safe OKF wiki scaffold, private commute-handoff importer, and
+  approved-source wiki compiler now exist. Live repo-backed classification,
+  deterministic queue generation, feedback-label promotion, the first real
+  wiki compilation, and public Pages enablement are not complete yet.
 
 ## Development
 
@@ -61,6 +61,15 @@ npm run import:commute-handoff -- --input path/to/YYYYMMDD-tldr-commute-handoff.
 The normalized record is written under gitignored
 `.private/commute-handoffs/`. See `docs/commute-voice-handoff.md` for the Monday
 workflow and `docs/replan-2026-07-12.md` for the current implementation order.
+
+Compile one explicitly approved TLDR source into the OKF wiki:
+
+```bash
+npm run compile:wiki -- --input sources/tldr/YYYY-MM-DD-<entry-slug>.txt
+```
+
+See `docs/wiki-ingestion-test.md` for the ChatGPT Project preparation and review
+flow.
 
 ## MVP Direction
 
