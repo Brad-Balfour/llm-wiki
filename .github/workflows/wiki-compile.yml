@@ -1,0 +1,73 @@
+name: Compile approved wiki source
+
+on:
+  workflow_dispatch:
+    inputs:
+      source_path:
+        description: Repository path to an approved TLDR source record
+        required: true
+        type: string
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: wiki-compile
+  cancel-in-progress: false
+
+env:
+  NODE_VERSION: 24
+  SOURCE_PATH: ${{ inputs.source_path }}
+
+jobs:
+  compile:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v6
+        with:
+          ref: main
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+      - name: Install dependencies
+        run: npm run ci:install
+      - name: Run project checks
+        run: npm run check
+      - name: Validate source path
+        shell: bash
+        run: |
+          if [[ ! "$SOURCE_PATH" =~ ^sources/tldr/[A-Za-z0-9._/-]+$ ]]; then
+            echo "source_path must be a safe path under sources/tldr/" >&2
+            exit 1
+          fi
+          if [[ ! -f "$SOURCE_PATH" ]]; then
+            echo "Approved source does not exist: $SOURCE_PATH" >&2
+            exit 1
+          fi
+      - name: Compile approved source
+        run: npm run compile:wiki -- --input "$SOURCE_PATH"
+      - name: Commit generated wiki changes to a review branch
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git add schema/compile-state.json wiki/
+          if git diff --cached --quiet; then
+            echo "No wiki changes to commit."
+            exit 0
+          fi
+          branch_name="wiki/compile-${GITHUB_RUN_ID}"
+          git switch -c "$branch_name"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "wiki: compile $SOURCE_PATH"
+          git push --set-upstream origin "$branch_name"
+          gh pr create \
+            --base main \
+            --head "$branch_name" \
+            --title "wiki: compile ${SOURCE_PATH##*/}" \
+            --body "Compiles the explicitly approved source \`$SOURCE_PATH\`. Review the generated wiki entry and compile-state changes before merging."

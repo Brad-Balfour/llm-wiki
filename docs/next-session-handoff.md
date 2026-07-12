@@ -66,7 +66,7 @@ npm run compile:wiki -- \
   --input sources/tldr/2026-07-12-context-engineering.txt
 ```
 
-All checks passed. OpenSpec progress after the compiler block is 24/52 tasks complete;
+All checks passed. OpenSpec progress after the compiler/workflow block is 25/52 tasks complete;
 the real commute/import task remains pending.
 
 ## Guardrails

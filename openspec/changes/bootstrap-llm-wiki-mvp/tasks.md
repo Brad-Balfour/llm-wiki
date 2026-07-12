@@ -74,7 +74,7 @@ of concept changes execution order without removing the automated runtime work:
 
 - [x] 8.0 Add the local repository-backed Pages entry point and minimal Jekyll configuration; keep public enablement pending review.
 - [ ] 8.1 Configure GitHub Pages as the MVP read path for approved `wiki/` output.
-- [ ] 8.2 Add a manually triggered GitHub Actions workflow for tests and wiki compilation after application code exists.
+- [x] 8.2 Add a manually triggered GitHub Actions workflow for tests and wiki compilation after application code exists.
 - [ ] 8.3 Enable scheduled nightly compile only after manual workflow runs are stable.
 - [ ] 8.4 Keep secrets in GitHub Actions configuration only, never in committed files.
 - [ ] 8.5 Keep RSS, YouTube, Cloudflare Workers, review UI, unattended Gmail automation, custom Realtime voice, and daily dual-provider ensembles deferred unless a later OpenSpec change promotes them.

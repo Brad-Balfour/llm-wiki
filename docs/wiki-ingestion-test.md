@@ -44,6 +44,13 @@ Inspect the generated Markdown and `schema/compile-state.json` before committing
 anything. Re-running the unchanged source should print `skipped` and should not
 duplicate provenance.
 
+After the branch is merged, the same compilation can be run manually from the
+GitHub Actions workflow named **Compile approved wiki source**. Its
+`source_path` input must name an approved record already committed under
+`sources/tldr/`. The workflow opens a review PR containing the generated wiki
+and compile-state changes; it does not write directly to `main`. No scheduled
+compilation is enabled.
+
 ## Expected Review
 
 Confirm that:
