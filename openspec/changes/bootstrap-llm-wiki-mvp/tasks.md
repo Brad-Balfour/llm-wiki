@@ -78,7 +78,7 @@ of concept changes execution order without removing the automated runtime work:
 - [x] 8.0a Make the wiki landing and taxonomy indexes Jekyll-renderable at stable directory URLs and verify their frontmatter in tests.
 - [x] 8.0b Parse Jekyll configuration and Pages-visible Markdown frontmatter in the deterministic project checks, including compiler-compatible template provenance.
 - [x] 8.0c Exclude the entry template from public Pages output and taxonomy listings.
-- [ ] 8.1 Configure GitHub Pages as the MVP read path for approved `wiki/` output.
+- [x] 8.1 Configure GitHub Pages as the MVP read path for approved `wiki/` output.
 - [x] 8.2 Add a manually triggered GitHub Actions workflow for tests and wiki compilation after application code exists.
 - [ ] 8.3 Enable scheduled nightly compile only after manual workflow runs are stable.
 - [ ] 8.4 Keep secrets in GitHub Actions configuration only, never in committed files.
