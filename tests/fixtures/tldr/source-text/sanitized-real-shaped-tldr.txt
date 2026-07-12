@@ -1,0 +1,45 @@
+[Sign Up](https://tldr.tech/ai)
+|[Advertise](https://advertise.tldr.tech/)|[View Online](https://a.tldrnewsletter.com/web-version)
+
+TLDR
+
+Together With
+[Example Sponsor](https://example.com/sponsor)
+
+TLDR AI 2026-07-02
+
+[A primary sponsor block that should be ignored (Sponsor)](https://example.com/sponsor-primary)
+
+This sponsor paragraph should not become a source record.
+
+🚀
+
+Headlines & Launches
+
+[OpenAI adds evaluation hooks for agents (2 minute read)](https://tracking.tldrnewsletter.com/CL0/https:%2F%2Fexample.com%2Ftldr%2Fopenai-agent-evals%3Futm_source=tldrai/1/example-token)
+
+OpenAI released new evaluation hooks for agent workflows, with examples for scoring tool-use reliability before deployment.
+
+[A quick sponsor link that should be ignored (Sponsor)](https://example.com/sponsor-secondary)
+
+This quick-link sponsor paragraph should not become a source record.
+
+⚡
+
+Quick Links
+
+[Smartphone maker previews a minor camera update (3 minute read)](https://example.com/tldr/minor-camera-update?utm_source=tldrai)
+
+A device launch added a modest camera mode that is useful awareness but unlikely to need deeper follow-up.
+
+[TLDR is hiring a curator for TLDR AI! (TLDR Curator, ~5 hrs/week)](mailto:ai@tldr.tech?utm_source=tldrai)
+
+This hiring paragraph should not become a source record.
+
+Love TLDR? Tell your friends and get rewards!
+
+Share your referral link below with friends to get free TLDR swag!
+
+[https://refer.tldr.tech/example](https://refer.tldr.tech/example)
+
+Manage your subscriptions to our other newsletters. Or unsubscribe.

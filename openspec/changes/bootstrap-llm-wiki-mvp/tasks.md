@@ -1,3 +1,13 @@
+## Current Implementation Priority (2026-07-12)
+
+The successful manual ChatGPT Project + Gmail connector + Library + Voice proof
+of concept changes execution order without removing the automated runtime work:
+
+1. Monday-ready OKF scaffold and structured post-commute handoff.
+2. Finish and merge the current TLDR ingestion work safely.
+3. Compile one approved source and establish the reviewed Pages read path.
+4. Resume provider-neutral classification and deterministic queue automation.
+
 ## 1. Schema Foundation
 
 - [x] 1.1 Create `schema/interest-profile.md` v1.4 from Claude v1.3 plus the agreed v1.4 fixes and Codex depth heuristics.
@@ -15,13 +25,13 @@
 
 ## 3. TLDR Ingestion
 
-- [ ] 3.1 Implement a text-file TLDR ingestion command for pasted or exported TLDR email bodies.
-- [ ] 3.2 Implement parser behavior for newsletter name, edition date, editorial item title, summary, and URL.
-- [ ] 3.3 Exclude primary sponsors, secondary sponsors, quick-link sponsors, TLDR hiring ads, referrals, subscription management, unsubscribe text, and forwarding wrapper text.
-- [ ] 3.4 Accept confirmed email body text from a manual Gmail connector workflow without building unattended Gmail polling.
-- [ ] 3.5 Require body-marker confirmation for TLDR editions and avoid subject-only identification.
-- [ ] 3.6 Route ambiguous parse results and validation failures to review.
-- [ ] 3.7 Run at least one real TLDR email through the local end-to-end ingestion path.
+- [x] 3.1 Implement a text-file TLDR ingestion command for pasted or exported TLDR email bodies.
+- [x] 3.2 Implement parser behavior for newsletter name, edition date, editorial item title, summary, and URL.
+- [x] 3.3 Exclude primary sponsors, secondary sponsors, quick-link sponsors, TLDR hiring ads, referrals, subscription management, unsubscribe text, and forwarding wrapper text.
+- [x] 3.4 Accept confirmed email body text from a manual Gmail connector workflow without building unattended Gmail polling.
+- [x] 3.5 Require body-marker confirmation for TLDR editions and avoid subject-only identification.
+- [x] 3.6 Route ambiguous parse results and validation failures to review.
+- [x] 3.7 Run at least one real TLDR email through the local end-to-end ingestion path.
 
 ## 4. Classifier And Routing
 
@@ -40,6 +50,8 @@
 - [ ] 5.4 Keep manual ChatGPT/Claude voice review as the MVP voice path.
 - [ ] 5.5 Queue explicit voice notes or commute corrections for review before wiki compile or external sending.
 - [ ] 5.6 Use at least one prepared queue in a real car session or equivalent manual voice test.
+- [x] 5.7 Define a private-by-default `commute-handoff.v1` file contract and local importer for explicit feedback, saved review notes, and session issues from the manual ChatGPT Voice workflow.
+- [ ] 5.8 Use the handoff contract in a real commute and import the generated `.txt` artifact without manual JSON repair.
 
 ## 6. Feedback Labels
 
@@ -51,6 +63,7 @@
 
 ## 7. Wiki Compilation
 
+- [x] 7.0 Create the review-safe `wiki/` index, taxonomy directories, and OKF entry template without claiming compiler completion.
 - [ ] 7.1 Compile approved full-source candidates into OKF-style markdown under `wiki/`.
 - [ ] 7.2 Require frontmatter with type, title, aliases or tags where applicable, created date, updated date, confidence, and provenance.
 - [ ] 7.3 Preserve prior sources when updating an existing wiki entry.
@@ -59,6 +72,7 @@
 
 ## 8. Read Path And Deferred Work
 
+- [x] 8.0 Add the local repository-backed Pages entry point and minimal Jekyll configuration; keep public enablement pending review.
 - [ ] 8.1 Configure GitHub Pages as the MVP read path for approved `wiki/` output.
 - [ ] 8.2 Add a manually triggered GitHub Actions workflow for tests and wiki compilation after application code exists.
 - [ ] 8.3 Enable scheduled nightly compile only after manual workflow runs are stable.

@@ -100,3 +100,44 @@ The MVP SHALL record that at least one prepared queue was used.
   corrections or notes produced by the session, plus the selected voice surface
   and any material interruption or recognition issue
 - **AND** those corrections SHALL be stored as feedback labels or review notes.
+
+### Requirement: Manual ChatGPT Project Adapter
+
+The MVP SHALL permit a ChatGPT Project to act as a manual adapter for connector-assisted
+classification, queue creation, and Voice playback before the repository's
+provider-neutral classifier and deterministic queue generator are complete.
+
+#### Scenario: Create a queue in a project chat
+
+- **WHEN** a project chat classifies a body-confirmed TLDR newsletter through the
+  Gmail connector using the versioned project source files
+- **THEN** it MAY create an ordered queue as JSON content in a `.txt` file
+- **AND** the queue SHALL preserve source item ids and the metadata required by
+  the prepared-queue contract
+- **AND** this manual output SHALL NOT be treated as satisfying the repository's
+  classifier-adapter or deterministic queue-generation implementation tasks.
+
+### Requirement: Structured Post-Commute Handoff
+
+The manual Voice workflow SHALL support a versioned, structured handoff that can
+be reviewed locally without ingesting the full conversation transcript.
+
+#### Scenario: Generate the handoff in ChatGPT
+
+- **WHEN** Brad ends a commute Voice session and requests a handoff
+- **THEN** the same chat SHALL create a `commute-handoff.v1` JSON object in a
+  `.txt` Library file
+- **AND** it SHALL contain session and queue identity, explicit item feedback,
+  explicit saved review notes, and material recognition or interruption issues
+- **AND** it SHALL NOT contain a full transcript or private detail that Brad did
+  not explicitly ask to save.
+
+#### Scenario: Import the handoff at home
+
+- **WHEN** Brad downloads the handoff `.txt` file and runs the local importer
+- **THEN** the importer SHALL validate the structured object and fail closed on
+  malformed or unsupported fields
+- **AND** it SHALL write a normalized create-only record to a gitignored private
+  inbox
+- **AND** no note SHALL be promoted into feedback labels, sources, public wiki
+  output, reminders, or external messages without review.

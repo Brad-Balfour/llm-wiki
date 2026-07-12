@@ -76,3 +76,19 @@ The MVP SHALL use GitHub Pages as the first read path for approved wiki output.
 - **AND** Cloudflare Pages or Workers SHALL remain deferred unless a later
   OpenSpec change promotes them.
 
+### Requirement: Review-Safe Initial Wiki Scaffold
+
+The repository SHALL establish the wiki taxonomy and readable index before the
+first source is compiled, without using placeholder content as evidence that
+compilation is complete.
+
+#### Scenario: Initialize the OKF wiki
+
+- **WHEN** the initial wiki scaffold is created
+- **THEN** `wiki/index.md` SHALL describe the reviewed public read path
+- **AND** the taxonomy SHALL include `concept`, `tool`, `person`, and `event`
+  entry locations
+- **AND** an entry template SHALL demonstrate the required frontmatter and
+  provenance shape
+- **AND** tasks 7.1-7.5 SHALL remain incomplete until an approved source can be
+  created or updated idempotently through the compiler with fixture coverage.

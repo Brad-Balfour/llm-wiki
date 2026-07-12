@@ -19,6 +19,12 @@ archive or superseded assumptions into the public implementation repo.
 - Generate a prepared, sanitized commute queue for manual ChatGPT Voice
   (prefer GPT Live when available), Claude, or equivalent review before any
   custom voice agent.
+- Allow a ChatGPT Project to act as a manual MVP adapter for connector-assisted
+  TLDR classification and queue-file creation while the provider-neutral repo
+  runtime is still being built.
+- Import an explicitly generated, structured post-commute handoff from a
+  JSON-in-TXT Library file into a private local review inbox; do not ingest a
+  full voice transcript.
 - Store feedback corrections as labels and use cadenced profile patches instead
   of rewriting the profile from each correction.
 - Compile approved source material into OKF-style markdown with provenance and a
@@ -42,7 +48,8 @@ archive or superseded assumptions into the public implementation repo.
   source-neutral classifier output, configure provider-neutral model use, and
   derive downstream routes in application code.
 - `commute-queue`: Produce a prepared queue ordered by interest/depth priority
-  for manual voice review and reviewed voice-note capture.
+  for manual voice review, reviewed voice-note capture, and a private structured
+  post-session handoff.
 - `wiki-compilation`: Compile approved TLDR source records into OKF-style wiki
   markdown with frontmatter, provenance, compile state, and GitHub Pages as the
   read path.
@@ -58,6 +65,9 @@ None. This is the first OpenSpec proposal pass for the implementation repo.
 
 - Affects future TypeScript/Node application code for TLDR parsing,
   classification, routing, queues, feedback, and wiki compilation.
+- Adds a private-by-default local commute-handoff importer and an initial
+  reviewed wiki scaffold without making ChatGPT Library a programmatic runtime
+  dependency.
 - Adds no application code in this proposal pass.
 - Adds a quality gate for future implementation PRs: local checks, focused
   tests/TDD where appropriate, and independent review before GitHub PR review.

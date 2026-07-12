@@ -1,0 +1,26 @@
+{
+  "schema_version": "commute-handoff.v1",
+  "session_id": "2026-07-13-morning-tldr-dry-run",
+  "session_date": "2026-07-13",
+  "voice_surface": "chatgpt_live",
+  "queue_files": ["20260713-tldr-ai-headline.txt"],
+  "feedback": [
+    {
+      "source_item_id": "tldr-ai-2026-07-13-example",
+      "title": "Example article",
+      "url": "https://example.com/article",
+      "action": "promote_to_in_depth",
+      "note": "Worth discussing tomorrow."
+    }
+  ],
+  "review_notes": [
+    {
+      "source_item_id": "tldr-ai-2026-07-13-example",
+      "title": "Example article",
+      "url": "https://example.com/article",
+      "note": "Possible reusable wiki idea.",
+      "destination": "wiki_review"
+    }
+  ],
+  "issues": []
+}

@@ -1,0 +1,4 @@
+title: LLM Wiki
+description: A provenance-first personal knowledge base compiled from reviewed sources.
+theme: jekyll-theme-minimal
+markdown: kramdown

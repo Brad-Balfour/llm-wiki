@@ -1,22 +1,39 @@
 import assert from 'node:assert/strict';
-import { readFile } from 'node:fs/promises';
+import { execFile } from 'node:child_process';
+import { mkdtemp, readFile } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
 import { resolve } from 'node:path';
 import test from 'node:test';
+import { promisify } from 'node:util';
 
+import { ingestTldrText } from '../src/tldr/ingestion.js';
+import { parseTldrEditionBody } from '../src/tldr/parser.js';
 import { buildSourceItemId, PARSER_VERSION } from '../src/tldr/parser-contract.js';
 import type { ParsedTldrItem } from '../src/tldr/parser-contract.js';
 
-test('parser output records use the sanitized item-level shape and stable ids', async () => {
+const execFileAsync = promisify(execFile);
+const EXTRACTED_AT = '2026-07-06T00:00:00.000Z';
+
+test('parser extracts sanitized non-sponsor editorial items with stable ids', async () => {
+  const body = await readFile(
+    resolve(process.cwd(), 'tests/fixtures/tldr/source-text/sanitized-real-shaped-tldr.txt'),
+    'utf8'
+  );
   const records = JSON.parse(
     await readFile(
       resolve(process.cwd(), 'tests/fixtures/expected/parser/minimal-sanitized-tldr.json'),
       'utf8'
     )
   ) as ParsedTldrItem[];
+  const result = parseTldrEditionBody(body, { extractedAt: EXTRACTED_AT });
 
-  assert.equal(records.length, 2);
+  assert.equal(result.newsletter, 'TLDR AI');
+  assert.equal(result.edition_date, '2026-07-02');
+  assert.match(result.confirmed_body_markers.join('\n'), /TLDR AI 2026-07-02/);
+  assert.equal(result.reviews.length, 0);
+  assert.deepEqual(result.items, records);
 
-  for (const item of records) {
+  for (const item of result.items) {
     assert.deepEqual(Object.keys(item), [
       'source_item_id',
       'newsletter',
@@ -33,4 +50,86 @@ test('parser output records use the sanitized item-level shape and stable ids', 
     assert.equal(item.parser_version, PARSER_VERSION);
     assert.equal(Object.hasOwn(item, 'raw_body'), false);
   }
+});
+
+test('ingestion routes subject-only or markerless text to review', () => {
+  const result = ingestTldrText(
+    [
+      'Subject: TLDR AI 2026-07-02',
+      '',
+      '[OpenAI adds evaluation hooks for agents (2 minute read)](https://example.com/tldr/openai-agent-evals)',
+      '',
+      'OpenAI released new evaluation hooks for agent workflows.',
+    ].join('\n'),
+    { source: 'text-file', extractedAt: EXTRACTED_AT }
+  );
+
+  assert.equal(result.items.length, 0);
+  assert.equal(result.review.length, 1);
+  assert.equal(result.review[0]?.reason, 'body_marker_missing');
+  assert.equal(result.review[0]?.route.review, 'parse_error');
+});
+
+test('ingestion routes ambiguous item validation failures to review', () => {
+  const result = ingestTldrText(
+    [
+      'TLDR',
+      '[View Online](https://a.tldrnewsletter.com/web-version)',
+      '',
+      'TLDR AI 2026-07-02',
+      '',
+      'Headlines & Launches',
+      '',
+      '[Unclear item without a summary (2 minute read)](https://example.com/tldr/unclear)',
+    ].join('\n'),
+    { source: 'text-file', extractedAt: EXTRACTED_AT }
+  );
+
+  assert.equal(result.items.length, 0);
+  assert.equal(result.review.length, 1);
+  assert.equal(result.review[0]?.reason, 'validation_error');
+  assert.equal(result.review[0]?.route.review, 'parse_error');
+  assert.match(result.review[0]?.context.snippet.join('\n') ?? '', /Unclear item/);
+});
+
+test('file ingestion command writes sanitized item and review outputs', async () => {
+  const records = JSON.parse(
+    await readFile(
+      resolve(process.cwd(), 'tests/fixtures/expected/parser/minimal-sanitized-tldr.json'),
+      'utf8'
+    )
+  ) as ParsedTldrItem[];
+  const tempDir = await mkdtemp(resolve(tmpdir(), 'llm-wiki-tldr-'));
+  const outputPath = resolve(tempDir, 'items.json');
+  const reviewPath = resolve(tempDir, 'review.json');
+
+  await execFileAsync(process.execPath, [
+    resolve(process.cwd(), 'dist/src/tldr/ingest-file.js'),
+    '--input',
+    resolve(process.cwd(), 'tests/fixtures/tldr/source-text/sanitized-real-shaped-tldr.txt'),
+    '--output',
+    outputPath,
+    '--review-output',
+    reviewPath,
+    '--source',
+    'gmail-manual',
+    '--source-message-id',
+    'test-message-id',
+    '--extracted-at',
+    EXTRACTED_AT,
+  ]);
+
+  const output = JSON.parse(await readFile(outputPath, 'utf8')) as {
+    input_source: string;
+    source_message_id: string;
+    items: ParsedTldrItem[];
+    review: unknown[];
+  };
+  const review = JSON.parse(await readFile(reviewPath, 'utf8')) as unknown[];
+
+  assert.equal(output.input_source, 'gmail-manual');
+  assert.equal(output.source_message_id, 'test-message-id');
+  assert.deepEqual(output.items, records);
+  assert.deepEqual(output.review, []);
+  assert.deepEqual(review, []);
 });
