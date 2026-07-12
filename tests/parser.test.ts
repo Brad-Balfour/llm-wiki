@@ -92,6 +92,30 @@ test('ingestion routes ambiguous item validation failures to review', () => {
   assert.match(result.review[0]?.context.snippet.join('\n') ?? '', /Unclear item/);
 });
 
+test('parser skips an unlabeled Together With sponsor block', () => {
+  const result = parseTldrEditionBody(
+    [
+      'TLDR',
+      'Together With',
+      'TLDR AI 2026-07-02',
+      '[Example Sponsor](https://example.com/ordinary-link)',
+      'A sponsor summary without an explicit sponsor label.',
+      '🚀',
+      'Headlines & Launches',
+      '[Editorial item (2 minute read)](https://example.com/editorial)',
+      'A real editorial summary that should be retained.',
+      'Manage your subscriptions',
+    ].join('\n'),
+    { extractedAt: EXTRACTED_AT }
+  );
+
+  assert.equal(result.reviews.length, 0);
+  assert.deepEqual(
+    result.items.map((item) => item.title),
+    ['Editorial item']
+  );
+});
+
 test('file ingestion command writes sanitized item and review outputs', async () => {
   const records = JSON.parse(
     await readFile(

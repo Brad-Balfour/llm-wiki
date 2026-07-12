@@ -21,3 +21,4 @@ exclude:
   - src
   - tests
   - tsconfig.json
+  - wiki/ENTRY_TEMPLATE.md

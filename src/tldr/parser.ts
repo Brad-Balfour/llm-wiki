@@ -55,7 +55,7 @@ const FOOTER_START_PATTERNS = [
   /^unsubscribe\b/i,
 ] as const;
 
-const IGNORABLE_LINES = new Set(['TLDR', 'Together With', 'Sign Up', 'Advertise', 'View Online']);
+const IGNORABLE_LINES = new Set(['TLDR', 'Sign Up', 'Advertise', 'View Online']);
 
 const KNOWN_SECTION_HEADINGS = new Set([
   'Big Tech & Startups',
@@ -115,6 +115,10 @@ export function parseTldrEditionBody(
   let currentSection: string | null = null;
   let index = bodyMarker.lineIndex + 1;
 
+  if (lines.slice(0, bodyMarker.lineIndex).some((line) => line.trim() === 'Together With')) {
+    index = skipSponsorBlock(lines, index);
+  }
+
   while (index < lines.length) {
     const line = lines[index] ?? '';
     const trimmed = line.trim();
@@ -126,6 +130,11 @@ export function parseTldrEditionBody(
 
     if (isFooterStart(trimmed)) {
       break;
+    }
+
+    if (trimmed === 'Together With') {
+      index = skipSponsorBlock(lines, index + 1);
+      continue;
     }
 
     if (isEmojiSeparator(trimmed) || isKnownIgnorableLine(trimmed)) {
@@ -338,6 +347,20 @@ function collectSummaryBlock(
     nextIndex: index,
     endLineIndex: lastContentIndex,
   };
+}
+
+function skipSponsorBlock(lines: string[], startIndex: number): number {
+  let index = startIndex;
+
+  while (index < lines.length) {
+    const trimmed = (lines[index] ?? '').trim();
+    if (isFooterStart(trimmed) || isEmojiSeparator(trimmed) || isSectionHeading(trimmed)) {
+      break;
+    }
+    index += 1;
+  }
+
+  return index;
 }
 
 type CandidateResult =

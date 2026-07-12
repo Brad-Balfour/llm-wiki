@@ -32,6 +32,7 @@ test('Jekyll applies the default layout to generated wiki entries', async () => 
   assert.ok(
     config.includes('defaults:\n  - scope:\n      path: wiki\n    values:\n      layout: default')
   );
+  assert.ok(config.includes('\n  - wiki/ENTRY_TEMPLATE.md\n'));
 });
 
 function escapeRegExp(value: string): string {
