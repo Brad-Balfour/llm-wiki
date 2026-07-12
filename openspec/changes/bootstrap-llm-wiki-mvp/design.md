@@ -98,14 +98,19 @@ the classifier output.
      complexity before product value is proven.
 
 6. **Start with prepared commute queue, not custom voice.**
-   - Decision: Generate a queue that Brad can use manually with ChatGPT, Claude,
-     or equivalent voice review.
+   - Decision: Generate a sanitized queue that Brad can use manually with
+     ChatGPT Voice, preferring GPT Live when it is available to the current
+     consumer account, Claude, or an equivalent voice workflow. The first car
+     validation SHALL work with a Tesla Model 3 phone-based workflow and SHALL
+     not assume a specific in-dash integration.
    - Rationale: The product question is whether classified TLDR items and
-     deliberate notes are useful in the car. Custom realtime voice is a later
-     integration question.
+     deliberate notes are useful in the car. GPT Live improves the manual
+     ChatGPT experience, but its API is not an MVP dependency; custom realtime
+     voice remains a later integration question.
    - Alternative considered: build a custom realtime agent immediately. Rejected
      because it adds API, latency, turn-taking, tool-call, and privacy complexity
-     before the queue proves useful.
+     before the queue proves useful. Reconsider a GPT Live API integration only
+     in a later OpenSpec change after its public API contract is available.
 
 7. **Store feedback labels as data.**
    - Decision: Corrections append structured labels with source id, original
@@ -160,6 +165,71 @@ the classifier output.
      Rejected because it creates needless inconsistency across Brad's local
      projects.
 
+11. **Treat the successful ChatGPT Project workflow as a manual adapter.**
+   - Decision: For the Monday commute prototype, a ChatGPT Project may hold the
+     interest profile, classifier instructions, queue contract, and car-reader
+     prompt; a project chat may use the Gmail connector to classify a confirmed
+     TLDR newsletter and create an ordered JSON queue stored in a `.txt` file.
+   - Decision: This manual path may run before tasks 4.1-5.3 are implemented in
+     the repository, but it does not satisfy or remove those deterministic
+     runtime tasks.
+   - Rationale: The workflow has now succeeded end to end through queue playback
+     in a real voice session, so it can answer the product question sooner than
+     the automated runtime.
+   - Alternative considered: keep automated classification and queue generation
+     as blockers for the next commute test. Rejected because it would delay use
+     of a working manual product slice without reducing implementation risk.
+
+12. **Use JSON content in TXT as the post-commute handoff.**
+   - Decision: At session end, the same project chat creates a
+     `commute-handoff.v1` object containing only explicit feedback, saved review
+     notes, queue/session identity, and material recognition issues. The Library
+     transport file uses `.txt`; its content is JSON.
+   - Decision: A local importer validates the object, rejects unknown top-level
+     fields such as `transcript`, and writes create-only normalized data under a
+     gitignored private directory.
+   - Rationale: TXT is explicitly supported by ChatGPT file workflows, while
+     JSON upload behavior is less clear in the observed product surface. The
+     structured object is more useful and safer than relying on a non-verbatim
+     full voice transcript.
+   - Alternative considered: copy the entire post-session transcript into the
+     repository. Rejected because transcripts may be imperfect and can contain
+     private, incidental, or unnecessary content.
+
+13. **Pull OKF scaffold and handoff ahead of classifier automation.**
+   - Decision: The current implementation priority is (1) initial reviewed OKF
+     wiki/read-path scaffold, (2) Monday-ready commute handoff and dry run, (3)
+     finish and merge the existing TLDR ingestion branch, (4) compile one
+     approved source, and then (5) resume provider-neutral classification and
+     deterministic queue automation.
+   - Rationale: This sequence closes the durable product loop around the proven
+     manual workflow while preserving the automated architecture as the intended
+     replacement.
+
+14. **Require local safety confirmation and safe public rendering.**
+   - Decision: A ChatGPT-authored `public: true` value is necessary but not
+     sufficient for compilation. The source contract also records cleared
+     privacy, publication-rights, and dual-use review, and the local compiler
+     requires an explicit `--confirm-public` flag.
+   - Decision: Public source URLs must be credential-free HTTP(S), public text
+     fields must reject raw HTML, Markdown links, private-work markers, control
+     characters, and credential-like material, and rendered plain text is
+     Markdown-escaped.
+   - Decision: Reuse of a stable source item id is idempotent only when the full
+     provenance identity—item id, immutable source path, and URL—matches. A
+     collision with different provenance fails closed.
+   - Rationale: The repository must enforce its public-promotion boundary
+     independently of model output and must never silently lose provenance.
+
+15. **Validate the static-site source before Pages deployment.**
+   - Decision: Keep Prettier and ESLint in the Node project checks, add a direct
+     YAML parser that validates Jekyll configuration and Markdown frontmatter,
+     and keep the GitHub Pages Jekyll build as the renderer-level check.
+   - Rationale: Prettier catches malformed YAML syntax while formatting, but it
+     does not verify required frontmatter shape or compatibility with the wiki
+     compiler. A deterministic Node check catches those failures before the
+     remote Jekyll build without adding a second local Ruby toolchain.
+
 ## Risks / Trade-offs
 
 - [Risk] Manual Gmail connector steps are slower than automation. -> Mitigation:
@@ -187,22 +257,33 @@ the classifier output.
 - [Risk] GitHub PR review can catch avoidable issues late. -> Mitigation: require
   local checks plus an independent Codex subagent or local Claude review before
   opening the PR or requesting GitHub Codex review.
+- [Risk] ChatGPT-created queue output can drift from the repo's classifier and
+  routing contracts. -> Mitigation: include the same versioned project source
+  files, preserve source ids and metadata, validate the handoff independently,
+  and treat the manual adapter as temporary rather than classifier truth.
+- [Risk] Voice transcripts can be incomplete or contain private incidental
+  speech. -> Mitigation: ingest only an explicit structured end-of-session
+  handoff and keep it private until reviewed.
 
 ## Migration Plan
 
 1. Create the schema files, compile state, model config example, and fixture
    directories.
-2. Implement parser, batch-capable classifier validation, routing, queue,
-   feedback, and wiki compile behavior against fixtures.
-3. Reuse applicable local repo conventions from `../bradbalfour-dot-com` and
+2. Establish the reviewed OKF wiki scaffold and private commute-handoff contract
+   so the proven manual ChatGPT workflow can be exercised on the next commute.
+3. Implement parser, batch-capable classifier validation, routing, queue,
+   feedback, and wiki compile behavior against fixtures. The manual ChatGPT
+   adapter may be used before classifier/queue automation is complete.
+4. Reuse applicable local repo conventions from `../bradbalfour-dot-com` and
    `../bradbalfour-photography` when adding or changing project tooling.
-4. Run one real TLDR email end to end locally.
-5. Use one prepared queue in a real car session or equivalent manual voice test.
-6. Record at least one correction label.
-7. Compile at least one approved source into the wiki.
-8. Run local checks and an independent pre-PR review before opening or updating
+5. Run one real TLDR email end to end locally.
+6. Use one prepared queue in a real car session or equivalent manual voice test,
+   then import the structured post-session handoff.
+7. Record at least one correction label.
+8. Compile at least one approved source into the wiki.
+9. Run local checks and an independent pre-PR review before opening or updating
    each implementation PR for GitHub review.
-9. Configure GitHub Pages and manual CI only after local tests pass.
+10. Configure GitHub Pages and manual CI only after local tests pass.
 
 Rollback is file-based: keep source records immutable, keep generated queues and
 wiki output reviewable, and revert generated output or route questionable items

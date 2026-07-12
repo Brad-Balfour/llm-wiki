@@ -11,10 +11,16 @@ Phase 0 is in progress:
 
 - OpenSpec has been initialized for Codex, GitHub Copilot, and Claude Code.
 - The first OpenSpec change is `bootstrap-llm-wiki-mvp`.
-- The TypeScript/Node runtime skeleton is initialized with focused parser-output
-  contract, classifier-validation, and routing tests.
-- End-to-end TLDR ingestion, live LLM classification, queue generation, feedback
-  handling, and wiki compilation are not implemented yet.
+- The TypeScript/Node runtime skeleton is initialized with focused parser,
+  classifier-validation, and routing tests.
+- TLDR text-file ingestion is implemented for pasted/exported email bodies,
+  including manual Gmail connector handoff via confirmed body text.
+- A manual ChatGPT Project + Gmail connector + Library + Voice workflow has
+  produced and played a real commute queue as a proof of concept.
+- The review-safe OKF wiki scaffold, private commute-handoff importer, and
+  approved-source wiki compiler now exist. Live repo-backed classification,
+  deterministic queue generation, feedback-label promotion, the first real
+  wiki compilation, and public Pages enablement are not complete yet.
 
 ## Development
 
@@ -34,6 +40,38 @@ npm run ci:install
 npm run check
 openspec validate bootstrap-llm-wiki-mvp --type change --strict
 ```
+
+Run local TLDR ingestion after building:
+
+```bash
+npm run ingest:tldr -- --input path/to/tldr-body.txt --output /tmp/tldr-items.json --review-output /tmp/tldr-review.json
+```
+
+Use `--input - --source gmail-manual --source-message-id <gmail-message-id>`
+when pasting or streaming a manually confirmed Gmail connector body. The command
+writes sanitized item-level JSON and review records; it does not persist raw
+email bodies.
+
+Import a structured post-commute handoff downloaded from ChatGPT Library:
+
+```bash
+npm run import:commute-handoff -- --input path/to/YYYYMMDD-tldr-commute-handoff.txt
+```
+
+The normalized record is written under gitignored
+`.private/commute-handoffs/`. See `docs/commute-voice-handoff.md` for the Monday
+workflow and `docs/replan-2026-07-12.md` for the current implementation order.
+
+Compile one explicitly approved TLDR source into the OKF wiki:
+
+```bash
+npm run compile:wiki -- \
+  --input sources/tldr/YYYY-MM-DD-<entry-slug>.txt \
+  --confirm-public
+```
+
+See `docs/wiki-ingestion-test.md` for the ChatGPT Project preparation and review
+flow.
 
 ## MVP Direction
 

@@ -1,0 +1,37 @@
+{
+  "schema_version": "approved-wiki-source.v1",
+  "approval": {
+    "status": "approved",
+    "public": true,
+    "approved_at": "2026-07-12T16:00:00Z",
+    "reviewed_by": "brad",
+    "safety_review": {
+      "privacy": "cleared",
+      "publication_rights": "cleared",
+      "dual_use": "cleared"
+    }
+  },
+  "source": {
+    "source_item_id": "tldr-ai-2026-07-12-context-engineering",
+    "source_path": "sources/tldr/2026-07-12-context-engineering.txt",
+    "source_type": "tldr",
+    "title": "Context engineering for reliable agents",
+    "url": "https://example.com/context-engineering",
+    "newsletter": "TLDR AI",
+    "edition_date": "2026-07-12"
+  },
+  "entry": {
+    "type": "concept",
+    "slug": "context-engineering",
+    "title": "Context Engineering",
+    "aliases": ["agent context engineering"],
+    "tags": ["agents", "llm"],
+    "confidence": "medium",
+    "summary": "Context engineering treats the information supplied to an agent as a designed system rather than an incidental prompt.",
+    "key_ideas": [
+      "Reliable agents need deliberate context selection and organization.",
+      "Context quality can matter as much as model capability."
+    ],
+    "related": ["prompt-engineering"]
+  }
+}

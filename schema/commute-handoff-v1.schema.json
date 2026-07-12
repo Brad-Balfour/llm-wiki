@@ -1,0 +1,74 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://brad-balfour.github.io/llm-wiki/schema/commute-handoff-v1.schema.json",
+  "title": "Commute voice handoff",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "session_id",
+    "session_date",
+    "voice_surface",
+    "queue_files",
+    "feedback",
+    "review_notes",
+    "issues"
+  ],
+  "properties": {
+    "schema_version": { "const": "commute-handoff.v1" },
+    "session_id": { "type": "string", "minLength": 1 },
+    "session_date": { "type": "string", "format": "date" },
+    "voice_surface": {
+      "enum": ["chatgpt_live", "chatgpt_advanced", "chatgpt_standard", "other"]
+    },
+    "queue_files": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "uniqueItems": true
+    },
+    "feedback": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["source_item_id", "action"],
+        "properties": {
+          "source_item_id": { "type": "string", "minLength": 1 },
+          "title": { "type": "string" },
+          "url": { "type": "string" },
+          "action": {
+            "enum": [
+              "mark_interested",
+              "mark_uninterested",
+              "promote_to_in_depth",
+              "save_for_review",
+              "skip"
+            ]
+          },
+          "note": { "type": "string" }
+        }
+      }
+    },
+    "review_notes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["title", "note", "destination"],
+        "properties": {
+          "source_item_id": { "type": "string" },
+          "title": { "type": "string", "minLength": 1 },
+          "url": { "type": "string" },
+          "note": { "type": "string", "minLength": 1 },
+          "destination": {
+            "enum": ["wiki_review", "range_review", "general_review"]
+          }
+        }
+      }
+    },
+    "issues": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    }
+  }
+}
