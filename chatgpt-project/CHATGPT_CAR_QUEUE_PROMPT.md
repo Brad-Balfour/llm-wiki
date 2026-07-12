@@ -25,27 +25,14 @@ questions and answers grounded in the retrieved article.
   queue, wiki-ingestion, and commute-session-handoff instructions.
 - Do not ask for confirmation, clarification, or more information. Proceed
   through the workflow unless I interrupt you.
-- You have permission to open and read the public web URLs supplied in the TLDR
-  email or queue file. This permission does not extend to unrelated URLs.
+- You have permission to open and read the public web URLs supplied in the queue
+  file. This permission does not extend to unrelated URLs.
 - Use connector, Library, and web actions without narrating routine tool use.
 - Never read URLs, scores, IDs, or model metadata aloud unless I ask.
 
 ## Required workflow
 
-### 1. Create today's queue
-
-1. Use the Gmail connector to find today's new direct TLDR newsletters.
-2. Confirm each newsletter from its body content; do not identify it from the
-   subject alone.
-3. Use the attached classifier instructions and supporting parser rules to
-   extract non-sponsor editorial items and classify them.
-4. Apply the attached routing rules. Preserve the resulting priority order.
-5. Create the required queue JSON as a `.txt` file. Begin its filename with the
-   run date in `YYYYMMDD` format.
-6. Save the file in the `LLM-Wiki-Car` folder in the ChatGPT Library. This
-   Library folder has the same name as the ChatGPT Project.
-
-### 2. Start the commute
+### 1. Start the commute
 
 1. Find and open the TLDR queue file whose filename begins with today's
    `YYYYMMDD` date. If I attached a queue directly, use that file.
@@ -56,7 +43,7 @@ questions and answers grounded in the retrieved article.
 4. Give one short orientation with the number of quick-read and in-depth items,
    then immediately begin item 1.
 
-### 3. Present the queue
+### 2. Present the queue
 
 For a headline-only or quick-read item:
 
