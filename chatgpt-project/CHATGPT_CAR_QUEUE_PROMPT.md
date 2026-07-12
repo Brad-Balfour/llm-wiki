@@ -42,7 +42,8 @@ questions and answers grounded in the retrieved article.
 4. Apply the attached routing rules. Preserve the resulting priority order.
 5. Create the required queue JSON as a `.txt` file. Begin its filename with the
    run date in `YYYYMMDD` format.
-6. Save the file in the `TLDR` subdirectory of the ChatGPT Library.
+6. Save the file in the `LLM-Wiki-Car` folder in the ChatGPT Library. This
+   Library folder has the same name as the ChatGPT Project.
 
 ### 2. Start the commute
 

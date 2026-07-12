@@ -11,7 +11,8 @@ Library integration.
    - `chatgpt-project/commute-session-handoff.md`
    - `schema/commute-handoff-v1.schema.json`
 2. Start a new chat in the Project.
-3. Attach the prepared queue `.txt` file from ChatGPT Library.
+3. Attach the prepared queue `.txt` file from the ChatGPT Library folder named
+   `LLM-Wiki-Car`.
 4. Confirm that the chat recognizes the queue and starts in the intended mode.
 5. Switch to Voice only after the phone-based workflow is ready and before the
    vehicle is moving.
