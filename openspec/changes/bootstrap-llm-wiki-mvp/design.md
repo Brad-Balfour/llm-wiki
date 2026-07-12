@@ -221,6 +221,15 @@ the classifier output.
    - Rationale: The repository must enforce its public-promotion boundary
      independently of model output and must never silently lose provenance.
 
+15. **Validate the static-site source before Pages deployment.**
+   - Decision: Keep Prettier and ESLint in the Node project checks, add a direct
+     YAML parser that validates Jekyll configuration and Markdown frontmatter,
+     and keep the GitHub Pages Jekyll build as the renderer-level check.
+   - Rationale: Prettier catches malformed YAML syntax while formatting, but it
+     does not verify required frontmatter shape or compatibility with the wiki
+     compiler. A deterministic Node check catches those failures before the
+     remote Jekyll build without adding a second local Ruby toolchain.
+
 ## Risks / Trade-offs
 
 - [Risk] Manual Gmail connector steps are slower than automation. -> Mitigation:

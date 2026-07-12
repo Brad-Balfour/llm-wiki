@@ -20,7 +20,7 @@ const USAGE = `Usage: node dist/src/tldr/ingest-file.js --input <body.txt|-> --o
 
 Options:
   --input <path|->             Text file containing a pasted/exported TLDR email body, or - for stdin.
-  --output <path>              JSON output path for sanitized parsed items.
+  --output <path>              JSON output path for the complete sanitized ingestion result.
   --review-output <path>       JSON output path for parse review records.
   --source <text-file|gmail-manual>
                                Input source label. Defaults to text-file.

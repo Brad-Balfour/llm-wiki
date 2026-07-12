@@ -48,6 +48,10 @@ jobs:
             echo "source_path must be a safe path under sources/tldr/" >&2
             exit 1
           fi
+          if [[ "$SOURCE_PATH" == *"//"* || "$SOURCE_PATH" =~ (^|/)\.\.?(/|$) ]]; then
+            echo "source_path must not contain empty, current-directory, or parent-directory segments" >&2
+            exit 1
+          fi
           if [[ ! -f "$SOURCE_PATH" ]]; then
             echo "Approved source does not exist: $SOURCE_PATH" >&2
             exit 1

@@ -14,6 +14,7 @@
     "build": "tsc -p tsconfig.json",
     "ci:build": "npm run build",
     "compile": "npm run build",
+    "validate:site": "node scripts/validate-jekyll.mjs",
     "compile:wiki": "npm run build --silent && node dist/src/wiki/compile-file.js",
     "ingest:tldr": "npm run build --silent && node dist/src/tldr/ingest-file.js",
     "import:commute-handoff": "npm run build --silent && node dist/src/commute/import-handoff.js",
@@ -22,19 +23,20 @@
     "lint": "eslint .",
     "ci:lint": "npm run lint",
     "lint:fix": "eslint . --fix",
-    "format": "prettier --write package.json tsconfig.json eslint.config.mjs .prettierrc README.md index.md _config.yml \".github/workflows/*.yml\" \"chatgpt-project/**/*.md\" \"docs/**/*.md\" \"schema/**/*.json\" \"sources/**/*.md\" \"src/**/*.ts\" \"tests/**/*.ts\" \"tests/fixtures/**/*.json\" \"wiki/**/*.md\"",
-    "format:check": "prettier --check package.json tsconfig.json eslint.config.mjs .prettierrc README.md index.md _config.yml \".github/workflows/*.yml\" \"chatgpt-project/**/*.md\" \"docs/**/*.md\" \"schema/**/*.json\" \"sources/**/*.md\" \"src/**/*.ts\" \"tests/**/*.ts\" \"tests/fixtures/**/*.json\" \"wiki/**/*.md\"",
+    "format": "prettier --write package.json tsconfig.json eslint.config.mjs .prettierrc README.md index.md _config.yml \".github/workflows/*.yml\" \"chatgpt-project/**/*.md\" \"docs/**/*.md\" \"schema/**/*.json\" \"scripts/**/*.mjs\" \"sources/**/*.md\" \"src/**/*.ts\" \"tests/**/*.ts\" \"tests/fixtures/**/*.json\" \"wiki/**/*.md\"",
+    "format:check": "prettier --check package.json tsconfig.json eslint.config.mjs .prettierrc README.md index.md _config.yml \".github/workflows/*.yml\" \"chatgpt-project/**/*.md\" \"docs/**/*.md\" \"schema/**/*.json\" \"scripts/**/*.mjs\" \"sources/**/*.md\" \"src/**/*.ts\" \"tests/**/*.ts\" \"tests/fixtures/**/*.json\" \"wiki/**/*.md\"",
     "format:write": "npm run format",
-    "check": "npm run test && npm run lint && npm run format:check"
+    "check": "npm run test && npm run lint && npm run format:check && npm run validate:site"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",
+    "@types/node": "^24.0.10",
     "@typescript-eslint/eslint-plugin": "^8.46.1",
     "@typescript-eslint/parser": "^8.46.1",
-    "@types/node": "^24.0.10",
     "eslint": "^9.39.1",
     "eslint-config-prettier": "^10.1.8",
     "globals": "^16.5.0",
+    "js-yaml": "^4.3.0",
     "prettier": "^3.6.2",
     "typescript": "^5.9.3"
   }

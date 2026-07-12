@@ -107,6 +107,21 @@ The MVP SHALL use GitHub Pages as the first read path for approved wiki output.
 - **AND** Cloudflare Pages or Workers SHALL remain deferred unless a later
   OpenSpec change promotes them.
 
+### Requirement: Deterministic Site-Source Validation
+
+The project checks SHALL validate Pages source files before the remote Jekyll
+build runs.
+
+#### Scenario: Validate Jekyll inputs locally and in CI
+
+- **WHEN** the project check command runs
+- **THEN** repository YAML files and all Pages-visible Markdown frontmatter
+  SHALL parse as YAML
+- **AND** the entry template provenance SHALL use the compiler-compatible
+  single-line JSON shape
+- **AND** the Pages workflow SHALL still perform a real Jekyll build before
+  deployment.
+
 ### Requirement: Review-Safe Initial Wiki Scaffold
 
 The repository SHALL establish the wiki taxonomy and readable index before the

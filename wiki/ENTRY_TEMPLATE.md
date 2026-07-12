@@ -6,14 +6,8 @@ tags: []
 created: YYYY-MM-DD
 updated: YYYY-MM-DD
 confidence: low
-provenance:
-  [
-    {
-      'source_item_id': 'stable-source-id',
-      'source_path': 'sources/tldr/YYYY-MM-DD-source.txt',
-      'url': 'https://example.com/source',
-    },
-  ]
+# prettier-ignore
+provenance: [{"source_item_id":"stable-id","source_path":"sources/tldr/date-source.txt","url":"https://example.com/source"}]
 ---
 
 # Entry title
