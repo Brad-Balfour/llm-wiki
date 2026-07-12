@@ -63,10 +63,11 @@ npm run import:commute-handoff -- \
   --output-dir /tmp/llm-wiki-handoff-dryrun-20260712
 npm run compile:wiki -- \
   --repo-root /tmp/llm-wiki-compile-test-20260712b \
-  --input sources/tldr/2026-07-12-context-engineering.txt
+  --input sources/tldr/2026-07-12-context-engineering.txt \
+  --confirm-public
 ```
 
-All checks passed. OpenSpec progress after the compiler/workflow block is 25/52 tasks complete;
+All checks passed. OpenSpec progress after the corrective review block is 28/55 tasks complete;
 the real commute/import task remains pending.
 
 ## Guardrails

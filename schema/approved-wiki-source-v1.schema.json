@@ -10,11 +10,22 @@
     "approval": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["status", "public", "approved_at"],
+      "required": ["status", "public", "approved_at", "reviewed_by", "safety_review"],
       "properties": {
         "status": { "const": "approved" },
         "public": { "const": true },
-        "approved_at": { "type": "string", "format": "date-time" }
+        "approved_at": { "type": "string", "format": "date-time" },
+        "reviewed_by": { "const": "brad" },
+        "safety_review": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["privacy", "publication_rights", "dual_use"],
+          "properties": {
+            "privacy": { "const": "cleared" },
+            "publication_rights": { "const": "cleared" },
+            "dual_use": { "const": "cleared" }
+          }
+        }
       }
     },
     "source": {
@@ -30,12 +41,18 @@
         "edition_date"
       ],
       "properties": {
-        "source_item_id": { "type": "string", "minLength": 1 },
-        "source_path": { "type": "string", "pattern": "^sources/tldr/" },
+        "source_item_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+        },
+        "source_path": {
+          "type": "string",
+          "pattern": "^sources/tldr/[A-Za-z0-9._/-]+$"
+        },
         "source_type": { "const": "tldr" },
-        "title": { "type": "string", "minLength": 1 },
-        "url": { "type": "string", "minLength": 1 },
-        "newsletter": { "type": "string", "minLength": 1 },
+        "title": { "type": "string", "minLength": 1, "maxLength": 300 },
+        "url": { "type": "string", "format": "uri" },
+        "newsletter": { "type": "string", "minLength": 1, "maxLength": 100 },
         "edition_date": { "type": "string", "format": "date" }
       }
     },
@@ -59,7 +76,7 @@
           "type": "string",
           "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
         },
-        "title": { "type": "string", "minLength": 1 },
+        "title": { "type": "string", "minLength": 1, "maxLength": 300 },
         "aliases": {
           "type": "array",
           "items": { "type": "string", "minLength": 1 },
@@ -71,7 +88,7 @@
           "uniqueItems": true
         },
         "confidence": { "enum": ["high", "medium", "low"] },
-        "summary": { "type": "string", "minLength": 1 },
+        "summary": { "type": "string", "minLength": 1, "maxLength": 2000 },
         "key_ideas": {
           "type": "array",
           "items": { "type": "string", "minLength": 1 },

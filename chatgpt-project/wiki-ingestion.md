@@ -29,13 +29,19 @@ For an eligible item:
 4. Set `schema_version` to `approved-wiki-source.v1`.
 5. Set `approval.status` to `approved`, `approval.public` to `true`, and
    `approval.approved_at` to the current timestamp.
-6. Set `source.source_path` to the exact future repository path
+6. Set `approval.reviewed_by` to `brad` and set each
+   `approval.safety_review` field—`privacy`, `publication_rights`, and
+   `dual_use`—to `cleared`. If any dimension is unclear, keep the item in review
+   instead of generating an approved source.
+7. Set `source.source_path` to the exact future repository path
    `sources/tldr/YYYY-MM-DD-<entry-slug>.txt`, matching the generated filename.
-7. Preserve the TLDR item title, URL, newsletter, edition date, and stable source
+8. Preserve the TLDR item title, URL, newsletter, edition date, and stable source
    item id. Do not include a raw Gmail body or full article text.
-8. Choose one entry type: `concept`, `tool`, `person`, or `event`.
-9. Use a lowercase kebab-case slug and concise, durable summary and key ideas.
-10. Create the file only. Do not publish, commit, or modify the wiki directly.
+9. Choose one entry type: `concept`, `tool`, `person`, or `event`.
+10. Use a lowercase kebab-case slug and concise, durable summary and key ideas.
+11. Use only plain text in titles, summaries, and key ideas. Do not emit raw
+    HTML, Markdown links, embedded credentials, or non-HTTP(S) URLs.
+12. Create the file only. Do not publish, commit, or modify the wiki directly.
 
 After creating the file, say: "The approved wiki source is ready for local
 review and compilation."

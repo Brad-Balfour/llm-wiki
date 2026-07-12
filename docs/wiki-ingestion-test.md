@@ -31,8 +31,14 @@ sources/tldr/YYYY-MM-DD-<entry-slug>.txt
 From the implementation repository:
 
 ```bash
-npm run compile:wiki -- --input sources/tldr/YYYY-MM-DD-<entry-slug>.txt
+npm run compile:wiki -- \
+  --input sources/tldr/YYYY-MM-DD-<entry-slug>.txt \
+  --confirm-public
 ```
+
+`--confirm-public` is the local human publication gate. Use it only after
+checking privacy, publication rights, dual-use risk, URLs, and the proposed
+public summary. The compiler fails closed without it.
 
 The command prints one of:
 
@@ -48,8 +54,8 @@ After the branch is merged, the same compilation can be run manually from the
 GitHub Actions workflow named **Compile approved wiki source**. Its
 `source_path` input must name an approved record already committed under
 `sources/tldr/`. The workflow opens a review PR containing the generated wiki
-and compile-state changes; it does not write directly to `main`. No scheduled
-compilation is enabled.
+and compile-state changes; it also requires the `confirm_public` checkbox and
+does not write directly to `main`. No scheduled compilation is enabled.
 
 ## Expected Review
 

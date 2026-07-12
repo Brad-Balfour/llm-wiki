@@ -27,10 +27,16 @@ interface Options {
   input: string;
   repoRoot: string;
   statePath: string;
+  confirmPublic: boolean;
 }
 
 async function main(): Promise<void> {
   const options = parseOptions(process.argv.slice(2));
+  if (!options.confirmPublic) {
+    throw new Error(
+      'Public compilation requires --confirm-public after local privacy, publication-rights, and dual-use review.'
+    );
+  }
   const inputPath = path.resolve(options.repoRoot, options.input);
   const inputText = await readFile(inputPath, 'utf8');
   const source = parseApprovedWikiSource(inputText);
@@ -45,6 +51,16 @@ async function main(): Promise<void> {
   const inputHash = sha256(inputText);
   const prior = state.processed_sources[source.source.source_path];
   const now = new Date().toISOString();
+  const conflictingSourceId = Object.entries(state.processed_sources).find(
+    ([sourcePath, record]) =>
+      record.source_item_id === source.source.source_item_id &&
+      sourcePath !== source.source.source_path
+  );
+  if (conflictingSourceId) {
+    throw new Error(
+      `source_item_id ${source.source.source_item_id} is already processed from ${conflictingSourceId[0]}. Use a new source item id for a distinct immutable record.`
+    );
+  }
 
   if (prior) {
     if (prior.hash !== inputHash) {
@@ -110,6 +126,7 @@ function parseOptions(args: string[]): Options {
   let input: string | undefined;
   let repoRoot = process.cwd();
   let statePath = 'schema/compile-state.json';
+  let confirmPublic = false;
 
   for (let index = 0; index < args.length; index += 1) {
     const arg = args[index];
@@ -122,15 +139,19 @@ function parseOptions(args: string[]): Options {
     } else if (arg === '--state') {
       statePath = args[index + 1] ?? statePath;
       index += 1;
+    } else if (arg === '--confirm-public') {
+      confirmPublic = true;
     } else {
       throw new Error(`Unknown argument: ${arg ?? ''}`);
     }
   }
 
   if (!input) {
-    throw new Error('Usage: compile:wiki -- --input sources/tldr/<approved-source>.txt');
+    throw new Error(
+      'Usage: compile:wiki -- --input sources/tldr/<approved-source>.txt --confirm-public'
+    );
   }
-  return { input, repoRoot, statePath };
+  return { input, repoRoot, statePath, confirmPublic };
 }
 
 async function readCompileState(statePath: string): Promise<CompileState> {

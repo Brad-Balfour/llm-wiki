@@ -206,6 +206,21 @@ the classifier output.
      manual workflow while preserving the automated architecture as the intended
      replacement.
 
+14. **Require local safety confirmation and safe public rendering.**
+   - Decision: A ChatGPT-authored `public: true` value is necessary but not
+     sufficient for compilation. The source contract also records cleared
+     privacy, publication-rights, and dual-use review, and the local compiler
+     requires an explicit `--confirm-public` flag.
+   - Decision: Public source URLs must be credential-free HTTP(S), public text
+     fields must reject raw HTML, Markdown links, private-work markers, control
+     characters, and credential-like material, and rendered plain text is
+     Markdown-escaped.
+   - Decision: Reuse of a stable source item id is idempotent only when the full
+     provenance identity—item id, immutable source path, and URL—matches. A
+     collision with different provenance fails closed.
+   - Rationale: The repository must enforce its public-promotion boundary
+     independently of model output and must never silently lose provenance.
+
 ## Risks / Trade-offs
 
 - [Risk] Manual Gmail connector steps are slower than automation. -> Mitigation:

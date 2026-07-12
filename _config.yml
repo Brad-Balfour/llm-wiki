@@ -2,6 +2,11 @@ title: LLM Wiki
 description: A provenance-first personal knowledge base compiled from reviewed sources.
 theme: jekyll-theme-minimal
 markdown: kramdown
+defaults:
+  - scope:
+      path: wiki
+    values:
+      layout: default
 exclude:
   - AGENTS.md
   - chatgpt-project

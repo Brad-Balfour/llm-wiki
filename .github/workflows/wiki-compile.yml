@@ -7,6 +7,10 @@ on:
         description: Repository path to an approved TLDR source record
         required: true
         type: string
+      confirm_public:
+        description: I completed privacy, publication-rights, and dual-use review
+        required: true
+        type: boolean
 
 permissions:
   contents: write
@@ -48,8 +52,12 @@ jobs:
             echo "Approved source does not exist: $SOURCE_PATH" >&2
             exit 1
           fi
+          if [[ "${{ inputs.confirm_public }}" != "true" ]]; then
+            echo "confirm_public must be checked before public compilation" >&2
+            exit 1
+          fi
       - name: Compile approved source
-        run: npm run compile:wiki -- --input "$SOURCE_PATH"
+        run: npm run compile:wiki -- --input "$SOURCE_PATH" --confirm-public
       - name: Commit generated wiki changes to a review branch
         shell: bash
         env:

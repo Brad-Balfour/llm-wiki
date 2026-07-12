@@ -12,6 +12,12 @@ export interface ApprovedWikiSource {
     status: 'approved';
     public: true;
     approved_at: string;
+    reviewed_by: 'brad';
+    safety_review: {
+      privacy: 'cleared';
+      publication_rights: 'cleared';
+      dual_use: 'cleared';
+    };
   };
   source: {
     source_item_id: string;

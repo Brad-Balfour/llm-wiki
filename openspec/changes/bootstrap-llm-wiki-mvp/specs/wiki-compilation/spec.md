@@ -38,6 +38,14 @@ Updating an existing wiki entry SHALL preserve previous source provenance.
 - **AND** the compiler SHALL add the new source provenance
 - **AND** the compiler SHALL NOT silently remove prior sources.
 
+#### Scenario: Reuse a source item id with conflicting provenance
+
+- **WHEN** a proposed immutable source reuses an existing source item id with a
+  different source path or URL
+- **THEN** the compiler SHALL reject the provenance collision
+- **AND** it SHALL NOT mark the conflicting record processed or silently treat
+  it as an idempotent rerun.
+
 ### Requirement: Compile-State Manifest
 
 The compiler SHALL track processed inputs and output state in a compile-state
@@ -64,6 +72,29 @@ output.
 - **THEN** the item SHALL remain in review
 - **AND** the item SHALL NOT be written to public wiki output automatically.
 
+#### Scenario: Confirm public compilation locally
+
+- **WHEN** an otherwise approved source is submitted to the local compiler
+- **THEN** its approval record SHALL show cleared privacy,
+  publication-rights, and dual-use review
+- **AND** the operator SHALL provide an explicit local public-confirmation flag
+- **AND** a model-authored `public: true` value alone SHALL NOT authorize a
+  public write.
+
+### Requirement: Safe Public Rendering
+
+The compiler SHALL validate and safely render public source fields before
+writing a Pages-visible Markdown file.
+
+#### Scenario: Unsafe public field
+
+- **WHEN** a proposed source contains a non-HTTP(S) or credential-bearing URL,
+  raw HTML, an embedded Markdown link, control characters, credential-like
+  content, or private Range.com context
+- **THEN** compilation SHALL fail closed before changing wiki output or compile
+  state
+- **AND** approved plain text SHALL be Markdown-escaped when rendered.
+
 ### Requirement: GitHub Pages Read Path
 
 The MVP SHALL use GitHub Pages as the first read path for approved wiki output.
@@ -88,6 +119,8 @@ compilation is complete.
 - **THEN** `wiki/index.md` SHALL describe the reviewed public read path
 - **AND** the taxonomy SHALL include `concept`, `tool`, `person`, and `event`
   entry locations
+- **AND** the wiki and taxonomy indexes SHALL have Jekyll frontmatter and stable
+  directory permalinks so their Pages URLs render
 - **AND** an entry template SHALL demonstrate the required frontmatter and
   provenance shape
 - **AND** tasks 7.1-7.5 SHALL remain incomplete until an approved source can be

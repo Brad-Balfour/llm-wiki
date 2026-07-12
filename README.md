@@ -65,7 +65,9 @@ workflow and `docs/replan-2026-07-12.md` for the current implementation order.
 Compile one explicitly approved TLDR source into the OKF wiki:
 
 ```bash
-npm run compile:wiki -- --input sources/tldr/YYYY-MM-DD-<entry-slug>.txt
+npm run compile:wiki -- \
+  --input sources/tldr/YYYY-MM-DD-<entry-slug>.txt \
+  --confirm-public
 ```
 
 See `docs/wiki-ingestion-test.md` for the ChatGPT Project preparation and review

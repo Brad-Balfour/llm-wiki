@@ -43,13 +43,21 @@ export function compileApprovedWikiSource(
   }
 
   const existing = parseExistingEntry(existingMarkdown);
-  if (existing.provenance.some((item) => item.source_item_id === provenance.source_item_id)) {
-    return {
-      status: 'skipped',
-      output_path: outputPath,
-      markdown: existingMarkdown,
-      provenance_count: existing.provenance.length,
-    };
+  const matchingId = existing.provenance.find(
+    (item) => item.source_item_id === provenance.source_item_id
+  );
+  if (matchingId) {
+    if (matchingId.source_path === provenance.source_path && matchingId.url === provenance.url) {
+      return {
+        status: 'skipped',
+        output_path: outputPath,
+        markdown: existingMarkdown,
+        provenance_count: existing.provenance.length,
+      };
+    }
+    throw new Error(
+      `Conflicting provenance for source_item_id ${provenance.source_item_id}. Use a new source item id for a distinct immutable record.`
+    );
   }
 
   const mergedProvenance = [...existing.provenance, provenance];
@@ -104,13 +112,13 @@ function renderInitialBody(source: ApprovedWikiSource): string {
       ? ''
       : `\n\n## Related\n\n${source.entry.related.map((slug) => `- [[${slug}]]`).join('\n')}`;
   return [
-    `# ${source.entry.title}`,
+    `# ${escapeMarkdownText(source.entry.title)}`,
     '',
-    source.entry.summary,
+    escapeMarkdownText(source.entry.summary),
     '',
     '## Key Ideas',
     '',
-    ...source.entry.key_ideas.map((idea) => `- ${idea}`),
+    ...source.entry.key_ideas.map((idea) => `- ${escapeMarkdownText(idea)}`),
     '',
     '## Source Notes',
     '',
@@ -121,12 +129,12 @@ function renderInitialBody(source: ApprovedWikiSource): string {
 
 function renderSourceNote(source: ApprovedWikiSource): string {
   return [
-    `### [${source.source.title}](${source.source.url})`,
+    `### [${escapeMarkdownText(source.source.title)}](${source.source.url})`,
     `<!-- source-item-id: ${source.source.source_item_id} -->`,
     '',
-    `${source.source.newsletter}, ${source.source.edition_date}. ${source.entry.summary}`,
+    `${escapeMarkdownText(source.source.newsletter)}, ${source.source.edition_date}. ${escapeMarkdownText(source.entry.summary)}`,
     '',
-    ...source.entry.key_ideas.map((idea) => `- ${idea}`),
+    ...source.entry.key_ideas.map((idea) => `- ${escapeMarkdownText(idea)}`),
   ].join('\n');
 }
 
@@ -218,4 +226,8 @@ function parseJsonFrontmatter(frontmatter: string, key: string): unknown {
 
 function unique(values: string[]): string[] {
   return [...new Set(values)];
+}
+
+function escapeMarkdownText(value: string): string {
+  return value.replace(/([\\`*_{}[\]()#+!|>])/g, '\\$1');
 }
