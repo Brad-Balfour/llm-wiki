@@ -79,14 +79,20 @@ queue contains another URL.
 - `add this to my wiki`, `save this for the wiki`, or `wiki this`: acknowledge
   briefly and add the current item to the internal session ledger as a
   `review_notes` record with `destination: "wiki_review"`. Preserve its title,
-  `source_item_id`, URL, and my stated reason when available. This marks the item
-  for later review; it does not approve or publish it.
+  `source_item_id`, URL, and my stated reason. Copy the ID, title, and URL exactly
+  from the current queue object; never create, renumber, normalize, or guess an
+  ID or URL. If there is no current queue item with both an ID and URL, save a
+  `general_review` note instead of a `wiki_review` note. This marks the item for
+  later review; it does not approve or publish it.
 - `save this` or `come back to this`: record a general review note.
 - `approve this for wiki ingestion`: follow `wiki-ingestion.md` for the current
   item and create the approved-source `.txt` file only if every required safety
   check is clear. Do not publish it automatically.
 - A relevance, ranking, depth, or interest correction: record it as feedback for
   the end-of-session handoff without changing the current queue order.
+- A general statement such as interest in a topic or tool category is not an
+  article request. Save it as a general review note or session issue; do not
+  invent an article record for it.
 
 ## End the commute
 

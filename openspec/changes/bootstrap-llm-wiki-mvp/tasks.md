@@ -73,6 +73,7 @@ of concept changes execution order without removing the automated runtime work:
 - [x] 7.7 Reject stable source-item-id collisions when immutable source path or URL differs.
 - [x] 7.8 Convert validated `wiki_review` handoff notes into private, non-approved draft candidates that enumerate missing enrichment and approval fields.
 - [x] 7.9 Orchestrate reviewed enrichment, immutable source creation, and compilation behind a second explicit public-confirmation flag, with contained enrichment lookup and rollback on failure.
+- [x] 7.10 Process every wiki-marked handoff item in one run with per-item results, while leaving duplicates unchanged and clearly reporting items that still need source details or a reviewed summary.
 
 ## 8. Read Path And Deferred Work
 

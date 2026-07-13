@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { execFile } from 'node:child_process';
-import { access, cp, mkdir, mkdtemp, readFile, writeFile } from 'node:fs/promises';
+import { access, cp, mkdir, mkdtemp, readFile, unlink, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
@@ -9,6 +9,7 @@ import { promisify } from 'node:util';
 import {
   buildApprovedSource,
   captureRollbackError,
+  formatRollbackFailure,
   resolveEnrichmentPath,
 } from '../src/wiki/ingest-handoff.js';
 
@@ -82,6 +83,16 @@ test('captures a rollback failure without preventing later restoration steps', a
   assert.equal(errors.length, 1);
 });
 
+test('reports the original ingestion error and every cleanup error', () => {
+  assert.equal(
+    formatRollbackFailure(new Error('compiler rejected the source'), [
+      new Error('source file could not be removed'),
+      new Error('compile state could not be restored'),
+    ]),
+    'Wiki ingestion failed: compiler rejected the source Cleanup also failed: source file could not be removed; compile state could not be restored'
+  );
+});
+
 test('CLI requires confirmation, rolls back compiler failure, and succeeds on retry', async () => {
   const root = await mkdtemp(path.join(tmpdir(), 'llm-wiki-ingest-'));
   await cp('dist/src', path.join(root, 'dist/src'), { recursive: true });
@@ -98,20 +109,58 @@ test('CLI requires confirmation, rolls back compiler failure, and succeeds on re
       voice_surface: 'chatgpt_advanced',
       queue_files: ['queue.txt'],
       feedback: [],
-      review_notes: [note],
+      review_notes: [
+        note,
+        {
+          source_item_id: 'tldr-missing-enrichment',
+          title: 'Needs reviewed summary',
+          url: 'https://example.com/missing-enrichment',
+          note: 'Wiki this.',
+          destination: 'wiki_review',
+        },
+        {
+          source_item_id: 'tldr-invalid-enrichment',
+          title: 'Invalid reviewed summary',
+          url: 'https://example.com/invalid-enrichment',
+          note: 'Wiki this.',
+          destination: 'wiki_review',
+        },
+        {
+          source_item_id: 'unknown',
+          title: 'Needs source details',
+          note: 'Topic-level preference.',
+          destination: 'wiki_review',
+        },
+      ],
       issues: [],
     })
   );
   await writeFile(enrichmentPath, JSON.stringify(enrichment));
+  await writeFile(
+    path.join(root, '.private/wiki-enrichments/tldr-invalid-enrichment.json'),
+    'not valid JSON'
+  );
   const statePath = path.join(root, 'schema/compile-state.json');
-  const conflictingState = compileState({
-    'sources/tldr/other.txt': {
-      hash: 'sha256:old',
-      output_path: 'wiki/concepts/other.md',
-      source_item_id: note.source_item_id,
-      processed_at: '2026-07-12T00:00:00.000Z',
+  const existingOutputPath = path.join(root, 'wiki/concepts/transformer-architecture.md');
+  await mkdir(path.dirname(existingOutputPath), { recursive: true });
+  await writeFile(existingOutputPath, 'existing output\n');
+  const conflictingState = compileState(
+    {
+      'sources/tldr/other.txt': {
+        hash: 'sha256:old',
+        output_path: 'wiki/concepts/other.md',
+        source_item_id: 'different-source-item',
+        processed_at: '2026-07-12T00:00:00.000Z',
+      },
     },
-  });
+    {
+      'wiki/concepts/transformer-architecture.md': {
+        hash: 'sha256:not-the-existing-output',
+        updated: '2026-07-12T00:00:00.000Z',
+        provenance_count: 1,
+      },
+    }
+  );
   await writeFile(statePath, conflictingState);
   const cli = path.join(root, 'dist/src/wiki/ingest-handoff.js');
   const args = ['--input', handoffPath, '--source-item-id', note.source_item_id];
@@ -125,17 +174,77 @@ test('CLI requires confirmation, rolls back compiler failure, and succeeds on re
     execFileAsync(process.execPath, [cli, ...args, '--confirm-public'], { cwd: root })
   );
   assert.equal(await readFile(statePath, 'utf8'), conflictingState);
+  assert.equal(await readFile(existingOutputPath, 'utf8'), 'existing output\n');
   await assert.rejects(
     access(path.join(root, 'sources/tldr/2026-06-23-transformer-architecture.txt'))
   );
 
+  await unlink(existingOutputPath);
   await writeFile(statePath, compileState({}));
   await execFileAsync(process.execPath, [cli, ...args, '--confirm-public'], { cwd: root });
-  await access(path.join(root, 'sources/tldr/2026-06-23-transformer-architecture.txt'));
+  const approvedSourcePath = path.join(
+    root,
+    'sources/tldr/2026-06-23-transformer-architecture.txt'
+  );
+  await access(approvedSourcePath);
   await access(path.join(root, 'wiki/concepts/transformer-architecture.md'));
+
+  const conflictHandoffPath = path.join(root, 'conflict-handoff.txt');
+  await writeFile(
+    conflictHandoffPath,
+    JSON.stringify({
+      schema_version: 'commute-handoff.v1',
+      session_id: 'conflict-session',
+      session_date: '2026-07-12',
+      voice_surface: 'chatgpt_advanced',
+      queue_files: ['queue.txt'],
+      feedback: [],
+      review_notes: [{ ...note, url: 'https://example.com/different-source' }],
+      issues: [],
+    })
+  );
+  const sourceBeforeConflict = await readFile(approvedSourcePath, 'utf8');
+  await assert.rejects(
+    execFileAsync(process.execPath, [cli, '--input', conflictHandoffPath, '--confirm-public'], {
+      cwd: root,
+    }),
+    (error: Error & { stdout?: string }) => {
+      assert.match(error.stdout ?? '', /does not match the current reviewed entry details/);
+      return true;
+    }
+  );
+  assert.equal(await readFile(approvedSourcePath, 'utf8'), sourceBeforeConflict);
+
+  await unlink(existingOutputPath);
+  const rebuilt = await execFileAsync(process.execPath, [cli, ...args, '--confirm-public'], {
+    cwd: root,
+  });
+  assert.match(rebuilt.stdout, /published: Transformer architecture/);
+  await access(existingOutputPath);
+
+  let batchFailure: unknown;
+  try {
+    await execFileAsync(process.execPath, [cli, '--input', handoffPath, '--confirm-public'], {
+      cwd: root,
+    });
+  } catch (error) {
+    batchFailure = error;
+  }
+  assert.ok(batchFailure instanceof Error);
+  const batchOutput = (batchFailure as Error & { stdout: string }).stdout;
+  assert.match(batchOutput, /already published: Transformer architecture/);
+  assert.match(batchOutput, /needs reviewed summary: Needs reviewed summary/);
+  assert.match(
+    batchOutput,
+    /failed: Invalid reviewed summary — reviewed entry details are not valid JSON/
+  );
+  assert.match(batchOutput, /needs source details: Needs source details/);
 });
 
-function compileState(processedSources: Record<string, unknown>): string {
+function compileState(
+  processedSources: Record<string, unknown>,
+  wikiOutputs: Record<string, unknown> = {}
+): string {
   return `${JSON.stringify(
     {
       manifest_version: 1,
@@ -143,7 +252,7 @@ function compileState(processedSources: Record<string, unknown>): string {
       created: '2026-07-12',
       updated: null,
       processed_sources: processedSources,
-      wiki_outputs: {},
+      wiki_outputs: wikiOutputs,
       runs: [],
     },
     null,

@@ -7,7 +7,7 @@ import { promisify } from 'node:util';
 
 import { parseCommuteHandoffText } from '../commute/handoff.js';
 import type { CommuteReviewNote } from '../commute/handoff.js';
-import { validateApprovedWikiSource } from './approved-source.js';
+import { parseApprovedWikiSource, validateApprovedWikiSource } from './approved-source.js';
 import type { ApprovedWikiSource, WikiConfidence, WikiEntryType } from './types.js';
 
 const execFileAsync = promisify(execFile);
@@ -33,7 +33,7 @@ interface Enrichment {
 async function main(): Promise<void> {
   const options = parseOptions(process.argv.slice(2));
   if (!options.confirmPublic) {
-    throw new Error('Wiki ingestion requires --confirm-public after reviewing the selected entry.');
+    throw new Error('Wiki ingestion requires --confirm-public after reviewing the entries.');
   }
 
   const handoff = parseCommuteHandoffText(await readFile(options.input, 'utf8'));
@@ -42,22 +42,58 @@ async function main(): Promise<void> {
       note.destination === 'wiki_review' &&
       (options.sourceItemId === undefined || note.source_item_id === options.sourceItemId)
   );
-  if (candidates.length !== 1) {
-    throw new Error(
-      `Expected exactly one wiki review item; found ${candidates.length}. Use --source-item-id to select one.`
-    );
+  if (candidates.length === 0) {
+    throw new Error('No matching wiki review items were found in the handoff.');
   }
-  const note = candidates[0];
+
+  let failures = 0;
+  for (const note of candidates) {
+    let result: { status: BatchStatus; detail?: string };
+    try {
+      result = await ingestCandidate(note, options.enrichmentDir);
+    } catch (error) {
+      result = {
+        status: 'failed',
+        detail: error instanceof Error ? error.message : String(error),
+      };
+    }
+    process.stdout.write(
+      `${result.status}: ${note.title}${result.detail ? ` — ${result.detail}` : ''}\n`
+    );
+    if (result.status === 'failed') failures += 1;
+  }
+  if (failures > 0) process.exitCode = 1;
+}
+
+type BatchStatus =
+  'published' | 'already published' | 'needs source details' | 'needs reviewed summary' | 'failed';
+
+async function ingestCandidate(
+  note: CommuteReviewNote,
+  enrichmentDir: string
+): Promise<{ status: BatchStatus; detail?: string }> {
   if (
-    note === undefined ||
     note.source_item_id === undefined ||
     note.source_item_id === 'unknown' ||
     note.url === undefined
   ) {
-    throw new Error('Selected wiki review item must include source_item_id and url.');
+    return { status: 'needs source details', detail: 'article ID or URL is missing' };
   }
-  const enrichmentPath = resolveEnrichmentPath(options.enrichmentDir, note.source_item_id);
-  const enrichment = JSON.parse(await readFile(enrichmentPath, 'utf8')) as Enrichment;
+
+  const enrichmentPath = resolveEnrichmentPath(enrichmentDir, note.source_item_id);
+  const enrichmentText = await readOptionalFile(enrichmentPath);
+  if (enrichmentText === undefined) {
+    return { status: 'needs reviewed summary', detail: 'no reviewed entry details were found' };
+  }
+  let enrichment: Enrichment;
+  try {
+    enrichment = JSON.parse(enrichmentText) as Enrichment;
+  } catch {
+    return {
+      status: 'failed',
+      detail: 'reviewed entry details are not valid JSON',
+    };
+  }
   const approved = buildApprovedSource(note, enrichment, new Date().toISOString());
   const sourcePath = approved.source.source_path;
 
@@ -70,19 +106,27 @@ async function main(): Promise<void> {
   );
   const stateBefore = await readFile(statePath, 'utf8');
   const outputBefore = await readOptionalFile(outputPath);
+  const sourceBefore = await readOptionalFile(sourcePath);
   let sourceCreated = false;
   try {
-    await mkdir(path.dirname(sourcePath), { recursive: true });
-    await writeFile(sourcePath, `${JSON.stringify(approved, null, 2)}\n`, { flag: 'wx' });
-    sourceCreated = true;
-    process.stdout.write(`created ${sourcePath}\n`);
+    if (sourceBefore === undefined) {
+      await mkdir(path.dirname(sourcePath), { recursive: true });
+      await writeFile(sourcePath, `${JSON.stringify(approved, null, 2)}\n`, { flag: 'wx' });
+      sourceCreated = true;
+      process.stdout.write(`created ${sourcePath}\n`);
+    } else {
+      assertExistingSourceMatches(sourceBefore, approved);
+    }
     const result = await execFileAsync(process.execPath, [
       compilerPath,
       '--input',
       sourcePath,
       '--confirm-public',
     ]);
-    process.stdout.write(result.stdout);
+    return {
+      status: result.stdout.startsWith('skipped') ? 'already published' : 'published',
+      detail: approved.source.source_path,
+    };
   } catch (error) {
     const rollbackErrors: unknown[] = [];
     if (sourceCreated) await captureRollbackError(() => unlink(sourcePath), rollbackErrors);
@@ -93,13 +137,36 @@ async function main(): Promise<void> {
       await captureRollbackError(() => writeFile(outputPath, outputBefore, 'utf8'), rollbackErrors);
     }
     if (rollbackErrors.length > 0) {
-      throw new AggregateError(
-        [error, ...rollbackErrors],
-        'Wiki ingestion failed and one or more rollback steps also failed.'
-      );
+      return {
+        status: 'failed',
+        detail: formatRollbackFailure(error, rollbackErrors),
+      };
     }
-    throw error;
+    return { status: 'failed', detail: error instanceof Error ? error.message : String(error) };
   }
+}
+
+function assertExistingSourceMatches(sourceText: string, approved: ApprovedWikiSource): void {
+  const existing = parseApprovedWikiSource(sourceText);
+  const candidateWithExistingApprovalTime = {
+    ...approved,
+    approval: { ...approved.approval, approved_at: existing.approval.approved_at },
+  };
+  if (JSON.stringify(existing) !== JSON.stringify(candidateWithExistingApprovalTime)) {
+    throw new Error(
+      `Existing approved source ${approved.source.source_path} does not match the current reviewed entry details.`
+    );
+  }
+}
+
+export function formatRollbackFailure(originalError: unknown, rollbackErrors: unknown[]): string {
+  return `Wiki ingestion failed: ${errorMessage(originalError)} Cleanup also failed: ${rollbackErrors
+    .map(errorMessage)
+    .join('; ')}`;
+}
+
+function errorMessage(error: unknown): string {
+  return error instanceof Error ? error.message : String(error);
 }
 
 export function buildApprovedSource(
