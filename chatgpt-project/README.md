@@ -20,5 +20,6 @@ Project.
 - `chatgpt-project/wiki-ingestion.md`
 - `schema/approved-wiki-source-v1.schema.json`
 
-The commute command is "End the commute session." The explicit public wiki
+The synonymous commute commands are "End commute" and "End the commute session."
+The explicit public wiki
 preparation command is "Approve this for wiki ingestion."

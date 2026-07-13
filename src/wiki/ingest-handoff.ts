@@ -1,0 +1,223 @@
+import { execFile } from 'node:child_process';
+import { realpathSync } from 'node:fs';
+import { mkdir, readFile, unlink, writeFile } from 'node:fs/promises';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { promisify } from 'node:util';
+
+import { parseCommuteHandoffText } from '../commute/handoff.js';
+import type { CommuteReviewNote } from '../commute/handoff.js';
+import { validateApprovedWikiSource } from './approved-source.js';
+import type { ApprovedWikiSource, WikiConfidence, WikiEntryType } from './types.js';
+
+const execFileAsync = promisify(execFile);
+
+interface Enrichment {
+  approval: {
+    reviewed_by: 'brad';
+    safety_review: { privacy: 'cleared'; publication_rights: 'cleared'; dual_use: 'cleared' };
+  };
+  newsletter: string;
+  edition_date: string;
+  type: WikiEntryType;
+  slug: string;
+  title: string;
+  aliases: string[];
+  tags: string[];
+  confidence: WikiConfidence;
+  summary: string;
+  key_ideas: string[];
+  related: string[];
+}
+
+async function main(): Promise<void> {
+  const options = parseOptions(process.argv.slice(2));
+  if (!options.confirmPublic) {
+    throw new Error('Wiki ingestion requires --confirm-public after reviewing the selected entry.');
+  }
+
+  const handoff = parseCommuteHandoffText(await readFile(options.input, 'utf8'));
+  const candidates = handoff.review_notes.filter(
+    (note) =>
+      note.destination === 'wiki_review' &&
+      (options.sourceItemId === undefined || note.source_item_id === options.sourceItemId)
+  );
+  if (candidates.length !== 1) {
+    throw new Error(
+      `Expected exactly one wiki review item; found ${candidates.length}. Use --source-item-id to select one.`
+    );
+  }
+  const note = candidates[0];
+  if (
+    note === undefined ||
+    note.source_item_id === undefined ||
+    note.source_item_id === 'unknown' ||
+    note.url === undefined
+  ) {
+    throw new Error('Selected wiki review item must include source_item_id and url.');
+  }
+  const enrichmentPath = resolveEnrichmentPath(options.enrichmentDir, note.source_item_id);
+  const enrichment = JSON.parse(await readFile(enrichmentPath, 'utf8')) as Enrichment;
+  const approved = buildApprovedSource(note, enrichment, new Date().toISOString());
+  const sourcePath = approved.source.source_path;
+
+  const compilerPath = path.resolve('dist/src/wiki/compile-file.js');
+  const statePath = path.resolve('schema/compile-state.json');
+  const outputPath = path.resolve(
+    'wiki',
+    approved.entry.type === 'person' ? 'people' : `${approved.entry.type}s`,
+    `${approved.entry.slug}.md`
+  );
+  const stateBefore = await readFile(statePath, 'utf8');
+  const outputBefore = await readOptionalFile(outputPath);
+  let sourceCreated = false;
+  try {
+    await mkdir(path.dirname(sourcePath), { recursive: true });
+    await writeFile(sourcePath, `${JSON.stringify(approved, null, 2)}\n`, { flag: 'wx' });
+    sourceCreated = true;
+    process.stdout.write(`created ${sourcePath}\n`);
+    const result = await execFileAsync(process.execPath, [
+      compilerPath,
+      '--input',
+      sourcePath,
+      '--confirm-public',
+    ]);
+    process.stdout.write(result.stdout);
+  } catch (error) {
+    const rollbackErrors: unknown[] = [];
+    if (sourceCreated) await captureRollbackError(() => unlink(sourcePath), rollbackErrors);
+    await captureRollbackError(() => writeFile(statePath, stateBefore, 'utf8'), rollbackErrors);
+    if (outputBefore === undefined) {
+      await captureRollbackError(() => unlinkIfPresent(outputPath), rollbackErrors);
+    } else {
+      await captureRollbackError(() => writeFile(outputPath, outputBefore, 'utf8'), rollbackErrors);
+    }
+    if (rollbackErrors.length > 0) {
+      throw new AggregateError(
+        [error, ...rollbackErrors],
+        'Wiki ingestion failed and one or more rollback steps also failed.'
+      );
+    }
+    throw error;
+  }
+}
+
+export function buildApprovedSource(
+  note: CommuteReviewNote,
+  enrichment: Enrichment,
+  approvedAt: string
+): ApprovedWikiSource {
+  if (
+    note.source_item_id === undefined ||
+    note.source_item_id === 'unknown' ||
+    note.url === undefined
+  ) {
+    throw new Error('Wiki review note requires source_item_id and url.');
+  }
+  const { approval, newsletter, edition_date, ...entry } = enrichment;
+  return validateApprovedWikiSource({
+    schema_version: 'approved-wiki-source.v1',
+    approval: {
+      status: 'approved',
+      public: true,
+      approved_at: approvedAt,
+      reviewed_by: approval.reviewed_by,
+      safety_review: approval.safety_review,
+    },
+    source: {
+      source_item_id: note.source_item_id,
+      source_path: `sources/tldr/${edition_date}-${entry.slug}.txt`,
+      source_type: 'tldr',
+      title: note.title,
+      url: note.url,
+      newsletter,
+      edition_date,
+    },
+    entry,
+  });
+}
+
+export function resolveEnrichmentPath(enrichmentDir: string, sourceItemId: string): string {
+  if (!/^[A-Za-z0-9][A-Za-z0-9._:-]*$/.test(sourceItemId)) {
+    throw new Error('Selected source_item_id contains unsupported characters.');
+  }
+  const enrichmentRoot = path.resolve(enrichmentDir);
+  const enrichmentPath = path.resolve(enrichmentRoot, `${sourceItemId}.json`);
+  if (!enrichmentPath.startsWith(`${enrichmentRoot}${path.sep}`)) {
+    throw new Error('Enrichment path escapes the configured directory.');
+  }
+  return enrichmentPath;
+}
+
+async function readOptionalFile(filePath: string): Promise<string | undefined> {
+  try {
+    return await readFile(filePath, 'utf8');
+  } catch (error) {
+    if (errorCode(error) === 'ENOENT') return undefined;
+    throw error;
+  }
+}
+
+async function unlinkIfPresent(filePath: string): Promise<void> {
+  try {
+    await unlink(filePath);
+  } catch (error) {
+    if (errorCode(error) !== 'ENOENT') throw error;
+  }
+}
+
+export async function captureRollbackError(
+  action: () => Promise<unknown>,
+  rollbackErrors: unknown[]
+): Promise<void> {
+  try {
+    await action();
+  } catch (error) {
+    rollbackErrors.push(error);
+  }
+}
+
+function errorCode(error: unknown): unknown {
+  return typeof error === 'object' && error !== null && 'code' in error ? error.code : undefined;
+}
+
+function parseOptions(args: string[]): {
+  input: string;
+  enrichmentDir: string;
+  sourceItemId?: string;
+  confirmPublic: boolean;
+} {
+  let input: string | undefined;
+  let enrichmentDir = '.private/wiki-enrichments';
+  let sourceItemId: string | undefined;
+  let confirmPublic = false;
+  for (let index = 0; index < args.length; index += 1) {
+    const arg = args[index];
+    if (arg === '--input') {
+      input = args[index + 1];
+      index += 1;
+    } else if (arg === '--enrichment-dir') {
+      enrichmentDir = args[index + 1] ?? enrichmentDir;
+      index += 1;
+    } else if (arg === '--source-item-id') {
+      sourceItemId = args[index + 1];
+      index += 1;
+    } else if (arg === '--confirm-public') {
+      confirmPublic = true;
+    } else {
+      throw new Error(`Unknown argument: ${arg ?? ''}`);
+    }
+  }
+  if (!input) throw new Error('Usage: ingest:wiki -- --input <handoff.txt> --confirm-public');
+  return {
+    input,
+    enrichmentDir,
+    ...(sourceItemId === undefined ? {} : { sourceItemId }),
+    confirmPublic,
+  };
+}
+
+if (
+  realpathSync(fileURLToPath(import.meta.url)) === realpathSync(path.resolve(process.argv[1] ?? ''))
+)
+  await main();

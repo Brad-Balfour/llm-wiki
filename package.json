@@ -18,6 +18,8 @@
     "compile:wiki": "npm run build --silent && node dist/src/wiki/compile-file.js",
     "ingest:tldr": "npm run build --silent && node dist/src/tldr/ingest-file.js",
     "import:commute-handoff": "npm run build --silent && node dist/src/commute/import-handoff.js",
+    "prepare:wiki-drafts": "npm run build --silent && node dist/src/wiki/prepare-handoff-drafts.js",
+    "ingest:wiki": "npm run build --silent && node dist/src/wiki/ingest-handoff.js",
     "test": "npm run build && node --test dist/tests/*.test.js",
     "ci:test": "npm run test",
     "lint": "eslint .",

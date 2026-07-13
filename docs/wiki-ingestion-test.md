@@ -1,5 +1,11 @@
 # Wiki Ingestion Test
 
+## Published read path
+
+GitHub Pages is enabled with GitHub Actions as its build source. The verified
+public wiki is available at <https://brad-balfour.github.io/llm-wiki/wiki/>.
+The initial Jekyll build and deployment completed successfully on 2026-07-12.
+
 This is the manual test path for compiling one reviewed TLDR item into the OKF
 wiki.
 

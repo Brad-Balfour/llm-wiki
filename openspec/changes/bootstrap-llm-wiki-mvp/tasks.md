@@ -71,6 +71,8 @@ of concept changes execution order without removing the automated runtime work:
 - [x] 7.5 Add fixture tests for create, update, provenance, and idempotent compile behavior.
 - [x] 7.6 Require explicit local public confirmation, structured safety review, safe HTTP(S) URLs, unsafe-content rejection, and escaped Markdown rendering.
 - [x] 7.7 Reject stable source-item-id collisions when immutable source path or URL differs.
+- [x] 7.8 Convert validated `wiki_review` handoff notes into private, non-approved draft candidates that enumerate missing enrichment and approval fields.
+- [x] 7.9 Orchestrate reviewed enrichment, immutable source creation, and compilation behind a second explicit public-confirmation flag, with contained enrichment lookup and rollback on failure.
 
 ## 8. Read Path And Deferred Work
 
@@ -78,7 +80,7 @@ of concept changes execution order without removing the automated runtime work:
 - [x] 8.0a Make the wiki landing and taxonomy indexes Jekyll-renderable at stable directory URLs and verify their frontmatter in tests.
 - [x] 8.0b Parse Jekyll configuration and Pages-visible Markdown frontmatter in the deterministic project checks, including compiler-compatible template provenance.
 - [x] 8.0c Exclude the entry template from public Pages output and taxonomy listings.
-- [ ] 8.1 Configure GitHub Pages as the MVP read path for approved `wiki/` output.
+- [x] 8.1 Configure GitHub Pages as the MVP read path for approved `wiki/` output.
 - [x] 8.2 Add a manually triggered GitHub Actions workflow for tests and wiki compilation after application code exists.
 - [ ] 8.3 Enable scheduled nightly compile only after manual workflow runs are stable.
 - [ ] 8.4 Keep secrets in GitHub Actions configuration only, never in committed files.
