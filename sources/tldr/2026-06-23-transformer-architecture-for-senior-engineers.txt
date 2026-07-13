@@ -3,7 +3,7 @@
   "approval": {
     "status": "approved",
     "public": true,
-    "approved_at": "2026-07-13T01:01:14.907Z",
+    "approved_at": "2026-07-13T02:23:03.445Z",
     "reviewed_by": "brad",
     "safety_review": {
       "privacy": "cleared",
@@ -12,7 +12,7 @@
     }
   },
   "source": {
-    "source_item_id": "tldr-dev-2026-06-23-001",
+    "source_item_id": "tldr_79edd44693b74006",
     "source_path": "sources/tldr/2026-06-23-transformer-architecture-for-senior-engineers.txt",
     "source_type": "tldr",
     "title": "Everything a Senior Engineer Needs to Know About What's Inside an LLM",
@@ -34,7 +34,7 @@
       "model-architecture"
     ],
     "confidence": "high",
-    "summary": "Transformers replaced recurrent neural networks for modern language models by processing relationships among tokens through attention rather than relying on a sequential hidden state. A transformer pipeline converts text into token IDs and embeddings, adds position information, applies multi-head attention, and combines attention with feed-forward layers, normalization, and residual connections.",
+    "summary": "Transformers process relationships among tokens through attention rather than a sequential recurrent state. A transformer pipeline maps text to tokens and embeddings, adds positional information, and combines multi-head attention with feed-forward layers, normalization, and residual connections.",
     "key_ideas": [
       "Transformers model token relationships through attention instead of sequential recurrent state.",
       "Tokenization converts text into token IDs, while embeddings map those IDs into learned vectors.",

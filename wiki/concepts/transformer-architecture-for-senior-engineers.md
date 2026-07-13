@@ -9,12 +9,12 @@ created: 2026-07-13
 updated: 2026-07-13
 confidence: high
 # prettier-ignore
-provenance: [{"source_item_id":"tldr-dev-2026-06-23-001","source_path":"sources/tldr/2026-06-23-transformer-architecture-for-senior-engineers.txt","url":"https://www.pathtostaff.com/p/everything-a-senior-engineer-needs"}]
+provenance: [{"source_item_id":"tldr_79edd44693b74006","source_path":"sources/tldr/2026-06-23-transformer-architecture-for-senior-engineers.txt","url":"https://www.pathtostaff.com/p/everything-a-senior-engineer-needs"}]
 ---
 
 # Transformer Architecture for Senior Engineers
 
-Transformers replaced recurrent neural networks for modern language models by processing relationships among tokens through attention rather than relying on a sequential hidden state. A transformer pipeline converts text into token IDs and embeddings, adds position information, applies multi-head attention, and combines attention with feed-forward layers, normalization, and residual connections.
+Transformers process relationships among tokens through attention rather than a sequential recurrent state. A transformer pipeline maps text to tokens and embeddings, adds positional information, and combines multi-head attention with feed-forward layers, normalization, and residual connections.
 
 ## Key Ideas
 
@@ -28,9 +28,9 @@ Transformers replaced recurrent neural networks for modern language models by pr
 
 ### [Everything a Senior Engineer Needs to Know About What's Inside an LLM](https://www.pathtostaff.com/p/everything-a-senior-engineer-needs)
 
-<!-- source-item-id: tldr-dev-2026-06-23-001 -->
+<!-- source-item-id: tldr_79edd44693b74006 -->
 
-TLDR Dev, 2026-06-23. Transformers replaced recurrent neural networks for modern language models by processing relationships among tokens through attention rather than relying on a sequential hidden state. A transformer pipeline converts text into token IDs and embeddings, adds position information, applies multi-head attention, and combines attention with feed-forward layers, normalization, and residual connections.
+TLDR Dev, 2026-06-23. Transformers process relationships among tokens through attention rather than a sequential recurrent state. A transformer pipeline maps text to tokens and embeddings, adds positional information, and combines multi-head attention with feed-forward layers, normalization, and residual connections.
 
 - Transformers model token relationships through attention instead of sequential recurrent state.
 - Tokenization converts text into token IDs, while embeddings map those IDs into learned vectors.
