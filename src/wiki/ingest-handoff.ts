@@ -48,7 +48,12 @@ async function main(): Promise<void> {
     );
   }
   const note = candidates[0];
-  if (note === undefined || note.source_item_id === undefined || note.url === undefined) {
+  if (
+    note === undefined ||
+    note.source_item_id === undefined ||
+    note.source_item_id === 'unknown' ||
+    note.url === undefined
+  ) {
     throw new Error('Selected wiki review item must include source_item_id and url.');
   }
   const enrichmentPath = resolveEnrichmentPath(options.enrichmentDir, note.source_item_id);
@@ -79,10 +84,20 @@ async function main(): Promise<void> {
     ]);
     process.stdout.write(result.stdout);
   } catch (error) {
-    if (sourceCreated) await unlink(sourcePath);
-    await writeFile(statePath, stateBefore, 'utf8');
-    if (outputBefore === undefined) await unlinkIfPresent(outputPath);
-    else await writeFile(outputPath, outputBefore, 'utf8');
+    const rollbackErrors: unknown[] = [];
+    if (sourceCreated) await captureRollbackError(() => unlink(sourcePath), rollbackErrors);
+    await captureRollbackError(() => writeFile(statePath, stateBefore, 'utf8'), rollbackErrors);
+    if (outputBefore === undefined) {
+      await captureRollbackError(() => unlinkIfPresent(outputPath), rollbackErrors);
+    } else {
+      await captureRollbackError(() => writeFile(outputPath, outputBefore, 'utf8'), rollbackErrors);
+    }
+    if (rollbackErrors.length > 0) {
+      throw new AggregateError(
+        [error, ...rollbackErrors],
+        'Wiki ingestion failed and one or more rollback steps also failed.'
+      );
+    }
     throw error;
   }
 }
@@ -92,7 +107,11 @@ export function buildApprovedSource(
   enrichment: Enrichment,
   approvedAt: string
 ): ApprovedWikiSource {
-  if (note.source_item_id === undefined || note.url === undefined) {
+  if (
+    note.source_item_id === undefined ||
+    note.source_item_id === 'unknown' ||
+    note.url === undefined
+  ) {
     throw new Error('Wiki review note requires source_item_id and url.');
   }
   const { approval, newsletter, edition_date, ...entry } = enrichment;
@@ -144,6 +163,17 @@ async function unlinkIfPresent(filePath: string): Promise<void> {
     await unlink(filePath);
   } catch (error) {
     if (errorCode(error) !== 'ENOENT') throw error;
+  }
+}
+
+export async function captureRollbackError(
+  action: () => Promise<unknown>,
+  rollbackErrors: unknown[]
+): Promise<void> {
+  try {
+    await action();
+  } catch (error) {
+    rollbackErrors.push(error);
   }
 }
 

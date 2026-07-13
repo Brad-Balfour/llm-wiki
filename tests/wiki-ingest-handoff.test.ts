@@ -6,7 +6,11 @@ import path from 'node:path';
 import test from 'node:test';
 import { promisify } from 'node:util';
 
-import { buildApprovedSource, resolveEnrichmentPath } from '../src/wiki/ingest-handoff.js';
+import {
+  buildApprovedSource,
+  captureRollbackError,
+  resolveEnrichmentPath,
+} from '../src/wiki/ingest-handoff.js';
 
 const execFileAsync = promisify(execFile);
 
@@ -53,6 +57,29 @@ test('rejects source item ids that could escape the enrichment directory', () =>
     resolveEnrichmentPath('.private/wiki-enrichments', note.source_item_id),
     /tldr-dev-2026-06-23-001\.json$/
   );
+});
+
+test('rejects the unknown placeholder before public source construction', () => {
+  assert.throws(() =>
+    buildApprovedSource(
+      { ...note, source_item_id: 'unknown' },
+      enrichment,
+      '2026-07-13T01:00:00.000Z'
+    )
+  );
+});
+
+test('captures a rollback failure without preventing later restoration steps', async () => {
+  const errors: unknown[] = [];
+  let stateRestored = false;
+  await captureRollbackError(async () => {
+    throw new Error('source remained locked');
+  }, errors);
+  await captureRollbackError(async () => {
+    stateRestored = true;
+  }, errors);
+  assert.equal(stateRestored, true);
+  assert.equal(errors.length, 1);
 });
 
 test('CLI requires confirmation, rolls back compiler failure, and succeeds on retry', async () => {
