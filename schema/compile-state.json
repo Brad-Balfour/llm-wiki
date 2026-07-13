@@ -2,8 +2,28 @@
   "manifest_version": 1,
   "schema_version": "compile-state.v1",
   "created": "2026-07-05",
-  "updated": null,
-  "processed_sources": {},
-  "wiki_outputs": {},
-  "runs": []
+  "updated": "2026-07-13T01:01:14.932Z",
+  "processed_sources": {
+    "sources/tldr/2026-06-23-transformer-architecture-for-senior-engineers.txt": {
+      "hash": "sha256:d850ac2c248749b0017c4966288d25bb17cc4e335096b1e960ed8c9d37c21d54",
+      "output_path": "wiki/concepts/transformer-architecture-for-senior-engineers.md",
+      "source_item_id": "tldr-dev-2026-06-23-001",
+      "processed_at": "2026-07-13T01:01:14.932Z"
+    }
+  },
+  "wiki_outputs": {
+    "wiki/concepts/transformer-architecture-for-senior-engineers.md": {
+      "hash": "sha256:220edfc56fbedc04cde257e4bc56add2a1bd7d344014af5c871116fed780c53c",
+      "updated": "2026-07-13T01:01:14.932Z",
+      "provenance_count": 1
+    }
+  },
+  "runs": [
+    {
+      "timestamp": "2026-07-13T01:01:14.932Z",
+      "source_path": "sources/tldr/2026-06-23-transformer-architecture-for-senior-engineers.txt",
+      "output_path": "wiki/concepts/transformer-architecture-for-senior-engineers.md",
+      "status": "created"
+    }
+  ]
 }
