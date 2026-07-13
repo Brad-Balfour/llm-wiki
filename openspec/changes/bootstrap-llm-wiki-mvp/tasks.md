@@ -72,6 +72,7 @@ of concept changes execution order without removing the automated runtime work:
 - [x] 7.6 Require explicit local public confirmation, structured safety review, safe HTTP(S) URLs, unsafe-content rejection, and escaped Markdown rendering.
 - [x] 7.7 Reject stable source-item-id collisions when immutable source path or URL differs.
 - [x] 7.8 Convert validated `wiki_review` handoff notes into private, non-approved draft candidates that enumerate missing enrichment and approval fields.
+- [x] 7.9 Orchestrate reviewed enrichment, immutable source creation, and compilation behind a second explicit public-confirmation flag, with contained enrichment lookup and rollback on failure.
 
 ## 8. Read Path And Deferred Work
 

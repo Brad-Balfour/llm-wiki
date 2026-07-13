@@ -17,7 +17,7 @@ test('creates an OKF entry from an explicitly approved TLDR source', async () =>
   assert.equal(result.output_path, 'wiki/concepts/context-engineering.md');
   assert.equal(result.provenance_count, 1);
   assert.match(result.markdown, /^---\ntype: concept\n/);
-  assert.match(result.markdown, /title: "Context Engineering"/);
+  assert.match(result.markdown, /title: 'Context Engineering'/);
   assert.match(result.markdown, /created: 2026-07-12/);
   assert.match(result.markdown, /updated: 2026-07-12/);
   assert.match(result.markdown, /confidence: medium/);
