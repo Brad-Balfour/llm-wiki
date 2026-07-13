@@ -45,6 +45,12 @@ When the trigger phrase is spoken:
    arrays for categories with no recorded items; do not invent missing details.
 7. Save explicit feedback under `feedback`, explicit saved notes under
    `review_notes`, and material session problems under `issues`.
+   - Every `feedback` item must identify one real `source_item_id` and use only a
+     schema-supported `action`: `mark_interested`, `mark_uninterested`,
+     `promote_to_in_depth`, `save_for_review`, or `skip`.
+   - Do not invent `type` fields in `feedback`.
+   - Put presentation, queue-state, retrieval, and general workflow observations
+     in `issues` unless they are explicit review notes about a particular item.
 8. Treat every saved note as review-only. Do not publish, commit, send, create a
    reminder, or take any other external action.
 9. After the file is created, say only: "The commute handoff is ready."
