@@ -2,8 +2,45 @@
   "manifest_version": 1,
   "schema_version": "compile-state.v1",
   "created": "2026-07-05",
-  "updated": null,
-  "processed_sources": {},
-  "wiki_outputs": {},
-  "runs": []
+  "updated": "2026-07-13T02:23:03.492Z",
+  "processed_sources": {
+    "sources/tldr/2026-06-23-transformer-architecture-for-senior-engineers.txt": {
+      "hash": "sha256:f9a592761c47b368e73c13dd97d27b02bc875433b632a582a40ec6419643e631",
+      "output_path": "wiki/concepts/transformer-architecture-for-senior-engineers.md",
+      "source_item_id": "tldr_79edd44693b74006",
+      "processed_at": "2026-07-13T02:23:03.467Z"
+    },
+    "sources/tldr/2026-06-23-claude-code-extended-thinking-output.txt": {
+      "hash": "sha256:0f085422c8b4aa8c9dbfd83a2dca611761cd926582e0eb93e644da989784acf9",
+      "output_path": "wiki/concepts/claude-code-extended-thinking-output.md",
+      "source_item_id": "tldr_f6b2ae0fb7b44ced",
+      "processed_at": "2026-07-13T02:23:03.492Z"
+    }
+  },
+  "wiki_outputs": {
+    "wiki/concepts/transformer-architecture-for-senior-engineers.md": {
+      "hash": "sha256:16bd28d60d8b9c8629563a6733eea4a696f532848cf968b21ebf188605fd815c",
+      "updated": "2026-07-13T02:23:03.467Z",
+      "provenance_count": 1
+    },
+    "wiki/concepts/claude-code-extended-thinking-output.md": {
+      "hash": "sha256:8f1f604d369b63d05403a471ae178a1702619e60e80c133f3b4022820616df6e",
+      "updated": "2026-07-13T02:23:03.492Z",
+      "provenance_count": 1
+    }
+  },
+  "runs": [
+    {
+      "timestamp": "2026-07-13T02:23:03.467Z",
+      "source_path": "sources/tldr/2026-06-23-transformer-architecture-for-senior-engineers.txt",
+      "output_path": "wiki/concepts/transformer-architecture-for-senior-engineers.md",
+      "status": "created"
+    },
+    {
+      "timestamp": "2026-07-13T02:23:03.492Z",
+      "source_path": "sources/tldr/2026-06-23-claude-code-extended-thinking-output.txt",
+      "output_path": "wiki/concepts/claude-code-extended-thinking-output.md",
+      "status": "created"
+    }
+  ]
 }
