@@ -9,6 +9,7 @@ import { promisify } from 'node:util';
 import {
   buildApprovedSource,
   captureRollbackError,
+  formatRollbackFailure,
   resolveEnrichmentPath,
 } from '../src/wiki/ingest-handoff.js';
 
@@ -80,6 +81,16 @@ test('captures a rollback failure without preventing later restoration steps', a
   }, errors);
   assert.equal(stateRestored, true);
   assert.equal(errors.length, 1);
+});
+
+test('reports the original ingestion error and every cleanup error', () => {
+  assert.equal(
+    formatRollbackFailure(new Error('compiler rejected the source'), [
+      new Error('source file could not be removed'),
+      new Error('compile state could not be restored'),
+    ]),
+    'Wiki ingestion failed: compiler rejected the source Cleanup also failed: source file could not be removed; compile state could not be restored'
+  );
 });
 
 test('CLI requires confirmation, rolls back compiler failure, and succeeds on retry', async () => {
@@ -171,8 +182,45 @@ test('CLI requires confirmation, rolls back compiler failure, and succeeds on re
   await unlink(existingOutputPath);
   await writeFile(statePath, compileState({}));
   await execFileAsync(process.execPath, [cli, ...args, '--confirm-public'], { cwd: root });
-  await access(path.join(root, 'sources/tldr/2026-06-23-transformer-architecture.txt'));
+  const approvedSourcePath = path.join(
+    root,
+    'sources/tldr/2026-06-23-transformer-architecture.txt'
+  );
+  await access(approvedSourcePath);
   await access(path.join(root, 'wiki/concepts/transformer-architecture.md'));
+
+  const conflictHandoffPath = path.join(root, 'conflict-handoff.txt');
+  await writeFile(
+    conflictHandoffPath,
+    JSON.stringify({
+      schema_version: 'commute-handoff.v1',
+      session_id: 'conflict-session',
+      session_date: '2026-07-12',
+      voice_surface: 'chatgpt_advanced',
+      queue_files: ['queue.txt'],
+      feedback: [],
+      review_notes: [{ ...note, url: 'https://example.com/different-source' }],
+      issues: [],
+    })
+  );
+  const sourceBeforeConflict = await readFile(approvedSourcePath, 'utf8');
+  await assert.rejects(
+    execFileAsync(process.execPath, [cli, '--input', conflictHandoffPath, '--confirm-public'], {
+      cwd: root,
+    }),
+    (error: Error & { stdout?: string }) => {
+      assert.match(error.stdout ?? '', /does not match the current reviewed entry details/);
+      return true;
+    }
+  );
+  assert.equal(await readFile(approvedSourcePath, 'utf8'), sourceBeforeConflict);
+
+  await unlink(existingOutputPath);
+  const rebuilt = await execFileAsync(process.execPath, [cli, ...args, '--confirm-public'], {
+    cwd: root,
+  });
+  assert.match(rebuilt.stdout, /published: Transformer architecture/);
+  await access(existingOutputPath);
 
   let batchFailure: unknown;
   try {
@@ -186,7 +234,10 @@ test('CLI requires confirmation, rolls back compiler failure, and succeeds on re
   const batchOutput = (batchFailure as Error & { stdout: string }).stdout;
   assert.match(batchOutput, /already published: Transformer architecture/);
   assert.match(batchOutput, /needs reviewed summary: Needs reviewed summary/);
-  assert.match(batchOutput, /failed: Invalid reviewed summary/);
+  assert.match(
+    batchOutput,
+    /failed: Invalid reviewed summary — reviewed entry details are not valid JSON/
+  );
   assert.match(batchOutput, /needs source details: Needs source details/);
 });
 

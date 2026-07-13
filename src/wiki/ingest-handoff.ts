@@ -7,7 +7,7 @@ import { promisify } from 'node:util';
 
 import { parseCommuteHandoffText } from '../commute/handoff.js';
 import type { CommuteReviewNote } from '../commute/handoff.js';
-import { validateApprovedWikiSource } from './approved-source.js';
+import { parseApprovedWikiSource, validateApprovedWikiSource } from './approved-source.js';
 import type { ApprovedWikiSource, WikiConfidence, WikiEntryType } from './types.js';
 
 const execFileAsync = promisify(execFile);
@@ -80,23 +80,20 @@ async function ingestCandidate(
     return { status: 'needs source details', detail: 'article ID or URL is missing' };
   }
 
-  const state = JSON.parse(await readFile('schema/compile-state.json', 'utf8')) as {
-    processed_sources?: Record<string, { source_item_id?: string }>;
-  };
-  if (
-    Object.values(state.processed_sources ?? {}).some(
-      (record) => record.source_item_id === note.source_item_id
-    )
-  ) {
-    return { status: 'already published' };
-  }
-
   const enrichmentPath = resolveEnrichmentPath(enrichmentDir, note.source_item_id);
   const enrichmentText = await readOptionalFile(enrichmentPath);
   if (enrichmentText === undefined) {
     return { status: 'needs reviewed summary', detail: 'no reviewed entry details were found' };
   }
-  const enrichment = JSON.parse(enrichmentText) as Enrichment;
+  let enrichment: Enrichment;
+  try {
+    enrichment = JSON.parse(enrichmentText) as Enrichment;
+  } catch {
+    return {
+      status: 'failed',
+      detail: 'reviewed entry details are not valid JSON',
+    };
+  }
   const approved = buildApprovedSource(note, enrichment, new Date().toISOString());
   const sourcePath = approved.source.source_path;
 
@@ -109,12 +106,17 @@ async function ingestCandidate(
   );
   const stateBefore = await readFile(statePath, 'utf8');
   const outputBefore = await readOptionalFile(outputPath);
+  const sourceBefore = await readOptionalFile(sourcePath);
   let sourceCreated = false;
   try {
-    await mkdir(path.dirname(sourcePath), { recursive: true });
-    await writeFile(sourcePath, `${JSON.stringify(approved, null, 2)}\n`, { flag: 'wx' });
-    sourceCreated = true;
-    process.stdout.write(`created ${sourcePath}\n`);
+    if (sourceBefore === undefined) {
+      await mkdir(path.dirname(sourcePath), { recursive: true });
+      await writeFile(sourcePath, `${JSON.stringify(approved, null, 2)}\n`, { flag: 'wx' });
+      sourceCreated = true;
+      process.stdout.write(`created ${sourcePath}\n`);
+    } else {
+      assertExistingSourceMatches(sourceBefore, approved);
+    }
     const result = await execFileAsync(process.execPath, [
       compilerPath,
       '--input',
@@ -137,14 +139,34 @@ async function ingestCandidate(
     if (rollbackErrors.length > 0) {
       return {
         status: 'failed',
-        detail: new AggregateError(
-          [error, ...rollbackErrors],
-          'Wiki ingestion failed and one or more cleanup steps also failed.'
-        ).message,
+        detail: formatRollbackFailure(error, rollbackErrors),
       };
     }
     return { status: 'failed', detail: error instanceof Error ? error.message : String(error) };
   }
+}
+
+function assertExistingSourceMatches(sourceText: string, approved: ApprovedWikiSource): void {
+  const existing = parseApprovedWikiSource(sourceText);
+  const candidateWithExistingApprovalTime = {
+    ...approved,
+    approval: { ...approved.approval, approved_at: existing.approval.approved_at },
+  };
+  if (JSON.stringify(existing) !== JSON.stringify(candidateWithExistingApprovalTime)) {
+    throw new Error(
+      `Existing approved source ${approved.source.source_path} does not match the current reviewed entry details.`
+    );
+  }
+}
+
+export function formatRollbackFailure(originalError: unknown, rollbackErrors: unknown[]): string {
+  return `Wiki ingestion failed: ${errorMessage(originalError)} Cleanup also failed: ${rollbackErrors
+    .map(errorMessage)
+    .join('; ')}`;
+}
+
+function errorMessage(error: unknown): string {
+  return error instanceof Error ? error.message : String(error);
 }
 
 export function buildApprovedSource(
