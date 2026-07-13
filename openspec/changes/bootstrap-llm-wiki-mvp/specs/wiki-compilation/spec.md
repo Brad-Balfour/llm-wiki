@@ -81,6 +81,22 @@ output.
 - **AND** a model-authored `public: true` value alone SHALL NOT authorize a
   public write.
 
+### Requirement: Batch Handoff Ingestion
+
+The handoff ingestion command SHALL evaluate every wiki-marked candidate in one
+run unless the operator explicitly selects one source item.
+
+#### Scenario: Process a mixed handoff batch
+
+- **WHEN** a validated commute handoff contains multiple wiki-marked candidates
+- **THEN** the command SHALL evaluate every candidate independently
+- **AND** it SHALL publish eligible reviewed candidates without preventing the
+  remaining candidates from being evaluated
+- **AND** it SHALL report each candidate as published, already published,
+  needing source details, needing a reviewed summary, or failed
+- **AND** operator-facing output SHALL describe missing information in ordinary
+  language rather than internal data-model terminology.
+
 ### Requirement: Safe Public Rendering
 
 The compiler SHALL validate and safely render public source fields before

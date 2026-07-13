@@ -132,6 +132,17 @@ be reviewed locally without ingesting the full conversation transcript.
 - **AND** it SHALL NOT contain a full transcript or private detail that Brad did
   not explicitly ask to save.
 
+#### Scenario: Save an article for wiki review
+
+- **WHEN** Brad asks to add the current queue article to the wiki
+- **THEN** the saved review note SHALL copy the current queue item's source item
+  id, title, and URL exactly
+- **AND** the adapter SHALL NOT invent, renumber, normalize, or guess a source
+  item id or URL
+- **AND** a general topic or tool preference without a matching current queue
+  item SHALL be saved as general review context rather than an article-specific
+  wiki review note.
+
 #### Scenario: Import the handoff at home
 
 - **WHEN** Brad downloads the handoff `.txt` file and runs the local importer

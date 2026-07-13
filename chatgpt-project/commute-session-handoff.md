@@ -29,6 +29,11 @@ Maintain a small internal session ledger containing only:
 Do not add casual conversation, inferred preferences, a full transcript, raw
 audio, or notes Brad did not explicitly ask to save.
 
+For every item-specific record, copy `source_item_id`, title, and URL exactly
+from the attached queue. Never generate sequential IDs, replace stable IDs, or
+use `unknown` as an article ID. A topic-level preference that is not tied to one
+queue item belongs in `general_review` or `issues`, never `wiki_review`.
+
 ## Required Trigger Behavior
 
 When the trigger phrase is spoken:

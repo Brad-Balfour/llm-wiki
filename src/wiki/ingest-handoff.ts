@@ -33,7 +33,7 @@ interface Enrichment {
 async function main(): Promise<void> {
   const options = parseOptions(process.argv.slice(2));
   if (!options.confirmPublic) {
-    throw new Error('Wiki ingestion requires --confirm-public after reviewing the selected entry.');
+    throw new Error('Wiki ingestion requires --confirm-public after reviewing the entries.');
   }
 
   const handoff = parseCommuteHandoffText(await readFile(options.input, 'utf8'));
@@ -42,22 +42,61 @@ async function main(): Promise<void> {
       note.destination === 'wiki_review' &&
       (options.sourceItemId === undefined || note.source_item_id === options.sourceItemId)
   );
-  if (candidates.length !== 1) {
-    throw new Error(
-      `Expected exactly one wiki review item; found ${candidates.length}. Use --source-item-id to select one.`
-    );
+  if (candidates.length === 0) {
+    throw new Error('No matching wiki review items were found in the handoff.');
   }
-  const note = candidates[0];
+
+  let failures = 0;
+  for (const note of candidates) {
+    let result: { status: BatchStatus; detail?: string };
+    try {
+      result = await ingestCandidate(note, options.enrichmentDir);
+    } catch (error) {
+      result = {
+        status: 'failed',
+        detail: error instanceof Error ? error.message : String(error),
+      };
+    }
+    process.stdout.write(
+      `${result.status}: ${note.title}${result.detail ? ` — ${result.detail}` : ''}\n`
+    );
+    if (result.status === 'failed') failures += 1;
+  }
+  if (failures > 0) process.exitCode = 1;
+}
+
+type BatchStatus =
+  'published' | 'already published' | 'needs source details' | 'needs reviewed summary' | 'failed';
+
+async function ingestCandidate(
+  note: CommuteReviewNote,
+  enrichmentDir: string
+): Promise<{ status: BatchStatus; detail?: string }> {
   if (
-    note === undefined ||
     note.source_item_id === undefined ||
     note.source_item_id === 'unknown' ||
     note.url === undefined
   ) {
-    throw new Error('Selected wiki review item must include source_item_id and url.');
+    return { status: 'needs source details', detail: 'article ID or URL is missing' };
   }
-  const enrichmentPath = resolveEnrichmentPath(options.enrichmentDir, note.source_item_id);
-  const enrichment = JSON.parse(await readFile(enrichmentPath, 'utf8')) as Enrichment;
+
+  const state = JSON.parse(await readFile('schema/compile-state.json', 'utf8')) as {
+    processed_sources?: Record<string, { source_item_id?: string }>;
+  };
+  if (
+    Object.values(state.processed_sources ?? {}).some(
+      (record) => record.source_item_id === note.source_item_id
+    )
+  ) {
+    return { status: 'already published' };
+  }
+
+  const enrichmentPath = resolveEnrichmentPath(enrichmentDir, note.source_item_id);
+  const enrichmentText = await readOptionalFile(enrichmentPath);
+  if (enrichmentText === undefined) {
+    return { status: 'needs reviewed summary', detail: 'no reviewed entry details were found' };
+  }
+  const enrichment = JSON.parse(enrichmentText) as Enrichment;
   const approved = buildApprovedSource(note, enrichment, new Date().toISOString());
   const sourcePath = approved.source.source_path;
 
@@ -82,7 +121,10 @@ async function main(): Promise<void> {
       sourcePath,
       '--confirm-public',
     ]);
-    process.stdout.write(result.stdout);
+    return {
+      status: result.stdout.startsWith('skipped') ? 'already published' : 'published',
+      detail: approved.source.source_path,
+    };
   } catch (error) {
     const rollbackErrors: unknown[] = [];
     if (sourceCreated) await captureRollbackError(() => unlink(sourcePath), rollbackErrors);
@@ -93,12 +135,15 @@ async function main(): Promise<void> {
       await captureRollbackError(() => writeFile(outputPath, outputBefore, 'utf8'), rollbackErrors);
     }
     if (rollbackErrors.length > 0) {
-      throw new AggregateError(
-        [error, ...rollbackErrors],
-        'Wiki ingestion failed and one or more rollback steps also failed.'
-      );
+      return {
+        status: 'failed',
+        detail: new AggregateError(
+          [error, ...rollbackErrors],
+          'Wiki ingestion failed and one or more cleanup steps also failed.'
+        ).message,
+      };
     }
-    throw error;
+    return { status: 'failed', detail: error instanceof Error ? error.message : String(error) };
   }
 }
 
