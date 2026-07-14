@@ -127,7 +127,8 @@ be reviewed locally without ingesting the full conversation transcript.
 - **WHEN** Brad ends a commute Voice session and requests a handoff
 - **THEN** the same chat SHALL create a `commute-handoff.v1` JSON object in a
   `.txt` Library file
-- **AND** it SHALL contain session and queue identity, explicit item feedback,
+- **AND** every item-specific record SHALL identify its exact source queue file
+  in addition to session and queue identity, explicit item feedback,
   explicit saved review notes, and material recognition or interruption issues
 - **AND** it SHALL NOT contain a full transcript or private detail that Brad did
   not explicitly ask to save.
@@ -135,8 +136,8 @@ be reviewed locally without ingesting the full conversation transcript.
 #### Scenario: Save an article for wiki review
 
 - **WHEN** Brad asks to add the current queue article to the wiki
-- **THEN** the saved review note SHALL copy the current queue item's source item
-  id, title, and URL exactly
+- **THEN** the saved review note SHALL copy the current queue filename, source
+  item id, title, and URL exactly
 - **AND** the adapter SHALL NOT invent, renumber, normalize, or guess a source
   item id or URL
 - **AND** a general topic or tool preference without a matching current queue

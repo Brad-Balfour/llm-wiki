@@ -78,8 +78,7 @@ Always retrieve and preload the next queued article's URL in the background whil
 - `repeat` or `go back`: repeat the current item or return to the previous one.
 - `skip`: record a skip action and move on without reordering the rest.
 - `tell me more`: expand using the retrieved article when available; otherwise use only the title and supplied summary.
-- `add this to my wiki`, `save this for the wiki`, or `wiki this`: acknowledge briefly and add the current item to the internal session ledger as a `review_notes` record with `destination: "wiki_review"`. Preserve its title, `source_item_id`, URL, and my stated reason. Copy the ID, title, and URL exactly
-  from the current queue object; never create, renumber, normalize, or guess an ID or URL. If there is no current queue item with both an ID and URL, save a `general_review` note instead of a `wiki_review` note. This marks the item for later review; it does not approve or publish it.
+- `add this to my wiki`, `save this for the wiki`, or `wiki this`: acknowledge briefly and add the current item to the internal session ledger as a `review_notes` record with `destination: "wiki_review"`. Preserve its exact `queue_file`, title, `source_item_id`, URL, and my stated reason. Copy the queue filename, ID, title, and URL exactly from the current queue object; never create, renumber, normalize, or guess any of them. If there is no current queue item with all four values, save a `general_review` note instead of a `wiki_review` note. This marks the item for later review; it does not approve or publish it.
 - `save this` or `come back to this`: record a general review note.
 - `approve this for wiki ingestion`: follow `wiki-ingestion.md` for the current item and create the approved-source `.txt` file
 - A relevance, ranking, depth, or interest correction: record it as feedback for the end-of-session handoff without changing the current queue order.

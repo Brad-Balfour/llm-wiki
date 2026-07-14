@@ -31,8 +31,9 @@
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["source_item_id", "action"],
+        "required": ["queue_file", "source_item_id", "action"],
         "properties": {
+          "queue_file": { "type": "string", "minLength": 1 },
           "source_item_id": { "type": "string", "minLength": 1 },
           "title": { "type": "string" },
           "url": { "type": "string" },
@@ -56,6 +57,7 @@
         "additionalProperties": false,
         "required": ["title", "note", "destination"],
         "properties": {
+          "queue_file": { "type": "string", "minLength": 1 },
           "source_item_id": { "type": "string" },
           "title": { "type": "string", "minLength": 1 },
           "url": { "type": "string" },
@@ -63,7 +65,18 @@
           "destination": {
             "enum": ["wiki_review", "range_review", "general_review"]
           }
-        }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": { "destination": { "const": "wiki_review" } },
+              "required": ["destination"]
+            },
+            "then": {
+              "required": ["queue_file", "source_item_id", "title", "url", "note", "destination"]
+            }
+          }
+        ]
       }
     },
     "issues": {

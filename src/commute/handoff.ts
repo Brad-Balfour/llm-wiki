@@ -24,6 +24,7 @@ export const REVIEW_DESTINATIONS = ['wiki_review', 'range_review', 'general_revi
 export type ReviewDestination = (typeof REVIEW_DESTINATIONS)[number];
 
 export interface CommuteFeedback {
+  queue_file: string;
   source_item_id: string;
   title?: string;
   url?: string;
@@ -32,6 +33,7 @@ export interface CommuteFeedback {
 }
 
 export interface CommuteReviewNote {
+  queue_file?: string;
   source_item_id?: string;
   title: string;
   url?: string;
@@ -111,11 +113,16 @@ export function validateCommuteHandoff(candidate: unknown): CommuteHandoff {
 function validateFeedback(candidate: unknown, index: number): CommuteFeedback {
   const field = `feedback[${index}]`;
   const record = requireRecord(candidate, field);
-  rejectUnknownKeys(record, ['source_item_id', 'title', 'url', 'action', 'note'], field);
+  rejectUnknownKeys(
+    record,
+    ['queue_file', 'source_item_id', 'title', 'url', 'action', 'note'],
+    field
+  );
   const title = optionalString(record.title, `${field}.title`);
   const url = optionalString(record.url, `${field}.url`);
   const note = optionalString(record.note, `${field}.note`);
   return {
+    queue_file: requireString(record.queue_file, `${field}.queue_file`),
     source_item_id: requireString(record.source_item_id, `${field}.source_item_id`),
     action: requireEnum(record.action, FEEDBACK_ACTIONS, `${field}.action`),
     ...(title === undefined ? {} : { title }),
@@ -127,13 +134,27 @@ function validateFeedback(candidate: unknown, index: number): CommuteFeedback {
 function validateReviewNote(candidate: unknown, index: number): CommuteReviewNote {
   const field = `review_notes[${index}]`;
   const record = requireRecord(candidate, field);
-  rejectUnknownKeys(record, ['source_item_id', 'title', 'url', 'note', 'destination'], field);
+  rejectUnknownKeys(
+    record,
+    ['queue_file', 'source_item_id', 'title', 'url', 'note', 'destination'],
+    field
+  );
+  const queueFile = optionalString(record.queue_file, `${field}.queue_file`);
   const sourceItemId = optionalString(record.source_item_id, `${field}.source_item_id`);
   const url = optionalString(record.url, `${field}.url`);
+  const destination = requireEnum(record.destination, REVIEW_DESTINATIONS, `${field}.destination`);
+  if (destination === 'wiki_review') {
+    if (queueFile === undefined) throw new Error(`${field}.queue_file is required for wiki_review`);
+    if (sourceItemId === undefined || sourceItemId === 'unknown') {
+      throw new Error(`${field}.source_item_id is required for wiki_review`);
+    }
+    if (url === undefined) throw new Error(`${field}.url is required for wiki_review`);
+  }
   return {
     title: requireString(record.title, `${field}.title`),
     note: requireString(record.note, `${field}.note`),
-    destination: requireEnum(record.destination, REVIEW_DESTINATIONS, `${field}.destination`),
+    destination,
+    ...(queueFile === undefined ? {} : { queue_file: queueFile }),
     ...(sourceItemId === undefined ? {} : { source_item_id: sourceItemId }),
     ...(url === undefined ? {} : { url }),
   };
