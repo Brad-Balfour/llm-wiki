@@ -29,10 +29,12 @@ Maintain a small internal session ledger containing only:
 Do not add casual conversation, inferred preferences, a full transcript, raw
 audio, or notes Brad did not explicitly ask to save.
 
-For every item-specific record, copy `source_item_id`, title, and URL exactly
-from the attached queue. Never generate sequential IDs, replace stable IDs, or
-use `unknown` as an article ID. A topic-level preference that is not tied to one
-queue item belongs in `general_review` or `issues`, never `wiki_review`.
+For every item-specific record, copy the exact `queue_file`, `source_item_id`,
+title, and URL from the active queue. Never generate sequential IDs, replace
+stable IDs, or use `unknown` as an article ID. Every `wiki_review` note MUST
+include all four values; do not create a `wiki_review` note if any is missing.
+A topic-level preference that is not tied to one queue item belongs in
+`general_review` or `issues`, never `wiki_review`.
 
 ## Required Trigger Behavior
 
@@ -50,10 +52,14 @@ When the trigger phrase is spoken:
    arrays for categories with no recorded items; do not invent missing details.
 7. Save explicit feedback under `feedback`, explicit saved notes under
    `review_notes`, and material session problems under `issues`.
-   - Every `feedback` item must identify one real `source_item_id` and use only a
+   - Every `feedback` item must identify the exact `queue_file`, one real
+     `source_item_id`, and use only a
      schema-supported `action`: `mark_interested`, `mark_uninterested`,
      `promote_to_in_depth`, `save_for_review`, or `skip`.
    - Do not invent `type` fields in `feedback`.
+   - Every `wiki_review` item must include `queue_file`, `source_item_id`,
+     `title`, `url`, `note`, and `destination`. If the active item cannot be
+     identified exactly, use `general_review` instead.
    - Put presentation, queue-state, retrieval, and general workflow observations
      in `issues` unless they are explicit review notes about a particular item.
 8. Treat every saved note as review-only. Do not publish, commit, send, create a
@@ -63,6 +69,33 @@ When the trigger phrase is spoken:
 If file creation is unavailable, preserve the same JSON object in the chat and
 say that it must be saved as `YYYYMMDD-tldr-commute-handoff.txt` after the drive.
 Do not ask Brad to troubleshoot while driving.
+
+## Minimal Valid Shape
+
+Use this shape when one queue item was marked for wiki review. Replace every
+example value with the exact active-session value; do not omit required fields.
+
+```json
+{
+  "schema_version": "commute-handoff.v1",
+  "session_id": "2026-07-13-evening-tldr",
+  "session_date": "2026-07-13",
+  "voice_surface": "chatgpt_standard",
+  "queue_files": ["20260713-tldr-indepth.txt"],
+  "feedback": [],
+  "review_notes": [
+    {
+      "queue_file": "20260713-tldr-indepth.txt",
+      "source_item_id": "tldr_example_001",
+      "title": "Exact queue headline",
+      "url": "https://example.com/article",
+      "note": "Brad said: wiki this.",
+      "destination": "wiki_review"
+    }
+  ],
+  "issues": []
+}
+```
 
 ## Privacy Rules
 

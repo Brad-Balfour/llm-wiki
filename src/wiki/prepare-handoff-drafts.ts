@@ -8,6 +8,7 @@ import type { CommuteHandoff, CommuteReviewNote } from '../commute/handoff.js';
 export const WIKI_REVIEW_DRAFT_SCHEMA_VERSION = 'wiki-review-drafts.v1';
 
 export interface WikiReviewDraft {
+  queue_file: string | null;
   source_item_id: string | null;
   title: string;
   url: string | null;
@@ -39,6 +40,7 @@ function toDraft(note: CommuteReviewNote): WikiReviewDraft {
   }
 
   return {
+    queue_file: note.queue_file ?? null,
     source_item_id:
       note.source_item_id === undefined || note.source_item_id === 'unknown'
         ? null

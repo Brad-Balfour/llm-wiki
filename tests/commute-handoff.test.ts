@@ -11,6 +11,7 @@ const validHandoff = {
   queue_files: ['20260713-tldr-ai-headline.txt'],
   feedback: [
     {
+      queue_file: '20260713-tldr-ai-headline.txt',
       source_item_id: 'tldr-ai-2026-07-13-example',
       action: 'promote_to_in_depth',
       note: 'Worth discussing tomorrow.',
@@ -18,8 +19,10 @@ const validHandoff = {
   ],
   review_notes: [
     {
+      queue_file: '20260713-tldr-ai-headline.txt',
       source_item_id: 'tldr-ai-2026-07-13-example',
       title: 'Example article',
+      url: 'https://example.com/article',
       note: 'Possible reusable wiki idea.',
       destination: 'wiki_review',
     },
@@ -46,4 +49,12 @@ test('fails closed when a transcript is included', () => {
     () => parseCommuteHandoffText(JSON.stringify({ ...validHandoff, transcript: 'private' })),
     /unsupported fields: transcript/
   );
+});
+
+test('rejects a wiki review note without the exact source queue and article identity', () => {
+  const malformed = JSON.parse(JSON.stringify(validHandoff)) as {
+    review_notes: Array<Record<string, unknown>>;
+  };
+  delete malformed.review_notes[0]?.queue_file;
+  assert.throws(() => parseCommuteHandoffText(JSON.stringify(malformed)), /queue_file is required/);
 });

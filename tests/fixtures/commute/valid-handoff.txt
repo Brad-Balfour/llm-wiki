@@ -6,6 +6,7 @@
   "queue_files": ["20260713-tldr-ai-headline.txt"],
   "feedback": [
     {
+      "queue_file": "20260713-tldr-ai-headline.txt",
       "source_item_id": "tldr-ai-2026-07-13-example",
       "title": "Example article",
       "url": "https://example.com/article",
@@ -15,6 +16,7 @@
   ],
   "review_notes": [
     {
+      "queue_file": "20260713-tldr-ai-headline.txt",
       "source_item_id": "tldr-ai-2026-07-13-example",
       "title": "Example article",
       "url": "https://example.com/article",

@@ -16,6 +16,7 @@ import {
 const execFileAsync = promisify(execFile);
 
 const note = {
+  queue_file: '20260623-tldr-dev-indepth.txt',
   source_item_id: 'tldr-dev-2026-06-23-001',
   title: 'Transformer architecture',
   url: 'https://example.com/transformers',
@@ -112,6 +113,7 @@ test('CLI requires confirmation, rolls back compiler failure, and succeeds on re
       review_notes: [
         note,
         {
+          queue_file: 'queue.txt',
           source_item_id: 'tldr-missing-enrichment',
           title: 'Needs reviewed summary',
           url: 'https://example.com/missing-enrichment',
@@ -119,16 +121,11 @@ test('CLI requires confirmation, rolls back compiler failure, and succeeds on re
           destination: 'wiki_review',
         },
         {
+          queue_file: 'queue.txt',
           source_item_id: 'tldr-invalid-enrichment',
           title: 'Invalid reviewed summary',
           url: 'https://example.com/invalid-enrichment',
           note: 'Wiki this.',
-          destination: 'wiki_review',
-        },
-        {
-          source_item_id: 'unknown',
-          title: 'Needs source details',
-          note: 'Topic-level preference.',
           destination: 'wiki_review',
         },
       ],
@@ -238,7 +235,6 @@ test('CLI requires confirmation, rolls back compiler failure, and succeeds on re
     batchOutput,
     /failed: Invalid reviewed summary — reviewed entry details are not valid JSON/
   );
-  assert.match(batchOutput, /needs source details: Needs source details/);
 });
 
 function compileState(

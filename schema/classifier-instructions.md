@@ -25,6 +25,14 @@ The classifier receives sanitized item metadata only:
 Do not rely on raw Gmail bodies, subject-only identification, forwarding wrapper
 text, ads, subscription text, private notes, or credentials.
 
+## Link Resolution
+
+Before an item is written to a commute queue, its `url` MUST be the direct
+article URL. If the newsletter supplies a TLDR tracking or redirect link, resolve
+it first and save the final HTTP(S) destination instead. Do not emit a tracking
+link as the item URL. If its destination cannot be resolved, flag the item for
+review rather than inventing or guessing a destination URL.
+
 ## Required Output
 
 The canonical classification record is one JSON object with exactly these
@@ -55,13 +63,13 @@ Allowed values:
 
 Recommended score bands use gap-free numeric thresholds:
 
-| Field | Label | Score threshold |
-| --- | --- | --- |
-| `interest_level` | `interested` | `score >= 0.80` |
-| `interest_level` | `maybe` | `score >= 0.60 && score < 0.80` |
-| `interest_level` | `uninterested` | `score < 0.60` |
-| `consumption_depth` | `in_depth` | `score >= 0.60` |
-| `consumption_depth` | `headline_only` | `score < 0.60` |
+| Field               | Label           | Score threshold                 |
+| ------------------- | --------------- | ------------------------------- |
+| `interest_level`    | `interested`    | `score >= 0.80`                 |
+| `interest_level`    | `maybe`         | `score >= 0.60 && score < 0.80` |
+| `interest_level`    | `uninterested`  | `score < 0.60`                  |
+| `consumption_depth` | `in_depth`      | `score >= 0.60`                 |
+| `consumption_depth` | `headline_only` | `score < 0.60`                  |
 
 `interest_score` and `depth_score` are the primary calibration values. The enum
 fields are stable routing labels derived from those scores so downstream code can
