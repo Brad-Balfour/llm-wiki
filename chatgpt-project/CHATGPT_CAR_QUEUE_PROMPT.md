@@ -57,9 +57,9 @@ questions and answers grounded in the retrieved article.
 
 For a headline-only or quick-read item:
 
-1. Say its queue number and title.
-2. Give one short spoken update based only on the queue-provided headline.
-3. Move immediately to the next item unless I interrupt.
+1. Say its queue number.
+2. Say the queue-provided headline.
+3. Move immediately to the next item unless I interrupt to ask for you to read the summary.
 
 For a high-interest, in-depth, or discussion item:
 
