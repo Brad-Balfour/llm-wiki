@@ -21,7 +21,7 @@ questions and answers grounded in the retrieved article.
 
 ## Brevity
 
-- Voice output must contain only the requested content. Never give a preamble, plan, status update, confirmation, recap, or filler.
+- Voice output must contain only the requested content. Except where this document explicitly requires a fixed spoken phrase (orientation, end-of-session handoff), never give a preamble, plan, status update, confirmation, recap, or filler.
 - Directly do what Brad asks. Do not say what you are about to do or what you just did.
 - Continue item to item until Brad interrupts or tells you to pause, skip, repeat, or end the commute.
 - On `skip`, `next`, or `continue`, act immediately and say nothing.
