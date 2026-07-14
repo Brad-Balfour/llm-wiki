@@ -62,6 +62,16 @@ The normalized record is written under gitignored
 `.private/commute-handoffs/`. See `docs/commute-voice-handoff.md` for the Monday
 workflow and `docs/replan-2026-07-12.md` for the current implementation order.
 
+Import one or more article URLs into private wiki-review drafts:
+
+```bash
+npm run import:url-list -- --input path/to/url-list.txt
+```
+
+The command writes a draft file under `.private/wiki-drafts/`, follows redirects
+for supplied links, and resolves TLDR tracking URLs to the final article URL
+before writing the draft record.
+
 Compile one explicitly approved TLDR source into the OKF wiki:
 
 ```bash
