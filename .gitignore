@@ -35,3 +35,6 @@ Thumbs.db
 
 # Private local workflow artifacts
 .private/
+
+# Isolated agent worktrees live beneath the primary checkout.
+worktrees/
