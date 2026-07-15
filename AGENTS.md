@@ -1,61 +1,116 @@
-# Agent Instructions
+# LLM Wiki Agent Guide
 
-## Purpose
+## Workspace and worktree policy
 
-This repo implements a personal LLM knowledge base and TLDR ingestion pipeline.
-Use the OpenSpec artifacts under `openspec/changes/bootstrap-llm-wiki-mvp/` as
-the active planning contract until the change is archived.
+This workspace has two layers:
 
-## Project Rules
+- The implementation repository is `repo/`. Begin all repository work with
+  `cd repo`; it is the only directory agents may edit unless the user explicitly
+  requests otherwise.
+- The directory above `repo/` is a historical research archive. Do not edit it
+  or copy its `codex-docs/`, `claude-docs/`, or `gemini-synthesis-docs/` trees
+  into the implementation repository unless explicitly requested.
 
-- Keep the outer parent folder as the exploration archive. Do not copy the full
-  `codex-docs/`, `claude-docs/`, or `gemini-synthesis-docs/` trees into this
-  public implementation repo unless explicitly requested.
-- Treat `sources/` as immutable once created. Corrections should create new
-  labels or metadata, not rewrite source files.
-- The classifier must emit source-neutral classification only. It must not emit
-  downstream-specific behavior such as `voice_behavior`.
-- Commute behavior, wiki routing, review queue placement, and stream-log
-  behavior belong in application routing code.
-- Do not commit API keys, raw Gmail bodies, private Range.com notes, or sensitive
-  voice-note content.
-- Treat public placement as an explicit promotion step. Do not rush source data,
-  feedback labels, voice notes, or generated wiki entries into public locations
-  when local/private review is more appropriate.
-- Consider dual-use implications for technical content. If an item could enable
-  abuse, expose sensitive operational detail, or create work/privacy risk, route
-  it to review instead of publishing it automatically.
-- Use TypeScript/Node for MVP implementation unless an OpenSpec design update
-  records a different decision.
-- When adding or revising runtime tooling, scripts, linting, formatting,
-  TypeScript options, ignore rules, or repo workflow conventions, first check
-  the sibling repos `../bradbalfour-dot-com` and
-  `../bradbalfour-photography` and borrow applicable patterns. Keep the borrowed
-  pieces practical for this repo; do not import frontend-, Astro-, Playwright-,
-  Cloudflare-, or browser-specific configuration unless a later OpenSpec change
-  introduces that surface area.
-- Prefer small, fixture-backed changes. Add or update tests when changing parser,
-  classifier schema, routing, queue, feedback, or OKF compilation behavior.
+Before making any write, create a new isolated worktree inside `repo/worktrees/`.
+Keep the primary `repo/` checkout clean on `main`; never implement work directly
+there. From `repo/`, use this pattern (replace `<task>` with a short slug):
 
-## Current Stack Decisions
+```bash
+git fetch origin
+git worktree add -b agent/<task> worktrees/<task> origin/main
+cd worktrees/<task>
+```
 
-- Planning workflow: OpenSpec.
-- Agent integrations: Codex, GitHub Copilot, Claude Code.
-- Runtime stack: TypeScript/Node.
-- Default Node target: research Node 26 during Phase 0, but default to Node 24
-  while Node 26 is still Current rather than Active LTS.
-- Tooling convention source: borrow practical Node/TypeScript, npm script,
-  ESLint, Prettier, TypeScript, and ignore-file patterns from local sibling repos
-  `../bradbalfour-dot-com` and `../bradbalfour-photography`.
-- Read path: GitHub Pages for MVP.
-- Cloudflare: deferred until review/admin UI or Workers are needed.
+For an existing branch, use `git worktree add worktrees/<task> <branch>`.
+Inspect `git worktree list` and `git status --short --branch` before editing.
+Do not share, reuse, or clean up another agent's worktree without explicit user
+direction.
 
-## Verification Expectations
+## Project
 
-Before implementation work is considered done:
+`llm-wiki` is a personal, Karpathy-style OKR and memory wiki with a TLDR
+ingestion pipeline. It saves useful knowledge and publishes the GitHub Pages
+wiki. A named `ingest:*` or `compile:wiki` command is authorization to make its
+intended wiki updates; do not invent review queues, permissions, attestations,
+or confirmation flags.
 
-- OpenSpec tasks should be checked off only when their acceptance criteria are
-  satisfied.
-- Schema and routing behavior should have fixture coverage.
-- LLM-backed writes must validate structured output and fail closed to review.
-- Generated wiki entries must preserve source provenance.
+The active implementation contract is
+`openspec/changes/bootstrap-llm-wiki-mvp/`. Read the proposal, design, relevant
+spec, and tasks before changing behavior in that scope. Treat archived changes
+as history, not current direction.
+
+## Repository map
+
+| Path                                     | Purpose                                                           |
+| ---------------------------------------- | ----------------------------------------------------------------- |
+| `src/tldr/`                              | Parse and sanitize TLDR email text.                               |
+| `src/classifier/`                        | Validate source-neutral model classification.                     |
+| `src/routing/`                           | Derive commute, wiki, stream-log, discard, and review behavior.   |
+| `src/commute/`                           | Import and validate commute handoffs.                             |
+| `src/wiki/`                              | Validate sources and compile provenance-preserving wiki pages.    |
+| `schema/`                                | Versioned contracts, routing rules, profiles, and compiler state. |
+| `sources/`                               | Sanitized source records.                                         |
+| `wiki/`                                  | GitHub Pages content and entry template.                          |
+| `tests/fixtures/` and `tests/`           | Node test fixtures and focused contract coverage.                 |
+| `docs/` and `chatgpt-project/`           | Operator runbooks and project prompts; keep commands accurate.    |
+| `.claude/`, `.codex/`, `.github/skills/` | OpenSpec integrations; use the matching workflow when it applies. |
+
+## Environment and commands
+
+- Use Node 24 and npm 11 (`.nvmrc`, `.node-version`, and `package.json` are the
+  source of truth). Do not casually change the runtime range.
+- Install locked dependencies with `npm run ci:install`.
+- Type-check/build: `npm run build`.
+- Run tests: `npm test`.
+- Lint: `npm run lint`.
+- Check formatting: `npm run format:check`.
+- Validate the Jekyll content: `npm run validate:site`.
+- Run the complete local gate for implementation changes: `npm run check`.
+- For an active OpenSpec change, also run
+  `openspec validate bootstrap-llm-wiki-mvp --type change --strict` when its
+  artifacts or requirements are touched.
+
+`dist/`, `node_modules/`, coverage output, and `.private/` are generated or
+local-only. Do not edit or commit them.
+
+When changing runtime tooling, scripts, linting, formatting, TypeScript options,
+ignore rules, or repository workflow conventions, first inspect applicable
+patterns in the sibling `bradbalfour-dot-com` and `bradbalfour-photography`
+repositories. Borrow only patterns that fit this Node/Jekyll pipeline; do not
+import Astro, browser, Playwright, Cloudflare, or frontend configuration unless
+the task introduces that surface.
+
+## Implementation rules
+
+- Keep raw credentials, API keys, `.env` contents, raw Gmail bodies, and private
+  work material out of Git.
+- Preserve source provenance and stable identifiers. In normal operation, avoid
+  rewriting an existing source record; make a deliberate schema migration
+  explicit in its OpenSpec change and tests.
+- Keep classifier output source-neutral. It must not emit routes,
+  `voice_behavior`, wiki destinations, review choices, or discard behavior.
+  Derive those in `src/routing/` according to `schema/routing-rules.md`.
+- Validate structured model output and handle malformed output explicitly. Do
+  not silently drop records or invent values.
+- Parser, classifier, routing, queue, feedback, and compiler changes need
+  focused fixtures and tests. Update the schema and operator documentation when
+  a contract or CLI changes.
+- Preserve idempotence and provenance in ingestion and compilation paths.
+- Keep public Markdown compatible with GitHub Pages/Jekyll.
+- LLM enrichment may be optional, but deterministic URL and source ingestion
+  must not require an API key or a paid model.
+
+## Git and handoff
+
+- Keep each worktree to one focused task. Stage only its intended files; do not
+  overwrite, reformat, or include another task's changes.
+- Use a descriptive, terse commit and run the relevant checks before handoff.
+- In a PR, summarize the change, its user impact, and validation performed.
+- Do not merge or deploy without explicit user authorization. A request to
+  create a PR authorizes a branch, commit, push, and draft PR.
+
+## Instruction compatibility
+
+`AGENTS.md` is the canonical repository guide. `CLAUDE.md` is a symbolic link
+to this file so Claude Code receives the same instructions. Update this file,
+not the link.
