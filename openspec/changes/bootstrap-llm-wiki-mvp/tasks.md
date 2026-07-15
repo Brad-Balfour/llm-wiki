@@ -46,11 +46,13 @@ of concept changes execution order without removing the automated runtime work:
 
 - [ ] 5.1 Generate a daily commute queue ordered by `interested/headline_only`, `interested/in_depth`, `maybe/headline_only`, then `maybe/in_depth`.
 - [ ] 5.2 Separate discuss items from quick-read awareness items in the queue file.
+- [x] 5.2a Define manual-project duplicate resolution by interest score, depth score, then source order, with mutually exclusive queue sections.
 - [ ] 5.3 Include source item ids, title, summary, URL, classification scores, derived commute behavior, reason, and version metadata.
 - [ ] 5.4 Keep manual ChatGPT/Claude voice review as the MVP voice path.
 - [ ] 5.5 Queue explicit voice notes or commute corrections for review before wiki compile or external sending.
 - [ ] 5.6 Use at least one prepared queue in a real car session or equivalent manual voice test.
-- [x] 5.7 Define a private-by-default `commute-handoff.v1` file contract and local importer for explicit feedback, saved review notes, and session issues from the manual ChatGPT Voice workflow.
+- [x] 5.7 Define private-by-default v1 and v2 commute handoff contracts and a backward-compatible local importer for explicit feedback, saved review notes, per-queue resume state, and session issues from the manual ChatGPT Voice workflow.
+- [x] 5.7a Define an append-only ChatGPT session ledger, current-pass artifact reconstruction and validation, create-only revisions, and preload/cursor safety rules.
 - [ ] 5.8 Use the handoff contract in a real commute and import the generated `.txt` artifact without manual JSON repair.
 
 ## 6. Feedback Labels

@@ -12,8 +12,9 @@ Date: 2026-07-12
 - The manual ChatGPT Project workflow has successfully used the Gmail connector
   to classify a TLDR newsletter, created a JSON queue in a `.txt` Library file,
   and played that queue in ChatGPT Voice.
-- The private `commute-handoff.v1` importer has passed a synthetic at-home dry
-  run. The first real post-commute import is still pending.
+- The private commute importer originally passed a v1 synthetic at-home dry run
+  and now accepts v2 handoffs with structured per-queue resume state. The first
+  real post-commute import is still pending.
 - The approved-source compiler, provenance-preserving update behavior, and
   compile-state tracking are implemented and fixture-tested. No real approved
   source has been compiled yet.
@@ -37,7 +38,7 @@ Date: 2026-07-12
 - `openspec/changes/bootstrap-llm-wiki-mvp/`
 - `docs/replan-2026-07-12.md`
 - `docs/commute-voice-handoff.md`
-- `schema/commute-handoff-v1.schema.json`
+- `schema/commute-handoff-v2.schema.json`
 - `schema/approved-wiki-source-v1.schema.json`
 - `src/commute/handoff.ts`
 - `src/commute/import-handoff.ts`
@@ -49,7 +50,8 @@ Date: 2026-07-12
 
 The active ChatGPT Project instruction sources are grouped under
 `chatgpt-project/`, with the handoff JSON contract under
-`schema/commute-handoff-v1.schema.json`.
+`schema/commute-handoff-v2.schema.json`, with v1 retained for backward
+compatibility.
 
 ## Verification
 
