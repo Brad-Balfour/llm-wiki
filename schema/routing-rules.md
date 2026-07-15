@@ -53,6 +53,16 @@ Separate quick-read and discuss sections in rendered queue files:
 - Quick-read section: `quick_read` and `optional_quick_read`.
 - Discuss section: `discuss` and `optional_discuss_or_teaser`.
 
+Within one source newsletter queue, Headline Only and In-Depth are mutually
+exclusive sections. Detect duplicates by identical source item id, otherwise by
+normalized final article URL, otherwise by normalized title. A duplicate may
+originate in the newsletter or during extraction or classification. Keep the
+candidate with the highest `interest_score`; if tied, keep the highest
+`depth_score`; if still tied, keep the earliest source-newsletter occurrence.
+Render the survivor exactly once in the section selected by its final
+`consumption_depth`. Preserve genuine repeated articles in different newsletter
+editions as separate source instances in their respective queue files.
+
 When commute time is short, defer or downgrade `maybe` items before `interested`
 items. A `maybe/in_depth` item may be reduced to a headline plus a save/resurface
 prompt.

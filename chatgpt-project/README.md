@@ -11,9 +11,11 @@ Project.
 
 ## Commute Queue And Handoff
 
+- `chatgpt-project/queue-generation.md`
 - `chatgpt-project/CHATGPT_CAR_QUEUE_PROMPT.md`
+- `chatgpt-project/commute-session-ledger.md`
 - `chatgpt-project/commute-session-handoff.md`
-- `schema/commute-handoff-v1.schema.json`
+- `schema/commute-handoff-v2.schema.json`
 
 ## Wiki Ingestion
 

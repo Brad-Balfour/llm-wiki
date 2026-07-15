@@ -18,16 +18,16 @@ schema, filename, privacy rules, or desired output.
 
 ## Information To Track During The Session
 
-Maintain a small internal session ledger containing only:
+Follow `commute-session-ledger.md`. Append each explicit action and material
+queue-state change to the structured internal ledger immediately. Do not wait
+until the end of the session or reconstruct the ledger from conversational
+memory.
 
-- the attached queue filename or filenames;
-- explicit interest, depth, ranking, or skip feedback;
-- items Brad explicitly asks to save, revisit, or add to the wiki;
-- sanitized placeholders for items Brad explicitly identifies as Range-related;
-- material interruption, retrieval, or speech-recognition problems.
-
-Do not add casual conversation, inferred preferences, a full transcript, raw
-audio, or notes Brad did not explicitly ask to save.
+Track only the attached queue filenames, explicit feedback and saved notes,
+sanitized Range-related placeholders, queue progress and resume positions, and
+material interruption, retrieval, preload, or speech-recognition problems. Do
+not add casual conversation, inferred preferences, a full transcript, raw audio,
+or notes Brad did not explicitly ask to save.
 
 For every item-specific record, copy the exact `queue_file`, `source_item_id`,
 title, and URL from the active queue. Never generate sequential IDs, replace
@@ -42,14 +42,19 @@ When the trigger phrase is spoken:
 
 1. Stop reading or discussing the queue.
 2. Say only: "Ending the commute session and creating the handoff."
-3. Create a downloadable file named
-   `YYYYMMDD-tldr-commute-handoff.txt`, using the local session date.
-4. Put only one JSON object in the file. Do not wrap it in Markdown or add prose.
-5. Validate the object against the project source file
-   `commute-handoff-v1.schema.json` and use
-   `schema_version: "commute-handoff.v1"`.
-6. Record the actual queue filenames and Voice surface when known. Use empty
-   arrays for categories with no recorded items; do not invent missing details.
+3. Begin a fresh reconstruction pass. Reload every active queue file, this
+   document, `commute-session-ledger.md`, `commute-handoff-v2.schema.json`, and
+   the routing and approved-source rules when applicable.
+4. Treat the queue files and structured ledger as the only sources of handoff
+   field values. Conversational memory may locate those inputs but must not
+   populate IDs, titles, URLs, filenames, actions, notes, or queue state.
+5. If an authoritative input or required value is unavailable, do not guess,
+   summarize from memory, or substitute an inferred value. Create no certified
+   handoff until the authoritative value is reloaded.
+6. Compile one `commute-handoff.v2` JSON object. Record the actual queue
+   filenames, Voice surface, and one structured `queue_states` entry per queue.
+   Use empty arrays for categories with no recorded items; do not invent missing
+   details.
 7. Save explicit feedback under `feedback`, explicit saved notes under
    `review_notes`, and material session problems under `issues`.
    - Every `feedback` item must identify the exact `queue_file`, one real
@@ -62,13 +67,24 @@ When the trigger phrase is spoken:
      identified exactly, use `general_review` instead.
    - Put presentation, queue-state, retrieval, and general workflow observations
      in `issues` unless they are explicit review notes about a particular item.
-8. Treat every saved note as review-only. Do not publish, commit, send, create a
-   reminder, or take any other external action.
-9. After the file is created, say only: "The commute handoff is ready."
+8. Validate the complete object against the currently loaded
+   `commute-handoff-v2.schema.json`. Validation must execute during this
+   generation pass. Never describe an artifact as schema-valid merely because
+   it looks correct or resembles an earlier valid object.
+9. Create a new downloadable file. Use
+   `YYYYMMDD-tldr-commute-handoff.txt` for the first artifact and append `-r2`,
+   `-r3`, and so on before `.txt` for corrected attempts. Never overwrite or
+   update an earlier artifact. Put only the validated JSON object in the file;
+   do not wrap it in Markdown or add prose.
+10. Treat every saved note as review-only. Do not publish, commit, send, create a
+    reminder, or take any other external action.
+11. Only after validation succeeds and the new file is created, say:
+    "The commute handoff is ready."
 
-If file creation is unavailable, preserve the same JSON object in the chat and
-say that it must be saved as `YYYYMMDD-tldr-commute-handoff.txt` after the drive.
-Do not ask Brad to troubleshoot while driving.
+If validation or file creation is unavailable, preserve the compiled JSON object
+in the chat as an unvalidated draft and state that it must be validated and saved
+after the drive. Do not say that the handoff is ready and do not ask Brad to
+troubleshoot while driving.
 
 ## Minimal Valid Shape
 
@@ -77,11 +93,19 @@ example value with the exact active-session value; do not omit required fields.
 
 ```json
 {
-  "schema_version": "commute-handoff.v1",
+  "schema_version": "commute-handoff.v2",
   "session_id": "2026-07-13-evening-tldr",
   "session_date": "2026-07-13",
   "voice_surface": "chatgpt_standard",
   "queue_files": ["20260713-tldr-indepth.txt"],
+  "queue_states": [
+    {
+      "queue_file": "20260713-tldr-indepth.txt",
+      "status": "partial",
+      "last_completed_source_item_id": "tldr_example_001",
+      "resume_source_item_id": "tldr_example_002"
+    }
+  ],
   "feedback": [],
   "review_notes": [
     {

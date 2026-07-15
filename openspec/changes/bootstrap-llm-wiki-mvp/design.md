@@ -182,9 +182,15 @@ the classifier output.
 
 12. **Use JSON content in TXT as the post-commute handoff.**
    - Decision: At session end, the same project chat creates a
-     `commute-handoff.v1` object containing only explicit feedback, saved review
-     notes, queue/session identity, and material recognition issues. The Library
-     transport file uses `.txt`; its content is JSON.
+     `commute-handoff.v2` object containing only explicit feedback, saved review
+     notes, queue/session identity, structured per-queue completion or resume
+     state, and material recognition issues. The Library transport file uses
+     `.txt`; its content is JSON. The local importer remains compatible with v1.
+   - Decision: Explicit actions and material queue-state changes append to a
+     structured internal ledger during the commute. Handoff generation reloads
+     authoritative queues, ledger, instructions, and schema; validates during
+     the current generation pass; and writes a new revision rather than relying
+     on conversational reconstruction or replacing an earlier artifact.
    - Decision: A local importer validates the object, rejects unknown top-level
      fields such as `transcript`, and writes create-only normalized data under a
      gitignored private directory.

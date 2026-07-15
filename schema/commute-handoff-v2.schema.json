@@ -1,0 +1,135 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://brad-balfour.github.io/llm-wiki/schema/commute-handoff-v2.schema.json",
+  "title": "Commute voice handoff",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "session_id",
+    "session_date",
+    "voice_surface",
+    "queue_files",
+    "queue_states",
+    "feedback",
+    "review_notes",
+    "issues"
+  ],
+  "properties": {
+    "schema_version": { "const": "commute-handoff.v2" },
+    "session_id": { "type": "string", "minLength": 1 },
+    "session_date": { "type": "string", "format": "date" },
+    "voice_surface": {
+      "enum": ["chatgpt_live", "chatgpt_advanced", "chatgpt_standard", "other"]
+    },
+    "queue_files": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "uniqueItems": true
+    },
+    "queue_states": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["queue_file", "status"],
+        "properties": {
+          "queue_file": { "type": "string", "minLength": 1 },
+          "status": { "enum": ["not_started", "partial", "completed"] },
+          "last_completed_source_item_id": { "type": "string", "minLength": 1 },
+          "current_source_item_id": { "type": "string", "minLength": 1 },
+          "resume_source_item_id": { "type": "string", "minLength": 1 }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": { "status": { "const": "partial" } },
+              "required": ["status"]
+            },
+            "then": { "required": ["resume_source_item_id"] }
+          },
+          {
+            "if": {
+              "properties": { "status": { "enum": ["not_started", "completed"] } },
+              "required": ["status"]
+            },
+            "then": {
+              "not": {
+                "anyOf": [
+                  { "required": ["current_source_item_id"] },
+                  { "required": ["resume_source_item_id"] }
+                ]
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": { "status": { "const": "not_started" } },
+              "required": ["status"]
+            },
+            "then": {
+              "not": { "required": ["last_completed_source_item_id"] }
+            }
+          }
+        ]
+      }
+    },
+    "feedback": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["queue_file", "source_item_id", "action"],
+        "properties": {
+          "queue_file": { "type": "string", "minLength": 1 },
+          "source_item_id": { "type": "string", "minLength": 1 },
+          "title": { "type": "string" },
+          "url": { "type": "string" },
+          "action": {
+            "enum": [
+              "mark_interested",
+              "mark_uninterested",
+              "promote_to_in_depth",
+              "save_for_review",
+              "skip"
+            ]
+          },
+          "note": { "type": "string" }
+        }
+      }
+    },
+    "review_notes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["title", "note", "destination"],
+        "properties": {
+          "queue_file": { "type": "string", "minLength": 1 },
+          "source_item_id": { "type": "string" },
+          "title": { "type": "string", "minLength": 1 },
+          "url": { "type": "string" },
+          "note": { "type": "string", "minLength": 1 },
+          "destination": {
+            "enum": ["wiki_review", "range_review", "general_review"]
+          }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": { "destination": { "const": "wiki_review" } },
+              "required": ["destination"]
+            },
+            "then": {
+              "required": ["queue_file", "source_item_id", "title", "url", "note", "destination"]
+            }
+          }
+        ]
+      }
+    },
+    "issues": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    }
+  }
+}

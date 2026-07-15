@@ -114,6 +114,10 @@ provider-neutral classifier and deterministic queue generator are complete.
 - **THEN** it MAY create an ordered queue as JSON content in a `.txt` file
 - **AND** the queue SHALL preserve source item ids and the metadata required by
   the prepared-queue contract
+- **AND** within each source-newsletter queue, duplicate candidates SHALL resolve
+  to one item by highest interest score, then highest depth score, then earliest
+  source occurrence
+- **AND** Headline Only and In-Depth SHALL be mutually exclusive sections
 - **AND** this manual output SHALL NOT be treated as satisfying the repository's
   classifier-adapter or deterministic queue-generation implementation tasks.
 
@@ -125,13 +129,31 @@ be reviewed locally without ingesting the full conversation transcript.
 #### Scenario: Generate the handoff in ChatGPT
 
 - **WHEN** Brad ends a commute Voice session and requests a handoff
-- **THEN** the same chat SHALL create a `commute-handoff.v1` JSON object in a
+- **THEN** the same chat SHALL compile a `commute-handoff.v2` JSON object from
+  reloaded authoritative queue files and an append-only structured session
+  ledger in a
   `.txt` Library file
+- **AND** the handoff SHALL contain one structured completion or exact resume
+  state for every loaded queue
+- **AND** the chat SHALL load the v2 schema and execute validation during the
+  current generation pass before claiming that the handoff is ready
+- **AND** corrected attempts SHALL create a new revisioned file rather than
+  replacing an earlier artifact
 - **AND** every item-specific record SHALL identify its exact source queue file
   in addition to session and queue identity, explicit item feedback,
   explicit saved review notes, and material recognition or interruption issues
 - **AND** it SHALL NOT contain a full transcript or private detail that Brad did
   not explicitly ask to save.
+
+#### Scenario: Record durable session actions
+
+- **WHEN** Brad issues an item command or a material queue-state change occurs
+- **THEN** the chat SHALL immediately append a structured event to its internal
+  session ledger
+- **AND** item-specific event identity SHALL be copied from the active queue
+  object rather than reconstructed from conversational memory
+- **AND** article preloading SHALL NOT advance the queue cursor, change the
+  resume position, mark an item complete, or cause duplicate playback.
 
 #### Scenario: Save an article for wiki review
 
@@ -149,6 +171,7 @@ be reviewed locally without ingesting the full conversation transcript.
 - **WHEN** Brad downloads the handoff `.txt` file and runs the local importer
 - **THEN** the importer SHALL validate the structured object and fail closed on
   malformed or unsupported fields
+- **AND** the importer SHALL remain backward compatible with v1 handoffs
 - **AND** it SHALL write a normalized create-only record to a gitignored private
   inbox
 - **AND** no note SHALL be promoted into feedback labels, sources, public wiki
