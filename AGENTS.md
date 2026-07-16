@@ -108,6 +108,11 @@ the task introduces that surface.
 - In a PR, summarize the change, its user impact, and validation performed.
 - Do not merge or deploy without explicit user authorization. A request to
   create a PR authorizes a branch, commit, push, and draft PR.
+- Before merging, wait for the PR head SHA's Copilot review workflow to reach a
+  completed state, then inspect its submitted review and every unresolved review
+  thread. An absent review result while the workflow is running is never
+  clearance to merge; address actionable findings in that PR or a clearly linked
+  follow-up before publishing.
 
 ## Failure-driven improvements
 
