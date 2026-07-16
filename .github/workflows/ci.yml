@@ -27,3 +27,18 @@ jobs:
         run: npm run ci:install
       - name: Run publish gate
         run: npm run verify:publish
+
+  render:
+    name: Render GitHub Pages site
+    needs: verify
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v6
+      - name: Build with Jekyll
+        uses: actions/jekyll-build-pages@v1
+        with:
+          source: ./
+          destination: ./_site

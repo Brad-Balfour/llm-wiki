@@ -19,7 +19,10 @@ and unreviewed voice notes do not belong here.
 
 ## Recent Additions
 
-{% assign recent_entries = site.pages | where_exp: "entry", "entry.type and entry.updated and entry.path != 'wiki/ENTRY_TEMPLATE.md'" | sort: "updated" | reverse %}
+{% assign typed_entries = site.pages | where_exp: "entry", "entry.type" %}
+{% assign dated_entries = typed_entries | where_exp: "entry", "entry.updated" %}
+{% assign publishable_entries = dated_entries | where_exp: "entry", "entry.path != 'wiki/ENTRY_TEMPLATE.md'" %}
+{% assign recent_entries = publishable_entries | sort: "updated" | reverse %}
 {% for entry in recent_entries limit: 10 %}
 
 - [{{ entry.title }}]({{ entry.url | relative_url }}) — {{ entry.type | capitalize }}, updated {{ entry.updated | date: "%B %-d, %Y" }}
