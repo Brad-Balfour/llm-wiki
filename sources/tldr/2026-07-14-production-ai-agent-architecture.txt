@@ -1,0 +1,45 @@
+{
+  "schema_version": "approved-wiki-source.v1",
+  "approval": {
+    "status": "approved",
+    "public": true,
+    "approved_at": "2026-07-16T01:04:39.441Z",
+    "reviewed_by": "brad",
+    "safety_review": {
+      "privacy": "cleared",
+      "publication_rights": "cleared",
+      "dual_use": "cleared"
+    }
+  },
+  "source": {
+    "source_item_id": "19f60cf507a74afc-05",
+    "source_path": "sources/tldr/2026-07-14-production-ai-agent-architecture.txt",
+    "source_type": "tldr",
+    "title": "How Microsoft Ships Thousands of Production AI Agents",
+    "url": "https://blog.bytebytego.com/p/how-microsoft-ships-ai-agents-at",
+    "newsletter": "TLDR AI",
+    "edition_date": "2026-07-14"
+  },
+  "entry": {
+    "type": "concept",
+    "slug": "production-ai-agent-architecture",
+    "title": "Production AI Agent Architecture",
+    "aliases": [
+      "How Microsoft Ships Thousands of Production AI Agents"
+    ],
+    "tags": [
+      "ai-agents",
+      "production-systems",
+      "identity",
+      "evaluation"
+    ],
+    "confidence": "medium",
+    "summary": "Production AI-agent systems benefit from clear boundaries between agents, resources, and evaluations. Microsoft describes patterns including retrieval sub-agents, distinct identities and workspaces, and rubric-driven improvement loops.",
+    "key_ideas": [
+      "Retrieval can be treated as a specialized sub-agent rather than an undifferentiated capability.",
+      "Separate identities and workspaces help define responsibility and isolation boundaries.",
+      "Rubric-based evaluations can provide a repeatable signal for improvement loops."
+    ],
+    "related": []
+  }
+}

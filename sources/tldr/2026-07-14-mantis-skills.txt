@@ -1,0 +1,45 @@
+{
+  "schema_version": "approved-wiki-source.v1",
+  "approval": {
+    "status": "approved",
+    "public": true,
+    "approved_at": "2026-07-16T01:04:39.467Z",
+    "reviewed_by": "brad",
+    "safety_review": {
+      "privacy": "cleared",
+      "publication_rights": "cleared",
+      "dual_use": "cleared"
+    }
+  },
+  "source": {
+    "source_item_id": "19f60cf507a74afc-06",
+    "source_path": "sources/tldr/2026-07-14-mantis-skills.txt",
+    "source_type": "tldr",
+    "title": "Mantis Skills: Portable Toolkit for Building Security Review Harnesses",
+    "url": "https://github.com/google/mantis",
+    "newsletter": "TLDR AI",
+    "edition_date": "2026-07-14"
+  },
+  "entry": {
+    "type": "tool",
+    "slug": "mantis-skills",
+    "title": "Mantis Skills",
+    "aliases": [
+      "Mantis Skills: Portable Toolkit for Building Security Review Harnesses"
+    ],
+    "tags": [
+      "coding-agents",
+      "security-review",
+      "threat-modeling",
+      "risk-calibration"
+    ],
+    "confidence": "medium",
+    "summary": "Mantis Skills is a toolkit for structuring sequential security-review work with coding agents. It emphasizes adapting documentation, threat models, and risk calibration to the environment being reviewed.",
+    "key_ideas": [
+      "Security-review workflows benefit from explicit, sequential skills rather than a single broad instruction.",
+      "Environment-specific documentation and threat models make a review more grounded.",
+      "Risk calibration helps keep agent-assisted review focused on the most consequential findings."
+    ],
+    "related": []
+  }
+}

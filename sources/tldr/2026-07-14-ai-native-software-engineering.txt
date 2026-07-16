@@ -1,0 +1,45 @@
+{
+  "schema_version": "approved-wiki-source.v1",
+  "approval": {
+    "status": "approved",
+    "public": true,
+    "approved_at": "2026-07-16T01:04:38.505Z",
+    "reviewed_by": "brad",
+    "safety_review": {
+      "privacy": "cleared",
+      "publication_rights": "cleared",
+      "dual_use": "cleared"
+    }
+  },
+  "source": {
+    "source_item_id": "19f6057544b9bae7-06",
+    "source_path": "sources/tldr/2026-07-14-ai-native-software-engineering.txt",
+    "source_type": "tldr",
+    "title": "Control the ideas, not the code",
+    "url": "https://antirez.com/news/169",
+    "newsletter": "TLDR Dev",
+    "edition_date": "2026-07-14"
+  },
+  "entry": {
+    "type": "concept",
+    "slug": "ai-native-software-engineering",
+    "title": "AI-Native Software Engineering",
+    "aliases": [
+      "Control the ideas, not the code"
+    ],
+    "tags": [
+      "ai-engineering",
+      "software-design",
+      "correctness",
+      "code-review"
+    ],
+    "confidence": "high",
+    "summary": "AI-native software engineering shifts the developer's center of gravity from manually producing and inspecting every line of code toward specifying behavior, making design choices, and verifying correctness and performance.",
+    "key_ideas": [
+      "A developer remains accountable for the system's behavior even when an LLM generates much of its code.",
+      "Design constraints, correctness criteria, and performance goals become primary control surfaces.",
+      "Review should focus on evidence that the system meets its intended behavior rather than only line-by-line authorship."
+    ],
+    "related": []
+  }
+}
