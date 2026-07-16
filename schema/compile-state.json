@@ -2,7 +2,7 @@
   "manifest_version": 1,
   "schema_version": "compile-state.v1",
   "created": "2026-07-05",
-  "updated": "2026-07-16T01:04:39.516Z",
+  "updated": "2026-07-16T01:27:23.087Z",
   "processed_sources": {
     "sources/tldr/2026-06-23-transformer-architecture-for-senior-engineers.txt": {
       "hash": "sha256:f9a592761c47b368e73c13dd97d27b02bc875433b632a582a40ec6419643e631",
@@ -59,28 +59,28 @@
       "provenance_count": 1
     },
     "wiki/concepts/ai-native-software-engineering.md": {
-      "hash": "sha256:e66f4f9da4bccdce717dc49ee0575a6f9b2c504536a55aa47b0f9f739f8ca8da",
-      "updated": "2026-07-16T01:04:38.528Z",
+      "hash": "sha256:551c5833161fa07331434ce7368cb1384c775407052c85902b95ec83a90f01c2",
+      "updated": "2026-07-16T01:27:22.985Z",
       "provenance_count": 1
     },
     "wiki/tools/clawk.md": {
-      "hash": "sha256:75c316e24e3ca181f5d109ba823dee0cc60ceff664c8ad8c41b9fc24d7c252af",
-      "updated": "2026-07-16T01:04:39.437Z",
+      "hash": "sha256:660fdd13fb3c9741dd784932d5a4d97b0b58b17805fc05d448fa83d61d6c7111",
+      "updated": "2026-07-16T01:27:23.011Z",
       "provenance_count": 1
     },
     "wiki/concepts/production-ai-agent-architecture.md": {
-      "hash": "sha256:e520f433075cff1636da80843a7da7dd6671d6a48166f7b30ddafa4df77d531d",
-      "updated": "2026-07-16T01:04:39.463Z",
+      "hash": "sha256:ba87ea7b2d6bb9718b6e85c186c14e7afd6bd1b864cf49c9bea58eed84cfca84",
+      "updated": "2026-07-16T01:27:23.036Z",
       "provenance_count": 1
     },
     "wiki/tools/mantis-skills.md": {
-      "hash": "sha256:57a050711e408f94603b17db7a974b9c3692dce04b36a1a4b780e22536bed7ec",
-      "updated": "2026-07-16T01:04:39.490Z",
+      "hash": "sha256:109da0d7b4666dbb5e3594a3c5151dbd08a7103213c3d137f005a7306f926e19",
+      "updated": "2026-07-16T01:27:23.062Z",
       "provenance_count": 1
     },
     "wiki/concepts/agentic-economy.md": {
-      "hash": "sha256:588c9334a403decb5867edf3d99f33c41275583a533da607b351350e6bdab99a",
-      "updated": "2026-07-16T01:04:39.516Z",
+      "hash": "sha256:161fa3315c02a55436cf646925b0c08b2b65ae3803e6543d2db71070dd1adf1d",
+      "updated": "2026-07-16T01:27:23.087Z",
       "provenance_count": 1
     }
   },
@@ -126,6 +126,36 @@
       "source_path": "sources/tldr/2026-07-14-agentic-economy.txt",
       "output_path": "wiki/concepts/agentic-economy.md",
       "status": "created"
+    },
+    {
+      "timestamp": "2026-07-16T01:27:22.985Z",
+      "source_path": "sources/tldr/2026-07-14-ai-native-software-engineering.txt",
+      "output_path": "wiki/concepts/ai-native-software-engineering.md",
+      "status": "updated"
+    },
+    {
+      "timestamp": "2026-07-16T01:27:23.011Z",
+      "source_path": "sources/tldr/2026-07-14-clawk.txt",
+      "output_path": "wiki/tools/clawk.md",
+      "status": "updated"
+    },
+    {
+      "timestamp": "2026-07-16T01:27:23.036Z",
+      "source_path": "sources/tldr/2026-07-14-production-ai-agent-architecture.txt",
+      "output_path": "wiki/concepts/production-ai-agent-architecture.md",
+      "status": "updated"
+    },
+    {
+      "timestamp": "2026-07-16T01:27:23.062Z",
+      "source_path": "sources/tldr/2026-07-14-mantis-skills.txt",
+      "output_path": "wiki/tools/mantis-skills.md",
+      "status": "updated"
+    },
+    {
+      "timestamp": "2026-07-16T01:27:23.087Z",
+      "source_path": "sources/tldr/2026-07-14-agentic-economy.txt",
+      "output_path": "wiki/concepts/agentic-economy.md",
+      "status": "updated"
     }
   ]
 }

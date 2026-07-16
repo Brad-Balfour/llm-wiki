@@ -2,6 +2,8 @@ import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import test from 'node:test';
 
+import { check as prettierCheck, resolveConfig as resolvePrettierConfig } from 'prettier';
+
 import { parseApprovedWikiSource } from '../src/wiki/approved-source.js';
 import { compileApprovedWikiSource } from '../src/wiki/compiler.js';
 
@@ -50,6 +52,22 @@ test('is idempotent when the same source is compiled again', async () => {
   assert.equal(repeated.status, 'skipped');
   assert.equal(repeated.markdown, created.markdown);
   assert.equal(repeated.provenance_count, 1);
+});
+
+test('emits Prettier-compliant Markdown for created and updated entries', async () => {
+  const first = parseApprovedWikiSource(await fixture('approved-source-one.json'));
+  const second = parseApprovedWikiSource(await fixture('approved-source-two.json'));
+  const created = compileApprovedWikiSource(first, undefined, '2026-07-12');
+  const updated = compileApprovedWikiSource(second, created.markdown, '2026-07-13');
+  const prettierOptions = await resolvePrettierConfig('.prettierrc');
+  assert.ok(prettierOptions);
+
+  for (const result of [created, updated]) {
+    assert.equal(
+      await prettierCheck(result.markdown, { ...prettierOptions, parser: 'markdown' }),
+      true
+    );
+  }
 });
 
 test('fails closed when public approval is missing', async () => {

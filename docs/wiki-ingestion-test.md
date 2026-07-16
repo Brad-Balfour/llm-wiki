@@ -56,6 +56,10 @@ Inspect the generated Markdown and `schema/compile-state.json` before committing
 anything. Re-running the unchanged source should print `skipped` and should not
 duplicate provenance.
 
+Both `compile:wiki` and `ingest:wiki` now run `npm run verify:publish` after
+writing their public output. A nonzero exit means do not create or update a PR
+until the reported check is fixed.
+
 After the branch is merged, the same compilation can be run manually from the
 GitHub Actions workflow named **Compile approved wiki source**. Its
 `source_path` input must name an approved record already committed under
@@ -73,3 +77,5 @@ Confirm that:
 - the TLDR title and URL appear under Source Notes;
 - the source path and stable source item id are correct;
 - no prior provenance disappeared when an existing entry was updated.
+- `npm run verify:publish` completes locally before the publication branch is
+  pushed.

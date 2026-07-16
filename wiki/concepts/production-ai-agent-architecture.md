@@ -25,6 +25,7 @@ Production AI-agent systems benefit from clear boundaries between agents, resour
 ## Source Notes
 
 ### [How Microsoft Ships Thousands of Production AI Agents](https://blog.bytebytego.com/p/how-microsoft-ships-ai-agents-at)
+
 <!-- source-item-id: 19f60cf507a74afc-05 -->
 
 TLDR AI, 2026-07-14. Production AI-agent systems benefit from clear boundaries between agents, resources, and evaluations. Microsoft describes patterns including retrieval sub-agents, distinct identities and workspaces, and rubric-driven improvement loops.

@@ -109,6 +109,14 @@ the task introduces that surface.
 - Do not merge or deploy without explicit user authorization. A request to
   create a PR authorizes a branch, commit, push, and draft PR.
 
+## Failure-driven improvements
+
+When an error escapes local validation, reaches CI, or affects the user-facing
+workflow, propose and—when approved—implement the smallest durable guard that
+would have caught it before the same boundary. Do not treat the remediation as
+complete until that guard is covered by a focused test or local command and, for
+publish-affecting changes, by a pull-request CI check.
+
 ## Instruction compatibility
 
 `AGENTS.md` is the canonical repository guide. `CLAUDE.md` is a symbolic link

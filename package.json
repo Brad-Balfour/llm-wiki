@@ -15,11 +15,11 @@
     "ci:build": "npm run build",
     "compile": "npm run build",
     "validate:site": "node scripts/validate-jekyll.mjs",
-    "compile:wiki": "npm run build --silent && node dist/src/wiki/compile-file.js",
+    "compile:wiki": "npm run build --silent && node dist/src/wiki/compile-file.js && npm run verify:publish",
     "ingest:tldr": "npm run build --silent && node dist/src/tldr/ingest-file.js",
     "import:commute-handoff": "npm run build --silent && node dist/src/commute/import-handoff.js",
     "prepare:wiki-drafts": "npm run build --silent && node dist/src/wiki/prepare-handoff-drafts.js",
-    "ingest:wiki": "npm run build --silent && node dist/src/wiki/ingest-handoff.js",
+    "ingest:wiki": "npm run build --silent && node dist/src/wiki/ingest-handoff.js && npm run verify:publish",
     "test": "npm run build && node --test dist/tests/*.test.js",
     "ci:test": "npm run test",
     "lint": "eslint .",
@@ -28,6 +28,7 @@
     "format": "prettier --write package.json tsconfig.json eslint.config.mjs .prettierrc README.md index.md _config.yml \".github/workflows/*.yml\" \"chatgpt-project/**/*.md\" \"docs/**/*.md\" \"schema/**/*.json\" \"scripts/**/*.mjs\" \"sources/**/*.md\" \"src/**/*.ts\" \"tests/**/*.ts\" \"tests/fixtures/**/*.json\" \"wiki/**/*.md\"",
     "format:check": "prettier --check package.json tsconfig.json eslint.config.mjs .prettierrc README.md index.md _config.yml \".github/workflows/*.yml\" \"chatgpt-project/**/*.md\" \"docs/**/*.md\" \"schema/**/*.json\" \"scripts/**/*.mjs\" \"sources/**/*.md\" \"src/**/*.ts\" \"tests/**/*.ts\" \"tests/fixtures/**/*.json\" \"wiki/**/*.md\"",
     "format:write": "npm run format",
+    "verify:publish": "npm run check",
     "check": "npm run test && npm run lint && npm run format:check && npm run validate:site"
   },
   "devDependencies": {

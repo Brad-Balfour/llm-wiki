@@ -25,6 +25,7 @@ Mantis Skills is a toolkit for structuring sequential security-review work with 
 ## Source Notes
 
 ### [Mantis Skills: Portable Toolkit for Building Security Review Harnesses](https://github.com/google/mantis)
+
 <!-- source-item-id: 19f60cf507a74afc-06 -->
 
 TLDR AI, 2026-07-14. Mantis Skills is a toolkit for structuring sequential security-review work with coding agents. It emphasizes adapting documentation, threat models, and risk calibration to the environment being reviewed.
