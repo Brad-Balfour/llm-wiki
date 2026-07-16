@@ -70,6 +70,17 @@ test('emits Prettier-compliant Markdown for created and updated entries', async 
   }
 });
 
+test('keeps summaries and key ideas out of Source Notes', async () => {
+  const source = parseApprovedWikiSource(await fixture('approved-source-one.json'));
+  const result = compileApprovedWikiSource(source, undefined, '2026-07-12');
+  const sourceNotes = result.markdown.split('## Source Notes\n\n')[1];
+
+  assert.ok(sourceNotes);
+  assert.match(sourceNotes, /TLDR AI, 2026-07-12\./);
+  assert.doesNotMatch(sourceNotes, /Context engineering treats the information/);
+  assert.doesNotMatch(sourceNotes, /Reliable agents need deliberate context/);
+});
+
 test('fails closed when public approval is missing', async () => {
   const source = JSON.parse(await fixture('approved-source-one.json')) as Record<string, unknown>;
   source.approval = {

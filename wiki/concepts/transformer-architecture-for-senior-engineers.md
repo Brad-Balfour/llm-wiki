@@ -30,10 +30,4 @@ Transformers process relationships among tokens through attention rather than a 
 
 <!-- source-item-id: tldr_79edd44693b74006 -->
 
-TLDR Dev, 2026-06-23. Transformers process relationships among tokens through attention rather than a sequential recurrent state. A transformer pipeline maps text to tokens and embeddings, adds positional information, and combines multi-head attention with feed-forward layers, normalization, and residual connections.
-
-- Transformers model token relationships through attention instead of sequential recurrent state.
-- Tokenization converts text into token IDs, while embeddings map those IDs into learned vectors.
-- Positional encoding supplies order information that attention alone does not contain.
-- Multi-head attention lets a model examine different relationships among tokens in parallel.
-- Feed-forward layers, normalization, and residual connections are essential parts of a transformer block alongside attention.
+TLDR Dev, 2026-06-23.

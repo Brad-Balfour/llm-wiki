@@ -28,8 +28,4 @@ Clawk is a tool for running coding agents in disposable Linux virtual machines, 
 
 <!-- source-item-id: 19f6057544b9bae7-07 -->
 
-TLDR Dev, 2026-07-14. Clawk is a tool for running coding agents in disposable Linux virtual machines, with outbound network access restricted through an allow-list.
-
-- Disposable virtual machines can reduce the persistence of an agent's execution environment.
-- Network allow-lists make outbound access an explicit control rather than a default capability.
-- Sandboxing and network controls are complementary safeguards for autonomous coding workflows.
+TLDR Dev, 2026-07-14.

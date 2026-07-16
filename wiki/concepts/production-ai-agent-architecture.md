@@ -28,8 +28,4 @@ Production AI-agent systems benefit from clear boundaries between agents, resour
 
 <!-- source-item-id: 19f60cf507a74afc-05 -->
 
-TLDR AI, 2026-07-14. Production AI-agent systems benefit from clear boundaries between agents, resources, and evaluations. Microsoft describes patterns including retrieval sub-agents, distinct identities and workspaces, and rubric-driven improvement loops.
-
-- Retrieval can be treated as a specialized sub-agent rather than an undifferentiated capability.
-- Separate identities and workspaces help define responsibility and isolation boundaries.
-- Rubric-based evaluations can provide a repeatable signal for improvement loops.
+TLDR AI, 2026-07-14.
