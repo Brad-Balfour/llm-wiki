@@ -26,10 +26,16 @@ test('wiki landing and taxonomy indexes have stable Jekyll routes', async () => 
   assert.doesNotMatch(wikiIndex, /README\.md/);
   assert.match(wikiIndex, /\(concepts\/\)/);
   assert.match(wikiIndex, /## Recent Additions/);
+  assert.match(wikiIndex, /assign typed_entries = site\.pages \| where_exp: "entry", "entry.type"/);
   assert.match(
     wikiIndex,
-    /where_exp: "entry", "entry.type and entry\.updated and entry\.path != 'wiki\/ENTRY_TEMPLATE\.md'"/
+    /assign dated_entries = typed_entries \| where_exp: "entry", "entry.updated"/
   );
+  assert.match(
+    wikiIndex,
+    /assign publishable_entries = dated_entries \| where_exp: "entry", "entry.path != 'wiki\/ENTRY_TEMPLATE\.md'"/
+  );
+  assert.doesNotMatch(wikiIndex, /where_exp: "entry", "[^"\n]*\band\b/);
   assert.match(wikiIndex, /sort: "updated" \| reverse/);
   assert.match(wikiIndex, /recent_entries limit: 10/);
   assert.match(wikiIndex, /entry\.url \| relative_url/);
