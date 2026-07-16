@@ -25,6 +25,7 @@ AI-native software engineering shifts the developer's center of gravity from man
 ## Source Notes
 
 ### [Control the ideas, not the code](https://antirez.com/news/169)
+
 <!-- source-item-id: 19f6057544b9bae7-06 -->
 
 TLDR Dev, 2026-07-14. AI-native software engineering shifts the developer's center of gravity from manually producing and inspecting every line of code toward specifying behavior, making design choices, and verifying correctness and performance.

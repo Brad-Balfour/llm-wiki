@@ -3,7 +3,7 @@ import { mkdir, readFile, rename, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 
 import { parseApprovedWikiSource } from './approved-source.js';
-import { compileApprovedWikiSource } from './compiler.js';
+import { compileApprovedWikiSource, normalizeGeneratedWikiMarkdown } from './compiler.js';
 
 interface CompileState {
   manifest_version: number;
@@ -62,6 +62,7 @@ async function main(): Promise<void> {
     );
   }
 
+  let normalizedPriorOutput: string | undefined;
   if (prior) {
     if (prior.hash !== inputHash) {
       throw new Error(
@@ -76,8 +77,12 @@ async function main(): Promise<void> {
           `Wiki output drift detected for ${prior.output_path}. Review the file before compiling again.`
         );
       }
-      process.stdout.write(`skipped ${prior.output_path}\n`);
-      return;
+      const normalized = normalizeGeneratedWikiMarkdown(priorOutput);
+      if (normalized === priorOutput) {
+        process.stdout.write(`skipped ${prior.output_path}\n`);
+        return;
+      }
+      normalizedPriorOutput = normalized;
     }
   }
 
@@ -92,7 +97,16 @@ async function main(): Promise<void> {
       );
     }
   }
-  const result = compileApprovedWikiSource(source, existingMarkdown, now.slice(0, 10));
+  const result =
+    normalizedPriorOutput === undefined
+      ? compileApprovedWikiSource(source, existingMarkdown, now.slice(0, 10))
+      : {
+          status: 'updated' as const,
+          output_path: prior?.output_path ?? outputPath,
+          markdown: normalizedPriorOutput,
+          provenance_count:
+            state.wiki_outputs[prior?.output_path ?? outputPath]?.provenance_count ?? 1,
+        };
 
   if (result.status !== 'skipped') {
     await mkdir(path.dirname(absoluteOutputPath), { recursive: true });
@@ -104,7 +118,7 @@ async function main(): Promise<void> {
     hash: inputHash,
     output_path: result.output_path,
     source_item_id: source.source.source_item_id,
-    processed_at: now,
+    processed_at: normalizedPriorOutput === undefined ? now : (prior?.processed_at ?? now),
   };
   state.wiki_outputs[result.output_path] = {
     hash: sha256(result.markdown),

@@ -41,6 +41,9 @@ npm run check
 openspec validate bootstrap-llm-wiki-mvp --type change --strict
 ```
 
+Public wiki commands also run `npm run verify:publish` after generating output;
+that is the required local gate before a publication PR is pushed.
+
 Run local TLDR ingestion after building:
 
 ```bash

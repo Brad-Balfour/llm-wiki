@@ -109,11 +109,15 @@ function renderEntry(
   ].join('\n');
 }
 
+export function normalizeGeneratedWikiMarkdown(markdown: string): string {
+  return markdown.replace(/^(### \[[^\n]+\]\([^\n]+\)\n)(<!-- source-item-id: )/gm, '$1\n$2');
+}
+
 function renderInitialBody(source: ApprovedWikiSource): string {
   const related =
     source.entry.related.length === 0
-      ? ''
-      : `\n\n## Related\n\n${source.entry.related.map((slug) => `- [[${slug}]]`).join('\n')}`;
+      ? []
+      : ['', '## Related', '', ...source.entry.related.map((slug) => `- [[${slug}]]`)];
   return [
     `# ${escapeMarkdownText(source.entry.title)}`,
     '',
@@ -126,13 +130,14 @@ function renderInitialBody(source: ApprovedWikiSource): string {
     '## Source Notes',
     '',
     renderSourceNote(source),
-    related,
+    ...related,
   ].join('\n');
 }
 
 function renderSourceNote(source: ApprovedWikiSource): string {
   return [
     `### [${escapeMarkdownText(source.source.title)}](${source.source.url})`,
+    '',
     `<!-- source-item-id: ${source.source.source_item_id} -->`,
     '',
     `${escapeMarkdownText(source.source.newsletter)}, ${source.source.edition_date}. ${escapeMarkdownText(source.entry.summary)}`,
