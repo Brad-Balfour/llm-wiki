@@ -110,7 +110,19 @@ function renderEntry(
 }
 
 export function normalizeGeneratedWikiMarkdown(markdown: string): string {
-  return markdown.replace(/^(### \[[^\n]+\]\([^\n]+\)\n)(<!-- source-item-id: )/gm, '$1\n$2');
+  const withNormalizedCommentSpacing = markdown.replace(
+    /^(### \[[^\n]+\]\([^\n]+\)\n)(<!-- source-item-id: )/gm,
+    '$1\n$2'
+  );
+  const withoutDuplicatedSourceNotes = withNormalizedCommentSpacing.replace(
+    /^(### \[[^\n]+\]\([^\n]+\)\n\n<!-- source-item-id: [^\n]+ -->\n\n)([^\n]+, \d{4}-\d{2}-\d{2})\. [^\n][\s\S]*?(?=^### \[|^## Related|(?![\s\S]))/gm,
+    (match, heading, metadata, offset, input) =>
+      `${heading}${metadata}.${offset + match.length === input.length ? '\n' : '\n\n'}`
+  );
+  return withoutDuplicatedSourceNotes.replace(
+    /(<!-- source-item-id: [^\n]+ -->\n\n[^\n]+, \d{4}-\d{2}-\d{2}\.)\n\n$/,
+    '$1\n'
+  );
 }
 
 function renderInitialBody(source: ApprovedWikiSource): string {
@@ -140,9 +152,7 @@ function renderSourceNote(source: ApprovedWikiSource): string {
     '',
     `<!-- source-item-id: ${source.source.source_item_id} -->`,
     '',
-    `${escapeMarkdownText(source.source.newsletter)}, ${source.source.edition_date}. ${escapeMarkdownText(source.entry.summary)}`,
-    '',
-    ...source.entry.key_ideas.map((idea) => `- ${escapeMarkdownText(idea)}`),
+    `${escapeMarkdownText(source.source.newsletter)}, ${source.source.edition_date}.`,
   ].join('\n');
 }
 

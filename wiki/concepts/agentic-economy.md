@@ -28,8 +28,4 @@ The agentic-economy thesis frames the growing role of AI agents as a possible re
 
 <!-- source-item-id: 19f60cf507a74afc-14 -->
 
-TLDR AI, 2026-07-14. The agentic-economy thesis frames the growing role of AI agents as a possible reorganization of economic activity around increasingly automated intelligence. This entry records the thesis rather than treating it as an established forecast.
-
-- The thesis links advances in AI capability with broader economic change.
-- Its central claim is directional and speculative rather than a settled empirical conclusion.
-- Evaluating such claims requires separating concrete agent adoption from longer-term economic forecasts.
+TLDR AI, 2026-07-14.

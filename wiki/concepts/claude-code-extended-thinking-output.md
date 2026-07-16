@@ -29,9 +29,4 @@ Claude Code's Extended Thinking logs may expose a signature and a summary rather
 
 <!-- source-item-id: tldr_f6b2ae0fb7b44ced -->
 
-TLDR Dev, 2026-06-23. Claude Code's Extended Thinking logs may expose a signature and a summary rather than plaintext model reasoning. The linked article says Anthropic retains the decryption key and that access to full thinking output requires an enterprise agreement.
-
-- The article reports that local Claude Code session logs contain thinking blocks represented by a signature rather than readable reasoning text.
-- It says Anthropic retains the decryption key and the user's machine does not receive it.
-- According to the article, the API returns a summary of reasoning rather than the full reasoning itself.
-- The article says that receiving full thinking output requires an enterprise agreement.
+TLDR Dev, 2026-06-23.

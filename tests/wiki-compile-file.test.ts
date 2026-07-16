@@ -26,10 +26,12 @@ test('file compiler requires local confirmation and enforces source immutability
   await assertPrettierCompliant(generatedOutput);
   const processedAt = await processedAtFor(repoRoot);
 
-  const legacyOutput = generatedOutput.replace(
-    '\n\n<!-- source-item-id:',
-    '\n<!-- source-item-id:'
-  );
+  const legacyOutput = generatedOutput
+    .replace('\n\n<!-- source-item-id:', '\n<!-- source-item-id:')
+    .replace(
+      'TLDR AI, 2026-07-12.\n\n',
+      'TLDR AI, 2026-07-12. Context engineering treats the information supplied to an agent as a designed system rather than an incidental prompt.\n\n- Reliable agents need deliberate context selection and organization.\n- Context quality can matter as much as model capability.\n\n'
+    );
   await writeFile(outputPath, legacyOutput);
   await updateOutputHash(repoRoot, legacyOutput);
   const normalized = runCompiler(repoRoot, true);
@@ -37,6 +39,8 @@ test('file compiler requires local confirmation and enforces source immutability
   assert.match(normalized.stdout, /updated wiki\/concepts\/context-engineering\.md/);
   await assertPrettierCompliant(await readFile(outputPath, 'utf8'));
   assert.equal(await processedAtFor(repoRoot), processedAt);
+  const normalizedOutput = await readFile(outputPath, 'utf8');
+  assert.doesNotMatch(normalizedOutput.split('## Source Notes\n\n')[1] ?? '', /Reliable agents/);
 
   const absoluteSource = path.join(repoRoot, SOURCE_PATH);
   const changed = JSON.parse(await readFile(absoluteSource, 'utf8')) as Record<string, unknown>;

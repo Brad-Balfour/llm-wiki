@@ -7,6 +7,7 @@ import { JSON_SCHEMA, load } from 'js-yaml';
 const markdownFiles = ['index.md', ...(await findMarkdownFiles('wiki'))];
 const yamlFiles = [
   '_config.yml',
+  '.github/dependabot.yml',
   ...(await findFiles('.github/workflows', isYaml)),
   ...(await findFiles('schema', isYaml)),
 ];

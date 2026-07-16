@@ -28,8 +28,4 @@ AI-native software engineering shifts the developer's center of gravity from man
 
 <!-- source-item-id: 19f6057544b9bae7-06 -->
 
-TLDR Dev, 2026-07-14. AI-native software engineering shifts the developer's center of gravity from manually producing and inspecting every line of code toward specifying behavior, making design choices, and verifying correctness and performance.
-
-- A developer remains accountable for the system's behavior even when an LLM generates much of its code.
-- Design constraints, correctness criteria, and performance goals become primary control surfaces.
-- Review should focus on evidence that the system meets its intended behavior rather than only line-by-line authorship.
+TLDR Dev, 2026-07-14.
