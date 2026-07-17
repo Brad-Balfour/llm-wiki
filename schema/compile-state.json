@@ -2,7 +2,7 @@
   "manifest_version": 1,
   "schema_version": "compile-state.v1",
   "created": "2026-07-05",
-  "updated": "2026-07-16T01:40:13.424Z",
+  "updated": "2026-07-17T00:38:58.784Z",
   "processed_sources": {
     "sources/tldr/2026-06-23-transformer-architecture-for-senior-engineers.txt": {
       "hash": "sha256:f9a592761c47b368e73c13dd97d27b02bc875433b632a582a40ec6419643e631",
@@ -45,6 +45,12 @@
       "output_path": "wiki/concepts/agentic-economy.md",
       "source_item_id": "19f60cf507a74afc-14",
       "processed_at": "2026-07-16T01:04:39.516Z"
+    },
+    "sources/tldr/2026-07-15-reality-driven-ai-product-development.txt": {
+      "hash": "sha256:2925dea85aaa2811a5ddfcaee5f18fc2b032aa13cf9671e37419ab8fe0b15c7a",
+      "output_path": "wiki/concepts/reality-driven-ai-product-development.md",
+      "source_item_id": "19f657fda97edc45-01",
+      "processed_at": "2026-07-17T00:38:58.784Z"
     }
   },
   "wiki_outputs": {
@@ -81,6 +87,11 @@
     "wiki/concepts/agentic-economy.md": {
       "hash": "sha256:63256bb7357cac7ddfb13f6d17c823de8bcc68217631aa5d92125214e6f03f74",
       "updated": "2026-07-16T01:40:13.319Z",
+      "provenance_count": 1
+    },
+    "wiki/concepts/reality-driven-ai-product-development.md": {
+      "hash": "sha256:bfd2423b63a3d9922d49e1938f97537c461c3c7fa2a39d5784020e3dd4d47ee6",
+      "updated": "2026-07-17T00:38:58.784Z",
       "provenance_count": 1
     }
   },
@@ -240,6 +251,12 @@
       "source_path": "sources/tldr/2026-07-14-production-ai-agent-architecture.txt",
       "output_path": "wiki/concepts/production-ai-agent-architecture.md",
       "status": "updated"
+    },
+    {
+      "timestamp": "2026-07-17T00:38:58.784Z",
+      "source_path": "sources/tldr/2026-07-15-reality-driven-ai-product-development.txt",
+      "output_path": "wiki/concepts/reality-driven-ai-product-development.md",
+      "status": "created"
     }
   ]
 }
