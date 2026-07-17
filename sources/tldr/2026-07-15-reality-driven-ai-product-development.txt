@@ -1,0 +1,38 @@
+{
+  "schema_version": "approved-wiki-source.v1",
+  "approval": {
+    "status": "approved",
+    "public": true,
+    "approved_at": "2026-07-17T00:38:40Z",
+    "reviewed_by": "brad",
+    "safety_review": {
+      "privacy": "cleared",
+      "publication_rights": "cleared",
+      "dual_use": "cleared"
+    }
+  },
+  "source": {
+    "source_item_id": "19f657fda97edc45-01",
+    "source_path": "sources/tldr/2026-07-15-reality-driven-ai-product-development.txt",
+    "source_type": "tldr",
+    "title": "Punch Yourself in the Face with Reality",
+    "url": "https://adi.bio/reality",
+    "newsletter": "TLDR Dev",
+    "edition_date": "2026-07-15"
+  },
+  "entry": {
+    "type": "concept",
+    "slug": "reality-driven-ai-product-development",
+    "title": "Reality-Driven AI Product Development",
+    "aliases": ["Punch Yourself in the Face with Reality"],
+    "tags": ["ai-product-development", "product-validation", "engineering-judgment"],
+    "confidence": "medium",
+    "summary": "AI can make prototyping and implementation much faster, but it does not replace direct user contact, market feedback, or testing a product's assumptions. AI-assisted building becomes counterproductive when polished output substitutes for those reality checks.",
+    "key_ideas": [
+      "Faster implementation shifts more of the work toward choosing worthwhile problems and validating solutions.",
+      "Direct conversations with users and repeated feedback help prevent AI-assisted building from becoming avoidance.",
+      "Coding speed, landing-page copy, and presentations may be useful, but they are not by themselves evidence that a product solves a real problem."
+    ],
+    "related": ["ai-native-software-engineering"]
+  }
+}
