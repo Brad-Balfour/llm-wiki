@@ -1,4 +1,9 @@
-# Commute Voice Handoff
+# Commute Voice Handoff (Current Legacy Procedure)
+
+> Status: This is the current v1/v2 operator procedure while the successor
+> `commute-wiki-operating-loop` is being designed and implemented. It is not the
+> governing design for new commute/session work. Do not extend its live-ledger
+> or single-handoff assumptions; see the successor change's compatibility map.
 
 The Monday prototype uses a manual, private-by-default bridge from ChatGPT Voice
 to this repository. It does not depend on a custom voice API or direct ChatGPT

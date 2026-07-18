@@ -75,3 +75,8 @@ runtime changes are made.
   intact while making its observable result the contract.
 - Creates a successor planning contract; it does not mark existing bootstrap
   implementation tasks complete or silently alter deployed behavior.
+- Includes an explicit compatibility map so reviewers and future agents can
+  distinguish retained bootstrap behavior, revised behavior, legacy-compatible
+  implementation, and historical records.
+- Keeps content safeguards, but replaces user-facing approval fields and
+  before-write confirmations with direct maintenance PRs and ordinary Git review.

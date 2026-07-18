@@ -34,10 +34,19 @@ wiki. A named `ingest:*` or `compile:wiki` command is authorization to make its
 intended wiki updates; do not invent review queues, permissions, attestations,
 or confirmation flags.
 
-The active implementation contract is
-`openspec/changes/bootstrap-llm-wiki-mvp/`. Read the proposal, design, relevant
-spec, and tasks before changing behavior in that scope. Treat archived changes
-as history, not current direction.
+The active planning contracts are:
+
+- `openspec/changes/bootstrap-llm-wiki-mvp/` for retained TLDR parsing,
+  classifier/routing, queue, compiler, and runtime behavior; and
+- `openspec/changes/commute-wiki-operating-loop/` for journey boundaries J1-J6
+  (scheduled queue output through wiki-maintainer PR).
+
+For J1-J6 planning and opt-in successor implementation work, read both changes
+and follow the compatibility map in `commute-wiki-operating-loop/design.md`;
+when they conflict, the successor change governs the new path. Bootstrap v1/v2
+handoffs and the current compiler remain the deployed/runtime default and
+legacy-compatible until the successor's stated migration criteria pass.
+Treat archived changes as history, not current direction.
 
 ## Repository map
 
@@ -66,9 +75,9 @@ as history, not current direction.
 - Check formatting: `npm run format:check`.
 - Validate the Jekyll content: `npm run validate:site`.
 - Run the complete local gate for implementation changes: `npm run check`.
-- For an active OpenSpec change, also run
-  `openspec validate bootstrap-llm-wiki-mvp --type change --strict` when its
-  artifacts or requirements are touched.
+- For an active OpenSpec change, run strict validation for every change whose
+  requirements are touched. J1-J6 work normally validates both
+  `bootstrap-llm-wiki-mvp` and `commute-wiki-operating-loop`.
 
 `dist/`, `node_modules/`, coverage output, and `.private/` are generated or
 local-only. Do not edit or commit them.

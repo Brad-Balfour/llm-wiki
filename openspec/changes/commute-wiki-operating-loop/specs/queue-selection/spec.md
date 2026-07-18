@@ -10,9 +10,18 @@ named queue file.
 #### Scenario: Select a named queue in text chat
 
 - **WHEN** Brad selects or attaches one queue file in the text chat
-- **THEN** the session header SHALL record that exact filename
+- **THEN** the current text chat SHALL visibly contain that exact attachment
+- **AND** the selection smoke test SHALL match the filename and a canonical
+  first-item identity from the file
+- **AND** the eventual bundle SHALL embed a literal queue snapshot
+- **AND** the local importer SHALL calculate a SHA-256 fingerprint from the
+  embedded snapshot's exact UTF-8 source bytes, rather than trust a
+  model-generated hash
 - **AND** the Project SHALL use that file as the sole active queue for the
   subsequent Voice session.
+
+This smoke test is evidence of current selection, not a claim that a later
+Voice turn will retain the attachment.
 
 #### Scenario: Ambiguous available queues
 

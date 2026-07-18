@@ -16,9 +16,18 @@ chat.
 #### Scenario: Switch newsletters
 
 - **WHEN** Brad wants to hear a different queue
-- **THEN** the current Voice session SHALL end or pause
+- **THEN** the current Voice session SHALL either export successfully or be
+  intentionally abandoned
 - **AND** the next queue SHALL be selected in a new text chat before a new Voice
   session begins.
+
+#### Scenario: Voice freezes, restarts, or opens a new chat
+
+- **WHEN** the platform loses the current chat or the selected queue cannot be
+  verified
+- **THEN** the previous session SHALL be terminal
+- **AND** the next session SHALL start from a fresh text-chat selection
+- **AND** it SHALL NOT claim a remembered resume position or persistent pause.
 
 ### Requirement: Prefetch Does Not Change Playback State
 

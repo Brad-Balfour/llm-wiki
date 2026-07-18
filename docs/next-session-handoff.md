@@ -1,4 +1,8 @@
-# Next Session Handoff
+# Next Session Handoff (Historical Record)
+
+> Status: Superseded session snapshot from July 12, 2026. Do not use this as
+> current operating guidance; see
+> `openspec/changes/commute-wiki-operating-loop/` and its compatibility map.
 
 Date: 2026-07-12
 

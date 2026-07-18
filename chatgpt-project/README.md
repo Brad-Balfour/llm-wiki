@@ -1,4 +1,9 @@
-# ChatGPT Project Source Bundle
+# ChatGPT Project Source Bundle (Current Legacy Configuration)
+
+> Status: These files are the currently deployed Project configuration. The
+> successor requirements are in `openspec/changes/commute-wiki-operating-loop/`.
+> Do not change the live-ledger, v2-handoff, or approval-command instructions
+> until their tested replacements are implemented.
 
 Use the repository files below as source knowledge for the LLM-Wiki ChatGPT
 Project.

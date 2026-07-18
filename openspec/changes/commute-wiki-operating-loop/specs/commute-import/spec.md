@@ -37,3 +37,44 @@ queue snapshot rather than conversational claims.
   queue snapshot
 - **THEN** the importer SHALL reject or isolate that event
 - **AND** it SHALL not silently retarget it to a similarly named item.
+
+#### Scenario: Complete integrity lacks complete evidence
+
+- **WHEN** a bundle declares `complete` without a durable contemporaneous event
+  record covering every claimed session action
+- **THEN** the importer SHALL reject that integrity declaration
+- **AND** it SHALL not silently downgrade the bundle to a trusted complete
+  session.
+
+### Requirement: Direct Maintenance Nomination
+
+An exact `wiki this` capture SHALL enter the maintenance input set without a
+second user approval or promotion step.
+
+#### Scenario: Import an exact wiki capture
+
+- **WHEN** a valid bundle contains an exact current-item `wiki this` capture
+- **THEN** the importer SHALL include it in the maintainer input set
+- **AND** it SHALL not require an `approved` source record, `public` field, or
+  local confirmation flag.
+
+#### Scenario: Import an unresolved or non-wiki capture
+
+- **WHEN** a bundle contains an unresolved capture, general save, skip, or
+  classifier correction
+- **THEN** the importer SHALL retain it in its applicable recovery, incident,
+  or feedback result
+- **AND** it SHALL NOT nominate it for wiki maintenance.
+
+### Requirement: Durable Maintenance Results
+
+The importer SHALL retain no-change, inaccessible-source, and unresolved
+maintenance outcomes in its private normalized record.
+
+#### Scenario: Maintenance cannot produce a PR
+
+- **WHEN** retrieval is insufficient or the maintainer finds no useful wiki
+  change
+- **THEN** the result SHALL be keyed by bundle, capture event, and source URL
+- **AND** it SHALL remain available for a later retry without appearing as an
+  unrelated new candidate.
