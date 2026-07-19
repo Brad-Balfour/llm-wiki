@@ -99,6 +99,45 @@ test('rejects feedback bound to a different current item after a later announcem
   );
 });
 
+test('requires a fresh announcement after repeat before accepting feedback', () => {
+  const malformed = clone(validBundle);
+  const events = malformed.events as Array<Record<string, unknown>>;
+  events.splice(2, 0, {
+    event_id: 'event-repeat',
+    sequence: 3,
+    kind: 'playback_transition',
+    transition: 'repeat',
+    item: {
+      source_item_id: 'tldr-demo-001',
+      title: 'First exact headline',
+      url: 'https://example.com/first',
+    },
+    evidence: [{ source: 'selected_queue_snapshot', reference: 'Brad said repeat' }],
+  });
+  events[3]!.sequence = 4;
+  events[4]!.sequence = 5;
+  events.splice(3, 0, {
+    event_id: 'event-feedback-after-repeat',
+    sequence: 4,
+    kind: 'item_action',
+    action: 'mark_interested',
+    item: {
+      source_item_id: 'tldr-demo-001',
+      title: 'First exact headline',
+      url: 'https://example.com/first',
+    },
+    user_words: 'interesting',
+    evidence: [{ source: 'explicit_user_capture', reference: 'Brad said: interesting' }],
+  });
+  events[4]!.sequence = 5;
+  events[5]!.sequence = 6;
+
+  assert.throws(
+    () => parseCommuteSessionBundleText(JSON.stringify(malformed)),
+    /item_action has no prior announced current item/
+  );
+});
+
 test('rejects an out-of-order queue announcement after a next transition', () => {
   const malformed = clone(validBundle);
   const events = malformed.events as Array<Record<string, unknown>>;

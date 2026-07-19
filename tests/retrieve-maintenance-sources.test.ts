@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 
 import {
+  isPrivateAddress,
   retrieveMaintenanceSources,
   type MaintenanceCandidate,
 } from '../src/wiki/retrieve-maintenance-sources.js';
@@ -79,4 +80,36 @@ test('does not fetch a source whose host resolves to a private address', async (
   assert.equal(fetchCalled, false);
   assert.equal(result.sources[0]?.status, 'inaccessible');
   assert.match(result.sources[0]?.error ?? '', /Private-network/);
+});
+
+test('stops reading a source that exceeds the byte limit while streaming', async () => {
+  const oversizedBody = new ReadableStream<Uint8Array>({
+    start(controller) {
+      controller.enqueue(new TextEncoder().encode('x'.repeat(1_500_000)));
+      controller.enqueue(new TextEncoder().encode('x'.repeat(600_000)));
+      controller.close();
+    },
+  });
+  const result = await retrieveMaintenanceSources(
+    [candidate],
+    async () => new Response(oversizedBody, { headers: { 'content-type': 'text/plain' } }),
+    '2026-07-20T12:00:00.000Z',
+    async () => '93.184.216.34'
+  );
+
+  assert.equal(result.sources[0]?.status, 'unsupported_content');
+  assert.match(result.sources[0]?.error ?? '', /2000000 byte retrieval limit/);
+});
+
+test('recognizes mapped, shared, and benchmarking addresses as non-public', () => {
+  for (const address of [
+    '::ffff:127.0.0.1',
+    '::ffff:192.168.1.1',
+    '100.64.0.1',
+    '198.18.0.1',
+    '198.19.255.255',
+  ]) {
+    assert.equal(isPrivateAddress(address), true, `${address} must be blocked`);
+  }
+  assert.equal(isPrivateAddress('93.184.216.34'), false);
 });

@@ -855,7 +855,11 @@ function validateLifecycle(events: SessionEvent[], queueItems: QueueItemIndex): 
         expectedItemIndex = currentItemIndex + 1;
         currentItemIndex = undefined;
       } else if (event.transition === 'repeat') {
-        // The item remains current; no re-announcement is required.
+        // A repeat must be followed by a fresh announcement before any later
+        // feedback can be bound to this item. That keeps a post-repeat action
+        // from being silently attributed to a stale announcement.
+        expectedItemIndex = currentItemIndex;
+        currentItemIndex = undefined;
       } else {
         currentItemIndex = undefined;
         expectedItemIndex = undefined;

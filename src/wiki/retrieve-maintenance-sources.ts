@@ -1,6 +1,7 @@
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { lookup } from 'node:dns/promises';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 const RETRIEVAL_SCHEMA_VERSION = 'commute-source-retrieval.v1';
 const MAX_EXTRACTED_TEXT_LENGTH = 60_000;
@@ -100,8 +101,8 @@ async function retrieveOne(
         error: `Source exceeds ${MAX_SOURCE_BYTES} byte retrieval limit`,
       };
     }
-    const sourceText = await response.text();
-    if (Buffer.byteLength(sourceText, 'utf8') > MAX_SOURCE_BYTES) {
+    const sourceText = await readResponseTextWithinLimit(response);
+    if (sourceText === undefined) {
       return {
         ...base,
         status: 'unsupported_content',
@@ -162,16 +163,18 @@ async function resolvePublicHost(hostname: string): Promise<string> {
   if (hostname.toLowerCase() === 'localhost') {
     throw new Error('Localhost source retrieval is not allowed');
   }
-  const { address } = await lookup(hostname);
-  if (isPrivateAddress(address)) {
+  const addresses = await lookup(hostname, { all: true, verbatim: true });
+  if (addresses.length === 0 || addresses.some(({ address }) => isPrivateAddress(address))) {
     throw new Error('Private-network source retrieval is not allowed');
   }
-  return address;
+  return addresses[0]!.address;
 }
 
-function isPrivateAddress(address: string): boolean {
+export function isPrivateAddress(address: string): boolean {
   if (address.includes(':')) {
     const normalized = address.toLowerCase();
+    const ipv4Mapped = /^::ffff:(\d+\.\d+\.\d+\.\d+)$/.exec(normalized);
+    if (ipv4Mapped) return isPrivateAddress(ipv4Mapped[1]!);
     return (
       normalized === '::1' ||
       normalized.startsWith('fc') ||
@@ -180,15 +183,49 @@ function isPrivateAddress(address: string): boolean {
     );
   }
   const parts = address.split('.').map(Number);
-  const [first, second] = parts;
+  const [first = Number.NaN, second] = parts;
+  if (
+    parts.length !== 4 ||
+    parts.some((part) => !Number.isInteger(part) || part < 0 || part > 255)
+  ) {
+    return true;
+  }
   return (
     first === 0 ||
     first === 10 ||
+    (first === 100 && second !== undefined && second >= 64 && second <= 127) ||
     first === 127 ||
     (first === 169 && second === 254) ||
     (first === 172 && second !== undefined && second >= 16 && second <= 31) ||
-    (first === 192 && second === 168)
+    (first === 192 && second === 168) ||
+    (first === 198 && second !== undefined && second >= 18 && second <= 19) ||
+    first >= 224
   );
+}
+
+async function readResponseTextWithinLimit(response: Response): Promise<string | undefined> {
+  if (response.body === null) return '';
+
+  const reader = response.body.getReader();
+  const decoder = new TextDecoder();
+  const chunks: Uint8Array[] = [];
+  let bytesRead = 0;
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      bytesRead += value.byteLength;
+      if (bytesRead > MAX_SOURCE_BYTES) {
+        await reader.cancel();
+        return undefined;
+      }
+      chunks.push(value);
+    }
+  } finally {
+    reader.releaseLock();
+  }
+
+  return chunks.map((chunk) => decoder.decode(chunk, { stream: true })).join('') + decoder.decode();
 }
 
 function extractTitle(sourceText: string, contentType: string): string | undefined {
@@ -319,7 +356,7 @@ function errorMessage(error: unknown): string {
 
 if (
   process.argv[1] &&
-  path.resolve(process.argv[1]) === path.resolve(new URL(import.meta.url).pathname)
+  path.resolve(process.argv[1]) === path.resolve(fileURLToPath(import.meta.url))
 ) {
   await main();
 }

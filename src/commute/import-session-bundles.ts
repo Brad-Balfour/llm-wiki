@@ -1,5 +1,6 @@
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 import {
   bundleArtifactFilenameMatches,
@@ -208,7 +209,7 @@ function errorMessage(error: unknown): string {
 
 if (
   process.argv[1] &&
-  path.resolve(process.argv[1]) === path.resolve(new URL(import.meta.url).pathname)
+  path.resolve(process.argv[1]) === path.resolve(fileURLToPath(import.meta.url))
 ) {
   await main();
 }
