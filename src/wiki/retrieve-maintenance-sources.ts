@@ -1,8 +1,11 @@
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
+import { lookup } from 'node:dns/promises';
 import path from 'node:path';
 
 const RETRIEVAL_SCHEMA_VERSION = 'commute-source-retrieval.v1';
 const MAX_EXTRACTED_TEXT_LENGTH = 60_000;
+const MAX_SOURCE_BYTES = 2_000_000;
+const MAX_REDIRECTS = 5;
 
 export interface MaintenanceCandidate {
   maintenance_key: string;
@@ -39,18 +42,20 @@ export interface SourceRetrievalRecord {
 
 export interface SourceFetchOptions {
   headers?: Record<string, string>;
-  redirect?: 'follow';
+  redirect?: 'manual';
 }
 
 export type FetchLike = (input: string, init?: SourceFetchOptions) => Promise<Response>;
+export type ResolveHost = (hostname: string) => Promise<string>;
 
 export async function retrieveMaintenanceSources(
   candidates: MaintenanceCandidate[],
   fetchLike: FetchLike = fetch,
-  retrievedAt = new Date().toISOString()
+  retrievedAt = new Date().toISOString(),
+  resolveHost: ResolveHost = resolvePublicHost
 ): Promise<SourceRetrievalRecord> {
   const sources = await Promise.all(
-    candidates.map((candidate) => retrieveOne(candidate, fetchLike, retrievedAt))
+    candidates.map((candidate) => retrieveOne(candidate, fetchLike, retrievedAt, resolveHost))
   );
   return { schema_version: RETRIEVAL_SCHEMA_VERSION, retrieved_at: retrievedAt, sources };
 }
@@ -58,7 +63,8 @@ export async function retrieveMaintenanceSources(
 async function retrieveOne(
   candidate: MaintenanceCandidate,
   fetchLike: FetchLike,
-  retrievedAt: string
+  retrievedAt: string,
+  resolveHost: ResolveHost
 ): Promise<RetrievedSource> {
   const base: Pick<
     RetrievedSource,
@@ -71,10 +77,7 @@ async function retrieveOne(
   };
 
   try {
-    const response = await fetchLike(candidate.url, {
-      headers: { Accept: 'text/html, text/plain;q=0.9, application/xhtml+xml;q=0.8' },
-      redirect: 'follow',
-    });
+    const { response, finalUrl } = await fetchPublicUrl(candidate.url, fetchLike, resolveHost);
     if (!response.ok) {
       return { ...base, status: 'inaccessible', error: `HTTP ${response.status}` };
     }
@@ -83,17 +86,36 @@ async function retrieveOne(
       return {
         ...base,
         status: 'unsupported_content',
-        final_url: response.url || candidate.url,
+        final_url: finalUrl,
         content_type: contentType || 'unknown',
       };
     }
+    const declaredLength = Number(response.headers.get('content-length'));
+    if (Number.isFinite(declaredLength) && declaredLength > MAX_SOURCE_BYTES) {
+      return {
+        ...base,
+        status: 'unsupported_content',
+        final_url: finalUrl,
+        content_type: contentType,
+        error: `Source exceeds ${MAX_SOURCE_BYTES} byte retrieval limit`,
+      };
+    }
     const sourceText = await response.text();
+    if (Buffer.byteLength(sourceText, 'utf8') > MAX_SOURCE_BYTES) {
+      return {
+        ...base,
+        status: 'unsupported_content',
+        final_url: finalUrl,
+        content_type: contentType,
+        error: `Source exceeds ${MAX_SOURCE_BYTES} byte retrieval limit`,
+      };
+    }
     const extractedText = extractReadableText(sourceText, contentType);
     if (extractedText.length === 0) {
       return {
         ...base,
         status: 'inaccessible',
-        final_url: response.url || candidate.url,
+        final_url: finalUrl,
         content_type: contentType,
         error: 'No readable text was extracted',
       };
@@ -101,7 +123,7 @@ async function retrieveOne(
     return {
       ...base,
       status: 'retrieved',
-      final_url: response.url || candidate.url,
+      final_url: finalUrl,
       content_type: contentType,
       title: extractTitle(sourceText, contentType) ?? candidate.title,
       extracted_text: extractedText,
@@ -109,6 +131,64 @@ async function retrieveOne(
   } catch (error) {
     return { ...base, status: 'inaccessible', error: errorMessage(error) };
   }
+}
+
+async function fetchPublicUrl(
+  requestedUrl: string,
+  fetchLike: FetchLike,
+  resolveHost: ResolveHost
+): Promise<{ response: Response; finalUrl: string }> {
+  let currentUrl = new URL(requestedUrl);
+  for (let redirects = 0; redirects <= MAX_REDIRECTS; redirects += 1) {
+    if (currentUrl.protocol !== 'http:' && currentUrl.protocol !== 'https:') {
+      throw new Error('Redirect resolved to a non-HTTP(S) URL');
+    }
+    await resolveHost(currentUrl.hostname);
+    const response = await fetchLike(currentUrl.href, {
+      headers: { Accept: 'text/html, text/plain;q=0.9, application/xhtml+xml;q=0.8' },
+      redirect: 'manual',
+    });
+    if (response.status < 300 || response.status > 399) {
+      return { response, finalUrl: currentUrl.href };
+    }
+    const location = response.headers.get('location');
+    if (!location) throw new Error(`HTTP ${response.status} response has no Location header`);
+    currentUrl = new URL(location, currentUrl);
+  }
+  throw new Error(`Source exceeded ${MAX_REDIRECTS} redirects`);
+}
+
+async function resolvePublicHost(hostname: string): Promise<string> {
+  if (hostname.toLowerCase() === 'localhost') {
+    throw new Error('Localhost source retrieval is not allowed');
+  }
+  const { address } = await lookup(hostname);
+  if (isPrivateAddress(address)) {
+    throw new Error('Private-network source retrieval is not allowed');
+  }
+  return address;
+}
+
+function isPrivateAddress(address: string): boolean {
+  if (address.includes(':')) {
+    const normalized = address.toLowerCase();
+    return (
+      normalized === '::1' ||
+      normalized.startsWith('fc') ||
+      normalized.startsWith('fd') ||
+      normalized.startsWith('fe80:')
+    );
+  }
+  const parts = address.split('.').map(Number);
+  const [first, second] = parts;
+  return (
+    first === 0 ||
+    first === 10 ||
+    first === 127 ||
+    (first === 169 && second === 254) ||
+    (first === 172 && second !== undefined && second >= 16 && second <= 31) ||
+    (first === 192 && second === 168)
+  );
 }
 
 function extractTitle(sourceText: string, contentType: string): string | undefined {

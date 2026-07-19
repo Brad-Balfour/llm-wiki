@@ -27,7 +27,8 @@ test('retrieves and privately extracts readable source text', async () => {
           headers: { 'content-type': 'text/html; charset=utf-8' },
         }
       ),
-    '2026-07-20T12:00:00.000Z'
+    '2026-07-20T12:00:00.000Z',
+    async () => '93.184.216.34'
   );
 
   assert.deepEqual(result.sources[0], {
@@ -47,7 +48,8 @@ test('preserves inaccessible sources without inventing their content', async () 
   const result = await retrieveMaintenanceSources(
     [candidate],
     async () => new Response('Not found', { status: 404 }),
-    '2026-07-20T12:00:00.000Z'
+    '2026-07-20T12:00:00.000Z',
+    async () => '93.184.216.34'
   );
 
   assert.deepEqual(result.sources[0], {
@@ -58,4 +60,23 @@ test('preserves inaccessible sources without inventing their content', async () 
     status: 'inaccessible',
     error: 'HTTP 404',
   });
+});
+
+test('does not fetch a source whose host resolves to a private address', async () => {
+  let fetchCalled = false;
+  const result = await retrieveMaintenanceSources(
+    [candidate],
+    async () => {
+      fetchCalled = true;
+      return new Response('unexpected', { status: 200 });
+    },
+    '2026-07-20T12:00:00.000Z',
+    async () => {
+      throw new Error('Private-network source retrieval is not allowed');
+    }
+  );
+
+  assert.equal(fetchCalled, false);
+  assert.equal(result.sources[0]?.status, 'inaccessible');
+  assert.match(result.sources[0]?.error ?? '', /Private-network/);
 });
