@@ -260,6 +260,14 @@ following are true:
 5. replacement operator instructions are published in the Project source
    bundle.
 
+These are **default/retirement criteria**, not a prohibition on creating and
+using a versioned successor-pilot prompt. Before they pass, an explicitly
+labeled pilot may replace the Project instructions for a controlled commute
+test (including Monday's first J2-J4 test), while the legacy instructions stay
+available as the fallback and continue to govern normal production use. A pilot
+test produces evidence for these criteria; it must not silently be described as
+the new default or cause the legacy instructions to be deleted.
+
 At that point, update `AGENTS.md` and the active operator documentation to name
 this change as the governing commute/wiki contract. Keep legacy importer support
 only for pre-migration artifacts, then archive/consolidate the bootstrap change
