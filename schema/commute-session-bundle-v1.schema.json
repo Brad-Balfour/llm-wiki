@@ -1,0 +1,334 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://brad-balfour.github.io/llm-wiki/schema/commute-session-bundle-v1.schema.json",
+  "title": "Commute session bundle",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "session", "queue_snapshot", "playback", "integrity", "events"],
+  "properties": {
+    "schema_version": { "const": "commute-session-bundle.v1" },
+    "session": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["session_id", "session_date", "artifact_filename", "voice_surface"],
+      "properties": {
+        "session_id": { "type": "string", "minLength": 1 },
+        "session_date": { "type": "string", "format": "date" },
+        "artifact_filename": {
+          "type": "string",
+          "pattern": "^[0-9]{12}-(morning|evening)-commute-session-bundle( \\([1-9][0-9]*\\))?\\.txt$"
+        },
+        "voice_surface": {
+          "enum": ["chatgpt_live", "chatgpt_advanced", "chatgpt_standard", "other"]
+        }
+      }
+    },
+    "queue_snapshot": {
+      "description": "The complete selected tldr-commute-queue.v2 JSON object. The local validator enforces its fields, ordering, and privacy boundary; its canonical JSON is compared with the selected downloaded queue.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["filename", "queue"],
+      "properties": {
+        "filename": { "type": "string", "minLength": 1 },
+        "queue": { "type": "object", "minProperties": 1 }
+      }
+    },
+    "playback": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status"],
+      "properties": {
+        "status": { "enum": ["not_started", "partial", "completed", "abandoned"] },
+        "last_announced_source_item_id": { "type": "string", "minLength": 1 },
+        "resume_source_item_id": { "type": "string", "minLength": 1 }
+      }
+    },
+    "integrity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["state", "unresolved_event_ids"],
+      "properties": {
+        "state": { "enum": ["complete", "partial", "recovered"] },
+        "incomplete_reason": { "type": "string", "minLength": 1 },
+        "unresolved_event_ids": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "uniqueItems": true
+        },
+        "durable_event_record": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["filename", "sha256", "covered_event_ids"],
+          "properties": {
+            "filename": { "type": "string", "minLength": 1 },
+            "sha256": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+            "covered_event_ids": {
+              "type": "array",
+              "items": { "type": "string", "minLength": 1 },
+              "uniqueItems": true
+            }
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "state": { "const": "complete" } }, "required": ["state"] },
+          "then": { "required": ["durable_event_record"] }
+        },
+        {
+          "if": {
+            "properties": { "state": { "enum": ["partial", "recovered"] } },
+            "required": ["state"]
+          },
+          "then": { "required": ["incomplete_reason"] }
+        }
+      ]
+    },
+    "events": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/event" }
+    }
+  },
+  "$defs": {
+    "item": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source_item_id", "title", "url"],
+      "properties": {
+        "source_item_id": { "type": "string", "minLength": 1 },
+        "title": { "type": "string", "minLength": 1 },
+        "url": { "type": "string", "format": "uri" }
+      }
+    },
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source", "reference"],
+      "properties": {
+        "source": {
+          "enum": [
+            "durable_contemporaneous_record",
+            "selected_queue_snapshot",
+            "explicit_user_capture",
+            "user_provided_chat_or_ui_observation"
+          ]
+        },
+        "reference": { "type": "string", "minLength": 1 }
+      }
+    },
+    "base_event": {
+      "type": "object",
+      "required": ["event_id", "sequence", "kind", "evidence"],
+      "properties": {
+        "event_id": { "type": "string", "minLength": 1 },
+        "sequence": { "type": "integer", "minimum": 1 },
+        "kind": { "type": "string" },
+        "evidence": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/evidence" }
+        }
+      }
+    },
+    "event": {
+      "oneOf": [
+        {
+          "allOf": [
+            { "$ref": "#/$defs/base_event" },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["event_id", "sequence", "kind", "item", "evidence"],
+              "properties": {
+                "event_id": { "type": "string", "minLength": 1 },
+                "sequence": { "type": "integer", "minimum": 1 },
+                "kind": { "const": "item_announced" },
+                "item": { "$ref": "#/$defs/item" },
+                "evidence": {
+                  "type": "array",
+                  "minItems": 1,
+                  "items": { "$ref": "#/$defs/evidence" }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "allOf": [
+            { "$ref": "#/$defs/base_event" },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "event_id",
+                "sequence",
+                "kind",
+                "action",
+                "item",
+                "user_words",
+                "evidence"
+              ],
+              "properties": {
+                "event_id": { "type": "string", "minLength": 1 },
+                "sequence": { "type": "integer", "minimum": 1 },
+                "kind": { "const": "item_action" },
+                "action": {
+                  "enum": [
+                    "wiki_this",
+                    "mark_interested",
+                    "mark_uninterested",
+                    "promote_to_in_depth",
+                    "save_for_review",
+                    "skip"
+                  ]
+                },
+                "item": { "$ref": "#/$defs/item" },
+                "user_words": { "type": "string", "minLength": 1 },
+                "evidence": {
+                  "type": "array",
+                  "minItems": 1,
+                  "items": { "$ref": "#/$defs/evidence" }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "allOf": [
+            { "$ref": "#/$defs/base_event" },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "event_id",
+                "sequence",
+                "kind",
+                "capture_type",
+                "user_words",
+                "recovery_clues",
+                "evidence"
+              ],
+              "properties": {
+                "event_id": { "type": "string", "minLength": 1 },
+                "sequence": { "type": "integer", "minimum": 1 },
+                "kind": { "const": "unresolved_capture" },
+                "capture_type": { "enum": ["wiki_this", "feedback", "general_save", "unknown"] },
+                "user_words": { "type": "string", "minLength": 1 },
+                "recovery_clues": {
+                  "type": "array",
+                  "items": { "type": "string", "minLength": 1 }
+                },
+                "evidence": {
+                  "type": "array",
+                  "minItems": 1,
+                  "items": { "$ref": "#/$defs/evidence" }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "allOf": [
+            { "$ref": "#/$defs/base_event" },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "event_id",
+                "sequence",
+                "kind",
+                "observed_behavior",
+                "boundary",
+                "evidence"
+              ],
+              "properties": {
+                "event_id": { "type": "string", "minLength": 1 },
+                "sequence": { "type": "integer", "minimum": 1 },
+                "kind": { "const": "quality_incident" },
+                "observed_behavior": { "type": "string", "minLength": 1 },
+                "boundary": { "type": "string", "minLength": 1 },
+                "evidence": {
+                  "type": "array",
+                  "minItems": 1,
+                  "items": { "$ref": "#/$defs/evidence" }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "allOf": [
+            { "$ref": "#/$defs/base_event" },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["event_id", "sequence", "kind", "transition", "item", "evidence"],
+              "properties": {
+                "event_id": { "type": "string", "minLength": 1 },
+                "sequence": { "type": "integer", "minimum": 1 },
+                "kind": { "const": "playback_transition" },
+                "transition": {
+                  "enum": [
+                    "next",
+                    "repeat",
+                    "interrupted",
+                    "voice_restart",
+                    "duplicate_recognition"
+                  ]
+                },
+                "item": { "$ref": "#/$defs/item" },
+                "evidence": {
+                  "type": "array",
+                  "minItems": 1,
+                  "items": { "$ref": "#/$defs/evidence" }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "allOf": [
+            { "$ref": "#/$defs/base_event" },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["event_id", "sequence", "kind", "user_words", "evidence"],
+              "properties": {
+                "event_id": { "type": "string", "minLength": 1 },
+                "sequence": { "type": "integer", "minimum": 1 },
+                "kind": { "const": "general_capture" },
+                "user_words": { "type": "string", "minLength": 1 },
+                "evidence": {
+                  "type": "array",
+                  "minItems": 1,
+                  "items": { "$ref": "#/$defs/evidence" }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "allOf": [
+            { "$ref": "#/$defs/base_event" },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["event_id", "sequence", "kind", "boundary", "evidence"],
+              "properties": {
+                "event_id": { "type": "string", "minLength": 1 },
+                "sequence": { "type": "integer", "minimum": 1 },
+                "kind": { "const": "session_boundary" },
+                "boundary": { "enum": ["start", "end"] },
+                "evidence": {
+                  "type": "array",
+                  "minItems": 1,
+                  "items": { "$ref": "#/$defs/evidence" }
+                }
+              }
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

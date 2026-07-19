@@ -14,6 +14,8 @@ Directories:
 - `expected/queue/`: expected commute queue output.
 - `expected/feedback/`: expected feedback label records.
 - `expected/wiki/`: expected OKF-style wiki markdown output.
+- `commute-bundles/`: sanitized, versioned session-bundle examples used to test
+  exact queue binding, recovery states, and integrity validation.
 
 Use stable source item ids and keep cross-edition duplicate instances distinct
 when a fixture is intended to exercise validation behavior.
