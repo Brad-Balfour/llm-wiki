@@ -2,6 +2,24 @@
 
 ## ADDED Requirements
 
+### Requirement: One-Command Commute Maintenance
+
+The user-facing home-side workflow SHALL accept one or more downloaded session
+bundles and run intake, source retrieval, existing-wiki maintenance, and PR
+creation as one command. The private intake record is an internal artifact, not
+an approval checkpoint.
+
+#### Scenario: Valid wiki capture produces a PR without an intake review
+
+- **WHEN** Brad supplies one or more downloaded session bundles to the
+  top-level maintenance command
+- **THEN** it SHALL independently retain invalid or unresolved sessions while
+  continuing with valid exact `wiki this` captures
+- **AND** it SHALL retrieve feasible sources, inspect relevant existing wiki
+  pages, and create a branch/PR when useful changes result
+- **AND** it SHALL NOT stop for Brad to review or promote the private intake
+  record before maintenance begins.
+
 ### Requirement: Existing-Wiki-Aware Maintenance
 
 The maintenance workflow SHALL consider both retrieved source material and

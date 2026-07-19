@@ -55,9 +55,9 @@
 
 - [ ] 3.1 Implement bundle validation and compatibility import for existing
       commute handoffs where practical.
-- [ ] 3.2 Implement one-command import of multiple selected bundles with
+- [x] 3.2 Implement one-command import of multiple selected bundles with
       independent per-session results.
-- [ ] 3.3 Persist valid feedback and quality incidents privately, preserving
+- [x] 3.3 Persist valid feedback and quality incidents privately, preserving
       unresolved records for recovery rather than dropping them.
 - [ ] 3.4 Store each no-change, inaccessible-source, and unresolved maintenance
       result in the private import record keyed by bundle, event, and source URL
@@ -73,7 +73,8 @@
 - [ ] 4.2 Implement a maintainer workflow that reads relevant existing wiki
       pages and produces one branch/PR with created, updated, and interlinked
       Markdown as appropriate, or an observable no-change/insufficient-source
-      result when no PR is useful.
+      result when no PR is useful. Compose it with private bundle intake as one
+      top-level user-facing command, with no intermediate intake review gate.
 - [ ] 4.3 Add fixtures and review guidance for inaccessible URLs, duplicate
       source concepts, updates to existing concepts, and link-only changes.
 - [ ] 4.4 Review early maintainer PRs manually before defining any auto-merge
