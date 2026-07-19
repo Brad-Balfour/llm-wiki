@@ -18,6 +18,7 @@
     "compile:wiki": "sh -c 'npm run build --silent && node dist/src/wiki/compile-file.js \"$@\" && npm run verify:publish' --",
     "ingest:tldr": "npm run build --silent && node dist/src/tldr/ingest-file.js",
     "import:commute-handoff": "npm run build --silent && node dist/src/commute/import-handoff.js",
+    "validate:commute-queue": "npm run build --silent && node dist/src/commute/validate-queue.js",
     "validate:commute-session-bundle": "npm run build --silent && node dist/src/commute/validate-session-bundle.js",
     "prepare:wiki-drafts": "npm run build --silent && node dist/src/wiki/prepare-handoff-drafts.js",
     "ingest:wiki": "sh -c 'npm run build --silent && node dist/src/wiki/ingest-handoff.js \"$@\" && npm run verify:publish' --",

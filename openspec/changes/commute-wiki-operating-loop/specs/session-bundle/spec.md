@@ -31,6 +31,24 @@ a statement that an artifact or ledger exists.
 - **AND** later local validation SHALL parse the artifact and verify its queue
   snapshot fingerprint.
 
+### Requirement: Unique, Readable Bundle Filename
+
+Every bundle artifact SHALL have a session-end-local-time filename of the form
+`YYYYMMDDHHmm-morning-commute-session-bundle.txt` or
+`YYYYMMDDHHmm-evening-commute-session-bundle.txt`, using America/New_York
+export time. The label is determined by that time: before 12:00 is `morning`;
+12:00 or later is `evening`.
+
+#### Scenario: Two sessions export on the same day
+
+- **WHEN** two Voice sessions export bundles on the same day
+- **THEN** each artifact SHALL have its own timestamped filename
+- **AND** the Project SHALL NOT reuse bare `commute-session-bundle.txt`
+- **AND** a numeric suffix such as `(1)` added by Library after creation SHALL
+  be accepted as the same exported artifact rather than treated as an export
+  failure. The bundle records the canonical requested filename because it may
+  not be able to observe a suffix assigned after its JSON is written.
+
 #### Scenario: Bundle delivery fails
 
 - **WHEN** the Project cannot create a downloadable session-bundle artifact

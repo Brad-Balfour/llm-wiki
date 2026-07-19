@@ -3,11 +3,69 @@
   "session": {
     "session_id": "2026-07-20-morning-tldr-dev",
     "session_date": "2026-07-20",
+    "artifact_filename": "202607200745-morning-commute-session-bundle.txt",
     "voice_surface": "chatgpt_standard"
   },
   "queue_snapshot": {
     "filename": "20260720-tldr-dev.txt",
-    "source_utf8": "{\"queue_version\":\"tldr-commute-queue.v1\",\"newsletter\":\"TLDR Dev\",\"edition_date\":\"2026-07-20\",\"source_email\":{\"gmail_message_id\":\"demo-message\",\"subject\":\"Demo TLDR Dev\",\"sender\":\"TLDR Dev <dan@tldrnewsletter.com>\"},\"headline_only\":[{\"source_item_id\":\"tldr-demo-001\",\"title\":\"First exact headline\",\"url\":\"https://example.com/first\",\"summary\":\"First summary\"}],\"in_depth\":[{\"source_item_id\":\"tldr-demo-002\",\"title\":\"Second exact headline\",\"url\":\"https://example.com/second\",\"summary\":\"Second summary\"}]}\n"
+    "queue": {
+      "queue_version": "tldr-commute-queue.v2",
+      "newsletter": "TLDR Dev",
+      "edition_date": "2026-07-20",
+      "source_email": {
+        "gmail_message_id": "demo-message",
+        "subject": "Demo TLDR Dev",
+        "sender": "TLDR Dev <dan@tldrnewsletter.com>",
+        "delivered_at": "2026-07-20T07:45:00-04:00"
+      },
+      "total_items": 2,
+      "items": [
+        {
+          "playback": { "position": 1, "total": 2, "spoken": "1 of 2" },
+          "source_item_id": "tldr-demo-001",
+          "title": "First exact headline",
+          "summary": "First summary",
+          "url": "https://example.com/first",
+          "interest_level": "interested",
+          "interest_score": 0.9,
+          "consumption_depth": "headline_only",
+          "depth_score": 0.2,
+          "commute_behavior": "brief",
+          "signals": ["fixture"],
+          "reason": "Fixture item.",
+          "profile_version": "fixture",
+          "prompt_version": "fixture",
+          "provider": "fixture",
+          "model": "fixture",
+          "parser_version": "fixture",
+          "route_version": "fixture",
+          "classified_at": "2026-07-20T07:45:00-04:00",
+          "routed_at": "2026-07-20T07:45:00-04:00"
+        },
+        {
+          "playback": { "position": 2, "total": 2, "spoken": "2 of 2" },
+          "source_item_id": "tldr-demo-002",
+          "title": "Second exact headline",
+          "summary": "Second summary",
+          "url": "https://example.com/second",
+          "interest_level": "maybe",
+          "interest_score": 0.7,
+          "consumption_depth": "in_depth",
+          "depth_score": 0.8,
+          "commute_behavior": "detail",
+          "signals": ["fixture"],
+          "reason": "Fixture item.",
+          "profile_version": "fixture",
+          "prompt_version": "fixture",
+          "provider": "fixture",
+          "model": "fixture",
+          "parser_version": "fixture",
+          "route_version": "fixture",
+          "classified_at": "2026-07-20T07:45:00-04:00",
+          "routed_at": "2026-07-20T07:45:00-04:00"
+        }
+      ]
+    }
   },
   "playback": {
     "status": "partial",

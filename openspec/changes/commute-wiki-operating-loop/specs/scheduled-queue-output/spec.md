@@ -13,12 +13,32 @@ queue artifact for every qualifying TLDR source email delivered that day.
 - **THEN** it SHALL produce one dated `.txt` queue file per source email
 - **AND** every produced file SHALL contain parseable queue content rather than
   a filename, placeholder, or reconstruction claim
-- **AND** every produced file SHALL conform to the versioned
-  `tldr-commute-queue.v1` contract, including one source-email identity and
-  ordered, mutually exclusive `headline_only` and `in_depth` arrays
+- **AND** every newly generated file SHALL conform to the versioned
+  `tldr-commute-queue.v2` contract, including one source-email identity and one
+  ordered `items` array whose literal playback phrases are contiguous from
+  `1 of M` through `M of M`
 - **AND** the Task's managed no-external-storage prompt SHALL be stored in the
   repository so that a later prompt change is reviewable and reversible
 - **AND** the completion message SHALL link to each produced artifact.
+
+#### Scenario: v2 queue preserves two reading styles without two cursors
+
+- **WHEN** the Task classifies a source email into headline-only and in-depth
+  reading styles
+- **THEN** it SHALL put every selected item in the one canonical `items` array
+- **AND** each item SHALL carry the existing `consumption_depth` tag that
+  determines its reading style
+- **AND** it SHALL NOT emit `headline_only`, `in_depth`, `source_order`, or a
+  newsletter-position field in a new v2 queue.
+
+#### Scenario: deliberate v2 cutover
+
+- **WHEN** Brad replaces the managed Task prompt and uploads the v2 schema in
+  the queue-generation Project
+- **THEN** he SHALL regenerate the queues needed for subsequent commutes in v2
+  format
+- **AND** newly created or imported commute bundles SHALL accept only v2 queues
+  rather than supporting two queue contracts in parallel.
 
 #### Scenario: Artifact creation fails
 

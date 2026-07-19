@@ -11,17 +11,31 @@ named queue file.
 
 - **WHEN** Brad selects or attaches one queue file in the text chat
 - **THEN** the current text chat SHALL visibly contain that exact attachment
-- **AND** the selection smoke test SHALL match the filename and a canonical
-  first-item identity from the file
+- **AND** the selection smoke test SHALL match the filename, the first item's
+  literal `1 of M` playback phrase, stable source ID, and title from the file
 - **AND** the eventual bundle SHALL embed a literal queue snapshot
-- **AND** the local importer SHALL calculate a SHA-256 fingerprint from the
-  embedded snapshot's exact UTF-8 source bytes, rather than trust a
+- **AND** the local importer SHALL calculate its own SHA-256 fingerprint from
+  the embedded snapshot's canonical JSON representation, rather than trust a
   model-generated hash
 - **AND** the Project SHALL use that file as the sole active queue for the
   subsequent Voice session.
 
 This smoke test is evidence of current selection, not a claim that a later
 Voice turn will retain the attachment.
+
+### Requirement: One Explicit Playback Cursor
+
+The selected queue SHALL have exactly one canonical playback cursor. Voice
+must use the literal `N of M` phrase carried by each item; it SHALL NOT derive
+position from a source-item suffix, newsletter order, separate sections, or
+conversational recollection.
+
+#### Scenario: Queue has changed reading mode
+
+- **WHEN** the next item has a different `consumption_depth` from the previous
+  item
+- **THEN** Voice SHALL change only its reading style
+- **AND** it SHALL continue the same canonical `N of M` playback order.
 
 #### Scenario: Ambiguous available queues
 

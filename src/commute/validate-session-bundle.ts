@@ -1,7 +1,12 @@
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 
-import { parseCommuteSessionBundleText, queueSnapshotFingerprint } from './session-bundle.js';
+import {
+  bundleArtifactFilenameMatches,
+  fileSha256,
+  parseCommuteSessionBundleText,
+  queueSnapshotFingerprint,
+} from './session-bundle.js';
 
 interface Options {
   input: string;
@@ -13,12 +18,22 @@ async function main(): Promise<void> {
   const options = parseOptions(process.argv.slice(2));
   const text = await readFile(options.input, 'utf8');
   const bundle = parseCommuteSessionBundleText(text);
-  const selectedQueue = await readFile(options.queue, 'utf8');
+  if (
+    !bundleArtifactFilenameMatches(path.basename(options.input), bundle.session.artifact_filename)
+  ) {
+    throw new Error(
+      'Bundle filename does not match session.artifact_filename (except a Library-added numeric suffix)'
+    );
+  }
+  const selectedQueue = JSON.parse(await readFile(options.queue, 'utf8')) as unknown;
   if (path.basename(options.queue) !== bundle.queue_snapshot.filename) {
     throw new Error('Embedded queue filename does not match --queue filename');
   }
-  if (selectedQueue !== bundle.queue_snapshot.source_utf8) {
-    throw new Error('Embedded queue snapshot does not exactly match --queue source bytes');
+  if (
+    queueSnapshotFingerprint(selectedQueue) !==
+    queueSnapshotFingerprint(bundle.queue_snapshot.queue)
+  ) {
+    throw new Error('Embedded queue snapshot does not canonically match --queue JSON');
   }
   if (bundle.integrity.state === 'complete') {
     if (options.durableEventRecord === undefined) {
@@ -29,7 +44,7 @@ async function main(): Promise<void> {
     if (
       declaredRecord === undefined ||
       declaredRecord.filename !== path.basename(options.durableEventRecord) ||
-      declaredRecord.sha256 !== queueSnapshotFingerprint(durableRecord)
+      declaredRecord.sha256 !== fileSha256(durableRecord)
     ) {
       throw new Error('Durable event record does not match the complete bundle declaration');
     }
@@ -46,8 +61,8 @@ async function main(): Promise<void> {
     [
       `Valid session bundle: ${bundle.session.session_id}`,
       `Queue: ${bundle.queue_snapshot.filename}`,
-      `Queue fingerprint: ${queueSnapshotFingerprint(bundle.queue_snapshot.source_utf8)}`,
-      'Queue comparison: exact source bytes matched',
+      `Queue fingerprint: ${queueSnapshotFingerprint(bundle.queue_snapshot.queue)}`,
+      'Queue comparison: canonical JSON matched',
       `Integrity: ${bundle.integrity.state}`,
       `${actionCount} item action(s), ${unresolvedCount} unresolved capture(s)`,
     ].join('\n') + '\n'

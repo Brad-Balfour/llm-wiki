@@ -10,23 +10,27 @@
     "session": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["session_id", "session_date", "voice_surface"],
+      "required": ["session_id", "session_date", "artifact_filename", "voice_surface"],
       "properties": {
         "session_id": { "type": "string", "minLength": 1 },
         "session_date": { "type": "string", "format": "date" },
+        "artifact_filename": {
+          "type": "string",
+          "pattern": "^[0-9]{12}-(morning|evening)-commute-session-bundle( \\([1-9][0-9]*\\))?\\.txt$"
+        },
         "voice_surface": {
           "enum": ["chatgpt_live", "chatgpt_advanced", "chatgpt_standard", "other"]
         }
       }
     },
     "queue_snapshot": {
-      "description": "The literal sanitized tldr-commute-queue.v1 JSON file. The local validator enforces its exact allowed fields, ordering, and privacy boundary.",
+      "description": "The complete selected tldr-commute-queue.v2 JSON object. The local validator enforces its fields, ordering, and privacy boundary; its canonical JSON is compared with the selected downloaded queue.",
       "type": "object",
       "additionalProperties": false,
-      "required": ["filename", "source_utf8"],
+      "required": ["filename", "queue"],
       "properties": {
         "filename": { "type": "string", "minLength": 1 },
-        "source_utf8": { "type": "string", "minLength": 1 }
+        "queue": { "type": "object", "minProperties": 1 }
       }
     },
     "playback": {

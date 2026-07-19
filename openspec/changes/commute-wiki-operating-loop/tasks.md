@@ -29,6 +29,11 @@
 - [ ] 1.5 Add fixtures for same filename with different queue content, terminal
       Voice restart, final-bundle creation failure, duplicate feedback utterance,
       and a ChatGPT Memory misinterpretation.
+- [ ] 1.6 Define and test queue-v2's single N-of-M playback order, including
+      rejection/audit fixtures for wrong section/count, repeated, foreign, and
+      unmatched announced items.
+- [ ] 1.7 Require and validate unique timestamped session-bundle filenames,
+      including two same-day export fixtures and Library-added numeric suffixes.
 
 ## 2. Project Instructions And Real-Car Tests
 
@@ -42,6 +47,9 @@
       session bundle with plain failure/recovery behavior.
 - [ ] 2.4 Run controlled real-car smoke tests for J2-J4 and record results
       without treating a chat's self-report as evidence.
+- [ ] 2.5 Deliberately cut the managed ChatGPT Task over to queue-v2 only after
+      its schema and prompt are uploaded in the queue-generation Project, then
+      regenerate the queued newsletters needed for the next commute.
 
 ## 3. Deterministic Local Reconciliation
 

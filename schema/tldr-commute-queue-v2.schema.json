@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://brad-balfour.github.io/llm-wiki/schema/tldr-commute-queue-v1.schema.json",
-  "title": "TLDR commute queue",
+  "$id": "https://brad-balfour.github.io/llm-wiki/schema/tldr-commute-queue-v2.schema.json",
+  "title": "TLDR commute queue — single playback order",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -9,35 +9,37 @@
     "newsletter",
     "edition_date",
     "source_email",
-    "headline_only",
-    "in_depth"
+    "total_items",
+    "items"
   ],
   "properties": {
-    "queue_version": { "const": "tldr-commute-queue.v1" },
+    "queue_version": { "const": "tldr-commute-queue.v2" },
     "newsletter": { "type": "string", "minLength": 1, "maxLength": 100 },
     "edition_date": { "type": "string", "format": "date" },
+    "total_items": { "type": "integer", "minimum": 1 },
     "source_email": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["gmail_message_id", "subject", "sender"],
+      "required": ["gmail_message_id", "subject", "sender", "delivered_at"],
       "properties": {
         "gmail_message_id": { "type": "string", "minLength": 1 },
         "subject": { "type": "string", "minLength": 1, "maxLength": 500 },
-        "sender": { "type": "string", "minLength": 1, "maxLength": 300 }
+        "sender": { "type": "string", "minLength": 1, "maxLength": 300 },
+        "delivered_at": { "type": "string", "format": "date-time" }
       }
     },
-    "headline_only": { "$ref": "#/$defs/items" },
-    "in_depth": { "$ref": "#/$defs/items" }
-  },
-  "$defs": {
     "items": {
       "type": "array",
+      "minItems": 1,
       "items": { "$ref": "#/$defs/item" }
-    },
+    }
+  },
+  "$defs": {
     "item": {
       "type": "object",
       "additionalProperties": false,
       "required": [
+        "playback",
         "source_item_id",
         "title",
         "summary",
@@ -59,6 +61,20 @@
         "routed_at"
       ],
       "properties": {
+        "playback": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["position", "total", "spoken"],
+          "properties": {
+            "position": { "type": "integer", "minimum": 1 },
+            "total": { "type": "integer", "minimum": 1 },
+            "spoken": {
+              "type": "string",
+              "pattern": "^[1-9][0-9]* of [1-9][0-9]*$",
+              "description": "The literal voice progress phrase, for example `4 of 6`."
+            }
+          }
+        },
         "source_item_id": { "type": "string", "minLength": 1 },
         "title": { "type": "string", "minLength": 1, "maxLength": 500 },
         "summary": { "type": "string", "minLength": 1, "maxLength": 4000 },

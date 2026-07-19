@@ -1,28 +1,27 @@
-# ChatGPT Project Source Bundle (Current Legacy Configuration)
+# ChatGPT Project Source Bundle
 
-> Status: These files are the currently deployed Project configuration. The
-> successor requirements are in `openspec/changes/commute-wiki-operating-loop/`.
-> Do not change the live-ledger, v2-handoff, or approval-command instructions
-> until their tested replacements are implemented.
+> Status: Queue v2 is the only supported queue contract in this worktree. Its
+> managed files are ready for a deliberate ChatGPT UI cutover; the existing
+> remote Task is unchanged until Brad performs that manual operation. Git
+> history retains the retired v1 prompt and schema if they are ever needed for
+> debugging.
 
 Use the repository files below as source knowledge for the LLM-Wiki ChatGPT
 Project.
 
-## Classification And Routing
+## Queue v2 Cutover Sources
+
+- `schema/tldr-commute-queue-v2.schema.json`
+- `chatgpt-project/queue-generation-v2.md`
+- `chatgpt-project/WEEKDAY_TLDR_QUEUE_TASK_PROMPT_V2.md`
+- `chatgpt-project/CHATGPT_CAR_QUEUE_PILOT_V2_PROMPT.md`
+- `schema/commute-session-bundle-v1.schema.json`
+
+## Classification And Routing Reference
 
 - `schema/interest-profile.md`
 - `schema/classifier-instructions.md`
 - `schema/routing-rules.md`
-- `schema/tldr-commute-queue-v1.schema.json`
-
-## Commute Queue And Handoff
-
-- `chatgpt-project/queue-generation.md`
-- `chatgpt-project/WEEKDAY_TLDR_QUEUE_TASK_PROMPT.md`
-- `chatgpt-project/CHATGPT_CAR_QUEUE_PROMPT.md`
-- `chatgpt-project/commute-session-ledger.md`
-- `chatgpt-project/commute-session-handoff.md`
-- `schema/commute-handoff-v2.schema.json`
 
 ## Wiki Ingestion
 
@@ -35,13 +34,13 @@ preparation command is "Approve this for wiki ingestion."
 
 ## J2-J4 Pilot Source Bundle
 
-For a controlled single-queue Voice-session test, create a separate temporary
-Project using `CHATGPT_CAR_QUEUE_PILOT_PROMPT.md` and make
-`schema/commute-session-bundle-v1.schema.json` available to it. Do not replace
-the production LLM-Wiki-Car Project instructions: its scheduled queue-generation
-Task depends on them. The pilot explicitly ignores the legacy ledger, v2
-handoff, and approval-command paths. Its output can be checked locally against
-the original downloaded queue with:
+For the controlled queue-pointer test, the temporary Pilot uses
+`CHATGPT_CAR_QUEUE_PILOT_V2_PROMPT.md` plus both
+`schema/tldr-commute-queue-v2.schema.json` and the session-bundle schema. Do
+not change the remote queue-generation Task until the explicit v2 cutover UI
+operation is performed. The Pilot ignores legacy ledger, v2-handoff, and
+approval-command paths. Its output can be checked locally against the original
+downloaded queue with:
 
 ```sh
 npm run validate:commute-session-bundle -- \
@@ -49,4 +48,12 @@ npm run validate:commute-session-bundle -- \
   --queue /path/to/selected-queue.txt
 ```
 
-Do not remove the legacy files until the default-change criteria pass.
+The deliberately retired v1 queue prompt, schema, fixture, and Pilot prompt
+are absent from this working tree. They are recoverable from Git history, but
+must not be uploaded alongside v2 sources.
+
+After downloading a v2 queue, the home-side deterministic preflight is:
+
+```sh
+npm run validate:commute-queue -- /path/to/queue.txt
+```

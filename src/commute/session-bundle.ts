@@ -46,7 +46,7 @@ export interface QueueItemIdentity {
 
 export interface QueueSnapshot {
   filename: string;
-  source_utf8: string;
+  queue: Record<string, unknown>;
 }
 
 interface QueueItemIndex {
@@ -137,6 +137,7 @@ export interface CommuteSessionBundle {
   session: {
     session_id: string;
     session_date: string;
+    artifact_filename: string;
     voice_surface: VoiceSurface;
   };
   queue_snapshot: QueueSnapshot;
@@ -174,7 +175,7 @@ export function validateCommuteSessionBundle(candidate: unknown): CommuteSession
 
   const session = validateSession(record.session);
   const queueSnapshot = validateQueueSnapshot(record.queue_snapshot);
-  const queueItems = indexQueueItems(queueSnapshot.source_utf8);
+  const queueItems = indexQueueItems(queueSnapshot.queue);
   const playback = validatePlayback(record.playback, queueItems);
   const events = validateEvents(record.events, queueItems);
   const integrity = validateIntegrity(record.integrity, events);
@@ -191,128 +192,261 @@ export function validateCommuteSessionBundle(candidate: unknown): CommuteSession
   };
 }
 
-export function queueSnapshotFingerprint(sourceUtf8: string): string {
-  return `sha256:${createHash('sha256').update(sourceUtf8, 'utf8').digest('hex')}`;
+export function queueSnapshotFingerprint(queue: unknown): string {
+  return `sha256:${createHash('sha256').update(canonicalJson(queue), 'utf8').digest('hex')}`;
+}
+
+/** Validate the single queue contract without requiring a session bundle. */
+export function validateTldrCommuteQueueV2(candidate: unknown): Record<string, unknown> {
+  const queue = requireRecord(candidate, 'queue');
+  rejectSensitiveQueueFields(queue, 'queue');
+  indexQueueItems(queue);
+  return queue;
+}
+
+/** Hash an externally stored record byte-for-byte. Unlike a queue snapshot, a
+ * durable record is not JSON-normalized before hashing. */
+export function fileSha256(text: string): string {
+  return `sha256:${createHash('sha256').update(text, 'utf8').digest('hex')}`;
+}
+
+export function bundleArtifactFilenameMatches(
+  actualFilename: string,
+  declaredFilename: string
+): boolean {
+  if (actualFilename === declaredFilename) return true;
+  return (
+    !hasLibrarySuffix(declaredFilename) &&
+    /^\d{8}\d{4}-(?:morning|evening)-commute-session-bundle \([1-9][0-9]*\)\.txt$/.test(
+      actualFilename
+    ) &&
+    actualFilename.replace(/ \([1-9][0-9]*\)\.txt$/, '.txt') === declaredFilename
+  );
 }
 
 function validateSession(candidate: unknown): CommuteSessionBundle['session'] {
   const record = requireRecord(candidate, 'session');
-  rejectUnknownKeys(record, ['session_id', 'session_date', 'voice_surface'], 'session');
+  rejectUnknownKeys(
+    record,
+    ['session_id', 'session_date', 'artifact_filename', 'voice_surface'],
+    'session'
+  );
   const sessionDate = requireString(record.session_date, 'session.session_date');
   if (!/^\d{4}-\d{2}-\d{2}$/.test(sessionDate)) {
     throw new Error('session.session_date must use YYYY-MM-DD');
   }
 
+  const artifactFilename = requireString(record.artifact_filename, 'session.artifact_filename');
+  validateArtifactFilename(artifactFilename, sessionDate);
+
   return {
     session_id: requireString(record.session_id, 'session.session_id'),
     session_date: sessionDate,
+    artifact_filename: artifactFilename,
     voice_surface: requireEnum(record.voice_surface, VOICE_SURFACES, 'session.voice_surface'),
   };
 }
 
 function validateQueueSnapshot(candidate: unknown): QueueSnapshot {
   const record = requireRecord(candidate, 'queue_snapshot');
-  rejectUnknownKeys(record, ['filename', 'source_utf8'], 'queue_snapshot');
-  const sourceUtf8 = requireString(record.source_utf8, 'queue_snapshot.source_utf8');
-
-  try {
-    const source = JSON.parse(sourceUtf8) as unknown;
-    rejectSensitiveQueueFields(source, 'queue_snapshot.source_utf8');
-  } catch (error) {
-    throw new Error(`queue_snapshot.source_utf8 must contain JSON: ${errorMessage(error)}`);
-  }
+  rejectUnknownKeys(record, ['filename', 'queue'], 'queue_snapshot');
+  const queue = requireRecord(record.queue, 'queue_snapshot.queue');
+  rejectSensitiveQueueFields(queue, 'queue_snapshot.queue');
 
   return {
     filename: requireString(record.filename, 'queue_snapshot.filename'),
-    source_utf8: sourceUtf8,
+    queue,
   };
 }
 
-function indexQueueItems(sourceUtf8: string): QueueItemIndex {
-  const record = requireRecord(JSON.parse(sourceUtf8) as unknown, 'queue_snapshot.source_utf8');
-  rejectUnknownKeys(
-    record,
-    ['queue_version', 'newsletter', 'edition_date', 'source_email', 'headline_only', 'in_depth'],
-    'queue_snapshot.source_utf8'
-  );
-  if (record.queue_version !== 'tldr-commute-queue.v1') {
-    throw new Error('queue_snapshot.source_utf8.queue_version must be tldr-commute-queue.v1');
-  }
-  requireString(record.newsletter, 'queue_snapshot.source_utf8.newsletter');
-  const editionDate = requireString(record.edition_date, 'queue_snapshot.source_utf8.edition_date');
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(editionDate)) {
-    throw new Error('queue_snapshot.source_utf8.edition_date must use YYYY-MM-DD');
-  }
+function indexQueueItems(record: Record<string, unknown>): QueueItemIndex {
+  const queueVersion = requireString(record.queue_version, 'queue_snapshot.queue.queue_version');
+  requireString(record.newsletter, 'queue_snapshot.queue.newsletter');
+  requireDate(record.edition_date, 'queue_snapshot.queue.edition_date');
   validateSourceEmail(record.source_email);
-  const ordered = [
-    ...validateQueueSection(record.headline_only, 'queue_snapshot.source_utf8.headline_only'),
-    ...validateQueueSection(record.in_depth, 'queue_snapshot.source_utf8.in_depth'),
-  ];
+  const ordered =
+    queueVersion === 'tldr-commute-queue.v2'
+      ? indexV2Queue(record)
+      : unsupportedQueueVersion(queueVersion);
   const byId = new Map<string, QueueItemIdentity>();
+  const urls = new Set<string>();
   for (const item of ordered) {
     if (byId.has(item.source_item_id)) {
-      throw new Error(`queue_snapshot.source_utf8 contains duplicate ${item.source_item_id}`);
+      throw new Error(`queue_snapshot.queue contains duplicate ${item.source_item_id}`);
     }
     byId.set(item.source_item_id, item);
+    if (urls.has(item.url)) {
+      throw new Error(`queue_snapshot.queue contains duplicate URL ${item.url}`);
+    }
+    urls.add(item.url);
   }
   if (byId.size === 0) {
     throw new Error(
-      'queue_snapshot.source_utf8 must contain queue items with source_item_id, title, and url'
+      'queue_snapshot.queue must contain queue items with source_item_id, title, and url'
     );
   }
   return { byId, ordered };
 }
 
-function validateQueueSection(candidate: unknown, path: string): QueueItemIdentity[] {
-  return requireArray(candidate, path).map((candidateItem, index) => {
-    const itemPath = `${path}[${index}]`;
-    const record = requireRecord(candidateItem, itemPath);
-    rejectUnknownKeys(
-      record,
-      [
-        'source_item_id',
-        'title',
-        'summary',
-        'url',
-        'interest_level',
-        'interest_score',
-        'consumption_depth',
-        'depth_score',
-        'commute_behavior',
-        'signals',
-        'reason',
-        'profile_version',
-        'prompt_version',
-        'provider',
-        'model',
-        'parser_version',
-        'route_version',
-        'classified_at',
-        'routed_at',
-      ],
-      itemPath
-    );
-    return {
-      source_item_id: requireString(record.source_item_id, `${itemPath}.source_item_id`),
-      title: requireString(record.title, `${itemPath}.title`),
-      url: requireHttpUrl(record.url, `${itemPath}.url`),
-    };
+function indexV2Queue(record: Record<string, unknown>): QueueItemIdentity[] {
+  rejectUnknownKeys(
+    record,
+    ['queue_version', 'newsletter', 'edition_date', 'source_email', 'total_items', 'items'],
+    'queue_snapshot.queue'
+  );
+  const totalItems = requirePositiveInteger(record.total_items, 'queue_snapshot.queue.total_items');
+  const values = requireArray(record.items, 'queue_snapshot.queue.items');
+  if (values.length !== totalItems) {
+    throw new Error('queue_snapshot.queue.total_items must equal items.length');
+  }
+  return values.map((candidate, index) => {
+    const itemPath = `queue_snapshot.queue.items[${index}]`;
+    const item = validateQueueItem(candidate, itemPath);
+    const record = requireRecord(candidate, itemPath);
+    const playback = requireRecord(record.playback, `${itemPath}.playback`);
+    rejectUnknownKeys(playback, ['position', 'total', 'spoken'], `${itemPath}.playback`);
+    const position = requirePositiveInteger(playback.position, `${itemPath}.playback.position`);
+    const total = requirePositiveInteger(playback.total, `${itemPath}.playback.total`);
+    const spoken = requireString(playback.spoken, `${itemPath}.playback.spoken`);
+    if (position !== index + 1 || total !== totalItems || spoken !== `${position} of ${total}`) {
+      throw new Error(
+        `${itemPath}.playback must be the contiguous literal ${index + 1} of ${totalItems}`
+      );
+    }
+    return item;
   });
 }
 
-function validateSourceEmail(candidate: unknown): void {
-  const record = requireRecord(candidate, 'queue_snapshot.source_utf8.source_email');
+function unsupportedQueueVersion(version: string): never {
+  throw new Error(
+    `queue_snapshot.queue.queue_version must be tldr-commute-queue.v2, not ${version}`
+  );
+}
+
+function validateQueueItem(candidate: unknown, itemPath: string): QueueItemIdentity {
+  const record = requireRecord(candidate, itemPath);
   rejectUnknownKeys(
     record,
-    ['gmail_message_id', 'subject', 'sender'],
-    'queue_snapshot.source_utf8.source_email'
+    [
+      'playback',
+      'source_item_id',
+      'title',
+      'summary',
+      'url',
+      'interest_level',
+      'interest_score',
+      'consumption_depth',
+      'depth_score',
+      'commute_behavior',
+      'signals',
+      'reason',
+      'profile_version',
+      'prompt_version',
+      'provider',
+      'model',
+      'parser_version',
+      'route_version',
+      'classified_at',
+      'routed_at',
+    ],
+    itemPath
   );
-  requireString(
-    record.gmail_message_id,
-    'queue_snapshot.source_utf8.source_email.gmail_message_id'
+  const playback = requireRecord(record.playback, `${itemPath}.playback`);
+  rejectUnknownKeys(playback, ['position', 'total', 'spoken'], `${itemPath}.playback`);
+  requirePositiveInteger(playback.position, `${itemPath}.playback.position`);
+  requirePositiveInteger(playback.total, `${itemPath}.playback.total`);
+  requireString(playback.spoken, `${itemPath}.playback.spoken`);
+  requireString(record.summary, `${itemPath}.summary`);
+  requireEnum(
+    record.interest_level,
+    ['interested', 'maybe', 'uninterested'] as const,
+    `${itemPath}.interest_level`
   );
-  requireString(record.subject, 'queue_snapshot.source_utf8.source_email.subject');
-  requireString(record.sender, 'queue_snapshot.source_utf8.source_email.sender');
+  requireNumberInRange(record.interest_score, `${itemPath}.interest_score`);
+  requireEnum(
+    record.consumption_depth,
+    ['headline_only', 'in_depth'] as const,
+    `${itemPath}.consumption_depth`
+  );
+  requireNumberInRange(record.depth_score, `${itemPath}.depth_score`);
+  requireString(record.commute_behavior, `${itemPath}.commute_behavior`);
+  requireStringArray(record.signals, `${itemPath}.signals`);
+  requireString(record.reason, `${itemPath}.reason`);
+  requireString(record.profile_version, `${itemPath}.profile_version`);
+  requireString(record.prompt_version, `${itemPath}.prompt_version`);
+  requireString(record.provider, `${itemPath}.provider`);
+  requireString(record.model, `${itemPath}.model`);
+  requireString(record.parser_version, `${itemPath}.parser_version`);
+  requireString(record.route_version, `${itemPath}.route_version`);
+  requireDateTime(record.classified_at, `${itemPath}.classified_at`);
+  requireDateTime(record.routed_at, `${itemPath}.routed_at`);
+  return {
+    source_item_id: requireString(record.source_item_id, `${itemPath}.source_item_id`),
+    title: requireString(record.title, `${itemPath}.title`),
+    url: requireHttpUrl(record.url, `${itemPath}.url`),
+  };
+}
+
+function validateSourceEmail(candidate: unknown): void {
+  const record = requireRecord(candidate, 'queue_snapshot.queue.source_email');
+  rejectUnknownKeys(
+    record,
+    ['gmail_message_id', 'subject', 'sender', 'delivered_at'],
+    'queue_snapshot.queue.source_email'
+  );
+  requireString(record.gmail_message_id, 'queue_snapshot.queue.source_email.gmail_message_id');
+  requireString(record.subject, 'queue_snapshot.queue.source_email.subject');
+  requireString(record.sender, 'queue_snapshot.queue.source_email.sender');
+  requireDateTime(record.delivered_at, 'queue_snapshot.queue.source_email.delivered_at');
+}
+
+function validateArtifactFilename(filename: string, sessionDate: string): void {
+  const match =
+    /^(\d{8})(\d{4})-(morning|evening)-commute-session-bundle(?: \([1-9][0-9]*\))?\.txt$/.exec(
+      filename
+    );
+  if (!match) {
+    throw new Error(
+      'session.artifact_filename must use YYYYMMDDHHmm-morning|evening-commute-session-bundle.txt, with an optional Library suffix'
+    );
+  }
+  if (match[1] !== sessionDate.replaceAll('-', '')) {
+    throw new Error('session.artifact_filename date must match session.session_date');
+  }
+  const time = match[2]!;
+  const hour = Number(time.slice(0, 2));
+  const minute = Number(time.slice(2, 4));
+  if (hour > 23 || minute > 59) {
+    throw new Error('session.artifact_filename HHmm must be a real local time');
+  }
+  if (match[3] === 'morning' && hour >= 12) {
+    throw new Error('session.artifact_filename morning must use a local time before 1200');
+  }
+  if (match[3] === 'evening' && hour < 12) {
+    throw new Error('session.artifact_filename evening must use a local time from 1200 onward');
+  }
+}
+
+function hasLibrarySuffix(filename: string): boolean {
+  return / \([1-9][0-9]*\)\.txt$/.test(filename);
+}
+
+function canonicalJson(value: unknown): string {
+  return JSON.stringify(canonicalize(value));
+}
+
+function canonicalize(value: unknown): unknown {
+  if (Array.isArray(value)) {
+    return value.map(canonicalize);
+  }
+  if (value !== null && typeof value === 'object') {
+    return Object.fromEntries(
+      Object.entries(value as Record<string, unknown>)
+        .sort(([left], [right]) => left.localeCompare(right))
+        .map(([key, child]) => [key, canonicalize(child)])
+    );
+  }
+  return value;
 }
 
 function validatePlayback(candidate: unknown, queueItems: QueueItemIndex): PlaybackState {
@@ -796,6 +930,25 @@ function requireString(candidate: unknown, field: string): string {
   return candidate;
 }
 
+function requireDate(candidate: unknown, field: string): string {
+  const value = requireString(candidate, field);
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(value) || Number.isNaN(Date.parse(`${value}T00:00:00Z`))) {
+    throw new Error(`${field} must use a real YYYY-MM-DD date`);
+  }
+  return value;
+}
+
+function requireDateTime(candidate: unknown, field: string): string {
+  const value = requireString(candidate, field);
+  if (
+    !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})$/.test(value) ||
+    Number.isNaN(Date.parse(value))
+  ) {
+    throw new Error(`${field} must use an RFC 3339 date-time with timezone`);
+  }
+  return value;
+}
+
 function requireHttpUrl(candidate: unknown, field: string): string {
   const value = requireString(candidate, field);
   let parsed: URL;
@@ -823,6 +976,18 @@ function requireStringArray(candidate: unknown, field: string): string[] {
 function requirePositiveInteger(candidate: unknown, field: string): number {
   if (typeof candidate !== 'number' || !Number.isInteger(candidate) || candidate < 1) {
     throw new Error(`${field} must be a positive integer`);
+  }
+  return candidate;
+}
+
+function requireNumberInRange(candidate: unknown, field: string): number {
+  if (
+    typeof candidate !== 'number' ||
+    !Number.isFinite(candidate) ||
+    candidate < 0 ||
+    candidate > 1
+  ) {
+    throw new Error(`${field} must be a number from 0 through 1`);
   }
   return candidate;
 }

@@ -47,8 +47,9 @@ runtime changes are made.
 
 ### Modified Capabilities
 
-- `commute-queue`: the existing v1/v2 handoff and mutable-ledger assumptions
-  are superseded for new work by the session-bundle requirements in this change.
+- `commute-queue`: the existing mutable-ledger assumptions are superseded for
+  new work by the session-bundle requirements in this change. Retired queue-v1
+  files are not supported by the successor path.
 - `feedback-labels`: exact in-session binding and quality-incident capture
   become prerequisites for later feedback aggregation.
 - `wiki-compilation`: direct maintenance PRs become the intended knowledge
