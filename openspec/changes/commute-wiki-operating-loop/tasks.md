@@ -15,11 +15,11 @@
 
 ## 1. Session Contract And Fixtures
 
-- [ ] 1.1 Define a versioned `commute-session-bundle` schema that embeds the
+- [x] 1.1 Define a versioned `commute-session-bundle` schema that embeds the
       selected queue snapshot, session metadata, state, captures, feedback,
       incidents, integrity/recovery declaration, evidence coverage, and
       monotonic item/action transitions.
-- [ ] 1.2 Specify the exact distinction between item-specific events and
+- [x] 1.2 Specify the exact distinction between item-specific events and
       `unresolved_capture` records.
 - [ ] 1.3 Add fixtures for a valid single-queue bundle, a partial-evidence
       recovery bundle, an unresolved capture, and multiple independent bundles.
@@ -32,13 +32,13 @@
 
 ## 2. Project Instructions And Real-Car Tests
 
-- [ ] 2.1 Revise queue-selection instructions so one text chat explicitly
+- [x] 2.1 Revise queue-selection instructions so one text chat explicitly
       selects one named queue before Voice begins, with visible-attachment and
       selection-challenge smoke-test evidence.
-- [ ] 2.2 Revise Voice/session instructions to preserve exact identity or emit
+- [x] 2.2 Revise Voice/session instructions to preserve exact identity or emit
       unresolved captures; remove any instruction that requires a claimed live
       mutable ledger.
-- [ ] 2.3 Revise end-of-session instructions to create one self-contained
+- [x] 2.3 Revise end-of-session instructions to create one self-contained
       session bundle with plain failure/recovery behavior.
 - [ ] 2.4 Run controlled real-car smoke tests for J2-J4 and record results
       without treating a chat's self-report as evidence.

@@ -13,6 +13,11 @@ queue artifact for every qualifying TLDR source email delivered that day.
 - **THEN** it SHALL produce one dated `.txt` queue file per source email
 - **AND** every produced file SHALL contain parseable queue content rather than
   a filename, placeholder, or reconstruction claim
+- **AND** every produced file SHALL conform to the versioned
+  `tldr-commute-queue.v1` contract, including one source-email identity and
+  ordered, mutually exclusive `headline_only` and `in_depth` arrays
+- **AND** the Task's managed no-external-storage prompt SHALL be stored in the
+  repository so that a later prompt change is reviewable and reversible
 - **AND** the completion message SHALL link to each produced artifact.
 
 #### Scenario: Artifact creation fails
