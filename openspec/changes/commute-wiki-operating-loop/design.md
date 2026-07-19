@@ -235,6 +235,13 @@ runs private intake, then immediately runs the maintainer against valid exact
 captures. The PR, if useful changes result, is the first normal human decision
 point.
 
+During implementation, narrow `validate:*`, `import:*`, and `retrieve:*`
+commands may remain available as diagnostics. Once the top-level command passes
+fixtures and a real commute-to-PR run, it becomes the documented operator path.
+The intermediate commands are then either made explicitly internal or removed
+from the public package-script surface; their tested modules remain as internal
+implementation components.
+
 ## Compatibility And Supersession Map
 
 This change is a proposed successor to parts of

@@ -79,6 +79,10 @@
       source concepts, updates to existing concepts, and link-only changes.
 - [ ] 4.4 Review early maintainer PRs manually before defining any auto-merge
       subset.
+- [ ] 4.5 After the top-level commute-maintenance command passes its fixture and
+      real commute-to-PR tests, consolidate the command surface: document only
+      the supported user workflow and make `import:*`/`retrieve:*` diagnostic
+      internals or remove their package scripts.
 
 ## 5. Learning Loops
 
