@@ -18,6 +18,16 @@ successful export.
 - **AND** item-specific records SHALL copy identity from the embedded selected
   queue snapshot.
 
+#### Scenario: Queue completion ends its session
+
+- **WHEN** Voice completes the active queue's final `M of M` item
+- **THEN** it SHALL first leave the final item current through the required
+  approximately five-second interruption-friendly gap
+- **AND** only when no command arrives during that gap, it SHALL create that
+  queue's downloadable bundle using the same export workflow as an explicit
+  end command
+- **AND** it SHALL NOT wait for Brad to name another queue before exporting.
+
 ### Requirement: Observable Bundle Delivery
 
 A successful session export SHALL be an identifiable downloadable artifact, not
@@ -36,8 +46,8 @@ a statement that an artifact or ledger exists.
 Every bundle artifact SHALL have a session-end-local-time filename of the form
 `YYYYMMDDHHmm-morning-commute-session-bundle.txt` or
 `YYYYMMDDHHmm-evening-commute-session-bundle.txt`, using America/New_York
-export time. The label is determined by that time: before 12:00 is `morning`;
-12:00 or later is `evening`.
+export time rather than UTC. The label is determined by that time: before 12:00
+is `morning`; 12:00 or later is `evening`.
 
 #### Scenario: Two sessions export on the same day
 
@@ -49,6 +59,14 @@ export time. The label is determined by that time: before 12:00 is `morning`;
   failure. The bundle records the canonical requested filename because it may
   not be able to observe a suffix assigned after its JSON is written.
 
+#### Scenario: New York time differs from UTC
+
+- **WHEN** export occurs at 9:46 PM EDT on July 19
+- **THEN** the canonical artifact filename SHALL start with `202607192146` and
+  use the `evening` label
+- **AND** it SHALL NOT use the UTC value `202607200146` or a July 20 `morning`
+  label.
+
 #### Scenario: Bundle delivery fails
 
 - **WHEN** the Project cannot create a downloadable session-bundle artifact
@@ -57,6 +75,15 @@ export time. The label is determined by that time: before 12:00 is `morning`;
   handoff
 - **AND** it SHALL NOT fabricate item-specific recovery events from
   conversational memory.
+
+#### Scenario: Active queue snapshot is unavailable at export
+
+- **WHEN** the Project no longer has the complete active queue JSON needed for
+  `queue_snapshot.queue`
+- **THEN** it SHALL report bundle-export failure and create no downloadable
+  bundle
+- **AND** it SHALL NOT create a `reconstructed-session`, an empty queue
+  snapshot, or a schema-shaped substitute.
 
 ### Requirement: Exact Item Binding
 
@@ -107,6 +134,17 @@ recovered from incomplete evidence.
 - **THEN** the bundle SHALL mark its integrity as partial or recovered
 - **AND** it SHALL identify the affected events or unresolved captures
 - **AND** it SHALL NOT claim that every action was recorded live.
+
+#### Scenario: End command has only visible session evidence
+
+- **WHEN** Brad ends an active session but no durable contemporaneous event
+  record exists
+- **THEN** the Project SHALL still attempt a downloadable partial bundle using
+  the complete active queue snapshot and visible session evidence
+- **AND** it SHALL retain only exact item actions that can be supported by that
+  evidence, using unresolved captures for anything else
+- **AND** it SHALL NOT refuse export solely because the event record is not
+  durable or complete.
 
 ### Requirement: Integrity Evidence Coverage
 

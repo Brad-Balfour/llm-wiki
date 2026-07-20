@@ -14,6 +14,9 @@ Library.
   date/newsletter request in Voice and its canonical filename validates from the
   live Project Library
 - **THEN** it SHALL begin from that queue's first item
+- **AND** before any summary or article commentary it SHALL announce
+  `Reading: <M> items from <filename>.` and begin the per-item playback
+  workflow at item 1
 - **AND** it SHALL NOT insert items from another queue
 - **AND** the resulting canonical-filename lookup SHALL occur only for session
   start, not as a fallback after another queue has become active.
@@ -21,13 +24,19 @@ Library.
 #### Scenario: Finish the selected queue
 
 - **WHEN** Voice completes item `M of M` in the selected queue
-- **THEN** it SHALL announce that canonical filename as finished and ask which
-  queue Brad would like next
-- **AND** it SHALL pause rather than automatically select another queue
-- **AND** when Brad names a next queue, it SHALL create the completed queue's
-  downloadable session bundle before selecting that next queue as a new session
+- **THEN** it SHALL keep that final item current through the same approximately
+  five-second interruption-friendly gap used after every other item
+- **AND** a `wiki this`, `tell me more`, `repeat`, or `pause` command during
+  that gap SHALL apply to the final item rather than begin export
+- **AND** only when no command arrives during that gap, it SHALL announce that
+  canonical filename as finished and immediately create that queue's
+  downloadable session bundle
+- **AND** it SHALL NOT ask which queue Brad would like next or automatically
+  start another queue
+- **AND** after a visible download, a later queue request SHALL start a new
+  session
 - **AND** if bundle creation fails, it SHALL report that failure and SHALL NOT
-  begin the next queue.
+  begin another queue.
 
 #### Scenario: Verify before speaking
 
@@ -37,10 +46,10 @@ Library.
 - **AND** the current item SHALL be exactly `items[position - 1]`, with an
   automatic advance moving only to the immediately next position
 - **AND** if the selected queue is lost, a new/restarted chat lacks a fresh
-  date/newsletter or exact-filename selection, or an identified item conflicts
+  date/newsletter or exact-filename request, or an identified item conflicts
   with it, it SHALL say `Queue context lost. End this Voice session and start
-  a new selection.` and stop playback
-- **AND** after session-start selection it SHALL NOT search Library, switch
+  a new queue.` and stop playback
+- **AND** after reading starts it SHALL NOT search Library, switch
   queues, or repair the cursor from conversational recollection.
 
 ### Requirement: Automatic, Terse Playback Is the Default
@@ -51,16 +60,28 @@ interrupts, says pause, or ends the session.
 #### Scenario: Normal playback
 
 - **WHEN** Brad has not interrupted or requested a pause
-- **THEN** Voice SHALL announce the item's literal `N of M` phrase and headline
-- **AND** it SHALL use `consumption_depth` to choose the requested concise or
-  in-depth reading style
-- **AND** it SHALL make only a brief interruption-friendly gap before continuing
-  to the next item
+- **THEN** Voice SHALL announce the item's literal `N of M` phrase, reading
+  mode, and headline before any summary or article commentary
+- **AND** `headline_only` SHALL use one brisk queue-summary sentence
+- **AND** `in_depth` SHALL use one or two short queue-summary sentences and
+  SHALL retrieve or discuss the linked article only after Brad requests more
+  detail
+- **AND** it SHALL make an approximately five-second interruption-friendly gap
+  before continuing to the next item
 - **AND** it SHALL NOT ask whether Brad wants to continue or narrate a routine
   transition.
 
-The brief gap is a prompt-level target, not a claim that Standard Voice can
-provide a measured timer or capture every overlapping interruption.
+The five-second gap is a prompt-level target, not a claim that Standard Voice
+can provide a measured timer or capture every overlapping interruption.
+
+#### Scenario: Voice combines spoken commands
+
+- **WHEN** Voice combines multiple spoken fragments into one transcript
+- **THEN** it SHALL follow the final clear commute command in that transcript
+- **AND** it SHALL NOT reload or replace the active queue because an earlier
+  fragment names a file
+- **AND** if no final command is clear, it SHALL request one of `next`, `pause`,
+  or `end commute` in a short response.
 
 #### Scenario: Brad gives feedback during playback
 
@@ -69,6 +90,8 @@ provide a measured timer or capture every overlapping interruption.
   it in two or three words
 - **AND** it SHALL bind item-specific feedback only to a verified current item;
   otherwise it SHALL retain an unresolved capture or a general quality incident
+- **AND** an item left by automatic advancement SHALL not remain current merely
+  because it was the most recently read item
 - **AND** it SHALL NOT repeat, summarize, diagnose, apologize at length, or ask
   a follow-up about that feedback
 - **AND** it SHALL continue playback unless Brad says pause.
@@ -78,16 +101,16 @@ provide a measured timer or capture every overlapping interruption.
 - **WHEN** Brad wants to hear a different queue
 - **THEN** the current Voice session SHALL either export successfully or be
   intentionally abandoned
-- **AND** the next queue SHALL be selected by an exact filename or unambiguous
+- **AND** the next queue SHALL start from an exact filename or unambiguous
   date/newsletter request in a new session before Voice playback begins.
 
 #### Scenario: Voice freezes, restarts, or opens a new chat
 
-- **WHEN** the platform loses the current chat or the selected queue cannot be
+- **WHEN** the platform loses the current chat or the active queue cannot be
   verified
 - **THEN** the previous session SHALL be terminal
 - **AND** the next session SHALL start from a fresh filename or date/newsletter
-  selection
+  request
 - **AND** it SHALL NOT claim a remembered resume position or persistent pause.
 
 ### Requirement: Prefetch Does Not Change Playback State

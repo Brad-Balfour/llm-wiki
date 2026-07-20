@@ -44,19 +44,23 @@ loaded a file is not evidence that this occurred.
 
 ### 1. One active queue per Voice session is the provisional car model
 
-Brad starts a Voice or text session by naming one exact queue filename or one
+Brad starts a commute session by naming one exact queue filename or one
 unambiguous date plus newsletter in the live `LLM-Wiki-Car` Project. The
 Project deterministically normalizes the latter to its canonical dated v2
 filename (General, Dev, AI, or Fintech), then resolves only that file; Voice
-uses it only. Switching newsletters starts a new session and a new selection.
-Each such session produces its own self-contained bundle.
+uses it only. The `Reading:` envelope and playback workflow do not vary by chat
+surface; the visible transcript is not a second interaction mode. Switching
+newsletters starts a new session and a new active queue. Each such session
+produces its own self-contained bundle.
 
-On reaching the final `M of M` item, Voice announces that queue as finished,
-asks which queue Brad wants next, and pauses. If Brad names another queue,
-Voice first creates the completed queue's downloadable bundle; only then may it
-normalize and begin the next queue as a distinct session. A failed bundle export
-means no next queue begins. This keeps an easy spoken transition without
-silently merging two queues' captures or feedback.
+On reaching the final `M of M` item, Voice keeps that item current through the
+same approximately five-second interruption-friendly gap as every other item.
+Only when no command arrives during that gap does it create the queue's
+downloadable bundle. It does not ask which queue is next or begin another queue
+in the same session. Any later date/newsletter or filename request begins a
+distinct session. A failed bundle export is reported as such; it never becomes
+a conversational transition that can silently merge two queues' captures or
+feedback.
 
 This replaces the initial attachment-handoff hypothesis. On July 19, a direct
 Voice request for `20260716-tldr-dev.txt` succeeded from the unified Project
@@ -140,9 +144,9 @@ defined observable proxy and, where possible, a deterministic local check.
 Those checks reduce risk; they do not promise that the platform retains state
 between turns.
 
-For queue selection, the operator names an exact filename or an unambiguous
+For queue startup, the operator names an exact filename or an unambiguous
 date/newsletter pair. The Project normalizes that request to one canonical
-filename and verifies a selection challenge against its resolved Project-Library
+filename and verifies a reading challenge against its resolved Project-Library
 file: its filename and first canonical N-of-M/title identity. This is a
 smoke-test proxy for the later Voice session, not proof that a future restart
 will retain the active queue. For session-bundle delivery, the proof is a
@@ -152,19 +156,20 @@ validation.
 ### 9. A Voice restart is terminal unless a bundle proves otherwise
 
 Voice pause, freeze, or restart SHALL not imply durable continuation. If the
-platform creates a new chat or the selected queue cannot be verified, the prior
+platform creates a new chat or the active queue cannot be verified, the prior
 session is terminal. A final bundle is attempted only when the end-of-session
 artifact can be created; otherwise the session has an explicit missing-artifact
 result. The next session starts from a fresh date/newsletter or exact-filename
-selection and may replay from a known item; it never claims a remembered resume
+request and may replay from a known item; it never claims a remembered resume
 position.
 
 ### 10. Bundle delivery has an explicit recovery hierarchy
 
 1. A successful session has one identifiable downloadable bundle artifact that
    is visible in the current chat/Library and later validates locally.
-2. If the artifact is created but contains partial evidence, it declares the
-   evidence sources and affected unresolved captures.
+2. If the complete active queue snapshot is available and the artifact contains
+   partial evidence, it declares the evidence sources and affected unresolved
+   captures.
 3. If artifact creation fails, the chat reports `session export failed: no
 downloadable bundle was created`; it does not claim a ledger, reconstruction,
    or importable handoff exists.
@@ -218,12 +223,25 @@ Git history retains the retired format if it is needed for debugging.
 
 At session start, Voice is instructed to accept an exact filename or an
 unambiguous date/newsletter request, normalize it to one canonical filename,
-and resolve only that file from the live Project Library. It then silently
-compares the selected filename, literal playback phrase, source ID, title, URL,
-and reading mode against that queue. After selection it neither searches
+and resolve only that file from the live Project Library. It then says a
+`Reading:` envelope and silently compares the active filename, literal playback
+phrase, source ID, title, URL, and reading mode against that queue. After
+reading begins it neither searches
 Library, merges queues, nor guesses. If active identity is lost or an item
-conflicts with the selected queue, it says `Queue context lost. End this Voice
-session and start a new selection.` and stops.
+conflicts with the active queue, it says `Queue context lost. End this Voice
+session and start a new queue.` and stops.
+
+The live prompt requires an audible item envelope before any content: literal
+N-of-M, reading mode, and title. It then leaves an approximately five-second
+interruption window before automatic advancement. `in_depth` changes only the
+available detail on request; it does not authorize an unsolicited article
+monologue. When Voice
+combines utterances, the final clear commute command controls and an earlier
+filename fragment cannot reload the active queue. An end command always attempts
+a partial bundle when it still has the complete active queue snapshot; missing
+durable event evidence limits its integrity declaration and event claims, not
+whether export is attempted. Missing queue snapshot is an explicit export
+failure, not a reconstructed bundle.
 
 This is a behavioral prompt guard, not proof that the check occurred. The home
 side instead audits observed announcements against the embedded queue and
@@ -245,9 +263,9 @@ not a claim that every action is implemented in repository code.
 | ID  | Boundary                                    | Input                                                                         | Success outcome and proof                                                                                                                                                                                                   | Failure outcome                                                                                                                         | Must never be guessed                                                                              | Owner                                        |
 | --- | ------------------------------------------- | ----------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- | -------------------------------------------- |
 | J1  | Scheduled Task -> Project Library queue     | Direct TLDR messages delivered today and the Task prompt                      | One real, parseable, dated `.txt` queue per source email is downloadable and present in the `LLM-Wiki-Car` Library. A v2 queue has one explicit N-of-M playback order. The Task Update and artifact contents are the proof. | State which expected queue is absent or invalid; create no filename-only placeholder and do not use Drive or another storage connector. | That a scheduler's “last ran” status proves a usable queue exists.                                 | Task prompt + manual acceptance record       |
-| J2  | Project Library -> selected session         | One exact queue filename or unambiguous date/newsletter request               | Voice or text normalizes the request to one canonical v2 filename in `LLM-Wiki-Car` Library and confirms filename plus first N-of-M/title. The selection reply is the proof.                                                     | Do not begin; ask Brad for a date and newsletter or one exact filename.                                                                  | A queue chosen from conversational recollection, an ambiguous request, or a similarly dated filename. | Project instructions                       |
-| J3  | Selected session -> Voice playback          | Selected queue and current session start                                      | Voice uses that queue only, begins at a known first item, and no prefetch advances the cursor. At `M of M`, it announces completion and pauses for a next-queue request; any next queue begins only after the completed queue's bundle exists. | End or restart the session when the queue cannot be verified; a failed export prevents the next queue from starting.                     | Queue position, item identity, or an attachment handoff after a restart.                           | Project instructions + session contract      |
-| J4  | Voice session -> session bundle             | Current queue snapshot, explicit user actions, and available session evidence | One self-contained bundle records exact captures, feedback, progress, quality incidents, and integrity/recovery state.                                                                                                      | Emit a partial/recovery bundle with unresolved captures; do not pretend the log is complete.                                            | Item IDs, titles, URLs, feedback targets, or ledger completeness.                                  | Session-bundle schema + Project instructions |
+| J2  | Project Library -> active reading           | One exact queue filename or unambiguous date/newsletter request               | The Project normalizes the request to one canonical v2 filename in `LLM-Wiki-Car` Library, confirms it with `Reading: <M> items from <filename>.`, then starts the per-item playback workflow at item 1.                           | Do not begin; ask Brad for a date and newsletter or one exact filename.                                                                  | A queue chosen from conversational recollection, an ambiguous request, or a similarly dated filename. | Project instructions                       |
+| J3  | Active reading -> Voice playback            | Active queue and current session start                                        | Voice uses that queue only, begins at a known first item, makes an approximately five-second interruption gap before automatic advancement, and no prefetch advances the cursor. At `M of M`, it keeps that item current through the same gap, then automatically exports that queue's bundle and ends the session if no command arrives; a later queue request begins a distinct session. | End or restart the session when the queue cannot be verified; a failed export is reported and does not start another queue.              | Queue position, item identity, or an attachment handoff after a restart.                           | Project instructions + session contract      |
+| J4  | Voice session -> session bundle             | Complete active queue snapshot, explicit user actions, and available session evidence | One self-contained bundle records exact captures, feedback, progress, quality incidents, and integrity/recovery state.                                                                                                  | Emit a partial bundle only when the full active queue snapshot is present; otherwise report export failure and do not create a reconstruction. | Item IDs, titles, URLs, feedback targets, queue snapshot, or ledger completeness.                  | Session-bundle schema + Project instructions |
 | J5  | One or more bundles -> local reconciliation | Selected bundle files                                                         | One local command validates/reconciles each bundle and returns one consolidated maintenance input set with per-session results.                                                                                             | Retain and report failed or unresolved records without discarding valid sessions.                                                       | That separate bundle events refer to the same queue/session, or that a reconstruction is complete. | Deterministic local importer                 |
 | J6  | Reconciled inputs -> wiki-maintainer PR     | Saved URLs, captures, feedback context, and existing wiki                     | Maintainer retrieves feasible sources, reads relevant wiki pages, and opens one PR containing useful page/link changes. The PR diff is the proof.                                                                           | Report inaccessible or insufficient sources and leave a traceable maintenance item for later recovery.                                  | That a queue summary is the full source, or that every source deserves a new page.                 | Source retrieval + wiki maintainer           |
 
