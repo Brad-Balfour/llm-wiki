@@ -154,6 +154,22 @@ test('rejects an out-of-order queue announcement after a next transition', () =>
   );
 });
 
+test('rejects a next transition that names its destination instead of its departing item', () => {
+  const malformed = clone(validBundle);
+  const events = malformed.events as Array<Record<string, unknown>>;
+  const transition = events[2] as Record<string, unknown>;
+  transition.item = {
+    source_item_id: 'tldr-demo-002',
+    title: 'Second exact headline',
+    url: 'https://example.com/second',
+  };
+
+  assert.throws(
+    () => parseCommuteSessionBundleText(JSON.stringify(malformed)),
+    /playback_transition does not match the currently announced item/
+  );
+});
+
 test('accepts an unresolved capture without inventing a target item', () => {
   const recovered = clone(validBundle);
   const events = recovered.events as Array<Record<string, unknown>>;
