@@ -11,6 +11,11 @@ Paste `chatgpt-project/CHATGPT_CAR_QUEUE_PROMPT.md` into the **Instructions**
 field of `LLM-Wiki-Car`. It supersedes the former commute prompt and the
 earlier separate-Project v2 Pilot.
 
+The prompt heading carries two distinct versions. `Queue Contract v2` changes
+only when the queue/schema contract changes. `Prompt Revision` increments for
+every behavior-changing Project-instruction edit, so the text pasted into
+ChatGPT can be identified independently of Git history.
+
 ## Live Project Sources
 
 Upload exactly these files to `LLM-Wiki-Car`:

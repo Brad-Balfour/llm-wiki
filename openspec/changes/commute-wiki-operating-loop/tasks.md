@@ -25,7 +25,8 @@
       recovery bundle, an unresolved capture, and multiple independent bundles.
 - [ ] 1.4 Add regression fixtures for lost queue after restart, invented item,
       partial ledger falsely represented as complete, and feedback bound to the
-      wrong item.
+      wrong item, including a `next` transition that incorrectly names its
+      destination rather than its departing item.
 - [ ] 1.5 Add fixtures for same filename with different queue content, terminal
       Voice restart, final-bundle creation failure, duplicate feedback utterance,
       and a ChatGPT Memory misinterpretation.

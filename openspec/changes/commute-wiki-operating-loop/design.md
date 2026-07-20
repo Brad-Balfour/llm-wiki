@@ -231,6 +231,12 @@ classifies each as exact, wrong-position-or-mode, repeated, foreign, or
 unmatched. A foreign item is not called a hallucination until other available
 input queues have been checked.
 
+Bundle event order has one intentionally minimal transition rule: an
+`item_announced` event identifies the item that became current, while a
+`playback_transition` identifies the item being left. For `next`, the next
+`item_announced` identifies the destination. Recording both items on the
+transition would duplicate identity and add a second mismatch opportunity.
+
 ## Journey Contract
 
 The following table is the source-of-truth product map. Each row is a boundary,

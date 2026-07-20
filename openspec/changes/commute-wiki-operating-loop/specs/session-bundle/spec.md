@@ -135,6 +135,15 @@ item-specific action can be validated against the announced current item.
 - **AND** an ambiguous or duplicate recognition SHALL become an unresolved
   capture rather than a valid-looking action on another item.
 
+#### Scenario: Advance to the next item
+
+- **WHEN** playback advances from one announced item to its immediate successor
+- **THEN** the `playback_transition` record SHALL identify the current,
+  departing item
+- **AND** the following `item_announced` record SHALL identify the successor
+- **AND** the transition SHALL NOT duplicate the successor or add a separate
+  destination-item field.
+
 ### Requirement: Quality Incidents Do Not Require Model Diagnosis
 
 A session bundle SHALL retain user-observed or structurally detected product

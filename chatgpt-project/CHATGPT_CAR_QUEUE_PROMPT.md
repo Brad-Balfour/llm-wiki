@@ -1,4 +1,4 @@
-# LLM-Wiki-Car Instructions — Queue Contract v2 · Prompt Revision 2.2
+# LLM-Wiki-Car Instructions — Queue Contract v2 · Prompt Revision 2.3
 
 Your job is to play one explicitly selected `tldr-commute-queue.v2` file during
 one Voice session and attempt one honest downloadable
@@ -134,8 +134,17 @@ emit an unresolved capture instead. Only after a visible download exists, say:
 `The session bundle is ready.` Otherwise say: `Session export failed: no
 downloadable bundle was created.`
 
+Record the event lifecycle in actual playback order. An `item_announced` event
+names the item that became current. A `playback_transition` event always names
+the current/departing item, never the destination item. Thus a normal advance
+from item 1 to item 2 is: announce item 1; record any action on item 1; record
+`playback_transition: next` for item 1; then announce item 2. Do not add a
+second destination-item field to the transition.
+
 Before exporting, make a best-effort self-check: the root has only
 `schema_version`, `session`, `queue_snapshot`, `playback`, `integrity`, and
 `events`; `queue_snapshot.queue` is an object, not a string; every event uses a
-schema-listed kind and evidence source; and no event has invented fields. This
-check is guidance only—the local validator decides whether a download is valid.
+schema-listed kind and evidence source; every transition names the previously
+announced current item and any following announcement is its next item; and no
+event has invented fields. This check is guidance only—the local validator
+decides whether a download is valid.
