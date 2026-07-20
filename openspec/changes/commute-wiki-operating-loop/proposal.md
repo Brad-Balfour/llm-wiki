@@ -18,7 +18,9 @@ runtime changes are made.
 - Define the six-boundary operating loop from scheduled queue creation through
   a wiki-maintainer PR.
 - Replace the assumption of one continuous multi-queue Voice conversation with
-  a provisional operating model: one named queue per text-chat/Voice session.
+  a provisional operating model: one named queue per Voice session, selected
+  from the live Project Library by exact filename or an unambiguous
+  date/newsletter request.
 - Define a new self-contained session-bundle contract that does not require a
   durable mutable ChatGPT ledger to be trusted.
 - Require explicit recovery records for unresolved captures instead of guessed
@@ -36,8 +38,8 @@ runtime changes are made.
 
 - `scheduled-queue-output`: observable, non-placeholder queue-generation
   outcomes for the ChatGPT Task integration.
-- `queue-selection`: a text-chat boundary that binds one explicitly named queue
-  to the next Voice session.
+- `queue-selection`: a date/newsletter-to-filename Project-Library boundary
+  that binds one unambiguously named queue to a Voice session.
 - `voice-session`: one active queue and predictable restart/switch behavior.
 - `session-bundle`: exact session events, recovery declarations, and quality
   incidents in a self-contained end-of-session artifact.

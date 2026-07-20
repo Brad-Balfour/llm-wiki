@@ -4,14 +4,30 @@
 
 ### Requirement: One Active Queue Per Voice Session
 
-A Voice session SHALL consume only the queue selected in its originating text
-chat.
+A Voice session SHALL consume only the queue selected by an exact filename or
+unambiguous date/newsletter request from the live `LLM-Wiki-Car` Project
+Library.
 
 #### Scenario: Begin a Voice session
 
-- **WHEN** Voice starts from a chat with one selected queue
-- **THEN** it SHALL begin from that queue's recorded first/resume item
-- **AND** it SHALL NOT insert items from another queue.
+- **WHEN** Brad names one exact queue filename or an unambiguous
+  date/newsletter request in Voice and its canonical filename validates from the
+  live Project Library
+- **THEN** it SHALL begin from that queue's first item
+- **AND** it SHALL NOT insert items from another queue
+- **AND** the resulting canonical-filename lookup SHALL occur only for session
+  start, not as a fallback after another queue has become active.
+
+#### Scenario: Finish the selected queue
+
+- **WHEN** Voice completes item `M of M` in the selected queue
+- **THEN** it SHALL announce that canonical filename as finished and ask which
+  queue Brad would like next
+- **AND** it SHALL pause rather than automatically select another queue
+- **AND** when Brad names a next queue, it SHALL create the completed queue's
+  downloadable session bundle before selecting that next queue as a new session
+- **AND** if bundle creation fails, it SHALL report that failure and SHALL NOT
+  begin the next queue.
 
 #### Scenario: Verify before speaking
 
@@ -20,10 +36,12 @@ chat.
   phrase, source ID, title, URL, and reading mode against the selected queue
 - **AND** the current item SHALL be exactly `items[position - 1]`, with an
   automatic advance moving only to the immediately next position
-- **AND** if any value cannot be verified, it SHALL say `Queue context lost.
-  End this Voice session and start a new text selection.` and stop playback
-- **AND** it SHALL NOT search Library, switch queues, or repair the cursor from
-  conversational recollection.
+- **AND** if the selected queue is lost, a new/restarted chat lacks a fresh
+  date/newsletter or exact-filename selection, or an identified item conflicts
+  with it, it SHALL say `Queue context lost. End this Voice session and start
+  a new selection.` and stop playback
+- **AND** after session-start selection it SHALL NOT search Library, switch
+  queues, or repair the cursor from conversational recollection.
 
 ### Requirement: Automatic, Terse Playback Is the Default
 
@@ -60,15 +78,16 @@ provide a measured timer or capture every overlapping interruption.
 - **WHEN** Brad wants to hear a different queue
 - **THEN** the current Voice session SHALL either export successfully or be
   intentionally abandoned
-- **AND** the next queue SHALL be selected in a new text chat before a new Voice
-  session begins.
+- **AND** the next queue SHALL be selected by an exact filename or unambiguous
+  date/newsletter request in a new session before Voice playback begins.
 
 #### Scenario: Voice freezes, restarts, or opens a new chat
 
 - **WHEN** the platform loses the current chat or the selected queue cannot be
   verified
 - **THEN** the previous session SHALL be terminal
-- **AND** the next session SHALL start from a fresh text-chat selection
+- **AND** the next session SHALL start from a fresh filename or date/newsletter
+  selection
 - **AND** it SHALL NOT claim a remembered resume position or persistent pause.
 
 ### Requirement: Prefetch Does Not Change Playback State

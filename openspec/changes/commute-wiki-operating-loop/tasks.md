@@ -37,12 +37,14 @@
 
 ## 2. Project Instructions And Real-Car Tests
 
-- [x] 2.1 Revise queue-selection instructions so one text chat explicitly
-      selects one named queue before Voice begins, with visible-attachment and
-      selection-challenge smoke-test evidence.
-- [x] 2.2 Revise Voice/session instructions to preserve exact identity or emit
-      unresolved captures; remove any instruction that requires a claimed live
-      mutable ledger.
+- [ ] 2.1 Revise queue-selection instructions so a Voice or text session starts
+      only after Brad names an exact v2 filename or unambiguous date/newsletter
+      pair and the live `LLM-Wiki-Car` Project Library resolves that canonical
+      file, with a filename/N-of-M/title selection-challenge smoke test.
+- [ ] 2.2 Revise Voice/session instructions to preserve exact identity or emit
+      unresolved captures; allow Project Library lookup only at canonical
+      filename session start, and remove any instruction that requires a
+      claimed live mutable ledger.
 - [x] 2.3 Revise end-of-session instructions to create one self-contained
       session bundle with plain failure/recovery behavior.
 - [ ] 2.4 Run controlled real-car smoke tests for J2-J4 and record results

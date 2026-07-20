@@ -1,43 +1,49 @@
-# ChatGPT Project Source Bundle
+# LLM-Wiki-Car Project Source Bundle
 
-> Status: Queue v2 is the only supported queue contract in this worktree. Its
-> managed files define the manually deployed ChatGPT Project configuration. Git
-> history retains the retired v1 prompt and schema if they are ever needed for
-> debugging.
+> Status: `LLM-Wiki-Car` is the one live ChatGPT Project for both weekday queue
+> generation and Voice commute playback. Queue v2 is the only supported queue
+> contract. Git history preserves the retired prompts, ledgers, handoffs, and
+> approval workflow for debugging; do not keep them as live Project sources.
 
-Use the repository files below as source knowledge for the LLM-Wiki ChatGPT
-Project.
+## Project Instructions
 
-## Queue v2 Cutover Sources
+Paste `chatgpt-project/CHATGPT_CAR_QUEUE_PROMPT.md` into the **Instructions**
+field of `LLM-Wiki-Car`. It supersedes the former commute prompt and the
+earlier separate-Project v2 Pilot.
+
+## Live Project Sources
+
+Upload exactly these files to `LLM-Wiki-Car`:
 
 - `schema/tldr-commute-queue-v2.schema.json`
-- `chatgpt-project/queue-generation-v2.md`
-- `chatgpt-project/WEEKDAY_TLDR_QUEUE_TASK_PROMPT_V2.md`
-- `chatgpt-project/CHATGPT_CAR_QUEUE_PILOT_V2_PROMPT.md`
 - `schema/commute-session-bundle-v1.schema.json`
-
-## Classification And Routing Reference
-
+- `chatgpt-project/queue-generation-v2.md`
 - `schema/interest-profile.md`
 - `schema/classifier-instructions.md`
 - `schema/routing-rules.md`
 
-## Wiki Ingestion
+The scheduled **Weekday TLDR Queues** Task uses
+`chatgpt-project/WEEKDAY_TLDR_QUEUE_TASK_PROMPT_V2.md` as its managed prompt.
+That Task remains Monday–Friday at 11:00 AM.
 
-- `chatgpt-project/wiki-ingestion.md`
-- `schema/approved-wiki-source-v1.schema.json`
+Voice may start a queue by an exact filename or an unambiguous date plus
+newsletter name, such as `July 16 TLDR Dev`. The Project normalizes that request
+to the dated v2 filename in its Library; it must not guess a nearby queue.
 
-The synonymous commute commands are "End commute" and "End the commute session."
-The retired "Approve this for wiki ingestion" command is not part of the v2
-path: an exact `wiki this` capture is sufficient to nominate maintenance.
+Do not upload the legacy `commute-session-handoff.md`,
+`commute-session-ledger.md`, `wiki-ingestion.md`, any `commute-handoff` schema,
+or `approved-wiki-source-v1.schema.json` as live Project sources. They conflict
+with the v2 single-queue/session-bundle path. Their Git history remains the
+rollback record.
 
-## J2-J4 Pilot Source Bundle
+The synonymous commute commands are "End commute" and "End the commute
+session." An exact `wiki this` capture is sufficient to nominate maintenance;
+there is no user-facing approval command in this path.
 
-For the controlled queue-pointer test, the temporary Pilot uses
-`CHATGPT_CAR_QUEUE_PILOT_V2_PROMPT.md` plus both
-`schema/tldr-commute-queue-v2.schema.json` and the session-bundle schema. The
-Pilot ignores legacy ledger, v2-handoff, and approval-command paths. Its output
-can be checked locally against the original downloaded queue with:
+## Bundle Validation
+
+The Voice output can be checked locally against the original downloaded queue
+with:
 
 ```sh
 npm run validate:commute-session-bundle -- \
@@ -45,9 +51,9 @@ npm run validate:commute-session-bundle -- \
   --queue /path/to/selected-queue.txt
 ```
 
-The deliberately retired v1 queue prompt, schema, fixture, and Pilot prompt
-are absent from this working tree. They are recoverable from Git history, but
-must not be uploaded alongside v2 sources.
+The deliberately retired v1 queue prompt, schema, fixture, and separate-Project
+Pilot prompt are absent from this working tree. They are recoverable from Git
+history, but must not be uploaded alongside v2 sources.
 
 After downloading a v2 queue, the home-side deterministic preflight is:
 
@@ -71,7 +77,7 @@ npm run import:commute-session-bundles -- \
 ```
 
 This command is an internal/diagnostic stage, not a user approval gate. The
-forthcoming top-level commute-maintenance command will invoke this intake,
-retrieve nominated sources, inspect the existing wiki, and create a branch/PR
-automatically. Its normal human decision point is the resulting PR—not an
-intermediate review of this private record.
+top-level `maintain:commute` command invokes this intake, retrieves nominated
+sources, inspects the existing wiki, and creates a branch/PR automatically. Its
+normal human decision point is the resulting PR—not an intermediate review of
+this private record.
