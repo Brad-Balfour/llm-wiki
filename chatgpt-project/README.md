@@ -86,3 +86,14 @@ top-level `maintain:commute` command invokes this intake, retrieves nominated
 sources, inspects the existing wiki, and creates a branch/PR automatically. Its
 normal human decision point is the resulting PR—not an intermediate review of
 this private record.
+
+Before the first real bundle-to-PR run, confirm that the local maintainer can
+launch the installed Codex command without changing the repository:
+
+```sh
+npm run diagnose:maintain-commute
+```
+
+It uses `COMMUTE_MAINTAINER_CODEX` when explicitly set; otherwise it invokes
+the Codex executable bundled with the ChatGPT macOS app. This deliberately
+avoids a broken global `codex` npm launcher.

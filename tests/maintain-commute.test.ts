@@ -1,7 +1,26 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { buildMaintainerPrompt, parseAgentResult } from '../src/wiki/maintain-commute.js';
+import {
+  buildMaintainerPrompt,
+  parseAgentResult,
+  resolveMaintainerCodexExecutable,
+} from '../src/wiki/maintain-commute.js';
+
+test('uses the app-bundled Codex unless an explicit maintainer executable is configured', () => {
+  assert.equal(
+    resolveMaintainerCodexExecutable({}),
+    '/Applications/ChatGPT.app/Contents/Resources/codex'
+  );
+  assert.equal(
+    resolveMaintainerCodexExecutable({ COMMUTE_MAINTAINER_CODEX: '/opt/tools/codex' }),
+    '/opt/tools/codex'
+  );
+  assert.equal(
+    resolveMaintainerCodexExecutable({ COMMUTE_MAINTAINER_CODEX: '  ' }),
+    '/Applications/ChatGPT.app/Contents/Resources/codex'
+  );
+});
 
 test('builds a maintainer prompt with no intermediate approval gate', () => {
   const prompt = buildMaintainerPrompt({
