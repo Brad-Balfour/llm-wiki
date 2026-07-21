@@ -43,9 +43,9 @@
       pair and the live `LLM-Wiki-Car` Project Library resolves that canonical
       file, with a filename/N-of-M/title selection-challenge smoke test.
 - [ ] 2.2 Revise Voice/session instructions to preserve exact identity or emit
-      unresolved captures; allow Project Library lookup only at canonical
-      filename session start, and remove any instruction that requires a
-      claimed live mutable ledger.
+      unresolved captures; allow Project Library lookup at canonical filename
+      session start and exact named-file recovery, and remove any instruction
+      that requires a claimed live mutable ledger.
 - [x] 2.3 Revise end-of-session instructions to create one self-contained
       session bundle with plain failure/recovery behavior.
 - [ ] 2.4 Run controlled real-car smoke tests for J2-J4 and record results

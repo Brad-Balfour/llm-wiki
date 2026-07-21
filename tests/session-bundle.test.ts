@@ -170,6 +170,30 @@ test('rejects a next transition that names its destination instead of its depart
   );
 });
 
+test('accepts a redundant next transition after a skip action', () => {
+  const bundle = clone(validBundle);
+  const events = bundle.events as Array<Record<string, unknown>>;
+  events.splice(2, 0, {
+    event_id: 'event-skip',
+    sequence: 3,
+    kind: 'item_action',
+    action: 'skip',
+    item: {
+      source_item_id: 'tldr-demo-001',
+      title: 'First exact headline',
+      url: 'https://example.com/first',
+    },
+    user_words: 'skip',
+    evidence: [{ source: 'explicit_user_capture', reference: 'Brad said: skip' }],
+  });
+  (events[3] as Record<string, unknown>).sequence = 4;
+  (events[4] as Record<string, unknown>).sequence = 5;
+
+  const parsed = parseCommuteSessionBundleText(JSON.stringify(bundle));
+
+  assert.equal(parsed.events.length, 5);
+});
+
 test('accepts an unresolved capture without inventing a target item', () => {
   const recovered = clone(validBundle);
   const events = recovered.events as Array<Record<string, unknown>>;
@@ -206,6 +230,18 @@ test('accepts a v2 queue with one explicit N-of-M playback order', () => {
 
   assert.equal(parsed.queue_snapshot.filename, '20260720-tldr-dev.txt');
   assert.equal(parsed.events[3]?.kind, 'item_announced');
+});
+
+test('accepts a new v2 queue without a source-email subject', () => {
+  const bundle = clone(validBundle);
+  const queueSnapshot = bundle.queue_snapshot as Record<string, unknown>;
+  const queue = v2Queue();
+  delete queue.source_email.subject;
+  queueSnapshot.queue = queue;
+
+  const parsed = parseCommuteSessionBundleText(JSON.stringify(bundle));
+
+  assert.equal(parsed.queue_snapshot.queue.source_email !== undefined, true);
 });
 
 test('rejects a v2 queue whose literal spoken position disagrees with its cursor', () => {
@@ -287,6 +323,10 @@ test('accepts a Library-added suffix as the canonical bundle artifact', () => {
   assert.equal(
     bundleArtifactFilenameMatches('unrelated-commute-session-bundle (1).txt', canonical),
     false
+  );
+  assert.equal(
+    bundleArtifactFilenameMatches('202607200745-morning-commute-session-bundle(1).txt', canonical),
+    true
   );
 });
 

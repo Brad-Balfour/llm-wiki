@@ -18,15 +18,13 @@ successful export.
 - **AND** item-specific records SHALL copy identity from the embedded selected
   queue snapshot.
 
-#### Scenario: Queue completion ends its session
+#### Scenario: Queue completion waits for an explicit end command
 
 - **WHEN** Voice completes the active queue's final `M of M` item
-- **THEN** it SHALL first leave the final item current through the required
-  approximately five-second interruption-friendly gap
-- **AND** only when no command arrives during that gap, it SHALL create that
-  queue's downloadable bundle using the same export workflow as an explicit
-  end command
-- **AND** it SHALL NOT wait for Brad to name another queue before exporting.
+- **THEN** it SHALL keep that item current, announce that the named queue is
+  finished, and wait for Brad's next command
+- **AND** it SHALL NOT auto-advance, auto-export, discard the active queue, or
+  start another queue.
 
 ### Requirement: Observable Bundle Delivery
 
@@ -76,14 +74,16 @@ is `morning`; 12:00 or later is `evening`.
 - **AND** it SHALL NOT fabricate item-specific recovery events from
   conversational memory.
 
-#### Scenario: Active queue snapshot is unavailable at export
+#### Scenario: Active queue snapshot needs recovery at export
 
 - **WHEN** the Project no longer has the complete active queue JSON needed for
   `queue_snapshot.queue`
-- **THEN** it SHALL report bundle-export failure and create no downloadable
-  bundle
-- **AND** it SHALL NOT create a `reconstructed-session`, an empty queue
-  snapshot, or a schema-shaped substitute.
+- **THEN** it SHALL automatically reload only the already named canonical queue
+  filename from the Project Library
+- **AND** if it finds valid queue JSON, it SHALL emit the requested bundle with
+  `recovered` integrity and only evidence-supported events
+- **AND** it SHALL report export failure only if that exact file cannot be
+  reloaded or no downloadable artifact can be created.
 
 ### Requirement: Exact Item Binding
 

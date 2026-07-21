@@ -226,22 +226,20 @@ unambiguous date/newsletter request, normalize it to one canonical filename,
 and resolve only that file from the live Project Library. It then says a
 `Reading:` envelope and silently compares the active filename, literal playback
 phrase, source ID, title, URL, and reading mode against that queue. After
-reading begins it neither searches
-Library, merges queues, nor guesses. If active identity is lost or an item
-conflicts with the active queue, it says `Queue context lost. End this Voice
-session and start a new queue.` and stops.
+reading begins it neither merges queues nor guesses. If active identity is lost,
+it may recover only by rereading the already named canonical filename from the
+Project Library; it never searches for a similar queue or chooses an article by
+topic.
 
 The live prompt requires an audible item envelope before any content: literal
-N-of-M, reading mode, and title. It then leaves an approximately five-second
-interruption window before automatic advancement. `in_depth` changes only the
-available detail on request; it does not authorize an unsolicited article
-monologue. When Voice
-combines utterances, the final clear commute command controls and an earlier
-filename fragment cannot reload the active queue. An end command always attempts
-a partial bundle when it still has the complete active queue snapshot; missing
-durable event evidence limits its integrity declaration and event claims, not
-whether export is attempted. Missing queue snapshot is an explicit export
-failure, not a reconstructed bundle.
+N-of-M, reading mode, and title. User navigation alone advances the cursor;
+there is no timed auto-advance. `in_depth` changes only the available detail on
+request; it does not authorize an unsolicited article monologue. Article
+retrieval uses only the verified current queue item's exact URL, not a topical
+match or email subject. At `M of M`, Voice announces completion and waits for an
+explicit command. An end command always attempts a bundle; missing active queue
+context triggers exact named-file recovery. Missing durable event evidence
+limits integrity and event claims, not whether export is attempted.
 
 This is a behavioral prompt guard, not proof that the check occurred. The home
 side instead audits observed announcements against the embedded queue and
@@ -264,8 +262,8 @@ not a claim that every action is implemented in repository code.
 | --- | ------------------------------------------- | ----------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- | -------------------------------------------- |
 | J1  | Scheduled Task -> Project Library queue     | Direct TLDR messages delivered today and the Task prompt                      | One real, parseable, dated `.txt` queue per source email is downloadable and present in the `LLM-Wiki-Car` Library. A v2 queue has one explicit N-of-M playback order. The Task Update and artifact contents are the proof. | State which expected queue is absent or invalid; create no filename-only placeholder and do not use Drive or another storage connector. | That a scheduler's “last ran” status proves a usable queue exists.                                 | Task prompt + manual acceptance record       |
 | J2  | Project Library -> active reading           | One exact queue filename or unambiguous date/newsletter request               | The Project normalizes the request to one canonical v2 filename in `LLM-Wiki-Car` Library, confirms it with `Reading: <M> items from <filename>.`, then starts the per-item playback workflow at item 1.                           | Do not begin; ask Brad for a date and newsletter or one exact filename.                                                                  | A queue chosen from conversational recollection, an ambiguous request, or a similarly dated filename. | Project instructions                       |
-| J3  | Active reading -> Voice playback            | Active queue and current session start                                        | Voice uses that queue only, begins at a known first item, makes an approximately five-second interruption gap before automatic advancement, and no prefetch advances the cursor. At `M of M`, it keeps that item current through the same gap, then automatically exports that queue's bundle and ends the session if no command arrives; a later queue request begins a distinct session. | End or restart the session when the queue cannot be verified; a failed export is reported and does not start another queue.              | Queue position, item identity, or an attachment handoff after a restart.                           | Project instructions + session contract      |
-| J4  | Voice session -> session bundle             | Complete active queue snapshot, explicit user actions, and available session evidence | One self-contained bundle records exact captures, feedback, progress, quality incidents, and integrity/recovery state.                                                                                                  | Emit a partial bundle only when the full active queue snapshot is present; otherwise report export failure and do not create a reconstruction. | Item IDs, titles, URLs, feedback targets, queue snapshot, or ledger completeness.                  | Session-bundle schema + Project instructions |
+| J3  | Active reading -> Voice playback            | Active queue and current session start                                        | Voice uses that queue only, begins at a known first item, and leaves it current until Brad explicitly navigates. At `M of M`, it announces completion and waits for instruction; it does not auto-export. | Recover only the already named canonical file when active identity is lost; otherwise end/restart the session without substituting a queue. | Queue position, item identity, or an attachment handoff after a restart.                           | Project instructions + session contract      |
+| J4  | Voice session -> session bundle             | Complete active queue snapshot, explicit user actions, and available session evidence | One self-contained bundle records exact captures, feedback, progress, quality incidents, and integrity/recovery state.                                                                                                  | On an explicit end command, recover the already named canonical queue from Project Library if necessary and emit a partial/recovered bundle; report failure only when that exact queue or a download cannot be produced. | Item IDs, titles, URLs, feedback targets, queue snapshot, or ledger completeness.                  | Session-bundle schema + Project instructions |
 | J5  | One or more bundles -> local reconciliation | Selected bundle files                                                         | One local command validates/reconciles each bundle and returns one consolidated maintenance input set with per-session results.                                                                                             | Retain and report failed or unresolved records without discarding valid sessions.                                                       | That separate bundle events refer to the same queue/session, or that a reconstruction is complete. | Deterministic local importer                 |
 | J6  | Reconciled inputs -> wiki-maintainer PR     | Saved URLs, captures, feedback context, and existing wiki                     | Maintainer retrieves feasible sources, reads relevant wiki pages, and opens one PR containing useful page/link changes. The PR diff is the proof.                                                                           | Report inaccessible or insufficient sources and leave a traceable maintenance item for later recovery.                                  | That a queue summary is the full source, or that every source deserves a new page.                 | Source retrieval + wiki maintainer           |
 

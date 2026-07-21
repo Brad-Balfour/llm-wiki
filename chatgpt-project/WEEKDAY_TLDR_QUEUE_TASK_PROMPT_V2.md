@@ -14,8 +14,9 @@ items array and total_items. Every item must contain playback.position,
 playback.total, and playback.spoken in literal contiguous form: 1 of M through
 M of M. Use consumption_depth only as the headline_only or in_depth reading
 style tag. Do not emit separate headline_only or in_depth arrays, source_order,
-or any newsletter-position field. Preserve exact source_item_id, title, summary,
-final HTTP(S) URL, and all schema-required classifier and routing metadata.
+any newsletter-position field, or a source-email subject. Preserve exact
+source_item_id, title, summary, final HTTP(S) URL, and all schema-required
+classifier and routing metadata.
 
 Apply the Project duplicate-resolution tie-breaker and perform this self-check:
 valid JSON, v2 schema shape, one source-email identity, items.length equals
@@ -40,7 +41,6 @@ schema-required classifier and routing fields for every real item.
   "edition_date": "2026-07-16",
   "source_email": {
     "gmail_message_id": "example-message-id",
-    "subject": "Example TLDR subject",
     "sender": "TLDR <dan@tldrnewsletter.com>",
     "delivered_at": "2026-07-16T07:05:43-04:00"
   },

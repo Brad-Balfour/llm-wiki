@@ -62,3 +62,19 @@ remembered filename or queue state from an earlier chat.
 - **THEN** the Project SHALL treat the queue as inactive
 - **AND** it SHALL require Brad to name a date/newsletter pair or one exact
   filename again before playback.
+
+### Requirement: Exact Named-Queue Recovery
+
+When active queue context is lost during a still-active session or explicit
+bundle export, the Project SHALL recover only the canonical filename already
+named for that session. It SHALL NOT select a similar file, a remembered queue,
+or an article based on topical similarity.
+
+#### Scenario: Active context is lost before export
+
+- **WHEN** Brad asks to create a bundle and the complete active queue JSON is
+  absent from working context
+- **THEN** the Project SHALL look up only the previously named canonical
+  filename in its Project Library
+- **AND** it SHALL use the recovered exact queue snapshot if it is valid
+- **AND** it SHALL mark reconstruction as recovered rather than complete.

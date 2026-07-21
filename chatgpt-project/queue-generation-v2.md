@@ -31,6 +31,10 @@ Do not emit `headline_only`, `in_depth`, `source_order`,
 source item ID, final HTTP(S) URL, summary, classifier facts, and routing
 metadata required by the schema.
 
+`source_email` identifies the source message only with its Gmail message ID,
+sender, and delivery time. Do not emit its subject: it is not playback identity
+and must never be used to choose or retrieve a commute article.
+
 ## Preflight
 
 Before creating a download, verify valid JSON, the v2 schema shape, one source

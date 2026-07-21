@@ -217,10 +217,10 @@ export function bundleArtifactFilenameMatches(
   if (actualFilename === declaredFilename) return true;
   return (
     !hasLibrarySuffix(declaredFilename) &&
-    /^\d{8}\d{4}-(?:morning|evening)-commute-session-bundle \([1-9][0-9]*\)\.txt$/.test(
+    /^\d{8}\d{4}-(?:morning|evening)-commute-session-bundle ?\([1-9][0-9]*\)\.txt$/.test(
       actualFilename
     ) &&
-    actualFilename.replace(/ \([1-9][0-9]*\)\.txt$/, '.txt') === declaredFilename
+    actualFilename.replace(/ ?\([1-9][0-9]*\)\.txt$/, '.txt') === declaredFilename
   );
 }
 
@@ -395,14 +395,19 @@ function validateSourceEmail(candidate: unknown): void {
     'queue_snapshot.queue.source_email'
   );
   requireString(record.gmail_message_id, 'queue_snapshot.queue.source_email.gmail_message_id');
-  requireString(record.subject, 'queue_snapshot.queue.source_email.subject');
+  // `subject` was emitted by early v2 queues. It is deliberately ignored when
+  // present so historical queue snapshots remain importable, but new queues do
+  // not carry it: it is not part of playback identity and invites topic drift.
+  if (record.subject !== undefined) {
+    requireString(record.subject, 'queue_snapshot.queue.source_email.subject');
+  }
   requireString(record.sender, 'queue_snapshot.queue.source_email.sender');
   requireDateTime(record.delivered_at, 'queue_snapshot.queue.source_email.delivered_at');
 }
 
 function validateArtifactFilename(filename: string, sessionDate: string): void {
   const match =
-    /^(\d{8})(\d{4})-(morning|evening)-commute-session-bundle(?: \([1-9][0-9]*\))?\.txt$/.exec(
+    /^(\d{8})(\d{4})-(morning|evening)-commute-session-bundle(?: ?\([1-9][0-9]*\))?\.txt$/.exec(
       filename
     );
   if (!match) {
@@ -428,7 +433,7 @@ function validateArtifactFilename(filename: string, sessionDate: string): void {
 }
 
 function hasLibrarySuffix(filename: string): boolean {
-  return / \([1-9][0-9]*\)\.txt$/.test(filename);
+  return / ?\([1-9][0-9]*\)\.txt$/.test(filename);
 }
 
 function canonicalJson(value: unknown): string {
@@ -804,23 +809,34 @@ function sameStringSet(left: string[], right: string[]): boolean {
 function validateLifecycle(events: SessionEvent[], queueItems: QueueItemIndex): void {
   let currentItemIndex: number | undefined;
   let expectedItemIndex: number | undefined = 0;
+  let skipAwaitingNavigation = false;
 
   for (const event of events) {
     if (event.kind === 'item_announced') {
       const announcedIndex = queueItems.ordered.findIndex(
         (item) => item.source_item_id === event.item.source_item_id
       );
-      if (currentItemIndex !== undefined || expectedItemIndex === undefined) {
+      const isImplicitNavigationAfterSkip =
+        skipAwaitingNavigation &&
+        currentItemIndex !== undefined &&
+        announcedIndex === currentItemIndex + 1;
+      if (
+        (currentItemIndex !== undefined && !isImplicitNavigationAfterSkip) ||
+        expectedItemIndex === undefined
+      ) {
         throw new Error(
           `events[${event.sequence - 1}] item_announced must follow a valid next or repeat transition`
         );
       }
-      if (announcedIndex !== expectedItemIndex) {
+      const expectedAnnouncementIndex =
+        currentItemIndex === undefined ? expectedItemIndex : currentItemIndex + 1;
+      if (announcedIndex !== expectedAnnouncementIndex) {
         throw new Error(
           `events[${event.sequence - 1}] item_announced does not match the expected queue position`
         );
       }
       currentItemIndex = announcedIndex;
+      skipAwaitingNavigation = false;
       continue;
     }
     if (event.kind === 'item_action') {
@@ -835,8 +851,11 @@ function validateLifecycle(events: SessionEvent[], queueItems: QueueItemIndex): 
         );
       }
       if (event.action === 'skip') {
-        expectedItemIndex = currentItemIndex + 1;
-        currentItemIndex = undefined;
+        // Voice commonly records both a spoken `skip` and a following `next`.
+        // Keep the item current until the actual transition, while also
+        // accepting the next announcement as an implicit departure if no
+        // separate transition was captured.
+        skipAwaitingNavigation = true;
       }
       continue;
     }
@@ -854,15 +873,18 @@ function validateLifecycle(events: SessionEvent[], queueItems: QueueItemIndex): 
       if (event.transition === 'next') {
         expectedItemIndex = currentItemIndex + 1;
         currentItemIndex = undefined;
+        skipAwaitingNavigation = false;
       } else if (event.transition === 'repeat') {
         // A repeat must be followed by a fresh announcement before any later
         // feedback can be bound to this item. That keeps a post-repeat action
         // from being silently attributed to a stale announcement.
         expectedItemIndex = currentItemIndex;
         currentItemIndex = undefined;
+        skipAwaitingNavigation = false;
       } else {
         currentItemIndex = undefined;
         expectedItemIndex = undefined;
+        skipAwaitingNavigation = false;
       }
     }
   }
