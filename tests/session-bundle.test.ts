@@ -49,6 +49,17 @@ test('rejects a wiki capture without direct evidence of Brad speaking the reques
   );
 });
 
+test('accepts a natural-language wiki save when the action has direct evidence and an exact item', () => {
+  const bundle = clone(validBundle);
+  const events = bundle.events as Array<Record<string, unknown>>;
+  const action = events[1] as Record<string, unknown>;
+  action.user_words = 'Please save the Codex outage tracker, item one.';
+
+  const parsed = parseCommuteSessionBundleText(JSON.stringify(bundle));
+
+  assert.equal(parsed.events[1]?.kind, 'item_action');
+});
+
 test('rejects raw-email-shaped fields in an embedded queue snapshot', () => {
   const malformed = clone(validBundle);
   const queueSnapshot = malformed.queue_snapshot as Record<string, unknown>;
@@ -192,6 +203,43 @@ test('accepts a redundant next transition after a skip action', () => {
   const parsed = parseCommuteSessionBundleText(JSON.stringify(bundle));
 
   assert.equal(parsed.events.length, 5);
+});
+
+test('accepts a recovered next transition whose exact departing item follows a missing announcement', () => {
+  const bundle = clone(validBundle);
+  const events = bundle.events as Array<Record<string, unknown>>;
+  events.splice(3, 0, {
+    event_id: 'event-unresolved',
+    sequence: 4,
+    kind: 'unresolved_capture',
+    capture_type: 'wiki_this',
+    user_words: 'Good, wiki this.',
+    recovery_clues: ['The assistant announced the wrong title for the next position.'],
+    evidence: [{ source: 'explicit_user_capture', reference: 'Brad said: wiki this' }],
+  });
+  events.splice(4, 1, {
+    event_id: 'event-recovered-next',
+    sequence: 5,
+    kind: 'playback_transition',
+    transition: 'next',
+    item: {
+      source_item_id: 'tldr-demo-002',
+      title: 'Second exact headline',
+      url: 'https://example.com/second',
+    },
+    evidence: [{ source: 'selected_queue_snapshot', reference: 'Recovered exact queue item.' }],
+  });
+  const integrity = bundle.integrity as Record<string, unknown>;
+  integrity.state = 'recovered';
+  integrity.incomplete_reason = 'Voice omitted the item announcement.';
+  const playback = bundle.playback as Record<string, unknown>;
+  playback.status = 'partial';
+  playback.last_announced_source_item_id = 'tldr-demo-001';
+  playback.resume_source_item_id = 'tldr-demo-002';
+
+  const parsed = parseCommuteSessionBundleText(JSON.stringify(bundle));
+
+  assert.equal(parsed.integrity.state, 'recovered');
 });
 
 test('accepts an unresolved capture without inventing a target item', () => {

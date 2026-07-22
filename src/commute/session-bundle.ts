@@ -179,7 +179,7 @@ export function validateCommuteSessionBundle(candidate: unknown): CommuteSession
   const playback = validatePlayback(record.playback, queueItems);
   const events = validateEvents(record.events, queueItems);
   const integrity = validateIntegrity(record.integrity, events);
-  validateLifecycle(events, queueItems);
+  validateLifecycle(events, queueItems, integrity.state);
   validatePlaybackMatchesEvents(playback, events);
 
   return {
@@ -550,9 +550,6 @@ function validateEvent(
       const action = requireEnum(record.action, ITEM_ACTIONS, `${field}.action`);
       const userWords = requireString(record.user_words, `${field}.user_words`);
       requireUserActionEvidence(base.evidence, `${field}.evidence`);
-      if (action === 'wiki_this' && !isWikiCapturePhrase(userWords)) {
-        throw new Error(`${field}.user_words must contain an explicit wiki capture phrase`);
-      }
       return {
         ...base,
         kind,
@@ -656,11 +653,6 @@ function requireUserActionEvidence(evidence: EventEvidence[], field: string): vo
   ) {
     throw new Error(`${field} must include direct evidence of the user's action`);
   }
-}
-
-function isWikiCapturePhrase(userWords: string): boolean {
-  const normalized = userWords.toLowerCase().replace(/[^a-z0-9 ]+/g, ' ');
-  return /\bwiki this\b|\badd this to my wiki\b|\bsave this for the wiki\b/.test(normalized);
 }
 
 function validateExactItem(
@@ -806,7 +798,11 @@ function sameStringSet(left: string[], right: string[]): boolean {
   return left.length === right.length && left.every((value) => right.includes(value));
 }
 
-function validateLifecycle(events: SessionEvent[], queueItems: QueueItemIndex): void {
+function validateLifecycle(
+  events: SessionEvent[],
+  queueItems: QueueItemIndex,
+  integrityState: IntegrityState
+): void {
   let currentItemIndex: number | undefined;
   let expectedItemIndex: number | undefined = 0;
   let skipAwaitingNavigation = false;
@@ -861,24 +857,41 @@ function validateLifecycle(events: SessionEvent[], queueItems: QueueItemIndex): 
     }
     if (event.kind === 'playback_transition') {
       if (currentItemIndex === undefined) {
+        const canRecoverMissingAnnouncement =
+          integrityState !== 'complete' &&
+          event.transition === 'next' &&
+          expectedItemIndex !== undefined &&
+          event.item.source_item_id === queueItems.ordered[expectedItemIndex]?.source_item_id;
+        if (!canRecoverMissingAnnouncement) {
+          throw new Error(
+            `events[${event.sequence - 1}] playback_transition has no current announced item`
+          );
+        }
+        // A partial/recovered Voice reconstruction may omit the announcement
+        // while preserving an exact departing item. Reconstruct only that
+        // cursor state; it never turns an ambiguous action into a wiki target.
+        currentItemIndex = expectedItemIndex;
+      }
+      const announcedItemIndex: number | undefined = currentItemIndex;
+      if (announcedItemIndex === undefined) {
         throw new Error(
           `events[${event.sequence - 1}] playback_transition has no current announced item`
         );
       }
-      if (event.item.source_item_id !== queueItems.ordered[currentItemIndex]?.source_item_id) {
+      if (event.item.source_item_id !== queueItems.ordered[announcedItemIndex]?.source_item_id) {
         throw new Error(
           `events[${event.sequence - 1}] playback_transition does not match the currently announced item`
         );
       }
       if (event.transition === 'next') {
-        expectedItemIndex = currentItemIndex + 1;
+        expectedItemIndex = announcedItemIndex + 1;
         currentItemIndex = undefined;
         skipAwaitingNavigation = false;
       } else if (event.transition === 'repeat') {
         // A repeat must be followed by a fresh announcement before any later
         // feedback can be bound to this item. That keeps a post-repeat action
         // from being silently attributed to a stale announcement.
-        expectedItemIndex = currentItemIndex;
+        expectedItemIndex = announcedItemIndex;
         currentItemIndex = undefined;
         skipAwaitingNavigation = false;
       } else {

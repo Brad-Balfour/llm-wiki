@@ -195,11 +195,14 @@ rejects a `complete` declaration that lacks the required evidence coverage.
 ### 12. Event ordering is required for exact action binding
 
 The bundle records a monotonic sequence of queue states and actions. An
-item-specific action is valid only after that exact item has been announced as
-current and before a later action advances, interrupts, or replaces it. `next`,
-skip, repeat, interrupted discussion, and duplicate speech recognition all
-produce explicit transitions or an unresolved capture. This is a structural
-guard against attaching feedback to any real-but-wrong item in the snapshot.
+item-specific action is valid only when it identifies an exact current queue
+item and has direct user evidence; it does not require Brad to use a memorized
+spoken phrase. `next`, skip, repeat, interrupted discussion, and duplicate
+speech recognition all produce explicit transitions or an unresolved capture.
+For partial/recovered sessions, an exact next transition may repair a missing
+announcement cursor, but never retroactively binds an ambiguous wiki request.
+This is a structural guard against attaching feedback to any real-but-wrong item
+in the snapshot.
 
 ### 13. A commute queue has one canonical playback order
 

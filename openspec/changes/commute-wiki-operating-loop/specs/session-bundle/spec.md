@@ -98,21 +98,30 @@ item at the time of the user action.
   item identifier, title, and URL copied from the queue snapshot
 - **AND** it SHALL NOT be stored as a general ChatGPT Memory.
 
-#### Scenario: Equivalent wiki capture phrases
+#### Scenario: Natural-language wiki capture
 
-- **WHEN** Brad says `wiki this`, `add this to my wiki`, or `save this for the
-wiki` for a verified current item
-- **THEN** the Project SHALL treat the phrases as equivalent exact maintenance
-  captures.
+- **WHEN** the Project records an item action as `wiki_this` with direct user
+  evidence and an exact verified current item
+- **THEN** the local validator SHALL accept the natural-language wording rather
+  than require one memorized phrase.
 
-#### Scenario: User says wiki this
+#### Scenario: User saves the current item
 
-- **WHEN** Brad says `wiki this` for a verified current item
+- **WHEN** Brad asks to save the verified current item for the wiki
 - **THEN** the bundle SHALL record an exact maintenance capture for that item
 - **AND** that capture SHALL be sufficient input for later source retrieval and
   maintainer PR work
 - **AND** it SHALL NOT require a second spoken approval or an intermediate
   approval record.
+
+#### Scenario: Recovered transition omits an announcement
+
+- **WHEN** a `partial` or `recovered` bundle has an exact `next` transition for
+  the expected queue item but lacks the preceding announcement event
+- **THEN** the local validator MAY reconstruct only the cursor state needed to
+  continue validating later events
+- **AND** it SHALL NOT use that recovery to bind an otherwise unresolved wiki
+  capture to the item.
 
 #### Scenario: Active item cannot be verified
 
