@@ -49,6 +49,17 @@ test('rejects a wiki capture without direct evidence of Brad speaking the reques
   );
 });
 
+test('accepts a natural-language wiki save when the action has direct evidence and an exact item', () => {
+  const bundle = clone(validBundle);
+  const events = bundle.events as Array<Record<string, unknown>>;
+  const action = events[1] as Record<string, unknown>;
+  action.user_words = 'Please save the Codex outage tracker, item one.';
+
+  const parsed = parseCommuteSessionBundleText(JSON.stringify(bundle));
+
+  assert.equal(parsed.events[1]?.kind, 'item_action');
+});
+
 test('rejects raw-email-shaped fields in an embedded queue snapshot', () => {
   const malformed = clone(validBundle);
   const queueSnapshot = malformed.queue_snapshot as Record<string, unknown>;
@@ -154,6 +165,83 @@ test('rejects an out-of-order queue announcement after a next transition', () =>
   );
 });
 
+test('rejects a next transition that names its destination instead of its departing item', () => {
+  const malformed = clone(validBundle);
+  const events = malformed.events as Array<Record<string, unknown>>;
+  const transition = events[2] as Record<string, unknown>;
+  transition.item = {
+    source_item_id: 'tldr-demo-002',
+    title: 'Second exact headline',
+    url: 'https://example.com/second',
+  };
+
+  assert.throws(
+    () => parseCommuteSessionBundleText(JSON.stringify(malformed)),
+    /playback_transition does not match the currently announced item/
+  );
+});
+
+test('accepts a redundant next transition after a skip action', () => {
+  const bundle = clone(validBundle);
+  const events = bundle.events as Array<Record<string, unknown>>;
+  events.splice(2, 0, {
+    event_id: 'event-skip',
+    sequence: 3,
+    kind: 'item_action',
+    action: 'skip',
+    item: {
+      source_item_id: 'tldr-demo-001',
+      title: 'First exact headline',
+      url: 'https://example.com/first',
+    },
+    user_words: 'skip',
+    evidence: [{ source: 'explicit_user_capture', reference: 'Brad said: skip' }],
+  });
+  (events[3] as Record<string, unknown>).sequence = 4;
+  (events[4] as Record<string, unknown>).sequence = 5;
+
+  const parsed = parseCommuteSessionBundleText(JSON.stringify(bundle));
+
+  assert.equal(parsed.events.length, 5);
+});
+
+test('accepts a recovered next transition whose exact departing item follows a missing announcement', () => {
+  const bundle = clone(validBundle);
+  const events = bundle.events as Array<Record<string, unknown>>;
+  events.splice(3, 0, {
+    event_id: 'event-unresolved',
+    sequence: 4,
+    kind: 'unresolved_capture',
+    capture_type: 'wiki_this',
+    user_words: 'Good, wiki this.',
+    recovery_clues: ['The assistant announced the wrong title for the next position.'],
+    evidence: [{ source: 'explicit_user_capture', reference: 'Brad said: wiki this' }],
+  });
+  events.splice(4, 1, {
+    event_id: 'event-recovered-next',
+    sequence: 5,
+    kind: 'playback_transition',
+    transition: 'next',
+    item: {
+      source_item_id: 'tldr-demo-002',
+      title: 'Second exact headline',
+      url: 'https://example.com/second',
+    },
+    evidence: [{ source: 'selected_queue_snapshot', reference: 'Recovered exact queue item.' }],
+  });
+  const integrity = bundle.integrity as Record<string, unknown>;
+  integrity.state = 'recovered';
+  integrity.incomplete_reason = 'Voice omitted the item announcement.';
+  const playback = bundle.playback as Record<string, unknown>;
+  playback.status = 'partial';
+  playback.last_announced_source_item_id = 'tldr-demo-001';
+  playback.resume_source_item_id = 'tldr-demo-002';
+
+  const parsed = parseCommuteSessionBundleText(JSON.stringify(bundle));
+
+  assert.equal(parsed.integrity.state, 'recovered');
+});
+
 test('accepts an unresolved capture without inventing a target item', () => {
   const recovered = clone(validBundle);
   const events = recovered.events as Array<Record<string, unknown>>;
@@ -190,6 +278,18 @@ test('accepts a v2 queue with one explicit N-of-M playback order', () => {
 
   assert.equal(parsed.queue_snapshot.filename, '20260720-tldr-dev.txt');
   assert.equal(parsed.events[3]?.kind, 'item_announced');
+});
+
+test('accepts a new v2 queue without a source-email subject', () => {
+  const bundle = clone(validBundle);
+  const queueSnapshot = bundle.queue_snapshot as Record<string, unknown>;
+  const queue = v2Queue();
+  delete queue.source_email.subject;
+  queueSnapshot.queue = queue;
+
+  const parsed = parseCommuteSessionBundleText(JSON.stringify(bundle));
+
+  assert.equal(parsed.queue_snapshot.queue.source_email !== undefined, true);
 });
 
 test('rejects a v2 queue whose literal spoken position disagrees with its cursor', () => {
@@ -271,6 +371,10 @@ test('accepts a Library-added suffix as the canonical bundle artifact', () => {
   assert.equal(
     bundleArtifactFilenameMatches('unrelated-commute-session-bundle (1).txt', canonical),
     false
+  );
+  assert.equal(
+    bundleArtifactFilenameMatches('202607200745-morning-commute-session-bundle(1).txt', canonical),
+    true
   );
 });
 

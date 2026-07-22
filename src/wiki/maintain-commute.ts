@@ -9,12 +9,21 @@ import { reconcileSessionBundles } from '../commute/import-session-bundles.js';
 import { retrieveMaintenanceSources } from './retrieve-maintenance-sources.js';
 
 const execFileAsync = promisify(execFile);
-const CODEX_EXECUTABLE =
-  process.env.COMMUTE_MAINTAINER_CODEX ?? '/Applications/ChatGPT.app/Contents/Resources/codex';
+type Options =
+  | { kind: 'diagnose_launcher' }
+  | {
+      kind: 'maintain';
+      inputs: string[];
+      outputDir: string;
+    };
 
-interface Options {
-  inputs: string[];
-  outputDir: string;
+const DEFAULT_MAINTAINER_CODEX = '/Applications/ChatGPT.app/Contents/Resources/codex';
+
+export function resolveMaintainerCodexExecutable(
+  environment: Record<string, string | undefined> = process.env
+): string {
+  const configured = environment.COMMUTE_MAINTAINER_CODEX?.trim();
+  return configured && configured.length > 0 ? configured : DEFAULT_MAINTAINER_CODEX;
 }
 
 interface MaintainerOutcome {
@@ -72,6 +81,10 @@ Do not ask Brad for an intermediate approval. The resulting PR is the review poi
 
 async function main(): Promise<void> {
   const options = parseOptions(process.argv.slice(2));
+  if (options.kind === 'diagnose_launcher') {
+    await diagnoseMaintainerLauncher();
+    return;
+  }
   ensurePrivateDirectory(options.outputDir);
   const outputDir = path.resolve(options.outputDir);
   await mkdir(outputDir, { recursive: true });
@@ -130,7 +143,7 @@ async function main(): Promise<void> {
 
   try {
     await execFileAsync(
-      CODEX_EXECUTABLE,
+      resolveMaintainerCodexExecutable(),
       [
         'exec',
         '--sandbox',
@@ -235,9 +248,12 @@ function optionalHttpUrl(candidate: unknown, field: string): string | undefined 
 function parseOptions(args: string[]): Options {
   const inputs: string[] = [];
   let outputDir: string | undefined;
+  let diagnoseLauncher = false;
   for (let index = 0; index < args.length; index += 1) {
     const arg = args[index];
-    if (arg === '--input') {
+    if (arg === '--diagnose-launcher') {
+      diagnoseLauncher = true;
+    } else if (arg === '--input') {
       const input = args[index + 1];
       if (!input) throw new Error('--input requires a bundle filename');
       inputs.push(input);
@@ -251,12 +267,30 @@ function parseOptions(args: string[]): Options {
       throw new Error(`Unknown argument: ${arg ?? ''}`);
     }
   }
+  if (diagnoseLauncher) {
+    if (inputs.length > 0 || outputDir !== undefined) {
+      throw new Error('--diagnose-launcher cannot be combined with maintenance inputs');
+    }
+    return { kind: 'diagnose_launcher' };
+  }
   if (inputs.length === 0 || !outputDir) {
     throw new Error(
-      'Usage: maintain:commute -- --input <bundle.txt> [--input <bundle.txt> ...] --output-dir <private-directory>'
+      'Usage: maintain:commute -- --input <bundle.txt> [--input <bundle.txt> ...] --output-dir <private-directory>, or --diagnose-launcher'
     );
   }
-  return { inputs, outputDir };
+  return { kind: 'maintain', inputs, outputDir };
+}
+
+async function diagnoseMaintainerLauncher(): Promise<void> {
+  const executable = resolveMaintainerCodexExecutable();
+  const { stdout, stderr } = await execFileAsync(executable, ['--version'], {
+    maxBuffer: 1024 * 1024,
+  });
+  const version = `${stdout}${stderr}`.trim();
+  if (version.length === 0) {
+    throw new Error(`Maintainer Codex launcher '${executable}' returned no version output`);
+  }
+  process.stdout.write(`Maintainer Codex launcher is ready: ${executable}\n${version}\n`);
 }
 
 function ensurePrivateDirectory(directory: string): void {

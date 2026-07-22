@@ -44,9 +44,29 @@ loaded a file is not evidence that this occurred.
 
 ### 1. One active queue per Voice session is the provisional car model
 
-A text chat explicitly loads one named queue. Voice begins from that chat and
-uses that queue only. Switching newsletters starts a new text chat and a new
-Voice session. Each such session produces its own self-contained bundle.
+Brad starts a commute session by naming one exact queue filename or one
+unambiguous date plus newsletter in the live `LLM-Wiki-Car` Project. The
+Project deterministically normalizes the latter to its canonical dated v2
+filename (General, Dev, AI, or Fintech), then resolves only that file; Voice
+uses it only. The `Reading:` envelope and playback workflow do not vary by chat
+surface; the visible transcript is not a second interaction mode. Switching
+newsletters starts a new session and a new active queue. Each such session
+produces its own self-contained bundle.
+
+On reaching the final `M of M` item, Voice keeps that item current through the
+same approximately five-second interruption-friendly gap as every other item.
+Only when no command arrives during that gap does it create the queue's
+downloadable bundle. It does not ask which queue is next or begin another queue
+in the same session. Any later date/newsletter or filename request begins a
+distinct session. A failed bundle export is reported as such; it never becomes
+a conversational transition that can silently merge two queues' captures or
+feedback.
+
+This replaces the initial attachment-handoff hypothesis. On July 19, a direct
+Voice request for `20260716-tldr-dev.txt` succeeded from the unified Project
+Library, while a text-attached queue followed by Voice immediately failed the
+strict attachment recheck. The same-Project Library is therefore the observed
+start boundary; a text attachment is optional support, not the contract.
 
 This is an intentionally testable constraint, not a permanent product choice.
 If repeated real commutes show the switch is too awkward, or the platform gains
@@ -124,28 +144,32 @@ defined observable proxy and, where possible, a deterministic local check.
 Those checks reduce risk; they do not promise that the platform retains state
 between turns.
 
-For queue selection, the operator verifies that the exact queue file is visibly
-attached to the _current_ text chat and performs a selection challenge against
-the file, such as matching its filename and first canonical item identity. This
-is a smoke-test proxy for the later Voice session, not proof that a future turn
-will retain the attachment. For session-bundle delivery, the proof is a visible
-download link/Library object followed by local schema and content validation.
+For queue startup, the operator names an exact filename or an unambiguous
+date/newsletter pair. The Project normalizes that request to one canonical
+filename and verifies a reading challenge against its resolved Project-Library
+file: its filename and first canonical N-of-M/title identity. This is a
+smoke-test proxy for the later Voice session, not proof that a future restart
+will retain the active queue. For session-bundle delivery, the proof is a
+visible download link/Library object followed by local schema and content
+validation.
 
 ### 9. A Voice restart is terminal unless a bundle proves otherwise
 
 Voice pause, freeze, or restart SHALL not imply durable continuation. If the
-platform creates a new chat or the selected queue cannot be verified, the prior
+platform creates a new chat or the active queue cannot be verified, the prior
 session is terminal. A final bundle is attempted only when the end-of-session
 artifact can be created; otherwise the session has an explicit missing-artifact
-result. The next session starts from a fresh text-chat selection and may replay
-from a known item; it never claims a remembered resume position.
+result. The next session starts from a fresh date/newsletter or exact-filename
+request and may replay from a known item; it never claims a remembered resume
+position.
 
 ### 10. Bundle delivery has an explicit recovery hierarchy
 
 1. A successful session has one identifiable downloadable bundle artifact that
    is visible in the current chat/Library and later validates locally.
-2. If the artifact is created but contains partial evidence, it declares the
-   evidence sources and affected unresolved captures.
+2. If the complete active queue snapshot is available and the artifact contains
+   partial evidence, it declares the evidence sources and affected unresolved
+   captures.
 3. If artifact creation fails, the chat reports `session export failed: no
 downloadable bundle was created`; it does not claim a ledger, reconstruction,
    or importable handoff exists.
@@ -171,11 +195,14 @@ rejects a `complete` declaration that lacks the required evidence coverage.
 ### 12. Event ordering is required for exact action binding
 
 The bundle records a monotonic sequence of queue states and actions. An
-item-specific action is valid only after that exact item has been announced as
-current and before a later action advances, interrupts, or replaces it. `next`,
-skip, repeat, interrupted discussion, and duplicate speech recognition all
-produce explicit transitions or an unresolved capture. This is a structural
-guard against attaching feedback to any real-but-wrong item in the snapshot.
+item-specific action is valid only when it identifies an exact current queue
+item and has direct user evidence; it does not require Brad to use a memorized
+spoken phrase. `next`, skip, repeat, interrupted discussion, and duplicate
+speech recognition all produce explicit transitions or an unresolved capture.
+For partial/recovered sessions, an exact next transition may repair a missing
+announcement cursor, but never retroactively binds an ambiguous wiki request.
+This is a structural guard against attaching feedback to any real-but-wrong item
+in the snapshot.
 
 ### 13. A commute queue has one canonical playback order
 
@@ -197,17 +224,37 @@ Git history retains the retired format if it is needed for debugging.
 
 ### 14. Voice has a prompt guard; local audit supplies the deterministic check
 
-Immediately before speaking an item, Voice is instructed to silently compare
-the selected filename, literal playback phrase, source ID, title, URL, and
-reading mode against the selected queue. If any part cannot be verified, it
-says `Queue context lost. End this Voice session and start a new text
-selection.` and stops. It neither searches Library, merges queues, nor guesses.
+At session start, Voice is instructed to accept an exact filename or an
+unambiguous date/newsletter request, normalize it to one canonical filename,
+and resolve only that file from the live Project Library. It then says a
+`Reading:` envelope and silently compares the active filename, literal playback
+phrase, source ID, title, URL, and reading mode against that queue. After
+reading begins it neither merges queues nor guesses. If active identity is lost,
+it may recover only by rereading the already named canonical filename from the
+Project Library; it never searches for a similar queue or chooses an article by
+topic.
+
+The live prompt requires an audible item envelope before any content: literal
+N-of-M, reading mode, and title. User navigation alone advances the cursor;
+there is no timed auto-advance. `in_depth` changes only the available detail on
+request; it does not authorize an unsolicited article monologue. Article
+retrieval uses only the verified current queue item's exact URL, not a topical
+match or email subject. At `M of M`, Voice announces completion and waits for an
+explicit command. An end command always attempts a bundle; missing active queue
+context triggers exact named-file recovery. Missing durable event evidence
+limits integrity and event claims, not whether export is attempted.
 
 This is a behavioral prompt guard, not proof that the check occurred. The home
 side instead audits observed announcements against the embedded queue and
 classifies each as exact, wrong-position-or-mode, repeated, foreign, or
 unmatched. A foreign item is not called a hallucination until other available
 input queues have been checked.
+
+Bundle event order has one intentionally minimal transition rule: an
+`item_announced` event identifies the item that became current, while a
+`playback_transition` identifies the item being left. For `next`, the next
+`item_announced` identifies the destination. Recording both items on the
+transition would duplicate identity and add a second mismatch opportunity.
 
 ## Journey Contract
 
@@ -217,9 +264,9 @@ not a claim that every action is implemented in repository code.
 | ID  | Boundary                                    | Input                                                                         | Success outcome and proof                                                                                                                                                                                                   | Failure outcome                                                                                                                         | Must never be guessed                                                                              | Owner                                        |
 | --- | ------------------------------------------- | ----------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- | -------------------------------------------- |
 | J1  | Scheduled Task -> Project Library queue     | Direct TLDR messages delivered today and the Task prompt                      | One real, parseable, dated `.txt` queue per source email is downloadable and present in the `LLM-Wiki-Car` Library. A v2 queue has one explicit N-of-M playback order. The Task Update and artifact contents are the proof. | State which expected queue is absent or invalid; create no filename-only placeholder and do not use Drive or another storage connector. | That a scheduler's “last ran” status proves a usable queue exists.                                 | Task prompt + manual acceptance record       |
-| J2  | Project Library -> selected text chat       | One explicitly named queue file                                               | Text chat confirms the exact filename and loads that queue. The attached/selected filename is the proof.                                                                                                                    | Stop selection; ask for or display the available named queues before Voice starts.                                                      | A queue chosen from conversational recollection or a similarly dated filename.                     | Project instructions                         |
-| J3  | Selected text chat -> Voice session         | Selected queue and current session start                                      | Voice uses that queue only, begins at a known first item, and no prefetch advances the cursor. A session header records the queue filename and identity.                                                                    | End or restart the session when the queue cannot be verified; selecting another queue means a new session.                              | Queue position, item identity, or prior chat attachments after a restart.                          | Project instructions + session contract      |
-| J4  | Voice session -> session bundle             | Current queue snapshot, explicit user actions, and available session evidence | One self-contained bundle records exact captures, feedback, progress, quality incidents, and integrity/recovery state.                                                                                                      | Emit a partial/recovery bundle with unresolved captures; do not pretend the log is complete.                                            | Item IDs, titles, URLs, feedback targets, or ledger completeness.                                  | Session-bundle schema + Project instructions |
+| J2  | Project Library -> active reading           | One exact queue filename or unambiguous date/newsletter request               | The Project normalizes the request to one canonical v2 filename in `LLM-Wiki-Car` Library, confirms it with `Reading: <M> items from <filename>.`, then starts the per-item playback workflow at item 1.                           | Do not begin; ask Brad for a date and newsletter or one exact filename.                                                                  | A queue chosen from conversational recollection, an ambiguous request, or a similarly dated filename. | Project instructions                       |
+| J3  | Active reading -> Voice playback            | Active queue and current session start                                        | Voice uses that queue only, begins at a known first item, and leaves it current until Brad explicitly navigates. At `M of M`, it announces completion and waits for instruction; it does not auto-export. | Recover only the already named canonical file when active identity is lost; otherwise end/restart the session without substituting a queue. | Queue position, item identity, or an attachment handoff after a restart.                           | Project instructions + session contract      |
+| J4  | Voice session -> session bundle             | Complete active queue snapshot, explicit user actions, and available session evidence | One self-contained bundle records exact captures, feedback, progress, quality incidents, and integrity/recovery state.                                                                                                  | On an explicit end command, recover the already named canonical queue from Project Library if necessary and emit a partial/recovered bundle; report failure only when that exact queue or a download cannot be produced. | Item IDs, titles, URLs, feedback targets, queue snapshot, or ledger completeness.                  | Session-bundle schema + Project instructions |
 | J5  | One or more bundles -> local reconciliation | Selected bundle files                                                         | One local command validates/reconciles each bundle and returns one consolidated maintenance input set with per-session results.                                                                                             | Retain and report failed or unresolved records without discarding valid sessions.                                                       | That separate bundle events refer to the same queue/session, or that a reconstruction is complete. | Deterministic local importer                 |
 | J6  | Reconciled inputs -> wiki-maintainer PR     | Saved URLs, captures, feedback context, and existing wiki                     | Maintainer retrieves feasible sources, reads relevant wiki pages, and opens one PR containing useful page/link changes. The PR diff is the proof.                                                                           | Report inaccessible or insufficient sources and leave a traceable maintenance item for later recovery.                                  | That a queue summary is the full source, or that every source deserves a new page.                 | Source retrieval + wiki maintainer           |
 
@@ -264,8 +311,9 @@ This change is a proposed successor to parts of
 | Feedback labels as durable data, cadence-based classifier updates, and private-data handling                                   | Retained, revised here                | Exact in-session binding is a prerequisite; only repeated, measurable corrections affect classifier/profile work.                                                    | Tasks 3.3 and 5.1-5.3.                                                                                                                                      |
 | Existing compiler implementation, safe rendering, source-link preservation, and Pages read path                                | Legacy compatibility only             | Existing code remains usable while J6 is built; its safety checks remain valuable.                                                                                   | Do not remove until direct maintainer PRs work for fixtures and real sources.                                                                               |
 | Bootstrap `approved source`, `public: true`, and local `--confirm-public` gates                                                | Superseded for new maintenance work   | `wiki this` creates a maintenance capture; safeguards validate content and the maintainer writes a PR directly. Git review/merge is the normal human decision point. | Replace as the default only after tasks 3-4 complete and early PRs are reviewed.                                                                            |
-| `docs/commute-voice-handoff.md` and `chatgpt-project/commute-session-*.md`                                                     | Current legacy operating instructions | They remain usable until replacement instructions and bundle support pass real-car tests.                                                                            | Replace in task 2.4/5.4; do not label obsolete prematurely.                                                                                                 |
-| `chatgpt-project/CHATGPT_CAR_QUEUE_PROMPT.md` and `chatgpt-project/wiki-ingestion.md`                                          | Current legacy operating instructions | Their live-ledger and “Approve this” command paths do not govern successor work.                                                                                     | Replace after J2-J6 acceptance; do not upload them with the v2 commute Pilot.                                                                               |
+| `docs/commute-voice-handoff.md` and `chatgpt-project/commute-session-*.md`                                                     | Historical fallback material          | Their live-ledger and reconstructed-handoff paths do not govern v2. The files stay in Git, but are not live Project sources.                                         | The July 19 two-Project test showed that preserving them in a separate live Project makes the commute queue inaccessible.                                   |
+| `chatgpt-project/CHATGPT_CAR_QUEUE_PROMPT.md`                                                                                   | Current v2 operating instructions     | It governs queue selection, Voice playback, and session-bundle export in the one live `LLM-Wiki-Car` Project.                                                        | Replace its legacy contents during the single-Project v2 cutover; retain the earlier text in Git history.                                                    |
+| `chatgpt-project/wiki-ingestion.md` and `schema/approved-wiki-source-v1.schema.json`                                            | Historical fallback material          | Their “Approve this” path does not govern v2. Exact `wiki this` is sufficient to create a maintenance capture for the local maintainer.                              | Do not upload them as live Project sources; retain their files and history while the legacy compiler remains available.                                     |
 | `docs/replan-2026-07-12.md` and `docs/next-session-handoff.md`                                                                 | Historical record                     | They are not current plans. Evidence needed from them is summarized in `docs/commute-wiki-replan-2026-07-16.md` and this change.                                     | Remove from the working documentation set or move to a clearly marked history location after link/reference audit. Git history remains the durable archive. |
 
 ### Requirement Disposition Detail
@@ -306,12 +354,16 @@ following are true:
    bundle.
 
 These are **default/retirement criteria**, not a prohibition on creating and
-using a versioned successor-pilot prompt. Before they pass, an explicitly
-labeled pilot may replace the Project instructions for a controlled commute
-test (including Monday's first J2-J4 test), while the legacy instructions stay
-available as the fallback and continue to govern normal production use. A pilot
-test produces evidence for these criteria; it must not silently be described as
-the new default or cause the legacy instructions to be deleted.
+using a versioned successor prompt for a controlled commute test. The July 19
+two-Project experiment established one additional constraint: queue generation
+and Voice playback must use the same live `LLM-Wiki-Car` Project. A separate
+Pilot makes Project-scoped Library queues unavailable to the Voice session and
+therefore defeats J2/J3 recovery. Before the criteria pass, the v2 instructions
+may replace the legacy instructions in that one Project for a controlled test;
+the earlier instructions stay recoverable in Git but are not competing live
+Project sources. A test produces evidence for these criteria; it must not
+silently be described as the new default or cause the historical material to be
+lost.
 
 At that point, update `AGENTS.md` and the active operator documentation to name
 this change as the governing commute/wiki contract. Keep legacy importer support
@@ -323,7 +375,7 @@ through the normal OpenSpec workflow.
 | Journey ID | OpenSpec capability      | Primary durable artifact                  | Acceptance evidence                               |
 | ---------- | ------------------------ | ----------------------------------------- | ------------------------------------------------- |
 | J1         | `scheduled-queue-output` | Task prompt and real queue files          | Manual Task run record plus parse/preflight check |
-| J2         | `queue-selection`        | Selected queue/session header             | Manual text-chat selection check                  |
+| J2         | `queue-selection`        | Selected queue/session header             | Manual date/newsletter or filename Project-Library selection |
 | J3         | `voice-session`          | Voice session state                       | Real-car smoke test and restart fixture           |
 | J4         | `session-bundle`         | Versioned bundle schema and fixture files | Schema validation and recovery fixtures           |
 | J5         | `commute-import`         | Private normalized import record          | One-command multi-bundle fixture import           |
@@ -354,8 +406,9 @@ example, or a documented platform limitation.
 
 - What smallest spoken/text interaction reliably creates a final bundle in
   ChatGPT Voice without falsely claiming that it wrote an ongoing ledger?
-- Can a new Voice session start from a text chat's selected queue consistently
-  enough on the phone surface?
+- Does date/newsletter-to-canonical-filename Project-Library selection remain
+  reliable across real Voice sessions, freezes, and restarts on the phone
+  surface?
 - What exact source-retrieval fallbacks are sufficient for JavaScript-heavy or
   paywalled article URLs?
 - What cadence and evaluation set should gate classifier/profile changes?

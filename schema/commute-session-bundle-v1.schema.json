@@ -276,7 +276,10 @@
                     "duplicate_recognition"
                   ]
                 },
-                "item": { "$ref": "#/$defs/item" },
+                "item": {
+                  "description": "The item that is current immediately before this transition. For transition next, this is the departing item; the following item_announced event identifies the destination item.",
+                  "$ref": "#/$defs/item"
+                },
                 "evidence": {
                   "type": "array",
                   "minItems": 1,

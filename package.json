@@ -20,6 +20,7 @@
     "import:commute-handoff": "npm run build --silent && node dist/src/commute/import-handoff.js",
     "import:commute-session-bundles": "npm run build --silent && node dist/src/commute/import-session-bundles.js",
     "maintain:commute": "npm run build --silent && node dist/src/wiki/maintain-commute.js",
+    "diagnose:maintain-commute": "npm run build --silent && node dist/src/wiki/maintain-commute.js --diagnose-launcher",
     "validate:commute-queue": "npm run build --silent && node dist/src/commute/validate-queue.js",
     "validate:commute-session-bundle": "npm run build --silent && node dist/src/commute/validate-session-bundle.js",
     "prepare:wiki-drafts": "npm run build --silent && node dist/src/wiki/prepare-handoff-drafts.js",
