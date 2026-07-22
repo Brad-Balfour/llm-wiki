@@ -7,12 +7,19 @@ import {
   type CommuteSessionBundle,
   parseCommuteSessionBundleText,
 } from './session-bundle.js';
+import { recoverSessionBundleWithSuppliedQueue } from './recover-session-bundle.js';
 
 const IMPORT_SCHEMA_VERSION = 'commute-session-import.v1';
 
 interface Options {
-  inputs: string[];
+  inputs: Array<{ bundle: string; recoveryQueue?: string }>;
   output: string;
+}
+
+export interface SessionBundleInput {
+  filename: string;
+  text: string;
+  recoveryQueue?: { filename: string; text: string };
 }
 
 interface ImportedSession {
@@ -53,7 +60,7 @@ export interface CommuteSessionImport {
 }
 
 export function reconcileSessionBundles(
-  inputs: Array<{ filename: string; text: string }>,
+  inputs: SessionBundleInput[],
   importedAt = new Date().toISOString()
 ): CommuteSessionImport {
   const result: CommuteSessionImport = {
@@ -83,6 +90,49 @@ export function reconcileSessionBundles(
       }
       sessionIds.add(bundle.session.session_id);
     } catch (error) {
+      if (input.recoveryQueue) {
+        try {
+          const recovered = recoverSessionBundleWithSuppliedQueue({
+            bundleFilename: input.filename,
+            bundleText: input.text,
+            queueFilename: input.recoveryQueue.filename,
+            queueText: input.recoveryQueue.text,
+          });
+          if (sessionIds.has(recovered.sessionId)) {
+            throw new Error(`Duplicate session_id ${recovered.sessionId}`);
+          }
+          sessionIds.add(recovered.sessionId);
+          result.sessions.push({
+            input_filename: input.filename,
+            status: 'accepted',
+            session_id: recovered.sessionId,
+            integrity_state: 'recovered',
+            queue_filename: recovered.queueFilename,
+          });
+          for (const capture of recovered.wikiCaptures) {
+            const maintenanceKey = [recovered.sessionId, capture.eventId, capture.url].join(':');
+            if (maintenanceKeys.has(maintenanceKey)) continue;
+            maintenanceKeys.add(maintenanceKey);
+            result.maintenance_candidates.push({
+              maintenance_key: maintenanceKey,
+              session_id: recovered.sessionId,
+              event_id: capture.eventId,
+              source_item_id: capture.sourceItemId,
+              title: capture.title,
+              url: capture.url,
+              status: 'pending',
+            });
+          }
+          continue;
+        } catch (recoveryError) {
+          result.sessions.push({
+            input_filename: input.filename,
+            status: 'rejected',
+            error: `Bundle validation failed: ${errorMessage(error)}; supplied-queue recovery failed: ${errorMessage(recoveryError)}`,
+          });
+          continue;
+        }
+      }
       result.sessions.push({
         input_filename: input.filename,
         status: 'rejected',
@@ -144,8 +194,16 @@ async function main(): Promise<void> {
   const options = parseOptions(process.argv.slice(2));
   const inputs = await Promise.all(
     options.inputs.map(async (input) => ({
-      filename: path.basename(input),
-      text: await readFile(input, 'utf8'),
+      filename: path.basename(input.bundle),
+      text: await readFile(input.bundle, 'utf8'),
+      ...(input.recoveryQueue === undefined
+        ? {}
+        : {
+            recoveryQueue: {
+              filename: path.basename(input.recoveryQueue),
+              text: await readFile(input.recoveryQueue, 'utf8'),
+            },
+          }),
     }))
   );
   const result = reconcileSessionBundles(inputs);
@@ -166,7 +224,7 @@ async function main(): Promise<void> {
 }
 
 function parseOptions(args: string[]): Options {
-  const inputs: string[] = [];
+  const inputs: Array<{ bundle: string; recoveryQueue?: string }> = [];
   let output: string | undefined;
 
   for (let index = 0; index < args.length; index += 1) {
@@ -174,7 +232,17 @@ function parseOptions(args: string[]): Options {
     if (arg === '--input') {
       const input = args[index + 1];
       if (!input) throw new Error('--input requires a filename');
-      inputs.push(input);
+      inputs.push({ bundle: input });
+      index += 1;
+    } else if (arg === '--recover-with') {
+      const queue = args[index + 1];
+      const prior = inputs.at(-1);
+      if (!queue || !prior) {
+        throw new Error('--recover-with requires a preceding --input and a queue filename');
+      }
+      if (prior.recoveryQueue)
+        throw new Error('Each --input accepts at most one --recover-with queue');
+      prior.recoveryQueue = queue;
       index += 1;
     } else if (arg === '--output') {
       const value = args[index + 1];
@@ -188,7 +256,7 @@ function parseOptions(args: string[]): Options {
 
   if (inputs.length === 0 || !output) {
     throw new Error(
-      'Usage: import:commute-session-bundles -- --input <bundle.txt> [--input <bundle.txt> ...] --output <private-record.json>'
+      'Usage: import:commute-session-bundles -- --input <bundle.txt> [--recover-with <queue.txt>] [--input <bundle.txt> ...] --output <private-record.json>'
     );
   }
 
