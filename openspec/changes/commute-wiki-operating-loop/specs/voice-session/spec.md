@@ -27,14 +27,16 @@ Library.
 - **THEN** it SHALL keep that final item current through the same approximately
   five-second interruption-friendly gap used after every other item
 - **AND** a `wiki this`, `tell me more`, `repeat`, or `pause` command during
-  that gap SHALL apply to the final item rather than begin export
-- **AND** only when no command arrives during that gap, it SHALL announce that
-  canonical filename as finished and immediately create that queue's
-  downloadable session bundle
+  that gap, or after the finished announcement, SHALL apply to the final item
+  rather than begin export
+- **AND** after the gap it SHALL announce that canonical filename is finished
+  and wait for Brad's instruction
+- **AND** it SHALL create the downloadable session bundle only after an
+  explicit `end commute` or `create bundle` command
 - **AND** it SHALL NOT ask which queue Brad would like next or automatically
   start another queue
-- **AND** after a visible download, a later queue request SHALL start a new
-  session
+- **AND** after a visible bundle download, a later queue request SHALL start a
+  new session
 - **AND** if bundle creation fails, it SHALL report that failure and SHALL NOT
   begin another queue.
 
