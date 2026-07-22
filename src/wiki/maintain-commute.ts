@@ -13,7 +13,7 @@ type Options =
   | { kind: 'diagnose_launcher' }
   | {
       kind: 'maintain';
-      inputs: string[];
+      inputs: Array<{ bundle: string; recoveryQueue?: string }>;
       outputDir: string;
     };
 
@@ -91,8 +91,16 @@ async function main(): Promise<void> {
 
   const bundleInputs = await Promise.all(
     options.inputs.map(async (input) => ({
-      filename: path.basename(input),
-      text: await readFile(input, 'utf8'),
+      filename: path.basename(input.bundle),
+      text: await readFile(input.bundle, 'utf8'),
+      ...(input.recoveryQueue === undefined
+        ? {}
+        : {
+            recoveryQueue: {
+              filename: path.basename(input.recoveryQueue),
+              text: await readFile(input.recoveryQueue, 'utf8'),
+            },
+          }),
     }))
   );
   const intake = reconcileSessionBundles(bundleInputs);
@@ -246,7 +254,7 @@ function optionalHttpUrl(candidate: unknown, field: string): string | undefined 
 }
 
 function parseOptions(args: string[]): Options {
-  const inputs: string[] = [];
+  const inputs: Array<{ bundle: string; recoveryQueue?: string }> = [];
   let outputDir: string | undefined;
   let diagnoseLauncher = false;
   for (let index = 0; index < args.length; index += 1) {
@@ -256,7 +264,17 @@ function parseOptions(args: string[]): Options {
     } else if (arg === '--input') {
       const input = args[index + 1];
       if (!input) throw new Error('--input requires a bundle filename');
-      inputs.push(input);
+      inputs.push({ bundle: input });
+      index += 1;
+    } else if (arg === '--recover-with') {
+      const queue = args[index + 1];
+      const prior = inputs.at(-1);
+      if (!queue || !prior) {
+        throw new Error('--recover-with requires a preceding --input and a queue filename');
+      }
+      if (prior.recoveryQueue)
+        throw new Error('Each --input accepts at most one --recover-with queue');
+      prior.recoveryQueue = queue;
       index += 1;
     } else if (arg === '--output-dir') {
       const output = args[index + 1];
@@ -275,7 +293,7 @@ function parseOptions(args: string[]): Options {
   }
   if (inputs.length === 0 || !outputDir) {
     throw new Error(
-      'Usage: maintain:commute -- --input <bundle.txt> [--input <bundle.txt> ...] --output-dir <private-directory>, or --diagnose-launcher'
+      'Usage: maintain:commute -- --input <bundle.txt> [--recover-with <queue.txt>] [--input <bundle.txt> ...] --output-dir <private-directory>, or --diagnose-launcher'
     );
   }
   return { kind: 'maintain', inputs, outputDir };

@@ -85,6 +85,21 @@ is `morning`; 12:00 or later is `evening`.
 - **AND** it SHALL report export failure only if that exact file cannot be
   reloaded or no downloadable artifact can be created.
 
+#### Scenario: Local recovery uses a supplied matching queue
+
+- **WHEN** a downloaded bundle is malformed but names its selected queue file
+  and Brad supplies that exact queue file to local intake
+- **THEN** local intake MAY recover an explicitly marked wiki capture by mapping
+  an exact item identifier or one-based legacy item position to the supplied
+  queue's exact identifier, title, and URL
+- **AND** the supplied queue filename SHALL exactly match the filename declared
+  by the malformed bundle
+- **AND** the recovered session SHALL be marked `recovered`
+- **AND** the importer SHALL reject a mismatched queue, an out-of-range position,
+  or an event that was not explicitly marked as a wiki capture
+- **AND** local intake SHALL not access the private ChatGPT Project Library;
+  Brad supplies the queue download when this rare recovery is needed.
+
 ### Requirement: Exact Item Binding
 
 Item-specific feedback or wiki captures SHALL refer to an exact active queue

@@ -56,6 +56,19 @@ npm run validate:commute-session-bundle -- \
   --queue /path/to/selected-queue.txt
 ```
 
+If an older malformed bundle names its queue but omitted its snapshot, recover
+only its explicitly marked wiki saves by placing `--recover-with` immediately
+after that bundle's `--input`. The supplied queue must have exactly the filename
+the malformed bundle declares; local tools cannot read the private Project
+Library themselves.
+
+```sh
+npm run import:commute-session-bundles -- \
+  --input /path/to/malformed-bundle.txt \
+  --recover-with /path/to/named-queue.txt \
+  --output .private/commute-session-imports/recovered.json
+```
+
 The deliberately retired v1 queue prompt, schema, fixture, and separate-Project
 Pilot prompt are absent from this working tree. They are recoverable from Git
 history, but must not be uploaded alongside v2 sources.
@@ -80,6 +93,9 @@ npm run import:commute-session-bundles -- \
   --input /path/to/evening-bundle.txt \
   --output .private/commute-session-imports/20260720.json
 ```
+
+The top-level maintainer accepts the same adjacent `--recover-with` form when
+you want recovery and wiki maintenance in one run.
 
 This command is an internal/diagnostic stage, not a user approval gate. The
 top-level `maintain:commute` command invokes this intake, retrieves nominated
