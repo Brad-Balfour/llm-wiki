@@ -160,6 +160,36 @@ No higher reasoning setting is required to run this probe. A stronger model can
 help analyze the captured evidence afterward, but it cannot make an unavailable
 Library result appear.
 
+### July 22 Home Probe Result
+
+Brad ran the probe at home over Wi-Fi in one text chat and two Voice-chat
+segments. The evidence is encouraging, but it does not isolate network type:
+
+| Surface            | What the transcript establishes                                                                                                                                                                       | What it does not establish                                                                                                                                                                                                    |
+| ------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Text chat          | A recent-file listing returned current General and Dev queues plus older candidates. A later exact lookup returned `20260722-tldr-ai.txt` with the expected edition date, newsletter, and first item. | The chat began with an uploaded file, so its result is not a pure Project-Library-only control. The initial recent-file list also did not include that current AI queue.                                                      |
+| Initial Voice chat | Before any manual upload, Voice found `20260722-tldr-dev.txt`, read its July 22 / TLDR Dev / eight-item metadata and first item, then listed recent queue candidates.                                 | The recent listing claimed that today's AI and Fintech queues were absent, even though the text probe later found today's AI queue. This is evidence of incomplete or variable discovery, not proof that the file was absent. |
+| Resumed Voice chat | After the drop and manual attachment, Voice read the attached Dev queue's edition date, newsletter, and first item correctly.                                                                         | It does not test Project-Library discovery after a restart, because the attachment supplied the queue directly.                                                                                                               |
+
+Wi-Fi is therefore a plausible factor in session continuity, latency, or Voice
+transport, but this evidence weakens the stronger claim that cellular is what
+makes Library discovery unavailable: exact discovery worked in the initial
+Voice chat. The current confounds are fresh short home sessions, different
+attachment state, different project/index visibility, and the lack of real-car
+interruption or restart conditions.
+
+The next controlled test should hold the Project, dated queue, device, model,
+and spoken prompt constant, with no manual attachment before the lookup:
+
+1. Run the exact-name lookup and recent-file listing once on Wi-Fi and once on
+   cellular while parked.
+2. Record the visible transcript, whether the exact queue is found, and the
+   filename/date/newsletter metadata of every proposed fallback.
+3. Only after a failure, attach the same queue manually and record whether its
+   metadata becomes readable.
+4. Repeat the same pair during a real commute only if the parked A/B result is
+   clear; do not change network, queue, and restart state in one experiment.
+
 ## Deferred Cleanup Question
 
 Assess whether the retired `v2-pilot` ChatGPT Project can now be deleted and
