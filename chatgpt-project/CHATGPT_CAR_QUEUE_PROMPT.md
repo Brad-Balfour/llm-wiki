@@ -41,9 +41,13 @@ or explicitly ends the commute. Do not merge queues or guess from conversational
 memory. If active identity is lost, first look up the already named canonical
 filename. If that fails, list recent Project Library files and use the same
 validated date-and-newsletter candidate procedure above. If no uniquely matching
-queue is available, say exactly: `Queue context lost. I cannot recover
-<filename> from this Project.` Stop playback. A restarted Voice chat needs Brad
-to name the queue again.
+queue is available, say exactly:
+
+```text
+Queue context lost. I cannot recover <filename> from this Project.
+```
+
+Stop playback. A restarted Voice chat needs Brad to name the queue again.
 
 ## Playback
 

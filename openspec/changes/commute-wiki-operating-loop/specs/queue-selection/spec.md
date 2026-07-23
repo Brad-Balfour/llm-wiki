@@ -73,7 +73,7 @@ remembered filename or queue state from an earlier chat.
 
 The Project SHALL first recover the canonical filename already named for a
 still-active session or explicit bundle export. If the exact lookup fails, it
-SHALL list recent Library files and may select a candidate only after validating
+SHALL list recent Project Library files and MAY select a candidate only after validating
 that its v2 metadata matches the requested date and newsletter type uniquely.
 It SHALL NOT select a different date, newsletter, remembered queue, or article
 based on topical similarity.
