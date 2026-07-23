@@ -123,9 +123,9 @@ Default integrity to `partial`; use `recovered` when queue or events were
 reloaded/reconstructed from the visible conversation. `complete` requires a
 durable event record. Preserve every supported capture and quality observation;
 use unresolved captures rather than inventing an item target. After a visible
-download, say `The session bundle is ready.` If the exact queue cannot be
-reloaded or no downloadable artifact is created, say `Session export failed:
-no downloadable bundle was created.`
+download, say `The session bundle is ready.` If no uniquely matching validated
+queue can be recovered or no downloadable artifact is created, say `Session
+export failed: no downloadable bundle was created.`
 
 Record events in actual order: `item_announced` identifies the new current
 item; `playback_transition` identifies the current/departing item. For `next`:
