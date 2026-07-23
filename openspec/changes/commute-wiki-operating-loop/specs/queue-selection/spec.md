@@ -2,7 +2,7 @@
 
 ## ADDED Requirements
 
-### Requirement: Exact Project-Library Queue Startup
+### Requirement: Validated Project-Library Queue Startup
 
 Before playback begins, the Project SHALL bind the session to one
 unambiguously named `tldr-commute-queue.v2` file in the live Project Library.
@@ -12,8 +12,14 @@ unambiguously named `tldr-commute-queue.v2` file in the live Project Library.
 - **WHEN** Brad names either one exact queue filename or an unambiguous date
   plus newsletter name in the live `LLM-Wiki-Car` Project
 - **THEN** the Project SHALL normalize bare TLDR/General, Dev, AI, and Fintech
-  to one dated canonical filename and MAY look up only that filename in its
+  to one dated canonical filename and SHALL first look up that filename in its
   Project Library
+- **AND** when that exact lookup fails, it SHALL list recent Project Library
+  files and MAY inspect plausible queue candidates
+- **AND** it SHALL select a fallback only when validated v2 queue metadata
+  matches the requested edition date and newsletter type uniquely
+- **AND** it SHALL NOT select an older date, a different newsletter, or a merely
+  similar title or filename
 - **AND** it SHALL validate that file as a v2 queue before playback
 - **AND** the `Reading: <M> items from <filename>.` envelope SHALL match that
   file's total item count and filename
@@ -63,18 +69,23 @@ remembered filename or queue state from an earlier chat.
 - **AND** it SHALL require Brad to name a date/newsletter pair or one exact
   filename again before playback.
 
-### Requirement: Exact Named-Queue Recovery
+### Requirement: Named-Queue Recovery With Validated Discovery Fallback
 
-When active queue context is lost during a still-active session or explicit
-bundle export, the Project SHALL recover only the canonical filename already
-named for that session. It SHALL NOT select a similar file, a remembered queue,
-or an article based on topical similarity.
+The Project SHALL first recover the canonical filename already named for a
+still-active session or explicit bundle export. If the exact lookup fails, it
+SHALL list recent Library files and may select a candidate only after validating
+that its v2 metadata matches the requested date and newsletter type uniquely.
+It SHALL NOT select a different date, newsletter, remembered queue, or article
+based on topical similarity.
 
 #### Scenario: Active context is lost before export
 
 - **WHEN** Brad asks to create a bundle and the complete active queue JSON is
   absent from working context
-- **THEN** the Project SHALL look up only the previously named canonical
+- **THEN** the Project SHALL first look up the previously named canonical
   filename in its Project Library
-- **AND** it SHALL use the recovered exact queue snapshot if it is valid
+- **AND** when that exact lookup fails, it SHALL list recent Project Library
+  files and select only a uniquely matching validated candidate for the
+  requested date and newsletter type
+- **AND** it SHALL use the recovered validated queue snapshot if it is valid
 - **AND** it SHALL mark reconstruction as recovered rather than complete.

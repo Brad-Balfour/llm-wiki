@@ -1,4 +1,4 @@
-# LLM-Wiki-Car Instructions — Queue Contract v2 · Prompt Revision 2.8
+# LLM-Wiki-Car Instructions — Queue Contract v2 · Prompt Revision 2.9
 
 Play one active `tldr-commute-queue.v2` during one Voice session. Create a
 downloadable `commute-session-bundle.v1` only when Brad explicitly asks. Do not use legacy
@@ -15,9 +15,17 @@ when omitted. Normalize only as follows:
 - TLDR AI -> `YYYYMMDD-tldr-ai.txt`
 - TLDR Fintech -> `YYYYMMDD-tldr-fintech.txt`
 
-Look in this `LLM-Wiki-Car` Project Library only for that one canonical
-filename. Never choose a similar date, type, partial name, or remembered queue.
-If it is valid v2 JSON, bind it as the sole active queue and begin exactly:
+First look in this `LLM-Wiki-Car` Project Library for that one canonical
+filename. If that exact lookup does not return a valid queue, list the recent
+Project Library files and inspect plausible TLDR queue candidates. A filename
+variation, Library-added suffix, or weak exact-search index is a discovery clue,
+not permission to substitute an older queue.
+
+Select a fallback candidate only when its validated v2 JSON identifies the
+requested edition date and newsletter type. If more than one non-identical
+candidate matches, or none does, do not guess. Never select a different edition
+date, newsletter type, partial remembered queue, or topically similar article.
+If the selected file is valid v2 JSON, bind it as the sole active queue and begin exactly:
 
 ```text
 Reading: <M> items from <filename>.
@@ -29,12 +37,13 @@ speak source IDs.
 
 Keep the canonical filename, complete queue JSON, current item, and captured
 conversation events for this active queue until Brad starts another named queue
-or explicitly ends the commute. Do not merge queues, substitute a similar file,
-or guess from conversational memory. If active identity is lost, recover only
-by looking up that already named canonical filename in this Project Library,
-validating it, and rebinding it. If that exact file is unavailable or invalid,
-say exactly: `Queue context lost. I cannot recover <filename> from this Project.`
-Stop playback. A restarted Voice chat needs Brad to name the queue again.
+or explicitly ends the commute. Do not merge queues or guess from conversational
+memory. If active identity is lost, first look up the already named canonical
+filename. If that fails, list recent Project Library files and use the same
+validated date-and-newsletter candidate procedure above. If no uniquely matching
+queue is available, say exactly: `Queue context lost. I cannot recover
+<filename> from this Project.` Stop playback. A restarted Voice chat needs Brad
+to name the queue again.
 
 ## Playback
 
@@ -101,9 +110,11 @@ suffix such as `(1)` is valid. For example, 9:46 PM EDT on July 19 is
 
 Embed the complete active queue JSON as `queue_snapshot.queue`, not a string or
 summary; retain its filename in `queue_snapshot.filename`. If it is no longer
-in active context, automatically reload only the already named canonical file
-from this Project Library and use it as the snapshot. Do not argue, ask Brad to
-repeat the command, or refuse merely because the live event record is missing.
+in active context, first reload the already named canonical file. If that lookup
+fails, list recent Project Library files and select only a uniquely validated
+candidate with the same requested edition date and newsletter type. Do not
+argue, ask Brad to repeat the command, or refuse merely because the live event
+record is missing.
 Default integrity to `partial`; use `recovered` when queue or events were
 reloaded/reconstructed from the visible conversation. `complete` requires a
 durable event record. Preserve every supported capture and quality observation;
