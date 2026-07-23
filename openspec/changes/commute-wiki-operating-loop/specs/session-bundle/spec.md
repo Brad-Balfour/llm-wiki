@@ -78,12 +78,15 @@ is `morning`; 12:00 or later is `evening`.
 
 - **WHEN** the Project no longer has the complete active queue JSON needed for
   `queue_snapshot.queue`
-- **THEN** it SHALL automatically reload only the already named canonical queue
-  filename from the Project Library
+- **THEN** it SHALL first reload the already named canonical queue filename from
+  the Project Library
+- **AND** when that exact lookup fails, it SHALL list recent Project Library
+  files and select only a uniquely validated candidate whose edition date and
+  newsletter type match the original request
 - **AND** if it finds valid queue JSON, it SHALL emit the requested bundle with
   `recovered` integrity and only evidence-supported events
-- **AND** it SHALL report export failure only if that exact file cannot be
-  reloaded or no downloadable artifact can be created.
+- **AND** it SHALL report export failure only if no uniquely matching validated
+  queue can be recovered or no downloadable artifact can be created.
 
 #### Scenario: Local recovery uses a supplied matching queue
 
