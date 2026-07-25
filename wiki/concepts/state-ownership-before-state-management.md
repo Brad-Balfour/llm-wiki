@@ -5,12 +5,12 @@ title: 'State Ownership Before State Management'
 aliases: ["Classify state before choosing a library","Do we need state management libraries anymore?"]
 # prettier-ignore
 tags: ["react","state-management","software-design","frontend"]
-permalink: /wiki/state-ownership-before-state-management/
+wiki_slug: state-ownership-before-state-management
 created: 2026-07-25
 updated: 2026-07-25
-confidence: high
+confidence: medium
 # prettier-ignore
-provenance: [{"source_item_id":"dev-20260724-02","source_path":"sources/tldr/2026-07-24-state-ownership.txt","url":"https://neciudan.dev/do-we-need-state-management-libraries-anymore"}]
+provenance: [{"source_item_id":"dev-20260724-02","source_path":"sources/tldr/2026-07-24-state-ownership.txt","url":"https://tldr.tech/dev/2026-07-24"}]
 ---
 
 # State Ownership Before State Management
@@ -41,17 +41,23 @@ Classify the state before evaluating a general-purpose store:
 6. **Mutable global client state:** the residual category that may justify
    Zustand, Redux, or another external store.
 
-The article's small Zustand-like implementation is valuable for exposing the
-mechanics and pitfalls—subscriptions, stale selector closures, tearing, and
-selectors that create fresh values. It is not by itself a reason to own a
-production state library. The decision should weigh library complexity against
+The TLDR summary says the source rebuilds a small Zustand-like implementation
+and encounters subscription races, stale selector closures, and selectors that
+create fresh values. Those examples are useful for understanding why a tiny
+store is not automatically production-ready. The broader decision guidance
+here is synthesis from the commute discussion: weigh library complexity against
 the maintenance and correctness work an established implementation already
 absorbs.
 
 ## Source Notes
 
-### [Do we need state management libraries anymore?](https://neciudan.dev/do-we-need-state-management-libraries-anymore)
+### [Do we need state management libraries anymore? (TLDR summary)](https://tldr.tech/dev/2026-07-24)
 
 <!-- source-item-id: dev-20260724-02 -->
 
 TLDR Dev, 2026-07-24.
+
+The original article URL in the commute queue was inaccessible during the July
+25 maintenance pass. This page therefore uses the retrievable TLDR edition for
+provenance and labels discussion-derived guidance as synthesis rather than
+claiming the full article was retrieved.

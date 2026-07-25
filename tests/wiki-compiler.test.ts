@@ -22,7 +22,7 @@ test('creates an OKF entry from an explicitly approved TLDR source', async () =>
   assert.match(result.markdown, /title: 'Context Engineering'/);
   assert.match(result.markdown, /created: 2026-07-12/);
   assert.match(result.markdown, /updated: 2026-07-12/);
-  assert.match(result.markdown, /permalink: \/wiki\/context-engineering\//);
+  assert.match(result.markdown, /wiki_slug: context-engineering/);
   assert.match(result.markdown, /confidence: medium/);
   assert.match(result.markdown, /"source_item_id":"tldr-ai-2026-07-12-context-engineering"/);
 });
@@ -43,11 +43,11 @@ test('updates an entry without losing prior provenance', async () => {
   assert.match(updated.markdown, /updated: 2026-07-13/);
   assert.match(
     updated.markdown,
-    /- \[prompt-engineering\]\(\{\{ '\/wiki\/prompt-engineering\/' \| relative_url \}\}\)/
+    /- \{% include wiki-related-link\.md slug="prompt-engineering" %\}/
   );
   assert.match(
     updated.markdown,
-    /- \[agent-observability\]\(\{\{ '\/wiki\/agent-observability\/' \| relative_url \}\}\)/
+    /- \{% include wiki-related-link\.md slug="agent-observability" %\}/
   );
 });
 

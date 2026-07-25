@@ -5,7 +5,7 @@ title: 'Kiro'
 aliases: ["AWS Kiro"]
 # prettier-ignore
 tags: ["ai-ide","spec-driven-development","developer-tools","agentic-coding"]
-permalink: /wiki/kiro/
+wiki_slug: kiro
 created: 2026-07-22
 updated: 2026-07-22
 confidence: high
@@ -71,5 +71,5 @@ time of an adoption decision.
 
 ## Related
 
-- [ai-native-software-engineering]({{ '/wiki/ai-native-software-engineering/' | relative_url }})
-- [production-ai-agent-architecture]({{ '/wiki/production-ai-agent-architecture/' | relative_url }})
+- {% include wiki-related-link.md slug="ai-native-software-engineering" %}
+- {% include wiki-related-link.md slug="production-ai-agent-architecture" %}

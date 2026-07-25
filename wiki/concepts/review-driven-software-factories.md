@@ -5,7 +5,7 @@ title: 'Review-Driven Software Factories'
 aliases: ["Why Software Factories Fail","Human-in-the-loop software factories"]
 # prettier-ignore
 tags: ["ai-agents","software-design","planning","code-review","context-management"]
-permalink: /wiki/review-driven-software-factories/
+wiki_slug: review-driven-software-factories
 created: 2026-07-25
 updated: 2026-07-25
 confidence: medium
@@ -56,6 +56,6 @@ optimal.
 
 ## Related
 
-- [ai-native-software-engineering]({{ '/wiki/ai-native-software-engineering/' | relative_url }})
-- [agent-context-handoff]({{ '/wiki/agent-context-handoff/' | relative_url }})
-- [claude-code-subagents]({{ '/wiki/claude-code-subagents/' | relative_url }})
+- {% include wiki-related-link.md slug="ai-native-software-engineering" %}
+- {% include wiki-related-link.md slug="agent-context-handoff" %}
+- {% include wiki-related-link.md slug="claude-code-subagents" %}

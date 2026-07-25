@@ -5,7 +5,7 @@ title: 'AI-Native Software Engineering'
 aliases: ["Control the ideas, not the code","Engineer away the slop"]
 # prettier-ignore
 tags: ["ai-engineering","software-design","correctness","code-review","formal-verification","quality-gates"]
-permalink: /wiki/ai-native-software-engineering/
+wiki_slug: ai-native-software-engineering
 created: 2026-07-16
 updated: 2026-07-25
 confidence: high
@@ -59,5 +59,5 @@ not be treated as proof that these methods are already routine.
 
 ## Related
 
-- [deterministic-agent-workflows]({{ '/wiki/deterministic-agent-workflows/' | relative_url }})
-- [review-driven-software-factories]({{ '/wiki/review-driven-software-factories/' | relative_url }})
+- {% include wiki-related-link.md slug="deterministic-agent-workflows" %}
+- {% include wiki-related-link.md slug="review-driven-software-factories" %}

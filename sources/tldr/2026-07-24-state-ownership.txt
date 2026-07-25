@@ -15,8 +15,8 @@
     "source_item_id": "dev-20260724-02",
     "source_path": "sources/tldr/2026-07-24-state-ownership.txt",
     "source_type": "tldr",
-    "title": "Do we need state management libraries anymore?",
-    "url": "https://neciudan.dev/do-we-need-state-management-libraries-anymore",
+    "title": "Do we need state management libraries anymore? (TLDR summary)",
+    "url": "https://tldr.tech/dev/2026-07-24",
     "newsletter": "TLDR Dev",
     "edition_date": "2026-07-24"
   },
@@ -34,7 +34,7 @@
       "software-design",
       "frontend"
     ],
-    "confidence": "high",
+    "confidence": "medium",
     "summary": "A React application should classify each piece of state by ownership and source of truth before introducing a general-purpose client store.",
     "key_ideas": [
       "Keep local interface state local with React primitives.",

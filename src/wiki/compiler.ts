@@ -97,7 +97,7 @@ function renderEntry(
     `aliases: ${JSON.stringify(source.entry.aliases)}`,
     '# prettier-ignore',
     `tags: ${JSON.stringify(source.entry.tags)}`,
-    `permalink: /wiki/${source.entry.slug}/`,
+    `wiki_slug: ${source.entry.slug}`,
     `created: ${created}`,
     `updated: ${updated}`,
     `confidence: ${source.entry.confidence}`,
@@ -168,7 +168,7 @@ function appendSourceNote(body: string, source: ApprovedWikiSource): string {
 
 function mergeRelatedLinks(body: string, related: string[]): string {
   const missing = related.filter(
-    (slug) => !body.includes(`- [[${slug}]]`) && !body.includes(relatedHref(slug))
+    (slug) => !body.includes(`- [[${slug}]]`) && !body.includes(renderRelatedLink(slug))
   );
   if (missing.length === 0) {
     return body;
@@ -254,9 +254,5 @@ function escapeMarkdownText(value: string): string {
 }
 
 function renderRelatedLink(slug: string): string {
-  return `- [${slug}](${relatedHref(slug)})`;
-}
-
-function relatedHref(slug: string): string {
-  return `{{ '/wiki/${slug}/' | relative_url }}`;
+  return `- {% include wiki-related-link.md slug="${slug}" %}`;
 }
