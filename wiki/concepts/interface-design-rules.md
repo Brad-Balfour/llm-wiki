@@ -5,6 +5,7 @@ title: 'Interface Design Rules'
 aliases: ["Safer visual design rules"]
 # prettier-ignore
 tags: ["design","interfaces","accessibility","visual-hierarchy"]
+wiki_slug: interface-design-rules
 created: 2026-07-21
 updated: 2026-07-21
 confidence: medium

@@ -5,6 +5,7 @@ title: 'Clawk'
 aliases: []
 # prettier-ignore
 tags: ["coding-agents","sandboxing","virtual-machines","network-controls"]
+wiki_slug: clawk
 created: 2026-07-16
 updated: 2026-07-16
 confidence: medium

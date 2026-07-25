@@ -5,6 +5,7 @@ title: 'Agentic Economy'
 aliases: ["The Agentic Economy treatise"]
 # prettier-ignore
 tags: ["ai-economics","ai-agents","macro-trends"]
+wiki_slug: agentic-economy
 created: 2026-07-16
 updated: 2026-07-16
 confidence: low

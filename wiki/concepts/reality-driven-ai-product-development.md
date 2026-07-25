@@ -5,6 +5,7 @@ title: 'Reality-Driven AI Product Development'
 aliases: ["Punch Yourself in the Face with Reality"]
 # prettier-ignore
 tags: ["ai-product-development","product-validation","engineering-judgment"]
+wiki_slug: reality-driven-ai-product-development
 created: 2026-07-17
 updated: 2026-07-17
 confidence: medium
@@ -32,4 +33,4 @@ TLDR Dev, 2026-07-15.
 
 ## Related
 
-- [[ai-native-software-engineering]]
+- {% include wiki-related-link.md slug="ai-native-software-engineering" %}

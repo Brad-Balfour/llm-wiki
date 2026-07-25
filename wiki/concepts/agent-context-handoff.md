@@ -5,6 +5,7 @@ title: 'Agent Context Handoff'
 aliases: ["Preserving an agent trajectory"]
 # prettier-ignore
 tags: ["ai-agents","context-management","model-routing","software-engineering"]
+wiki_slug: agent-context-handoff
 created: 2026-07-21
 updated: 2026-07-21
 confidence: medium
@@ -34,5 +35,5 @@ Saved from TLDR Dev, 2026-07-21.
 
 ## Related
 
-- [[deterministic-agent-workflows]]
-- [[ai-native-software-engineering]]
+- {% include wiki-related-link.md slug="deterministic-agent-workflows" %}
+- {% include wiki-related-link.md slug="ai-native-software-engineering" %}

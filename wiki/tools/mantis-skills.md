@@ -5,6 +5,7 @@ title: 'Mantis Skills'
 aliases: ["Mantis Skills: Portable Toolkit for Building Security Review Harnesses"]
 # prettier-ignore
 tags: ["coding-agents","security-review","threat-modeling","risk-calibration"]
+wiki_slug: mantis-skills
 created: 2026-07-16
 updated: 2026-07-16
 confidence: medium

@@ -3,6 +3,7 @@ type: concept
 title: 'Entry title'
 aliases: []
 tags: []
+wiki_slug: entry-slug
 created: YYYY-MM-DD
 updated: YYYY-MM-DD
 confidence: low

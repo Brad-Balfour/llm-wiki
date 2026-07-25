@@ -5,6 +5,7 @@ title: 'Codex Resets'
 aliases: []
 # prettier-ignore
 tags: ["coding-agents","usage-limits","service-reliability"]
+wiki_slug: codex-resets
 created: 2026-07-21
 updated: 2026-07-21
 confidence: medium

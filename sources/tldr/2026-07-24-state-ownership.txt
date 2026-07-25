@@ -1,0 +1,47 @@
+{
+  "schema_version": "approved-wiki-source.v1",
+  "approval": {
+    "status": "approved",
+    "public": true,
+    "approved_at": "2026-07-25T16:00:00Z",
+    "reviewed_by": "brad",
+    "safety_review": {
+      "privacy": "cleared",
+      "publication_rights": "cleared",
+      "dual_use": "cleared"
+    }
+  },
+  "source": {
+    "source_item_id": "dev-20260724-02",
+    "source_path": "sources/tldr/2026-07-24-state-ownership.txt",
+    "source_type": "tldr",
+    "title": "Do we need state management libraries anymore? (TLDR summary)",
+    "url": "https://tldr.tech/dev/2026-07-24",
+    "newsletter": "TLDR Dev",
+    "edition_date": "2026-07-24"
+  },
+  "entry": {
+    "type": "concept",
+    "slug": "state-ownership-before-state-management",
+    "title": "State Ownership Before State Management",
+    "aliases": [
+      "Classify state before choosing a library",
+      "Do we need state management libraries anymore?"
+    ],
+    "tags": [
+      "react",
+      "state-management",
+      "software-design",
+      "frontend"
+    ],
+    "confidence": "medium",
+    "summary": "A React application should classify each piece of state by ownership and source of truth before introducing a general-purpose client store.",
+    "key_ideas": [
+      "Keep local interface state local with React primitives.",
+      "Use server-state and URL-state tools for data whose source of truth is not a global client store.",
+      "Context fits stable shared configuration; a mutable global store is for the smaller residual category.",
+      "A small implementation can teach the mechanism, but established libraries still carry maintenance and correctness value."
+    ],
+    "related": []
+  }
+}

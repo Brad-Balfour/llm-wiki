@@ -5,6 +5,7 @@ title: 'Production AI Agent Architecture'
 aliases: ["How Microsoft Ships Thousands of Production AI Agents"]
 # prettier-ignore
 tags: ["ai-agents","production-systems","identity","evaluation"]
+wiki_slug: production-ai-agent-architecture
 created: 2026-07-16
 updated: 2026-07-16
 confidence: medium

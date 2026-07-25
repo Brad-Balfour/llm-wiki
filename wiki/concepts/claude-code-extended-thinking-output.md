@@ -5,6 +5,7 @@ title: 'Claude Code Extended Thinking Output'
 aliases: ["Claude Code thinking blocks","encrypted reasoning signature"]
 # prettier-ignore
 tags: ["claude-code","extended-thinking","reasoning","auditability"]
+wiki_slug: claude-code-extended-thinking-output
 created: 2026-07-13
 updated: 2026-07-13
 confidence: medium
