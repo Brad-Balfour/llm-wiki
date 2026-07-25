@@ -48,6 +48,14 @@ interface ReconciledEvent {
   event: CommuteSessionBundle['events'][number];
 }
 
+interface EventConversion {
+  session_id: string;
+  event_id: string;
+  reason: string;
+  original_event: CommuteSessionBundle['events'][number];
+  converted_event: CommuteSessionBundle['events'][number];
+}
+
 export interface CommuteSessionImport {
   schema_version: typeof IMPORT_SCHEMA_VERSION;
   imported_at: string;
@@ -57,6 +65,7 @@ export interface CommuteSessionImport {
   unresolved_captures: ReconciledEvent[];
   quality_incidents: ReconciledEvent[];
   general_captures: ReconciledEvent[];
+  event_conversions: EventConversion[];
 }
 
 export function reconcileSessionBundles(
@@ -72,6 +81,7 @@ export function reconcileSessionBundles(
     unresolved_captures: [],
     quality_incidents: [],
     general_captures: [],
+    event_conversions: [],
   };
   const sessionIds = new Set<string>();
   const maintenanceKeys = new Set<string>();
@@ -174,6 +184,34 @@ export function reconcileSessionBundles(
               status: 'pending',
             });
           }
+        } else if (
+          event.action === 'promote_to_in_depth' &&
+          queueItemConsumptionDepth(bundle, event.item.source_item_id) === 'in_depth'
+        ) {
+          const convertedEvent: CommuteSessionBundle['events'][number] = {
+            event_id: `${event.event_id}:quality-incident`,
+            sequence: event.sequence,
+            kind: 'quality_incident',
+            observed_behavior:
+              `A promote_to_in_depth action was recorded for "${event.item.title}", ` +
+              'but the embedded canonical queue already classified that item as in_depth.',
+            boundary: 'bundle import semantic normalization',
+            evidence: event.evidence,
+          };
+          result.event_conversions.push({
+            session_id: bundle.session.session_id,
+            event_id: event.event_id,
+            reason:
+              'The requested promotion contradicts the canonical queue and is playback/process evidence, not classifier feedback.',
+            original_event: event,
+            converted_event: convertedEvent,
+          });
+          result.quality_incidents.push({
+            session_id: bundle.session.session_id,
+            event_id: convertedEvent.event_id,
+            kind: convertedEvent.kind,
+            event: convertedEvent,
+          });
         } else {
           result.feedback_events.push(reconciled);
         }
@@ -188,6 +226,22 @@ export function reconcileSessionBundles(
   }
 
   return result;
+}
+
+function queueItemConsumptionDepth(
+  bundle: CommuteSessionBundle,
+  sourceItemId: string
+): string | undefined {
+  const items = bundle.queue_snapshot.queue.items;
+  if (!Array.isArray(items)) return undefined;
+  for (const candidate of items) {
+    if (typeof candidate !== 'object' || candidate === null || Array.isArray(candidate)) continue;
+    const item = candidate as Record<string, unknown>;
+    if (item.source_item_id === sourceItemId) {
+      return typeof item.consumption_depth === 'string' ? item.consumption_depth : undefined;
+    }
+  }
+  return undefined;
 }
 
 async function main(): Promise<void> {

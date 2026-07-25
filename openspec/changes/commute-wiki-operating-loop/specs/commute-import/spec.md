@@ -26,6 +26,18 @@ The importer SHALL retain valid partial information while reporting its limits.
 - **AND** unresolved captures SHALL be preserved for recovery
 - **AND** invalid bundles SHALL be reported without corrupting other sessions.
 
+#### Scenario: Semantically contradictory feedback is recoverable
+
+- **WHEN** an otherwise valid bundle records a classifier correction that
+  contradicts the embedded canonical queue, such as promoting an item already
+  marked `in_depth`
+- **THEN** the importer SHALL accept the session
+- **AND** it SHALL preserve the original event and user words
+- **AND** it SHALL convert the downstream interpretation into a quality
+  incident with an explicit reason
+- **AND** it SHALL NOT emit the contradiction as classifier-training feedback
+  or abort the remaining import.
+
 ### Requirement: Deterministic Integrity Validation
 
 The importer SHALL validate bundle references against the bundle's embedded

@@ -129,3 +129,53 @@ test('recovers a legacy numeric wiki marker without a memorized spoken command',
   assert.equal(result.maintenance_candidates[0]?.source_item_id, 'tldr-demo-001');
   assert.equal(result.maintenance_candidates[0]?.url, 'https://example.com/first');
 });
+
+test('converts a redundant depth promotion into a quality incident without rejecting the session', () => {
+  const bundle = JSON.parse(validBundle) as {
+    queue_snapshot: { queue: { items: Array<Record<string, unknown>> } };
+    events: Array<Record<string, unknown>>;
+  };
+  const firstItem = bundle.queue_snapshot.queue.items[0];
+  assert.ok(firstItem);
+  firstItem.consumption_depth = 'in_depth';
+  const action = bundle.events[1];
+  assert.ok(action);
+  action.action = 'promote_to_in_depth';
+  action.user_words = 'This should have been in depth.';
+
+  const result = reconcileSessionBundles(
+    [{ filename: artifactFilename, text: JSON.stringify(bundle) }],
+    '2026-07-25T12:00:00.000Z'
+  );
+
+  assert.equal(result.sessions[0]?.status, 'accepted');
+  assert.equal(result.feedback_events.length, 0);
+  assert.equal(result.quality_incidents.length, 1);
+  assert.equal(result.event_conversions.length, 1);
+  assert.equal(result.event_conversions[0]?.original_event.kind, 'item_action');
+  assert.equal(result.event_conversions[0]?.converted_event.kind, 'quality_incident');
+  assert.match(
+    result.event_conversions[0]?.reason ?? '',
+    /playback\/process evidence, not classifier feedback/
+  );
+});
+
+test('keeps a genuine depth promotion as classifier feedback', () => {
+  const bundle = JSON.parse(validBundle) as {
+    events: Array<Record<string, unknown>>;
+  };
+  const action = bundle.events[1];
+  assert.ok(action);
+  action.action = 'promote_to_in_depth';
+  action.user_words = 'This should have been in depth.';
+
+  const result = reconcileSessionBundles(
+    [{ filename: artifactFilename, text: JSON.stringify(bundle) }],
+    '2026-07-25T12:00:00.000Z'
+  );
+
+  assert.equal(result.sessions[0]?.status, 'accepted');
+  assert.equal(result.feedback_events.length, 1);
+  assert.equal(result.quality_incidents.length, 0);
+  assert.equal(result.event_conversions.length, 0);
+});

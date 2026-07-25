@@ -221,3 +221,13 @@ problems without requiring the model to explain their cause.
 - **THEN** the bundle SHALL record an unclassified quality incident with the
   observed behavior, boundary, and available evidence pointer
 - **AND** it SHALL NOT present a model diagnosis as established fact.
+
+#### Scenario: Contradiction is detected after the commute
+
+- **WHEN** local reconciliation detects that an event's semantic
+  interpretation contradicts the embedded canonical queue
+- **THEN** it SHALL retain the original event as evidence
+- **AND** it SHALL create a converted quality-incident interpretation for
+  process improvement
+- **AND** the contradiction SHALL NOT cause the session or its other exact
+  captures to be rejected.
