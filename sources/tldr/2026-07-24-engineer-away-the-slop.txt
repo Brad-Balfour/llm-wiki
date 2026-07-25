@@ -1,0 +1,51 @@
+{
+  "schema_version": "approved-wiki-source.v1",
+  "approval": {
+    "status": "approved",
+    "public": true,
+    "approved_at": "2026-07-25T16:00:00Z",
+    "reviewed_by": "brad",
+    "safety_review": {
+      "privacy": "cleared",
+      "publication_rights": "cleared",
+      "dual_use": "cleared"
+    }
+  },
+  "source": {
+    "source_item_id": "general-20260724-05",
+    "source_path": "sources/tldr/2026-07-24-engineer-away-the-slop.txt",
+    "source_type": "tldr",
+    "title": "Engineer away the slop",
+    "url": "https://ghuntley.com/slop/",
+    "newsletter": "TLDR",
+    "edition_date": "2026-07-24"
+  },
+  "entry": {
+    "type": "concept",
+    "slug": "ai-native-software-engineering",
+    "title": "AI-Native Software Engineering",
+    "aliases": [
+      "Control the ideas, not the code",
+      "Engineer away the slop"
+    ],
+    "tags": [
+      "ai-engineering",
+      "software-design",
+      "correctness",
+      "code-review",
+      "formal-verification",
+      "quality-gates"
+    ],
+    "confidence": "high",
+    "summary": "AI-native software engineering shifts the developer's center of gravity from manually producing and inspecting every line of code toward specifying behavior, making design choices, and building repeatable evidence that generated code is correct.",
+    "key_ideas": [
+      "Recurring model mistakes should become deterministic tests, static checks, or repository-specific quality gates.",
+      "Adversarial model review can complement deterministic verification but should not replace it.",
+      "Pre-commit enforcement moves known failure patterns out of repeated human review."
+    ],
+    "related": [
+      "deterministic-agent-workflows",
+      "review-driven-software-factories"
+    ]
+  }
+}

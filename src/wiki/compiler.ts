@@ -97,6 +97,7 @@ function renderEntry(
     `aliases: ${JSON.stringify(source.entry.aliases)}`,
     '# prettier-ignore',
     `tags: ${JSON.stringify(source.entry.tags)}`,
+    `permalink: /wiki/${source.entry.slug}/`,
     `created: ${created}`,
     `updated: ${updated}`,
     `confidence: ${source.entry.confidence}`,
@@ -129,7 +130,7 @@ function renderInitialBody(source: ApprovedWikiSource): string {
   const related =
     source.entry.related.length === 0
       ? []
-      : ['', '## Related', '', ...source.entry.related.map((slug) => `- [[${slug}]]`)];
+      : ['', '## Related', '', ...source.entry.related.map(renderRelatedLink)];
   return [
     `# ${escapeMarkdownText(source.entry.title)}`,
     '',
@@ -166,11 +167,13 @@ function appendSourceNote(body: string, source: ApprovedWikiSource): string {
 }
 
 function mergeRelatedLinks(body: string, related: string[]): string {
-  const missing = related.filter((slug) => !body.includes(`- [[${slug}]]`));
+  const missing = related.filter(
+    (slug) => !body.includes(`- [[${slug}]]`) && !body.includes(relatedHref(slug))
+  );
   if (missing.length === 0) {
     return body;
   }
-  const links = missing.map((slug) => `- [[${slug}]]`).join('\n');
+  const links = missing.map(renderRelatedLink).join('\n');
   if (!body.includes('\n## Related\n')) {
     return `${body.trim()}\n\n## Related\n\n${links}`;
   }
@@ -248,4 +251,12 @@ function unique(values: string[]): string[] {
 
 function escapeMarkdownText(value: string): string {
   return value.replace(/([\\`*_{}[\]()#+!|>])/g, '\\$1');
+}
+
+function renderRelatedLink(slug: string): string {
+  return `- [${slug}](${relatedHref(slug)})`;
+}
+
+function relatedHref(slug: string): string {
+  return `{{ '/wiki/${slug}/' | relative_url }}`;
 }

@@ -2,7 +2,7 @@
   "manifest_version": 1,
   "schema_version": "compile-state.v1",
   "created": "2026-07-05",
-  "updated": "2026-07-17T00:38:58.784Z",
+  "updated": "2026-07-25T16:07:25.227Z",
   "processed_sources": {
     "sources/tldr/2026-06-23-transformer-architecture-for-senior-engineers.txt": {
       "hash": "sha256:f9a592761c47b368e73c13dd97d27b02bc875433b632a582a40ec6419643e631",
@@ -51,47 +51,75 @@
       "output_path": "wiki/concepts/reality-driven-ai-product-development.md",
       "source_item_id": "19f657fda97edc45-01",
       "processed_at": "2026-07-17T00:38:58.784Z"
+    },
+    "sources/tldr/2026-07-24-engineer-away-the-slop.txt": {
+      "hash": "sha256:dfbd1ece92aa28b70a171800d21321d286b62e23d46c6ed40235086c5a210b02",
+      "output_path": "wiki/concepts/ai-native-software-engineering.md",
+      "source_item_id": "general-20260724-05",
+      "processed_at": "2026-07-25T16:07:12.245Z"
+    },
+    "sources/tldr/2026-07-24-why-software-factories-fail.txt": {
+      "hash": "sha256:b2e98ec4906b460fe7295cf7c159934c998a03b249716b43141be5e1f1537dee",
+      "output_path": "wiki/concepts/review-driven-software-factories.md",
+      "source_item_id": "dev-20260724-01",
+      "processed_at": "2026-07-25T16:07:22.059Z"
+    },
+    "sources/tldr/2026-07-24-state-ownership.txt": {
+      "hash": "sha256:54c61e021c05808b171523c31072129e509f9b9abfe756702cd0bcd5de046362",
+      "output_path": "wiki/concepts/state-ownership-before-state-management.md",
+      "source_item_id": "dev-20260724-02",
+      "processed_at": "2026-07-25T16:07:25.227Z"
     }
   },
   "wiki_outputs": {
     "wiki/concepts/transformer-architecture-for-senior-engineers.md": {
-      "hash": "sha256:164815168d43929b401ea6a20ad0815c119d6b3bb2a929b5af864c5139bd4a7d",
+      "hash": "sha256:b03ed2d9e3a3d9f7a0377bdfea24730ef44f12c356aac204a682d7151f110cd7",
       "updated": "2026-07-16T01:40:13.294Z",
       "provenance_count": 1
     },
     "wiki/concepts/claude-code-extended-thinking-output.md": {
-      "hash": "sha256:70d7f03980204e21fe96bc7b0b2f9cc5f175978dcd4f541bc343a756066b26d1",
+      "hash": "sha256:9ea682ec5e5d2c50d44d46ac93a625d5b6201b0d6c4b8701c5cf671b534e2534",
       "updated": "2026-07-16T01:40:13.268Z",
       "provenance_count": 1
     },
     "wiki/concepts/ai-native-software-engineering.md": {
-      "hash": "sha256:bfd66bb3c5a522f2b3ea4d3beda0b5ce4c2eb25dda25cdca1ffeef7f9dab778a",
-      "updated": "2026-07-16T01:40:13.347Z",
-      "provenance_count": 1
+      "hash": "sha256:3c108562d02923c33bae229c0b6ff7d81ca0330821ad79351a4fa4ebd74136f6",
+      "updated": "2026-07-25T16:07:12.245Z",
+      "provenance_count": 2
     },
     "wiki/tools/clawk.md": {
-      "hash": "sha256:b77ed56eb09d9d586bf93ef126c77e39ca6929b81f869c295543914154b6aeec",
+      "hash": "sha256:c6e8a7378a46c055bbf7573ed513e2133b574999678e88fed9e763e039efe5f4",
       "updated": "2026-07-16T01:40:13.373Z",
       "provenance_count": 1
     },
     "wiki/concepts/production-ai-agent-architecture.md": {
-      "hash": "sha256:9b0c4ec4e27dc4f97f14c1aaf30fbe64f69ab2e6068cf899e528cc426f793289",
+      "hash": "sha256:6f35237a2b819c81887a52936dfd26115366ebbd573f2bbfa67a82c667ebb229",
       "updated": "2026-07-16T01:40:13.424Z",
       "provenance_count": 1
     },
     "wiki/tools/mantis-skills.md": {
-      "hash": "sha256:ddb6cb19d4029dc6dc3463019c126b6f530252e2486bb37d072d0cf80548802d",
+      "hash": "sha256:5e6e3b98ddcd24dee35480edfc271ea2b6e27f89834e8bc7e3fa6d02598a9977",
       "updated": "2026-07-16T01:40:13.399Z",
       "provenance_count": 1
     },
     "wiki/concepts/agentic-economy.md": {
-      "hash": "sha256:63256bb7357cac7ddfb13f6d17c823de8bcc68217631aa5d92125214e6f03f74",
+      "hash": "sha256:85f17ae316f9272bc72346a0a2d64a758d89bb1aace6be8ddb6bb416f2c28305",
       "updated": "2026-07-16T01:40:13.319Z",
       "provenance_count": 1
     },
     "wiki/concepts/reality-driven-ai-product-development.md": {
-      "hash": "sha256:bfd2423b63a3d9922d49e1938f97537c461c3c7fa2a39d5784020e3dd4d47ee6",
+      "hash": "sha256:cfa5806cc0286cd1ac3d40ffbbef3632d827234f8274ad7f3cb597cd1b32b767",
       "updated": "2026-07-17T00:38:58.784Z",
+      "provenance_count": 1
+    },
+    "wiki/concepts/review-driven-software-factories.md": {
+      "hash": "sha256:597927d04d7f9681e80987a4d30a00463d334d8777b91f0c5ed82493f664668e",
+      "updated": "2026-07-25T16:07:22.059Z",
+      "provenance_count": 1
+    },
+    "wiki/concepts/state-ownership-before-state-management.md": {
+      "hash": "sha256:d0e65302ad2f9f7476991f9153ac4756e1a2289459ff2dc4bf221c7120c3ab74",
+      "updated": "2026-07-25T16:07:25.227Z",
       "provenance_count": 1
     }
   },
@@ -256,6 +284,24 @@
       "timestamp": "2026-07-17T00:38:58.784Z",
       "source_path": "sources/tldr/2026-07-15-reality-driven-ai-product-development.txt",
       "output_path": "wiki/concepts/reality-driven-ai-product-development.md",
+      "status": "created"
+    },
+    {
+      "timestamp": "2026-07-25T16:07:12.245Z",
+      "source_path": "sources/tldr/2026-07-24-engineer-away-the-slop.txt",
+      "output_path": "wiki/concepts/ai-native-software-engineering.md",
+      "status": "updated"
+    },
+    {
+      "timestamp": "2026-07-25T16:07:22.059Z",
+      "source_path": "sources/tldr/2026-07-24-why-software-factories-fail.txt",
+      "output_path": "wiki/concepts/review-driven-software-factories.md",
+      "status": "created"
+    },
+    {
+      "timestamp": "2026-07-25T16:07:25.227Z",
+      "source_path": "sources/tldr/2026-07-24-state-ownership.txt",
+      "output_path": "wiki/concepts/state-ownership-before-state-management.md",
       "status": "created"
     }
   ]

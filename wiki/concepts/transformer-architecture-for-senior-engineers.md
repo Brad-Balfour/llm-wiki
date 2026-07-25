@@ -5,6 +5,7 @@ title: 'Transformer Architecture for Senior Engineers'
 aliases: ["LLM transformer architecture"]
 # prettier-ignore
 tags: ["llm","transformers","attention","model-architecture"]
+permalink: /wiki/transformer-architecture-for-senior-engineers/
 created: 2026-07-13
 updated: 2026-07-13
 confidence: high

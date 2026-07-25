@@ -5,6 +5,7 @@ title: 'Deterministic Agent Workflows'
 aliases: ["Reducing Agent Token Spend"]
 # prettier-ignore
 tags: ["ai-agents","deterministic-tools","token-efficiency","workflow-design"]
+permalink: /wiki/deterministic-agent-workflows/
 created: 2026-07-21
 updated: 2026-07-21
 confidence: medium
@@ -34,5 +35,5 @@ Saved from TLDR Dev, 2026-07-20.
 
 ## Related
 
-- [[production-ai-agent-architecture]]
-- [[ai-native-software-engineering]]
+- [production-ai-agent-architecture]({{ '/wiki/production-ai-agent-architecture/' | relative_url }})
+- [ai-native-software-engineering]({{ '/wiki/ai-native-software-engineering/' | relative_url }})
