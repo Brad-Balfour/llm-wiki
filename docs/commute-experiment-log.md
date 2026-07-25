@@ -47,7 +47,30 @@ retrieve sources, and preserve history after the drive.
 | Jul. 21    | Natural-language save support, explicit-end behavior, and supplied-queue recovery (PRs #30–31) | Accept genuine "save this" wording when a bundle binds it to the current item; repair older malformed bundles only when they contain an explicit wiki marker and a matching supplied queue. | The local path is safer and more useful, but it cannot recover a natural-language save that Voice never put in the bundle.                                                                                                                                                                                   |
 | Jul. 22    | General and Dev sessions                                                                       | Use real queues, discuss high-value items, save two for later team sharing, and export bundles.                                                                                             | The sessions retained valuable discussion, but failed to preserve the two saves. Exact Library lookup failed despite the files being attachable by Brad. The available queues also conflict with some transcript item identities.                                                                            |
 | Jul. 24    | General, Dev, and AI sessions                                                                  | Exercise queue-v2 playback, article discussion, wiki captures, exact-name recovery, and self-contained bundle export.                                                                       | All three bundles preserved exact canonical queue snapshots; Dev and AI exported on the first attempt. General recovered after an avoidable refusal. Several spoken modes and summaries diverged from the embedded queues, proving that correct queue identity does not guarantee per-item field projection. |
-| Jul. 25    | Prompt 3.0 and fail-soft local conversion                                                      | Project every initial announcement from the literal current queue item and preserve semantically contradictory feedback as a quality incident rather than classifier evidence.              | Deterministic import now keeps the original event, converts its downstream interpretation, and accepts the rest of the session. Real-bundle import remains to be rerun when the transient Downloads attachments are available again.                                                                         |
+| Jul. 25    | Prompt 3.0 and fail-soft local conversion                                                      | Project every initial announcement from the literal current queue item and preserve semantically contradictory feedback as a quality incident rather than classifier evidence.              | All three reattached bundles imported as accepted recovered sessions. Their embedded queues matched the three downloaded canonical queues exactly. The contradictory state-management promotion was preserved and converted into a quality incident without rejecting any session.                           |
+
+### July 24 Bundle Acceptance Result
+
+The July 25 deterministic acceptance run used the three downloaded bundle
+artifacts and their corresponding downloaded queues, not reconstructed
+transcript data:
+
+- all three queue-v2 files validated: six General items, three Dev items, and
+  three AI items;
+- all three bundle snapshots matched their corresponding canonical queue as
+  canonical JSON, with exact fingerprints;
+- all three sessions imported as `recovered`, with zero rejected sessions and
+  zero unresolved captures;
+- the import produced three wiki-maintenance candidates, one genuine classifier
+  feedback event, three quality incidents, and one semantic event conversion;
+  and
+- the conversion retained the original state-management promotion wording,
+  interpreted it as a playback/process contradiction because the canonical
+  item was already `in_depth`, and allowed the rest of the intake to complete.
+
+The normalized intake is deliberately private and gitignored. The durable
+public evidence is the aggregate result above plus the fixture-backed importer
+behavior, not the raw commute transcript or private intake record.
 
 ## What Worked
 
