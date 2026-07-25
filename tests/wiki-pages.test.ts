@@ -54,23 +54,37 @@ test('Jekyll applies the default layout to generated wiki entries', async () => 
 });
 
 test('typed wiki entries preserve typed routes and have no unrendered wiki-link syntax', async () => {
+  const seenSlugs = new Map<string, string>();
   for (const directory of ['concepts', 'tools', 'people', 'events']) {
     const names = await readdir(path.join('wiki', directory));
     for (const name of names) {
       if (!name.endsWith('.md') || name === 'index.md') continue;
       const slug = name.slice(0, -3);
-      const markdown = await readFile(path.join('wiki', directory, name), 'utf8');
+      const entryPath = path.join('wiki', directory, name);
+      const markdown = await readFile(entryPath, 'utf8');
       assert.match(markdown, new RegExp(`\\nwiki_slug: ${escapeRegExp(slug)}\\n`));
       assert.doesNotMatch(markdown, /\npermalink: /);
       assert.doesNotMatch(markdown, /\[\[[a-z0-9-]+\]\]/);
+      assert.equal(
+        seenSlugs.get(slug),
+        undefined,
+        `wiki_slug ${slug} is duplicated by ${seenSlugs.get(slug)} and ${entryPath}`
+      );
+      seenSlugs.set(slug, entryPath);
     }
   }
 });
 
 test('related-link include resolves typed entry URLs instead of inventing flat routes', async () => {
   const include = await readFile('_includes/wiki-related-link.md', 'utf8');
-  assert.match(include, /where: "wiki_slug", include\.slug/);
+  assert.match(
+    include,
+    /assign related_entries = site\.pages \| where: "wiki_slug", include\.slug/
+  );
+  assert.match(include, /assign related_count = related_entries \| size/);
+  assert.match(include, /if related_count == 1/);
   assert.match(include, /related_entry\.url \| relative_url/);
+  assert.match(include, /include\.slug \| escape/);
   assert.doesNotMatch(include, /\/wiki\/\{\{/);
 });
 
