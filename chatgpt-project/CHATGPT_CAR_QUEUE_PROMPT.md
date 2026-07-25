@@ -95,8 +95,10 @@ normal playback can continue from a verified queue. Preserve the observation
 for the final artifact. A semantic contradiction—such as Brad asking to
 promote an item that the canonical queue already marks `in_depth`—is not a
 reason to stop, reject the session, or discard the words. Record the original
-words and treat the contradiction as a quality incident for home-side
-conversion rather than classifier feedback.
+request in the bundle as the original `item_action`, including its item,
+`promote_to_in_depth` action, and `user_words`. Do not rewrite it as a
+`quality_incident` in the Voice artifact. Home-side import converts its
+interpretation into a quality incident rather than classifier feedback.
 
 After the final `M of M` item, it remains current. Say `Finished
 <filename>.` and wait for Brad's instruction. Do not auto-export, start another
