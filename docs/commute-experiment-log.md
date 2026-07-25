@@ -15,8 +15,7 @@ found a queue as proof.
 - The three July 24 shared commute transcripts and the three downloaded
   session bundles inspected during the July 25 post-mortem.
 - The versioned project prompt, schemas, OpenSpec changes, source code, tests,
-  commits, and merged pull requests in this repository through `origin/main` at
-  `ecab953`.
+  commits, and merged pull requests in this repository.
 
 The transcript evidence is useful for recovering Brad's explicit requests and
 observed failures. It is not authoritative for a claimed queue position, URL,

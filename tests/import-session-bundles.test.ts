@@ -154,9 +154,52 @@ test('converts a redundant depth promotion into a quality incident without rejec
   assert.equal(result.event_conversions.length, 1);
   assert.equal(result.event_conversions[0]?.original_event.kind, 'item_action');
   assert.equal(result.event_conversions[0]?.converted_event.kind, 'quality_incident');
+  assert.equal(
+    result.event_conversions[0]?.converted_event.event_id,
+    result.event_conversions[0]?.original_event.event_id
+  );
   assert.match(
     result.event_conversions[0]?.reason ?? '',
     /playback\/process evidence, not classifier feedback/
+  );
+});
+
+test('preserves source identity when another event uses the old synthesized incident suffix', () => {
+  const bundle = JSON.parse(validBundle) as {
+    queue_snapshot: { queue: { items: Array<Record<string, unknown>> } };
+    events: Array<Record<string, unknown>>;
+  };
+  const firstItem = bundle.queue_snapshot.queue.items[0];
+  assert.ok(firstItem);
+  firstItem.consumption_depth = 'in_depth';
+  const action = bundle.events[1];
+  assert.ok(action);
+  action.event_id = 'feedback';
+  action.action = 'promote_to_in_depth';
+  action.user_words = 'This should have been in depth.';
+  bundle.events.push({
+    event_id: 'feedback:quality-incident',
+    sequence: 5,
+    kind: 'quality_incident',
+    observed_behavior: 'A separate playback issue.',
+    boundary: 'playback',
+    evidence: [
+      {
+        source: 'user_provided_chat_or_ui_observation',
+        reference: 'Visible conversation',
+      },
+    ],
+  });
+
+  const result = reconcileSessionBundles(
+    [{ filename: artifactFilename, text: JSON.stringify(bundle) }],
+    '2026-07-25T12:00:00.000Z'
+  );
+
+  assert.equal(result.sessions[0]?.status, 'accepted');
+  assert.deepEqual(
+    result.quality_incidents.map((incident) => incident.event_id),
+    ['feedback', 'feedback:quality-incident']
   );
 });
 

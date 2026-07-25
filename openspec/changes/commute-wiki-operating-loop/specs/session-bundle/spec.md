@@ -222,10 +222,10 @@ problems without requiring the model to explain their cause.
   observed behavior, boundary, and available evidence pointer
 - **AND** it SHALL NOT present a model diagnosis as established fact.
 
-#### Scenario: Contradiction is detected after the commute
+#### Scenario: Redundant depth promotion is detected after the commute
 
-- **WHEN** local reconciliation detects that an event's semantic
-  interpretation contradicts the embedded canonical queue
+- **WHEN** local reconciliation detects `promote_to_in_depth` for an item that
+  the embedded canonical queue already marks `in_depth`
 - **THEN** it SHALL retain the original event as evidence
 - **AND** it SHALL create a converted quality-incident interpretation for
   process improvement

@@ -189,7 +189,7 @@ export function reconcileSessionBundles(
           queueItemConsumptionDepth(bundle, event.item.source_item_id) === 'in_depth'
         ) {
           const convertedEvent: CommuteSessionBundle['events'][number] = {
-            event_id: `${event.event_id}:quality-incident`,
+            event_id: event.event_id,
             sequence: event.sequence,
             kind: 'quality_incident',
             observed_behavior:

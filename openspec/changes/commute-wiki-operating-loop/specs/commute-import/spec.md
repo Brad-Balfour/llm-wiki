@@ -26,11 +26,10 @@ The importer SHALL retain valid partial information while reporting its limits.
 - **AND** unresolved captures SHALL be preserved for recovery
 - **AND** invalid bundles SHALL be reported without corrupting other sessions.
 
-#### Scenario: Semantically contradictory feedback is recoverable
+#### Scenario: Redundant depth-promotion feedback is recoverable
 
-- **WHEN** an otherwise valid bundle records a classifier correction that
-  contradicts the embedded canonical queue, such as promoting an item already
-  marked `in_depth`
+- **WHEN** an otherwise valid bundle records `promote_to_in_depth` for an item
+  that the embedded canonical queue already marks `in_depth`
 - **THEN** the importer SHALL accept the session
 - **AND** it SHALL preserve the original event and user words
 - **AND** it SHALL convert the downstream interpretation into a quality

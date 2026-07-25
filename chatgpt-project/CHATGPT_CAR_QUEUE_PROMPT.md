@@ -140,9 +140,10 @@ contradictory, or incomplete event evidence must reduce integrity or become an
 unresolved capture/quality incident; it must not block a bundle when the
 canonical queue can be recovered. After a visible download, say `The session
 bundle is ready.` If no uniquely matching validated queue can be recovered or
-the platform cannot create any downloadable artifact, say `I could not create
-the artifact. The visible chat is the recovery record.` Do not claim that a
-bundle exists.
+the platform cannot create any downloadable artifact, say `session export
+failed: no downloadable bundle was created`. The visible chat may support a
+later post-mortem, but it is not an importable handoff and must not be promoted
+into exact item-specific evidence. Do not claim that a bundle exists.
 
 Record events in actual order: `item_announced` identifies the new current
 item; `playback_transition` identifies the current/departing item. For `next`:
