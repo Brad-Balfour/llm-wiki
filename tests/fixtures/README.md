@@ -27,3 +27,9 @@ same-day exports, Library suffixes, and explicit export failure.
 
 Use stable source item ids and keep cross-edition duplicate instances distinct
 when a fixture is intended to exercise validation behavior.
+
+`wiki-maintenance-cases.json` covers deterministic retrieval/result-recording
+boundaries and manual PR review expectations for inaccessible URLs, duplicate
+concepts, material updates to existing concepts, and useful link-only changes.
+The semantic wiki decision remains agent-driven and is reviewed in the
+resulting PR.

@@ -112,6 +112,24 @@ test('two same-day exports and a Library-suffixed artifact remain independent', 
   assert.notEqual(imported.sessions[0]?.input_filename, imported.sessions[1]?.input_filename);
 });
 
+test('rejects distinct sessions that declare the same canonical artifact filename', () => {
+  const firstCase = requiredFixture('valid-single-queue-partial');
+  const collisionCase = requiredFixture('distinct-session-reuses-canonical-filename');
+  const imported = reconcileSessionBundles([
+    { filename: firstCase.input_filename, text: fixtureText(firstCase) },
+    { filename: collisionCase.input_filename, text: fixtureText(collisionCase) },
+  ]);
+
+  assert.deepEqual(
+    imported.sessions.map((session) => session.status),
+    ['accepted', 'rejected']
+  );
+  assert.match(
+    imported.sessions[1]?.error ?? '',
+    /Canonical artifact filename 202607200745-morning-commute-session-bundle\.txt is already declared by distinct session/
+  );
+});
+
 test('restart and duplicate recognition fixtures preserve unresolved evidence, not classifier feedback', () => {
   const restart = requiredFixture('recovered-terminal-voice-restart');
   const duplicate = requiredFixture('duplicate-recognition-becomes-unresolved');

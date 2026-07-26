@@ -1,6 +1,10 @@
 import { createHash } from 'node:crypto';
 
-import { queueSnapshotFingerprint, validateTldrCommuteQueueV2 } from './session-bundle.js';
+import {
+  canonicalBundleArtifactFilename,
+  queueSnapshotFingerprint,
+  validateTldrCommuteQueueV2,
+} from './session-bundle.js';
 
 export interface SuppliedQueueRecoveryInput {
   bundleFilename: string;
@@ -18,6 +22,7 @@ export interface RecoveredWikiCapture {
 
 export interface RecoveredSessionBundle {
   sessionId: string;
+  artifactFilename: string;
   queueFilename: string;
   queueFingerprint: string;
   wikiCaptures: RecoveredWikiCapture[];
@@ -47,7 +52,8 @@ export function recoverSessionBundleWithSuppliedQueue(
   }
   const exactItems = items.map((item, index) => parseQueueItem(item, index));
   const events = requireArray(bundle.events, 'Recovery bundle events');
-  const sessionId = declaredSessionId(bundle, input.bundleFilename);
+  const artifactFilename = declaredArtifactFilename(bundle, input.bundleFilename);
+  const sessionId = declaredSessionId(bundle, artifactFilename);
   const wikiCaptures: RecoveredWikiCapture[] = [];
 
   for (const [index, event] of events.entries()) {
@@ -68,6 +74,7 @@ export function recoverSessionBundleWithSuppliedQueue(
 
   return {
     sessionId,
+    artifactFilename,
     queueFilename: input.queueFilename,
     queueFingerprint: queueSnapshotFingerprint(queue),
     wikiCaptures,
@@ -97,7 +104,17 @@ function declaredSessionId(bundle: Record<string, unknown>, bundleFilename: stri
   const session = optionalObject(bundle.session);
   const declared = session && optionalString(session.session_id);
   if (declared) return declared;
-  return `recovered-${createHash('sha256').update(bundleFilename).digest('hex').slice(0, 16)}`;
+  return `recovered-${createHash('sha256')
+    .update(canonicalBundleArtifactFilename(bundleFilename))
+    .digest('hex')
+    .slice(0, 16)}`;
+}
+
+function declaredArtifactFilename(bundle: Record<string, unknown>, inputFilename: string): string {
+  const session = optionalObject(bundle.session);
+  return canonicalBundleArtifactFilename(
+    (session && optionalString(session.artifact_filename)) ?? inputFilename
+  );
 }
 
 function parseQueueItem(candidate: unknown, index: number): ExactQueueItem {

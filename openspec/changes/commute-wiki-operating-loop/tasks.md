@@ -39,10 +39,10 @@
 - [x] 1.6 Define and test queue-v2's single N-of-M playback order, including
       rejection/audit fixtures for wrong section/count, repeated, foreign, and
       unmatched announced items.
-- [ ] 1.7 Require and validate unique timestamped session-bundle filenames.
+- [x] 1.7 Require and validate unique timestamped session-bundle filenames.
       Timestamp format, two distinct same-day exports, and Library-added numeric
-      suffixes are covered; collision rejection for distinct sessions declaring
-      the same canonical artifact filename remains open.
+      suffixes are covered, and local intake rejects distinct sessions declaring
+      the same canonical artifact filename.
 
 ## 2. Live Project Instructions And Real-Car Tests
 
@@ -99,7 +99,7 @@ combine unrelated conversations or queues into one queue.
       Markdown as appropriate, or an observable no-change/insufficient-source
       result when no PR is useful. Compose it with private bundle intake as one
       top-level user-facing command, with no intermediate intake review gate.
-- [ ] 4.3 Add fixtures and review guidance for inaccessible URLs, duplicate
+- [x] 4.3 Add fixtures and review guidance for inaccessible URLs, duplicate
       source concepts, updates to existing concepts, and link-only changes.
 - [ ] 4.4 Review early maintainer PRs manually before defining any auto-merge
       subset.

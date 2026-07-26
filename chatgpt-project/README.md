@@ -132,6 +132,11 @@ Per-candidate maintainer statuses are closed values: `pr_created`, `no_change`,
 the result detail. If the maintainer reports a PR but its candidate results
 cannot be reconciled safely, the intake records `review_required` and blocks an
 automatic retry until that PR is inspected, avoiding duplicate maintenance.
+Review early maintainer diffs with
+[`docs/wiki-maintainer-pr-review.md`](../docs/wiki-maintainer-pr-review.md);
+the checklist distinguishes duplicate concepts, material existing-page updates,
+useful link-only changes, and inaccessible-source outcomes without adding an
+intermediate approval gate.
 
 Before the first real bundle-to-PR run, confirm that the local maintainer can
 launch the installed Codex command without changing the repository:

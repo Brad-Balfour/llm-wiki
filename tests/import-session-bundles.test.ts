@@ -113,6 +113,120 @@ test('recovers a malformed v1-shaped bundle from its named supplied queue', () =
   });
 });
 
+test('rejects a recovered bundle that declares an artifact claimed by a distinct session', () => {
+  const queue = (JSON.parse(validBundle) as { queue_snapshot: { queue: unknown } }).queue_snapshot
+    .queue;
+  const malformed = {
+    schema_version: 'commute-session-bundle.v1',
+    session: {
+      session_id: 'distinct-recovered-session',
+      session_date: '2026-07-20',
+      artifact_filename: artifactFilename,
+      voice_surface: 'chatgpt_standard',
+    },
+    queue_snapshot: { filename: 'fixture-queue.txt', queue: {} },
+    events: [{ event_id: 'save-first', action: 'wiki_this', item: 1 }],
+  };
+
+  const result = reconcileSessionBundles([
+    { filename: artifactFilename, text: validBundle },
+    {
+      filename: '202607200745-morning-commute-session-bundle (1).txt',
+      text: JSON.stringify(malformed),
+      recoveryQueue: { filename: 'fixture-queue.txt', text: JSON.stringify(queue) },
+    },
+  ]);
+
+  assert.deepEqual(
+    result.sessions.map((session) => session.status),
+    ['accepted', 'rejected']
+  );
+  assert.match(result.sessions[1]?.error ?? '', /Canonical artifact filename .* already declared/);
+});
+
+test('rejects a recovered bundle whose downloaded filename conflicts with its declaration', () => {
+  const queue = (JSON.parse(validBundle) as { queue_snapshot: { queue: unknown } }).queue_snapshot
+    .queue;
+  const malformed = {
+    schema: 'legacy-summary',
+    session: {
+      session_id: 'renamed-recovered-session',
+      artifact_filename: artifactFilename,
+      queue_filename: 'fixture-queue.txt',
+    },
+    queue_snapshot: { filename: 'fixture-queue.txt', queue: {} },
+    events: [{ action: 'wiki', item: 1 }],
+  };
+
+  const result = reconcileSessionBundles([
+    {
+      filename: 'renamed-recovery.txt',
+      text: JSON.stringify(malformed),
+      recoveryQueue: { filename: 'fixture-queue.txt', text: JSON.stringify(queue) },
+    },
+  ]);
+
+  assert.equal(result.sessions[0]?.status, 'rejected');
+  assert.match(result.sessions[0]?.error ?? '', /Recovery bundle filename does not match/);
+});
+
+test('rejects a recovered bundle without a declared artifact when its filename is noncanonical', () => {
+  const queue = (JSON.parse(validBundle) as { queue_snapshot: { queue: unknown } }).queue_snapshot
+    .queue;
+  const malformed = {
+    schema: 'legacy-summary',
+    session: {
+      session_id: 'noncanonical-recovered-session',
+      queue_filename: 'fixture-queue.txt',
+    },
+    queue_snapshot: { filename: 'fixture-queue.txt', queue: {} },
+    events: [{ action: 'wiki', item: 1 }],
+  };
+
+  const result = reconcileSessionBundles([
+    {
+      filename: 'renamed-recovery.txt',
+      text: JSON.stringify(malformed),
+      recoveryQueue: { filename: 'fixture-queue.txt', text: JSON.stringify(queue) },
+    },
+  ]);
+
+  assert.equal(result.sessions[0]?.status, 'rejected');
+  assert.match(result.sessions[0]?.error ?? '', /artifact_filename must use YYYYMMDDHHmm/);
+});
+
+test('uses the canonical artifact name for a recovered fallback session identity', () => {
+  const queue = (JSON.parse(validBundle) as { queue_snapshot: { queue: unknown } }).queue_snapshot
+    .queue;
+  const malformed = {
+    schema: 'legacy-summary',
+    session: {
+      session_date: '2026-07-20',
+      queue_filename: 'fixture-queue.txt',
+    },
+    queue_snapshot: { filename: 'fixture-queue.txt', queue: {} },
+    events: [{ action: 'wiki', item: 1 }],
+  };
+  const librarySuffixFilename = '202607200745-morning-commute-session-bundle (1).txt';
+
+  const result = reconcileSessionBundles([
+    {
+      filename: artifactFilename,
+      text: JSON.stringify(malformed),
+      recoveryQueue: { filename: 'fixture-queue.txt', text: JSON.stringify(queue) },
+    },
+    {
+      filename: librarySuffixFilename,
+      text: JSON.stringify(malformed),
+      recoveryQueue: { filename: 'fixture-queue.txt', text: JSON.stringify(queue) },
+    },
+  ]);
+
+  assert.equal(result.sessions[0]?.status, 'accepted');
+  assert.equal(result.sessions[1]?.status, 'rejected');
+  assert.match(result.sessions[1]?.error ?? '', /Duplicate session_id recovered-/);
+});
+
 test('keeps distinct maintenance candidates whose colon-delimited identities would collide', () => {
   const first = JSON.parse(validBundle) as {
     session: Record<string, unknown>;
