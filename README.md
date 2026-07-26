@@ -85,6 +85,11 @@ queue fingerprint and label to the gitignored
 preferences, duplicate/prior-awareness signals, and assistant summaries are
 rejected as classifier labels.
 
+The recorder serializes writes with a sibling `.lock` file containing its PID
+and start time. If it reports a stale or unreadable lock after a crash, first
+confirm that no recorder is running, then remove only that named `.lock` file
+and retry; the JSONL store itself remains append-only.
+
 Compile one explicitly approved TLDR source into the OKF wiki:
 
 ```bash

@@ -164,6 +164,13 @@ test('records to locked private JSONL, repairs a missing newline, and rejects se
     /has a stale lock.*inspect and remove it/
   );
 
+  const unreadablePath = path.join(root, '.private/classifier-feedback/unreadable.jsonl');
+  await writeFile(`${unreadablePath}.lock`, 'not-json\n');
+  await assert.rejects(
+    appendClassifierFeedbackLabels(unreadablePath, [labels[0]!]),
+    /has an unreadable lock requiring review/
+  );
+
   const lockedPath = path.join(root, '.private/classifier-feedback/locked.jsonl');
   await writeFile(
     `${lockedPath}.lock`,
