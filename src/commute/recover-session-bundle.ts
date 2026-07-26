@@ -1,6 +1,10 @@
 import { createHash } from 'node:crypto';
 
-import { queueSnapshotFingerprint, validateTldrCommuteQueueV2 } from './session-bundle.js';
+import {
+  canonicalBundleArtifactFilename,
+  queueSnapshotFingerprint,
+  validateTldrCommuteQueueV2,
+} from './session-bundle.js';
 
 export interface SuppliedQueueRecoveryInput {
   bundleFilename: string;
@@ -101,21 +105,16 @@ function declaredSessionId(bundle: Record<string, unknown>, bundleFilename: stri
   const declared = session && optionalString(session.session_id);
   if (declared) return declared;
   return `recovered-${createHash('sha256')
-    .update(canonicalArtifactFilename(bundleFilename))
+    .update(canonicalBundleArtifactFilename(bundleFilename))
     .digest('hex')
     .slice(0, 16)}`;
 }
 
 function declaredArtifactFilename(bundle: Record<string, unknown>, inputFilename: string): string {
   const session = optionalObject(bundle.session);
-  return (
-    (session && optionalString(session.artifact_filename)) ??
-    canonicalArtifactFilename(inputFilename)
+  return canonicalBundleArtifactFilename(
+    (session && optionalString(session.artifact_filename)) ?? inputFilename
   );
-}
-
-function canonicalArtifactFilename(filename: string): string {
-  return filename.replace(/ ?\([1-9][0-9]*\)\.txt$/, '.txt');
 }
 
 function parseQueueItem(candidate: unknown, index: number): ExactQueueItem {

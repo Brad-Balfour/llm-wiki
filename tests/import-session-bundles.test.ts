@@ -170,6 +170,31 @@ test('rejects a recovered bundle whose downloaded filename conflicts with its de
   assert.match(result.sessions[0]?.error ?? '', /Recovery bundle filename does not match/);
 });
 
+test('rejects a recovered bundle without a declared artifact when its filename is noncanonical', () => {
+  const queue = (JSON.parse(validBundle) as { queue_snapshot: { queue: unknown } }).queue_snapshot
+    .queue;
+  const malformed = {
+    schema: 'legacy-summary',
+    session: {
+      session_id: 'noncanonical-recovered-session',
+      queue_filename: 'fixture-queue.txt',
+    },
+    queue_snapshot: { filename: 'fixture-queue.txt', queue: {} },
+    events: [{ action: 'wiki', item: 1 }],
+  };
+
+  const result = reconcileSessionBundles([
+    {
+      filename: 'renamed-recovery.txt',
+      text: JSON.stringify(malformed),
+      recoveryQueue: { filename: 'fixture-queue.txt', text: JSON.stringify(queue) },
+    },
+  ]);
+
+  assert.equal(result.sessions[0]?.status, 'rejected');
+  assert.match(result.sessions[0]?.error ?? '', /artifact_filename must use YYYYMMDDHHmm/);
+});
+
 test('uses the canonical artifact name for a recovered fallback session identity', () => {
   const queue = (JSON.parse(validBundle) as { queue_snapshot: { queue: unknown } }).queue_snapshot
     .queue;

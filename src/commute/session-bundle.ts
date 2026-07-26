@@ -224,6 +224,11 @@ export function bundleArtifactFilenameMatches(
   );
 }
 
+export function canonicalBundleArtifactFilename(filename: string): string {
+  validateArtifactFilenameShape(filename);
+  return filename.replace(/ ?\([1-9][0-9]*\)\.txt$/, '.txt');
+}
+
 function validateSession(candidate: unknown): CommuteSessionBundle['session'] {
   const record = requireRecord(candidate, 'session');
   rejectUnknownKeys(
@@ -406,6 +411,13 @@ function validateSourceEmail(candidate: unknown): void {
 }
 
 function validateArtifactFilename(filename: string, sessionDate: string): void {
+  const match = validateArtifactFilenameShape(filename);
+  if (match[1] !== sessionDate.replaceAll('-', '')) {
+    throw new Error('session.artifact_filename date must match session.session_date');
+  }
+}
+
+function validateArtifactFilenameShape(filename: string): RegExpExecArray {
   const match =
     /^(\d{8})(\d{4})-(morning|evening)-commute-session-bundle(?: ?\([1-9][0-9]*\))?\.txt$/.exec(
       filename
@@ -414,9 +426,6 @@ function validateArtifactFilename(filename: string, sessionDate: string): void {
     throw new Error(
       'session.artifact_filename must use YYYYMMDDHHmm-morning|evening-commute-session-bundle.txt, with an optional Library suffix'
     );
-  }
-  if (match[1] !== sessionDate.replaceAll('-', '')) {
-    throw new Error('session.artifact_filename date must match session.session_date');
   }
   const time = match[2]!;
   const hour = Number(time.slice(0, 2));
@@ -430,6 +439,7 @@ function validateArtifactFilename(filename: string, sessionDate: string): void {
   if (match[3] === 'evening' && hour < 12) {
     throw new Error('session.artifact_filename evening must use a local time from 1200 onward');
   }
+  return match;
 }
 
 function hasLibrarySuffix(filename: string): boolean {
