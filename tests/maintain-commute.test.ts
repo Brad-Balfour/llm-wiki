@@ -3,10 +3,12 @@ import test from 'node:test';
 
 import {
   buildMaintainerPrompt,
+  maintenanceAttemptsFromAgentFailure,
   maintenanceAttemptsFromAgentResult,
   maintenanceAttemptsFromRetrieval,
   maintenanceCandidatesForAttempt,
   parseAgentResult,
+  reportedAgentPrUrl,
   resolveMaintainerCodexExecutable,
 } from '../src/wiki/maintain-commute.js';
 
@@ -36,6 +38,8 @@ test('builds a maintainer prompt with no intermediate approval gate', () => {
   assert.match(prompt, /There is no approval or intake-review gate/);
   assert.match(prompt, /create one GitHub PR with gh/);
   assert.match(prompt, /\/private\/sources\.json/);
+  assert.match(prompt, /Use per-candidate status "pr_created" only/);
+  assert.doesNotMatch(prompt, /updated_existing_page/);
 });
 
 test('accepts a structured PR result from the isolated maintainer branch', () => {
@@ -48,7 +52,7 @@ test('accepts a structured PR result from the isolated maintainer branch', () =>
       results: [
         {
           maintenance_key: 'session:event:https://example.com/article',
-          status: 'updated_existing_page',
+          status: 'pr_created',
           detail: 'Added a concise source-grounded note.',
         },
       ],
@@ -58,6 +62,29 @@ test('accepts a structured PR result from the isolated maintainer branch', () =>
 
   assert.equal(result.status, 'pr_created');
   assert.equal(result.pr_url, 'https://github.com/Brad-Balfour/llm-wiki/pull/99');
+});
+
+test('rejects an unsupported per-candidate status instead of treating it as PR success', () => {
+  assert.throws(
+    () =>
+      parseAgentResult(
+        {
+          schema_version: 'commute-maintenance-result.v1',
+          status: 'pr_created',
+          branch: 'commute-maintenance-20260720120000',
+          pr_url: 'https://github.com/Brad-Balfour/llm-wiki/pull/99',
+          results: [
+            {
+              maintenance_key: 'candidate',
+              status: 'updated_existing_page',
+              detail: 'Updated an existing page.',
+            },
+          ],
+        },
+        'commute-maintenance-20260720120000'
+      ),
+    /results\[0\]\.status has an unsupported status/
+  );
 });
 
 test('rejects a PR result that does not identify its pull request', () => {
@@ -73,6 +100,25 @@ test('rejects a PR result that does not identify its pull request', () => {
         'commute-maintenance-20260720120000'
       ),
     /pr_created requires pr_url/
+  );
+});
+
+test('routes a reported PR with a conflicting overall status to manual review', () => {
+  const candidate = {
+    schema_version: 'commute-maintenance-result.v1',
+    status: 'failed',
+    branch: 'commute-maintenance-20260720120000',
+    pr_url: 'https://github.com/Brad-Balfour/llm-wiki/pull/99',
+    results: [],
+  };
+
+  assert.equal(
+    reportedAgentPrUrl(candidate, 'commute-maintenance-20260720120000'),
+    'https://github.com/Brad-Balfour/llm-wiki/pull/99'
+  );
+  assert.throws(
+    () => parseAgentResult(candidate, 'commute-maintenance-20260720120000'),
+    /pr_url requires pr_created status/
   );
 });
 
@@ -160,6 +206,30 @@ test('rejects maintainer results that omit a retrievable candidate', () => {
   );
 });
 
+test('requires an explicit PR-created candidate before closing retry state', () => {
+  assert.throws(
+    () =>
+      maintenanceAttemptsFromAgentResult(
+        {
+          schema_version: 'commute-maintenance-result.v1',
+          status: 'pr_created',
+          branch: 'commute-maintenance-20260720120000',
+          pr_url: 'https://github.com/Brad-Balfour/llm-wiki/pull/99',
+          results: [
+            {
+              maintenance_key: 'candidate',
+              status: 'no_change',
+              detail: 'No change for this candidate.',
+            },
+          ],
+        },
+        ['candidate'],
+        '2026-07-20T12:00:00.000Z'
+      ),
+    /must explicitly identify at least one PR-created candidate/
+  );
+});
+
 test('retries only pending or retryable maintenance candidates', () => {
   const completedKey = 'completed-candidate';
   const retryableKey = 'retryable-candidate';
@@ -226,4 +296,42 @@ test('records every candidate as failed when the overall maintainer pass fails',
   );
 
   assert.equal(attempts[0]?.status, 'failed');
+});
+
+test('requires manual review instead of retrying when a malformed result names a created PR', () => {
+  const candidate = {
+    schema_version: 'commute-maintenance-result.v1',
+    status: 'pr_created',
+    branch: 'commute-maintenance-20260720120000',
+    pr_url: 'https://github.com/Brad-Balfour/llm-wiki/pull/99',
+    results: [],
+  };
+  const prUrl = reportedAgentPrUrl(candidate, 'commute-maintenance-20260720120000');
+  const attempts = maintenanceAttemptsFromAgentFailure(
+    ['candidate-a', 'candidate-b'],
+    'Maintainer agent result is missing maintenance candidate(s): candidate-b',
+    '2026-07-20T12:00:00.000Z',
+    prUrl
+  );
+
+  assert.equal(prUrl, 'https://github.com/Brad-Balfour/llm-wiki/pull/99');
+  assert.deepEqual(
+    attempts.map((attempt) => attempt.status),
+    ['review_required', 'review_required']
+  );
+  assert.match(attempts[0]?.detail ?? '', /pull\/99/);
+});
+
+test('does not trust a reported PR URL from the wrong maintainer branch', () => {
+  assert.equal(
+    reportedAgentPrUrl(
+      {
+        status: 'pr_created',
+        branch: 'different-branch',
+        pr_url: 'https://github.com/Brad-Balfour/llm-wiki/pull/99',
+      },
+      'commute-maintenance-20260720120000'
+    ),
+    undefined
+  );
 });

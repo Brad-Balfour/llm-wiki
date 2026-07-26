@@ -51,6 +51,7 @@ export type MaintenanceAttemptStatus =
   | 'insufficient_source'
   | 'unresolved'
   | 'pr_created'
+  | 'review_required'
   | 'failed';
 
 export interface MaintenanceAttemptInput {
@@ -395,7 +396,7 @@ function deriveMaintenanceResults(attempts: MaintenanceAttempt[]): MaintenanceLa
       latest_detail: attempt.detail,
       latest_attempted_at: attempt.attempted_at,
       attempt_count: (prior?.attempt_count ?? 0) + 1,
-      retryable: attempt.status !== 'pr_created',
+      retryable: attempt.status !== 'pr_created' && attempt.status !== 'review_required',
     });
   }
   return [...results.values()];
@@ -532,6 +533,7 @@ function requireMaintenanceAttemptStatus(
     candidate !== 'insufficient_source' &&
     candidate !== 'unresolved' &&
     candidate !== 'pr_created' &&
+    candidate !== 'review_required' &&
     candidate !== 'failed'
   ) {
     throw new Error(`${field} is unsupported`);

@@ -61,8 +61,15 @@ export interface AgentResult {
   status: 'pr_created' | 'no_change' | 'insufficient_source' | 'failed';
   branch: string;
   pr_url?: string;
-  results: Array<{ maintenance_key: string; status: string; detail: string }>;
+  results: Array<{
+    maintenance_key: string;
+    status: MaintainerCandidateStatus;
+    detail: string;
+  }>;
 }
+
+type MaintainerCandidateStatus =
+  'pr_created' | 'no_change' | 'insufficient_source' | 'unresolved' | 'failed';
 
 export function buildMaintainerPrompt(options: {
   intakePath: string;
@@ -86,9 +93,9 @@ Before finishing, write JSON to ${options.resultPath} with this shape:
   "status": "pr_created" | "no_change" | "insufficient_source" | "failed",
   "branch": "${options.branch}",
   "pr_url": "string when created",
-  "results": [{ "maintenance_key": "...", "status": "...", "detail": "..." }]
+  "results": [{ "maintenance_key": "...", "status": "pr_created" | "no_change" | "insufficient_source" | "unresolved" | "failed", "detail": "..." }]
 }
-Use per-candidate status "no_change", "insufficient_source", or "unresolved" when no change is produced. For a candidate included in a PR, use a concise change status such as "updated_existing_page"; it will be retained as a successful PR attempt.
+Use per-candidate status "pr_created" only for a candidate included in the PR, and put the specific change summary (for example, that an existing page was updated) in "detail". Use "no_change", "insufficient_source", "unresolved", or "failed" for every other candidate. Do not invent additional status values.
 Do not ask Brad for an intermediate approval. The resulting PR is the review point.`;
 }
 
@@ -180,6 +187,7 @@ async function main(): Promise<void> {
   await writeJsonExclusive(path.join(outputDir, 'outcome.json'), outcome);
 
   let agentResult: AgentResult | undefined;
+  let reportedPrUrl: string | undefined;
   let agentAttemptsRecorded = false;
   try {
     await execFileAsync(
@@ -198,10 +206,9 @@ async function main(): Promise<void> {
       ],
       { cwd: repoRoot, maxBuffer: 10 * 1024 * 1024 }
     );
-    agentResult = parseAgentResult(
-      JSON.parse(await readFile(resultPath, 'utf8')) as unknown,
-      branch
-    );
+    const agentResultCandidate = JSON.parse(await readFile(resultPath, 'utf8')) as unknown;
+    reportedPrUrl = reportedAgentPrUrl(agentResultCandidate, branch);
+    agentResult = parseAgentResult(agentResultCandidate, branch);
     intake = recordMaintenanceAttempts(
       intake,
       maintenanceAttemptsFromAgentResult(
@@ -228,24 +235,27 @@ async function main(): Promise<void> {
       `${outputDir}\nMaintainer ${agentResult.status}${agentResult.pr_url ? `: ${agentResult.pr_url}` : ''}\n`
     );
   } catch (error) {
+    reportedPrUrl ??= await readReportedAgentPrUrl(resultPath, branch);
     if (!agentAttemptsRecorded) {
       const attemptedAt = new Date().toISOString();
+      const prUrl = agentResult?.pr_url ?? reportedPrUrl;
       intake = recordMaintenanceAttempts(
         intake,
-        viableSources.map((source) => ({
-          maintenance_key: source.maintenance_key,
-          source: 'maintainer',
-          status: 'failed',
-          detail: errorMessage(error),
-          attempted_at: attemptedAt,
-        }))
+        maintenanceAttemptsFromAgentFailure(
+          viableSources.map((source) => source.maintenance_key),
+          errorMessage(error),
+          attemptedAt,
+          prUrl
+        )
       );
       await writeJson(intakePath, intake);
     }
+    const knownPrUrl = agentResult?.pr_url ?? reportedPrUrl;
     const failed: MaintainerOutcome = {
       ...outcome,
       status: 'agent_failed',
       detail: errorMessage(error),
+      ...(knownPrUrl === undefined ? {} : { pr_url: knownPrUrl }),
     };
     await writeFile(path.join(outputDir, 'outcome.json'), `${JSON.stringify(failed, null, 2)}\n`);
     throw error;
@@ -313,6 +323,14 @@ export function maintenanceAttemptsFromAgentResult(
       `Maintainer agent result is missing maintenance candidate(s): ${missing.join(', ')}`
     );
   }
+  if (
+    result.status === 'pr_created' &&
+    !result.results.some((entry) => entry.status === 'pr_created')
+  ) {
+    throw new Error(
+      'Maintainer agent result pr_created must explicitly identify at least one PR-created candidate'
+    );
+  }
 
   return result.results.map((entry) => ({
     maintenance_key: entry.maintenance_key,
@@ -323,21 +341,57 @@ export function maintenanceAttemptsFromAgentResult(
   }));
 }
 
+export function maintenanceAttemptsFromAgentFailure(
+  expectedMaintenanceKeys: string[],
+  error: string,
+  attemptedAt: string,
+  prUrl?: string
+): MaintenanceAttemptInput[] {
+  return expectedMaintenanceKeys.map((maintenanceKey) => ({
+    maintenance_key: maintenanceKey,
+    source: 'maintainer',
+    status: prUrl === undefined ? 'failed' : 'review_required',
+    detail:
+      prUrl === undefined
+        ? error
+        : `Maintainer created ${prUrl}, but its structured result requires manual review: ${error}`,
+    attempted_at: attemptedAt,
+  }));
+}
+
 function normalizedAgentAttemptStatus(
   overallStatus: AgentResult['status'],
-  entryStatus: string
+  entryStatus: MaintainerCandidateStatus
 ): MaintenanceAttemptInput['status'] {
   if (overallStatus === 'failed') return 'failed';
-  if (
-    entryStatus === 'no_change' ||
-    entryStatus === 'insufficient_source' ||
-    entryStatus === 'unresolved' ||
-    entryStatus === 'failed'
-  ) {
-    return entryStatus;
+  if (entryStatus === 'pr_created' && overallStatus !== 'pr_created') {
+    throw new Error('Per-candidate pr_created requires an overall pr_created result');
   }
-  if (overallStatus === 'pr_created') return 'pr_created';
-  return overallStatus;
+  return entryStatus;
+}
+
+export function reportedAgentPrUrl(candidate: unknown, branch: string): string | undefined {
+  if (typeof candidate !== 'object' || candidate === null || Array.isArray(candidate)) {
+    return undefined;
+  }
+  const result = candidate as Record<string, unknown>;
+  if (result.branch !== branch) return undefined;
+  try {
+    return optionalHttpUrl(result.pr_url, 'Maintainer agent result pr_url');
+  } catch {
+    return undefined;
+  }
+}
+
+async function readReportedAgentPrUrl(
+  resultPath: string,
+  branch: string
+): Promise<string | undefined> {
+  try {
+    return reportedAgentPrUrl(JSON.parse(await readFile(resultPath, 'utf8')) as unknown, branch);
+  } catch {
+    return undefined;
+  }
 }
 
 export function parseAgentResult(candidate: unknown, branch: string): AgentResult {
@@ -363,6 +417,9 @@ export function parseAgentResult(candidate: unknown, branch: string): AgentResul
   if (result.status === 'pr_created' && prUrl === undefined) {
     throw new Error('Maintainer agent result pr_created requires pr_url');
   }
+  if (result.status !== 'pr_created' && prUrl !== undefined) {
+    throw new Error('Maintainer agent result pr_url requires pr_created status');
+  }
   return {
     schema_version: 'commute-maintenance-result.v1',
     status: result.status as AgentResult['status'],
@@ -375,16 +432,32 @@ export function parseAgentResult(candidate: unknown, branch: string): AgentResul
 function parseAgentResultEntry(
   candidate: unknown,
   index: number
-): { maintenance_key: string; status: string; detail: string } {
+): { maintenance_key: string; status: MaintainerCandidateStatus; detail: string } {
   if (typeof candidate !== 'object' || candidate === null || Array.isArray(candidate)) {
     throw new Error(`Maintainer agent result results[${index}] must be an object`);
   }
   const result = candidate as Record<string, unknown>;
   return {
     maintenance_key: requireString(result.maintenance_key, `results[${index}].maintenance_key`),
-    status: requireString(result.status, `results[${index}].status`),
+    status: requireMaintainerCandidateStatus(result.status, `results[${index}].status`),
     detail: requireString(result.detail, `results[${index}].detail`),
   };
+}
+
+function requireMaintainerCandidateStatus(
+  candidate: unknown,
+  field: string
+): MaintainerCandidateStatus {
+  if (
+    candidate !== 'pr_created' &&
+    candidate !== 'no_change' &&
+    candidate !== 'insufficient_source' &&
+    candidate !== 'unresolved' &&
+    candidate !== 'failed'
+  ) {
+    throw new Error(`${field} has an unsupported status`);
+  }
+  return candidate;
 }
 
 function optionalHttpUrl(candidate: unknown, field: string): string | undefined {

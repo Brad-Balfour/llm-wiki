@@ -117,3 +117,14 @@ maintenance outcomes in its private normalized record.
   attempt
 - **AND** a partial per-candidate no-change or unresolved value SHALL NOT hide
   the overall failure.
+
+#### Scenario: A PR exists but its structured candidate result is invalid
+
+- **WHEN** the maintainer reports a branch-matching PR URL but its per-candidate
+  result is missing, duplicated, or uses an unsupported status
+- **THEN** local intake SHALL retain a non-retryable `review_required` attempt
+  for every candidate in that maintainer pass
+- **AND** the attempt detail and top-level outcome SHALL retain the reported PR
+  URL and the validation failure
+- **AND** the candidate SHALL require manual reconciliation rather than
+  automatically creating a duplicate maintenance PR.

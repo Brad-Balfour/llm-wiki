@@ -64,6 +64,26 @@ test('stores append-only maintenance attempts and derives the latest retry state
   ]);
 });
 
+test('does not automatically retry a candidate whose created PR needs manual review', () => {
+  const initial = importFixture('2026-07-20T12:00:00.000Z');
+  const maintenanceKey = initial.maintenance_candidates[0]?.maintenance_key;
+  assert.ok(maintenanceKey);
+
+  const result = recordMaintenanceAttempts(initial, [
+    {
+      maintenance_key: maintenanceKey,
+      source: 'maintainer',
+      status: 'review_required',
+      detail:
+        'Maintainer created https://github.com/Brad-Balfour/llm-wiki/pull/99, but its structured result requires manual review.',
+      attempted_at: '2026-07-20T12:00:00.000Z',
+    },
+  ]);
+
+  assert.equal(result.maintenance_results[0]?.latest_status, 'review_required');
+  assert.equal(result.maintenance_results[0]?.retryable, false);
+});
+
 test('carries history into a retry and keeps the same candidate identity', () => {
   const initial = importFixture('2026-07-20T12:00:00.000Z');
   const maintenanceKey = initial.maintenance_candidates[0]?.maintenance_key;
