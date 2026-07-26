@@ -5,8 +5,18 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { promisify } from 'node:util';
 
-import { reconcileSessionBundles } from '../commute/import-session-bundles.js';
-import { retrieveMaintenanceSources } from './retrieve-maintenance-sources.js';
+import {
+  carryForwardMaintenanceHistory,
+  type CommuteSessionImport,
+  type MaintenanceCandidate,
+  type MaintenanceAttemptInput,
+  reconcileSessionBundles,
+  recordMaintenanceAttempts,
+} from '../commute/import-session-bundles.js';
+import {
+  retrieveMaintenanceSources,
+  type SourceRetrievalRecord,
+} from './retrieve-maintenance-sources.js';
 
 const execFileAsync = promisify(execFile);
 type Options =
@@ -15,6 +25,7 @@ type Options =
       kind: 'maintain';
       inputs: Array<{ bundle: string; recoveryQueue?: string }>;
       outputDir: string;
+      priorIntake?: string;
     };
 
 const DEFAULT_MAINTAINER_CODEX = '/Applications/ChatGPT.app/Contents/Resources/codex';
@@ -34,6 +45,7 @@ interface MaintainerOutcome {
     | 'pr_created'
     | 'no_change'
     | 'insufficient_source'
+    | 'no_retryable_candidates'
     | 'agent_failed';
   intake_path: string;
   retrieval_path: string;
@@ -44,13 +56,20 @@ interface MaintainerOutcome {
   pr_url?: string;
 }
 
-interface AgentResult {
+export interface AgentResult {
   schema_version: 'commute-maintenance-result.v1';
   status: 'pr_created' | 'no_change' | 'insufficient_source' | 'failed';
   branch: string;
   pr_url?: string;
-  results: Array<{ maintenance_key: string; status: string; detail: string }>;
+  results: Array<{
+    maintenance_key: string;
+    status: MaintainerCandidateStatus;
+    detail: string;
+  }>;
 }
+
+type MaintainerCandidateStatus =
+  'pr_created' | 'no_change' | 'insufficient_source' | 'unresolved' | 'failed';
 
 export function buildMaintainerPrompt(options: {
   intakePath: string;
@@ -74,8 +93,9 @@ Before finishing, write JSON to ${options.resultPath} with this shape:
   "status": "pr_created" | "no_change" | "insufficient_source" | "failed",
   "branch": "${options.branch}",
   "pr_url": "string when created",
-  "results": [{ "maintenance_key": "...", "status": "...", "detail": "..." }]
+  "results": [{ "maintenance_key": "...", "status": "pr_created" | "no_change" | "insufficient_source" | "unresolved" | "failed", "detail": "..." }]
 }
+Use per-candidate status "pr_created" only for a candidate included in the PR, and put the specific change summary (for example, that an existing page was updated) in "detail". Use "no_change", "insufficient_source", "unresolved", or "failed" for every other candidate. Do not invent additional status values.
 Do not ask Brad for an intermediate approval. The resulting PR is the review point.`;
 }
 
@@ -103,24 +123,41 @@ async function main(): Promise<void> {
           }),
     }))
   );
-  const intake = reconcileSessionBundles(bundleInputs);
+  let intake = reconcileSessionBundles(bundleInputs);
+  if (options.priorIntake !== undefined) {
+    ensurePrivatePath(options.priorIntake, '--prior-intake');
+    intake = carryForwardMaintenanceHistory(
+      intake,
+      JSON.parse(await readFile(options.priorIntake, 'utf8')) as unknown
+    );
+  }
   const intakePath = path.join(outputDir, 'intake.json');
   await writeJsonExclusive(intakePath, intake);
-  const retrieval = await retrieveMaintenanceSources(intake.maintenance_candidates);
+  const candidatesToAttempt = maintenanceCandidatesForAttempt(intake);
+  const retrieval = await retrieveMaintenanceSources(candidatesToAttempt);
   const retrievalPath = path.join(outputDir, 'sources.json');
   await writeJsonExclusive(retrievalPath, retrieval);
+  intake = recordMaintenanceAttempts(intake, maintenanceAttemptsFromRetrieval(retrieval));
+  await writeJson(intakePath, intake);
 
   const viableSources = retrieval.sources.filter((source) => source.status === 'retrieved');
   if (viableSources.length === 0) {
+    const noRetryableCandidates = candidatesToAttempt.length === 0;
     const outcome: MaintainerOutcome = {
       schema_version: 'commute-maintenance-outcome.v1',
-      status: 'no_retrievable_sources',
+      status: noRetryableCandidates ? 'no_retryable_candidates' : 'no_retrievable_sources',
       intake_path: intakePath,
       retrieval_path: retrievalPath,
-      detail: 'No exact wiki_this capture had a retrievable text source.',
+      detail: noRetryableCandidates
+        ? 'Every maintenance candidate already has a non-retryable successful result.'
+        : 'No exact wiki_this capture had a retrievable text source.',
     };
     await writeJsonExclusive(path.join(outputDir, 'outcome.json'), outcome);
-    process.stdout.write(`${outputDir}\nNo retrievable wiki sources; no PR created.\n`);
+    process.stdout.write(
+      noRetryableCandidates
+        ? `${outputDir}\nNo retryable maintenance candidates; no PR created.\n`
+        : `${outputDir}\nNo retrievable wiki sources; no PR created.\n`
+    );
     return;
   }
 
@@ -149,6 +186,9 @@ async function main(): Promise<void> {
   };
   await writeJsonExclusive(path.join(outputDir, 'outcome.json'), outcome);
 
+  let agentResult: AgentResult | undefined;
+  let reportedPrUrl: string | undefined;
+  let agentAttemptsRecorded = false;
   try {
     await execFileAsync(
       resolveMaintainerCodexExecutable(),
@@ -166,10 +206,19 @@ async function main(): Promise<void> {
       ],
       { cwd: repoRoot, maxBuffer: 10 * 1024 * 1024 }
     );
-    const agentResult = parseAgentResult(
-      JSON.parse(await readFile(resultPath, 'utf8')) as unknown,
-      branch
+    const agentResultCandidate = JSON.parse(await readFile(resultPath, 'utf8')) as unknown;
+    reportedPrUrl = reportedAgentPrUrl(agentResultCandidate, branch);
+    agentResult = parseAgentResult(agentResultCandidate, branch);
+    intake = recordMaintenanceAttempts(
+      intake,
+      maintenanceAttemptsFromAgentResult(
+        agentResult,
+        viableSources.map((source) => source.maintenance_key),
+        new Date().toISOString()
+      )
     );
+    await writeJson(intakePath, intake);
+    agentAttemptsRecorded = true;
     if (agentResult.status === 'failed') {
       throw new Error('Maintainer agent reported failed outcome');
     }
@@ -186,13 +235,162 @@ async function main(): Promise<void> {
       `${outputDir}\nMaintainer ${agentResult.status}${agentResult.pr_url ? `: ${agentResult.pr_url}` : ''}\n`
     );
   } catch (error) {
+    reportedPrUrl ??= await readReportedAgentPrUrl(resultPath, branch);
+    if (!agentAttemptsRecorded) {
+      const attemptedAt = new Date().toISOString();
+      const prUrl = agentResult?.pr_url ?? reportedPrUrl;
+      intake = recordMaintenanceAttempts(
+        intake,
+        maintenanceAttemptsFromAgentFailure(
+          viableSources.map((source) => source.maintenance_key),
+          errorMessage(error),
+          attemptedAt,
+          prUrl
+        )
+      );
+      await writeJson(intakePath, intake);
+    }
+    const knownPrUrl = agentResult?.pr_url ?? reportedPrUrl;
     const failed: MaintainerOutcome = {
       ...outcome,
       status: 'agent_failed',
       detail: errorMessage(error),
+      ...(knownPrUrl === undefined ? {} : { pr_url: knownPrUrl }),
     };
     await writeFile(path.join(outputDir, 'outcome.json'), `${JSON.stringify(failed, null, 2)}\n`);
     throw error;
+  }
+}
+
+export function maintenanceAttemptsFromRetrieval(
+  retrieval: SourceRetrievalRecord
+): MaintenanceAttemptInput[] {
+  return retrieval.sources.flatMap((source) => {
+    if (source.status === 'retrieved') return [];
+    return [
+      {
+        maintenance_key: source.maintenance_key,
+        source: 'retrieval' as const,
+        status:
+          source.status === 'inaccessible'
+            ? ('inaccessible_source' as const)
+            : ('unsupported_source' as const),
+        detail:
+          source.error ??
+          (source.status === 'inaccessible'
+            ? 'Source could not be retrieved.'
+            : `Unsupported source content type: ${source.content_type ?? 'unknown'}`),
+        attempted_at: retrieval.retrieved_at,
+      },
+    ];
+  });
+}
+
+export function maintenanceCandidatesForAttempt(
+  record: Pick<CommuteSessionImport, 'maintenance_candidates' | 'maintenance_results'>
+): MaintenanceCandidate[] {
+  const latestByKey = new Map(
+    record.maintenance_results.map((result) => [result.maintenance_key, result])
+  );
+  return record.maintenance_candidates.filter(
+    (candidate) => latestByKey.get(candidate.maintenance_key)?.retryable !== false
+  );
+}
+
+export function maintenanceAttemptsFromAgentResult(
+  result: AgentResult,
+  expectedMaintenanceKeys: string[],
+  attemptedAt: string
+): MaintenanceAttemptInput[] {
+  const expected = new Set(expectedMaintenanceKeys);
+  const seen = new Set<string>();
+  for (const entry of result.results) {
+    if (!expected.has(entry.maintenance_key)) {
+      throw new Error(
+        `Maintainer agent result names unexpected maintenance candidate ${entry.maintenance_key}`
+      );
+    }
+    if (seen.has(entry.maintenance_key)) {
+      throw new Error(
+        `Maintainer agent result duplicates maintenance candidate ${entry.maintenance_key}`
+      );
+    }
+    seen.add(entry.maintenance_key);
+  }
+  if (seen.size !== expected.size) {
+    const missing = [...expected].filter((key) => !seen.has(key));
+    throw new Error(
+      `Maintainer agent result is missing maintenance candidate(s): ${missing.join(', ')}`
+    );
+  }
+  if (
+    result.status === 'pr_created' &&
+    !result.results.some((entry) => entry.status === 'pr_created')
+  ) {
+    throw new Error(
+      'Maintainer agent result pr_created must explicitly identify at least one PR-created candidate'
+    );
+  }
+
+  return result.results.map((entry) => ({
+    maintenance_key: entry.maintenance_key,
+    source: 'maintainer',
+    status: normalizedAgentAttemptStatus(result.status, entry.status),
+    detail: entry.detail,
+    attempted_at: attemptedAt,
+  }));
+}
+
+export function maintenanceAttemptsFromAgentFailure(
+  expectedMaintenanceKeys: string[],
+  error: string,
+  attemptedAt: string,
+  prUrl?: string
+): MaintenanceAttemptInput[] {
+  return expectedMaintenanceKeys.map((maintenanceKey) => ({
+    maintenance_key: maintenanceKey,
+    source: 'maintainer',
+    status: prUrl === undefined ? 'failed' : 'review_required',
+    detail:
+      prUrl === undefined
+        ? error
+        : `Maintainer created ${prUrl}, but its structured result requires manual review: ${error}`,
+    attempted_at: attemptedAt,
+  }));
+}
+
+function normalizedAgentAttemptStatus(
+  overallStatus: AgentResult['status'],
+  entryStatus: MaintainerCandidateStatus
+): MaintenanceAttemptInput['status'] {
+  if (overallStatus === 'failed') return 'failed';
+  if (entryStatus === 'pr_created' && overallStatus !== 'pr_created') {
+    throw new Error('Per-candidate pr_created requires an overall pr_created result');
+  }
+  return entryStatus;
+}
+
+export function reportedAgentPrUrl(candidate: unknown, branch: string): string | undefined {
+  if (typeof candidate !== 'object' || candidate === null || Array.isArray(candidate)) {
+    return undefined;
+  }
+  const result = candidate as Record<string, unknown>;
+  if (result.branch !== branch) return undefined;
+  try {
+    return optionalHttpUrl(result.pr_url, 'Maintainer agent result pr_url');
+  } catch {
+    return undefined;
+  }
+}
+
+async function readReportedAgentPrUrl(
+  resultPath: string,
+  branch: string
+): Promise<string | undefined> {
+  try {
+    return reportedAgentPrUrl(JSON.parse(await readFile(resultPath, 'utf8')) as unknown, branch);
+  } catch {
+    return undefined;
   }
 }
 
@@ -219,6 +417,9 @@ export function parseAgentResult(candidate: unknown, branch: string): AgentResul
   if (result.status === 'pr_created' && prUrl === undefined) {
     throw new Error('Maintainer agent result pr_created requires pr_url');
   }
+  if (result.status !== 'pr_created' && prUrl !== undefined) {
+    throw new Error('Maintainer agent result pr_url requires pr_created status');
+  }
   return {
     schema_version: 'commute-maintenance-result.v1',
     status: result.status as AgentResult['status'],
@@ -231,16 +432,32 @@ export function parseAgentResult(candidate: unknown, branch: string): AgentResul
 function parseAgentResultEntry(
   candidate: unknown,
   index: number
-): { maintenance_key: string; status: string; detail: string } {
+): { maintenance_key: string; status: MaintainerCandidateStatus; detail: string } {
   if (typeof candidate !== 'object' || candidate === null || Array.isArray(candidate)) {
     throw new Error(`Maintainer agent result results[${index}] must be an object`);
   }
   const result = candidate as Record<string, unknown>;
   return {
     maintenance_key: requireString(result.maintenance_key, `results[${index}].maintenance_key`),
-    status: requireString(result.status, `results[${index}].status`),
+    status: requireMaintainerCandidateStatus(result.status, `results[${index}].status`),
     detail: requireString(result.detail, `results[${index}].detail`),
   };
+}
+
+function requireMaintainerCandidateStatus(
+  candidate: unknown,
+  field: string
+): MaintainerCandidateStatus {
+  if (
+    candidate !== 'pr_created' &&
+    candidate !== 'no_change' &&
+    candidate !== 'insufficient_source' &&
+    candidate !== 'unresolved' &&
+    candidate !== 'failed'
+  ) {
+    throw new Error(`${field} has an unsupported status`);
+  }
+  return candidate;
 }
 
 function optionalHttpUrl(candidate: unknown, field: string): string | undefined {
@@ -256,6 +473,7 @@ function optionalHttpUrl(candidate: unknown, field: string): string | undefined 
 function parseOptions(args: string[]): Options {
   const inputs: Array<{ bundle: string; recoveryQueue?: string }> = [];
   let outputDir: string | undefined;
+  let priorIntake: string | undefined;
   let diagnoseLauncher = false;
   for (let index = 0; index < args.length; index += 1) {
     const arg = args[index];
@@ -281,22 +499,32 @@ function parseOptions(args: string[]): Options {
       if (!output) throw new Error('--output-dir requires a directory');
       outputDir = output;
       index += 1;
+    } else if (arg === '--prior-intake') {
+      const input = args[index + 1];
+      if (!input) throw new Error('--prior-intake requires a filename');
+      priorIntake = input;
+      index += 1;
     } else {
       throw new Error(`Unknown argument: ${arg ?? ''}`);
     }
   }
   if (diagnoseLauncher) {
-    if (inputs.length > 0 || outputDir !== undefined) {
+    if (inputs.length > 0 || outputDir !== undefined || priorIntake !== undefined) {
       throw new Error('--diagnose-launcher cannot be combined with maintenance inputs');
     }
     return { kind: 'diagnose_launcher' };
   }
   if (inputs.length === 0 || !outputDir) {
     throw new Error(
-      'Usage: maintain:commute -- --input <bundle.txt> [--recover-with <queue.txt>] [--input <bundle.txt> ...] --output-dir <private-directory>, or --diagnose-launcher'
+      'Usage: maintain:commute -- --input <bundle.txt> [--recover-with <queue.txt>] [--input <bundle.txt> ...] --output-dir <private-directory> [--prior-intake <private-intake.json>], or --diagnose-launcher'
     );
   }
-  return { kind: 'maintain', inputs, outputDir };
+  return {
+    kind: 'maintain',
+    inputs,
+    outputDir,
+    ...(priorIntake === undefined ? {} : { priorIntake }),
+  };
 }
 
 async function diagnoseMaintainerLauncher(): Promise<void> {
@@ -319,6 +547,14 @@ function ensurePrivateDirectory(directory: string): void {
   }
 }
 
+function ensurePrivatePath(filePath: string, option: string): void {
+  const privateRoot = path.resolve('.private');
+  const resolved = path.resolve(filePath);
+  if (!resolved.startsWith(`${privateRoot}${path.sep}`)) {
+    throw new Error(`${option} must be inside the gitignored .private directory`);
+  }
+}
+
 async function gitOutput(args: string[]): Promise<string> {
   const { stdout } = await execFileAsync('git', args);
   return stdout.trim();
@@ -326,6 +562,10 @@ async function gitOutput(args: string[]): Promise<string> {
 
 async function writeJsonExclusive(filePath: string, value: unknown): Promise<void> {
   await writeFile(filePath, `${JSON.stringify(value, null, 2)}\n`, { flag: 'wx' });
+}
+
+async function writeJson(filePath: string, value: unknown): Promise<void> {
+  await writeFile(filePath, `${JSON.stringify(value, null, 2)}\n`);
 }
 
 function timestamp(): string {

@@ -87,5 +87,44 @@ maintenance outcomes in its private normalized record.
 - **WHEN** retrieval is insufficient or the maintainer finds no useful wiki
   change
 - **THEN** the result SHALL be keyed by bundle, capture event, and source URL
+- **AND** that compound identity SHALL use an injective canonical encoding or
+  hash rather than ambiguous delimiter concatenation
+- **AND** the private import record SHALL append an immutable attempt containing
+  the result status, detail, source boundary, and timestamp
+- **AND** it SHALL derive the candidate's latest status and attempt count from
+  the append-only attempts rather than overwrite prior outcomes
 - **AND** it SHALL remain available for a later retry without appearing as an
   unrelated new candidate.
+
+#### Scenario: Retry a prior maintenance candidate
+
+- **WHEN** a later maintenance pass supplies the prior private import record
+  with the same bundle session, capture event, source URL, and maintenance key
+- **THEN** local intake SHALL carry the earlier attempts into the new private
+  record
+- **AND** it SHALL append the retry result under that existing candidate
+- **AND** it SHALL retry only candidates with no prior result or a derived
+  retryable latest result
+- **AND** it SHALL not retrieve or maintain a candidate whose latest result is
+  a completed PR
+- **AND** it SHALL reject prior history whose candidate set or exact identity
+  differs from the newly reconciled bundle input.
+
+#### Scenario: Maintainer pass fails after producing partial result data
+
+- **WHEN** the overall maintainer pass reports or throws a failure
+- **THEN** every candidate attempted by that pass SHALL receive a failed latest
+  attempt
+- **AND** a partial per-candidate no-change or unresolved value SHALL NOT hide
+  the overall failure.
+
+#### Scenario: A PR exists but its structured candidate result is invalid
+
+- **WHEN** the maintainer reports a branch-matching PR URL but its per-candidate
+  result is missing, duplicated, or uses an unsupported status
+- **THEN** local intake SHALL retain a non-retryable `review_required` attempt
+  for every candidate in that maintainer pass
+- **AND** the attempt detail and top-level outcome SHALL retain the reported PR
+  URL and the validation failure
+- **AND** the candidate SHALL require manual reconciliation rather than
+  automatically creating a duplicate maintenance PR.

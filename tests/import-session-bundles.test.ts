@@ -3,7 +3,10 @@ import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import test from 'node:test';
 
-import { reconcileSessionBundles } from '../src/commute/import-session-bundles.js';
+import {
+  maintenanceCandidateKey,
+  reconcileSessionBundles,
+} from '../src/commute/import-session-bundles.js';
 
 const fixturePath = path.resolve('tests/fixtures/commute-bundles/valid-partial-bundle.json');
 const validBundle = readFileSync(fixturePath, 'utf8');
@@ -19,7 +22,11 @@ test('reconciles a valid partial bundle without a second approval step', () => {
   assert.equal(result.sessions[0]?.status, 'accepted');
   assert.equal(result.maintenance_candidates.length, 1);
   assert.deepEqual(result.maintenance_candidates[0], {
-    maintenance_key: '2026-07-20-morning-tldr-dev:event-002:https://example.com/first',
+    maintenance_key: maintenanceCandidateKey(
+      '2026-07-20-morning-tldr-dev',
+      'event-002',
+      'https://example.com/first'
+    ),
     session_id: '2026-07-20-morning-tldr-dev',
     event_id: 'event-002',
     source_item_id: 'tldr-demo-001',
@@ -92,7 +99,11 @@ test('recovers a malformed v1-shaped bundle from its named supplied queue', () =
   assert.equal(result.sessions[0]?.status, 'accepted');
   assert.equal(result.sessions[0]?.integrity_state, 'recovered');
   assert.deepEqual(result.maintenance_candidates[0], {
-    maintenance_key: 'reconstructed-demo:save-second:https://example.com/second',
+    maintenance_key: maintenanceCandidateKey(
+      'reconstructed-demo',
+      'save-second',
+      'https://example.com/second'
+    ),
     session_id: 'reconstructed-demo',
     event_id: 'save-second',
     source_item_id: 'tldr-demo-002',
@@ -100,6 +111,41 @@ test('recovers a malformed v1-shaped bundle from its named supplied queue', () =
     url: 'https://example.com/second',
     status: 'pending',
   });
+});
+
+test('keeps distinct maintenance candidates whose colon-delimited identities would collide', () => {
+  const first = JSON.parse(validBundle) as {
+    session: Record<string, unknown>;
+    events: Array<Record<string, unknown>>;
+  };
+  first.session.session_id = 'a';
+  first.events[1]!.event_id = 'b:c';
+
+  const second = JSON.parse(validBundle) as {
+    session: Record<string, unknown>;
+    events: Array<Record<string, unknown>>;
+  };
+  second.session.session_id = 'a:b';
+  second.session.artifact_filename = '202607200815-morning-commute-session-bundle.txt';
+  second.events[1]!.event_id = 'c';
+
+  const result = reconcileSessionBundles([
+    { filename: artifactFilename, text: JSON.stringify(first) },
+    {
+      filename: '202607200815-morning-commute-session-bundle.txt',
+      text: JSON.stringify(second),
+    },
+  ]);
+
+  assert.deepEqual(
+    result.sessions.map((session) => session.status),
+    ['accepted', 'accepted']
+  );
+  assert.equal(result.maintenance_candidates.length, 2);
+  assert.notEqual(
+    result.maintenance_candidates[0]?.maintenance_key,
+    result.maintenance_candidates[1]?.maintenance_key
+  );
 });
 
 test('recovers a legacy numeric wiki marker without a memorized spoken command', () => {

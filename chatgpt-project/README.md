@@ -120,7 +120,18 @@ them solely to create a human-facing command surface. The
 `maintain:commute` command composes intake, retrieval, existing-wiki inspection,
 and branch/PR creation when that full pass is appropriate. Its normal human
 decision point is the resulting PR—not an intermediate review of the private
-record.
+record. That private `intake.json` stores append-only retrieval/maintainer
+attempts and a derived latest result for every attempted maintenance candidate.
+When retrying the same bundle/event/URL candidate in a new private output
+directory, the agent passes the earlier record with
+`--prior-intake .private/.../intake.json`. The command rejects mismatched prior
+candidate identity instead of treating it as unrelated history, and it skips
+candidates whose latest result already created a PR.
+Per-candidate maintainer statuses are closed values: `pr_created`, `no_change`,
+`insufficient_source`, `unresolved`, or `failed`; change specifics belong in
+the result detail. If the maintainer reports a PR but its candidate results
+cannot be reconciled safely, the intake records `review_required` and blocks an
+automatic retry until that PR is inspected, avoiding duplicate maintenance.
 
 Before the first real bundle-to-PR run, confirm that the local maintainer can
 launch the installed Codex command without changing the repository:
