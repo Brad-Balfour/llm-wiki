@@ -50,24 +50,22 @@ test('session-contract fixture manifest has unique scenario ids', () => {
 for (const fixture of manifest.cases) {
   test(`session-contract fixture: ${fixture.id}`, () => {
     const text = fixtureText(fixture);
+    const rejectionPattern =
+      fixture.expected === 'rejected' ? requiredErrorPattern(fixture) : undefined;
 
     if (fixture.expected === 'accepted') {
       const parsed = parseCommuteSessionBundleText(text);
       assert.equal(parsed.schema_version, 'commute-session-bundle.v1');
     } else {
-      assert.throws(
-        () => parseCommuteSessionBundleText(text),
-        new RegExp(escapeRegExp(fixture.error ?? ''))
-      );
+      assert.ok(rejectionPattern);
+      assert.throws(() => parseCommuteSessionBundleText(text), rejectionPattern);
     }
 
     const imported = reconcileSessionBundles([{ filename: fixture.input_filename, text }]);
     assert.equal(imported.sessions[0]?.status, fixture.expected);
     if (fixture.expected === 'rejected') {
-      assert.match(
-        imported.sessions[0]?.error ?? '',
-        new RegExp(escapeRegExp(fixture.error ?? ''))
-      );
+      assert.ok(rejectionPattern);
+      assert.match(imported.sessions[0]?.error ?? '', rejectionPattern);
     }
   });
 }
@@ -79,10 +77,9 @@ test('same queue filename with different content stays independently fingerprint
   const alternate = parseCommuteSessionBundleText(fixtureText(alternateCase));
 
   assert.equal(base.queue_snapshot.filename, alternate.queue_snapshot.filename);
-  assert.notEqual(
-    queueSnapshotFingerprint(base.queue_snapshot.queue),
-    queueSnapshotFingerprint(alternate.queue_snapshot.queue)
-  );
+  const baseFingerprint = queueSnapshotFingerprint(base.queue_snapshot.queue);
+  const alternateFingerprint = queueSnapshotFingerprint(alternate.queue_snapshot.queue);
+  assert.notEqual(baseFingerprint, alternateFingerprint);
 
   const imported = reconcileSessionBundles([
     { filename: baseCase.input_filename, text: fixtureText(baseCase) },
@@ -93,6 +90,10 @@ test('same queue filename with different content stays independently fingerprint
     ['accepted', 'accepted']
   );
   assert.notEqual(imported.sessions[0]?.session_id, imported.sessions[1]?.session_id);
+  assert.deepEqual(
+    imported.sessions.map((session) => session.queue_fingerprint),
+    [baseFingerprint, alternateFingerprint]
+  );
 });
 
 test('two same-day exports and a Library-suffixed artifact remain independent', () => {
@@ -205,6 +206,11 @@ function requiredFixture(id: string): FixtureCase {
   const fixture = manifest.cases.find((candidate) => candidate.id === id);
   assert.ok(fixture, `missing fixture ${id}`);
   return fixture;
+}
+
+function requiredErrorPattern(fixture: FixtureCase): RegExp {
+  assert.ok(fixture.error, `rejected fixture ${fixture.id} must declare its expected error`);
+  return new RegExp(escapeRegExp(fixture.error));
 }
 
 function withDistinctSession(fixture: FixtureCase): FixtureCase {

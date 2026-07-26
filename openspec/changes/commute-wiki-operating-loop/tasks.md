@@ -39,8 +39,10 @@
 - [x] 1.6 Define and test queue-v2's single N-of-M playback order, including
       rejection/audit fixtures for wrong section/count, repeated, foreign, and
       unmatched announced items.
-- [x] 1.7 Require and validate unique timestamped session-bundle filenames,
-      including two same-day export fixtures and Library-added numeric suffixes.
+- [ ] 1.7 Require and validate unique timestamped session-bundle filenames.
+      Timestamp format, two distinct same-day exports, and Library-added numeric
+      suffixes are covered; collision rejection for distinct sessions declaring
+      the same canonical artifact filename remains open.
 
 ## 2. Live Project Instructions And Real-Car Tests
 

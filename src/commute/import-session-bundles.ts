@@ -6,6 +6,7 @@ import {
   bundleArtifactFilenameMatches,
   type CommuteSessionBundle,
   parseCommuteSessionBundleText,
+  queueSnapshotFingerprint,
 } from './session-bundle.js';
 import { recoverSessionBundleWithSuppliedQueue } from './recover-session-bundle.js';
 
@@ -28,6 +29,7 @@ interface ImportedSession {
   session_id?: string;
   integrity_state?: CommuteSessionBundle['integrity']['state'];
   queue_filename?: string;
+  queue_fingerprint?: string;
   error?: string;
 }
 
@@ -118,6 +120,7 @@ export function reconcileSessionBundles(
             session_id: recovered.sessionId,
             integrity_state: 'recovered',
             queue_filename: recovered.queueFilename,
+            queue_fingerprint: recovered.queueFingerprint,
           });
           for (const capture of recovered.wikiCaptures) {
             const maintenanceKey = [recovered.sessionId, capture.eventId, capture.url].join(':');
@@ -157,6 +160,7 @@ export function reconcileSessionBundles(
       session_id: bundle.session.session_id,
       integrity_state: bundle.integrity.state,
       queue_filename: bundle.queue_snapshot.filename,
+      queue_fingerprint: queueSnapshotFingerprint(bundle.queue_snapshot.queue),
     });
 
     for (const event of bundle.events) {
