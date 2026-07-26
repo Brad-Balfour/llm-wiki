@@ -40,7 +40,7 @@ const manifest = JSON.parse(
 ) as FixtureManifest;
 const reviewGuide = readFileSync(path.resolve('docs/wiki-maintainer-pr-review.md'), 'utf8');
 
-test('wiki-maintainer fixtures cover every task 4.3 outcome', () => {
+test('wiki-maintainer declarative review fixtures cover every task 4.3 outcome', () => {
   assert.equal(manifest.fixture_version, 1);
   assert.deepEqual(manifest.cases.map((fixture) => fixture.id).sort(), [
     'duplicate-source-concept',
@@ -54,6 +54,11 @@ test('wiki-maintainer fixtures cover every task 4.3 outcome', () => {
     assert.ok(fixture.review_checks.length >= 2);
     if (fixture.boundary === 'maintainer') {
       assert.match(fixture.detail, /wiki\/.+\.md/);
+      const mentionedPaths = fixture.detail.match(/wiki\/[a-z0-9/-]+\.md/g) ?? [];
+      assert.ok(mentionedPaths.length > 0);
+      for (const mentionedPath of mentionedPaths) {
+        assert.doesNotThrow(() => readFileSync(path.resolve(mentionedPath), 'utf8'));
+      }
     }
   }
 });
@@ -71,7 +76,7 @@ test('wiki-maintainer review guidance covers the fixture families without enabli
 });
 
 for (const fixture of manifest.cases) {
-  test(`wiki-maintainer fixture: ${fixture.id}`, () => {
+  test(`wiki-maintainer result-recording fixture: ${fixture.id}`, () => {
     const attempt =
       fixture.boundary === 'retrieval'
         ? maintenanceAttemptsFromRetrieval({

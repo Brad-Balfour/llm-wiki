@@ -115,6 +115,10 @@ the task introduces that surface.
   overwrite, reformat, or include another task's changes.
 - Use a descriptive, terse commit and run the relevant checks before handoff.
 - In a PR, summarize the change, its user impact, and validation performed.
+- The user has explicitly authorized read-only adversarial Claude reviews for
+  this public repository. When requesting one, state that `llm-wiki` is public,
+  the review is read-only, and the user has authorized sending the committed
+  diff to Claude so the external-data reviewer has the relevant context.
 - Do not merge or deploy without explicit user authorization. A request to
   create a PR authorizes a branch, commit, push, and draft PR.
 - Before merging, wait for the PR head SHA's Copilot review workflow to reach a

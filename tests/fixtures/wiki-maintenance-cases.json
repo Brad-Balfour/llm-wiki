@@ -22,7 +22,7 @@
       "maintenance_key": "fixture:duplicate-source-concept",
       "overall_status": "no_change",
       "candidate_status": "no_change",
-      "detail": "wiki/concepts/agentic-workflows.md already covers the source without a material addition.",
+      "detail": "wiki/concepts/deterministic-agent-workflows.md already covers the source without a material addition.",
       "expected_attempt_status": "no_change",
       "review_checks": [
         "No duplicate slug or second concept page is created.",
@@ -36,7 +36,7 @@
       "maintenance_key": "fixture:existing-concept-update",
       "overall_status": "pr_created",
       "candidate_status": "pr_created",
-      "detail": "Updated wiki/concepts/agentic-workflows.md with new source-grounded synthesis and its source relationship.",
+      "detail": "Updated wiki/concepts/deterministic-agent-workflows.md with new source-grounded synthesis and its source relationship.",
       "expected_attempt_status": "pr_created",
       "review_checks": [
         "Existing useful content and provenance remain intact.",
@@ -51,7 +51,7 @@
       "maintenance_key": "fixture:useful-link-only-change",
       "overall_status": "pr_created",
       "candidate_status": "pr_created",
-      "detail": "Added a useful relationship link from wiki/concepts/agentic-workflows.md to wiki/concepts/evaluation.md.",
+      "detail": "Added a useful relationship link from wiki/concepts/deterministic-agent-workflows.md to wiki/concepts/review-driven-software-factories.md.",
       "expected_attempt_status": "pr_created",
       "review_checks": [
         "The link explains or improves a real navigational relationship.",

@@ -161,7 +161,7 @@ export function reconcileSessionBundles(
           if (sessionIds.has(recovered.sessionId)) {
             throw new Error(`Duplicate session_id ${recovered.sessionId}`);
           }
-          claimArtifactFilename(artifactFilenames, input.filename, recovered.sessionId);
+          claimArtifactFilename(artifactFilenames, recovered.artifactFilename, recovered.sessionId);
           sessionIds.add(recovered.sessionId);
           result.sessions.push({
             input_filename: input.filename,

@@ -5,6 +5,12 @@ Use this checklist for the early manual reviews required by operating-loop task
 gate: the maintainer still creates its branch and PR directly, and the PR diff
 is the review point.
 
+The accompanying fixtures are declarative review scenarios plus
+result-recording checks. They do not simulate an LLM making the maintenance
+decision or deterministically prove duplicate avoidance, provenance
+preservation, or link usefulness. Task 4.4's review of real PR diffs is the
+behavioral evidence for those judgments.
+
 ## Inaccessible URL
 
 - Confirm the private maintenance result records the retrieval limitation and
