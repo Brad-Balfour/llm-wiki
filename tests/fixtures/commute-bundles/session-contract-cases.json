@@ -1,0 +1,350 @@
+{
+  "fixture_version": 1,
+  "base_fixture": "valid-partial-bundle.json",
+  "cases": [
+    {
+      "id": "valid-single-queue-partial",
+      "description": "One self-contained queue and partial session remain importable.",
+      "input_filename": "202607200745-morning-commute-session-bundle.txt",
+      "expected": "accepted",
+      "mutations": []
+    },
+    {
+      "id": "recovered-terminal-voice-restart",
+      "description": "A Voice restart terminates playback and leaves the following capture unresolved.",
+      "input_filename": "202607200745-morning-commute-session-bundle.txt",
+      "expected": "accepted",
+      "mutations": [
+        { "op": "set", "path": ["integrity", "state"], "value": "recovered" },
+        {
+          "op": "set",
+          "path": ["integrity", "incomplete_reason"],
+          "value": "Voice restarted after item two and the prior session became terminal."
+        },
+        {
+          "op": "set",
+          "path": ["integrity", "unresolved_event_ids"],
+          "value": ["event-006"]
+        },
+        { "op": "set", "path": ["playback", "status"], "value": "abandoned" },
+        { "op": "delete", "path": ["playback", "resume_source_item_id"] },
+        {
+          "op": "append",
+          "path": ["events"],
+          "value": {
+            "event_id": "event-005",
+            "sequence": 5,
+            "kind": "playback_transition",
+            "transition": "voice_restart",
+            "item": {
+              "source_item_id": "tldr-demo-002",
+              "title": "Second exact headline",
+              "url": "https://example.com/second"
+            },
+            "evidence": [
+              {
+                "source": "user_provided_chat_or_ui_observation",
+                "reference": "The Voice surface restarted."
+              }
+            ]
+          }
+        },
+        {
+          "op": "append",
+          "path": ["events"],
+          "value": {
+            "event_id": "event-006",
+            "sequence": 6,
+            "kind": "unresolved_capture",
+            "capture_type": "unknown",
+            "user_words": "Continue where we left off.",
+            "recovery_clues": [
+              "The command occurred after Voice restarted and no queue was active."
+            ],
+            "evidence": [
+              {
+                "source": "user_provided_chat_or_ui_observation",
+                "reference": "Visible restarted chat."
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "duplicate-recognition-becomes-unresolved",
+      "description": "Duplicate speech recognition is retained without inventing a second item action.",
+      "input_filename": "202607200745-morning-commute-session-bundle.txt",
+      "expected": "accepted",
+      "mutations": [
+        { "op": "set", "path": ["integrity", "state"], "value": "recovered" },
+        {
+          "op": "set",
+          "path": ["integrity", "incomplete_reason"],
+          "value": "Voice duplicated an ambiguous feedback utterance."
+        },
+        {
+          "op": "set",
+          "path": ["integrity", "unresolved_event_ids"],
+          "value": ["event-006"]
+        },
+        { "op": "set", "path": ["playback", "status"], "value": "abandoned" },
+        { "op": "delete", "path": ["playback", "resume_source_item_id"] },
+        {
+          "op": "append",
+          "path": ["events"],
+          "value": {
+            "event_id": "event-005",
+            "sequence": 5,
+            "kind": "playback_transition",
+            "transition": "duplicate_recognition",
+            "item": {
+              "source_item_id": "tldr-demo-002",
+              "title": "Second exact headline",
+              "url": "https://example.com/second"
+            },
+            "evidence": [
+              {
+                "source": "user_provided_chat_or_ui_observation",
+                "reference": "Visible duplicate transcript fragment."
+              }
+            ]
+          }
+        },
+        {
+          "op": "append",
+          "path": ["events"],
+          "value": {
+            "event_id": "event-006",
+            "sequence": 6,
+            "kind": "unresolved_capture",
+            "capture_type": "feedback",
+            "user_words": "That was interesting, interesting.",
+            "recovery_clues": [
+              "The duplicated transcript did not establish one or two intended corrections."
+            ],
+            "evidence": [
+              {
+                "source": "user_provided_chat_or_ui_observation",
+                "reference": "Visible duplicate transcript fragment."
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "same-queue-filename-different-content",
+      "description": "A later independent session may embed different bytes under the same queue filename without being merged.",
+      "input_filename": "202607200815-morning-commute-session-bundle.txt",
+      "expected": "accepted",
+      "mutations": [
+        {
+          "op": "set",
+          "path": ["session", "session_id"],
+          "value": "2026-07-20-morning-tldr-dev-alternate"
+        },
+        {
+          "op": "set",
+          "path": ["session", "artifact_filename"],
+          "value": "202607200815-morning-commute-session-bundle.txt"
+        },
+        {
+          "op": "set",
+          "path": ["queue_snapshot", "queue", "items", 0, "summary"],
+          "value": "A deliberately different first summary for fingerprint comparison."
+        }
+      ]
+    },
+    {
+      "id": "same-day-library-suffixed-export",
+      "description": "A second same-day export remains distinct while a Library suffix is accepted.",
+      "input_filename": "202607200830-morning-commute-session-bundle (1).txt",
+      "expected": "accepted",
+      "mutations": [
+        {
+          "op": "set",
+          "path": ["session", "session_id"],
+          "value": "2026-07-20-morning-tldr-dev-second-export"
+        },
+        {
+          "op": "set",
+          "path": ["session", "artifact_filename"],
+          "value": "202607200830-morning-commute-session-bundle.txt"
+        }
+      ]
+    },
+    {
+      "id": "invented-item-identity",
+      "description": "An item identifier absent from the embedded queue is rejected.",
+      "input_filename": "202607200745-morning-commute-session-bundle.txt",
+      "expected": "rejected",
+      "error": "is not present in the embedded queue snapshot",
+      "mutations": [
+        {
+          "op": "set",
+          "path": ["events", 1, "item", "source_item_id"],
+          "value": "invented-item"
+        }
+      ]
+    },
+    {
+      "id": "feedback-bound-to-wrong-current-item",
+      "description": "A real queue item is still rejected when it was not current for the feedback.",
+      "input_filename": "202607200745-morning-commute-session-bundle.txt",
+      "expected": "rejected",
+      "error": "item_action does not match the currently announced item",
+      "mutations": [
+        {
+          "op": "set",
+          "path": ["events", 1, "item"],
+          "value": {
+            "source_item_id": "tldr-demo-002",
+            "title": "Second exact headline",
+            "url": "https://example.com/second"
+          }
+        }
+      ]
+    },
+    {
+      "id": "partial-evidence-falsely-complete",
+      "description": "A partial session cannot claim complete integrity without a durable record.",
+      "input_filename": "202607200745-morning-commute-session-bundle.txt",
+      "expected": "rejected",
+      "error": "complete integrity requires a durable event record",
+      "mutations": [
+        { "op": "set", "path": ["integrity", "state"], "value": "complete" },
+        { "op": "delete", "path": ["integrity", "incomplete_reason"] }
+      ]
+    },
+    {
+      "id": "next-transition-names-destination",
+      "description": "A next transition must identify the departing item, not its successor.",
+      "input_filename": "202607200745-morning-commute-session-bundle.txt",
+      "expected": "rejected",
+      "error": "playback_transition does not match the currently announced item",
+      "mutations": [
+        {
+          "op": "set",
+          "path": ["events", 2, "item"],
+          "value": {
+            "source_item_id": "tldr-demo-002",
+            "title": "Second exact headline",
+            "url": "https://example.com/second"
+          }
+        }
+      ]
+    },
+    {
+      "id": "repeated-announced-item",
+      "description": "Playback cannot repeat a prior item after a next transition without a repeat transition.",
+      "input_filename": "202607200745-morning-commute-session-bundle.txt",
+      "expected": "rejected",
+      "error": "item_announced does not match the expected queue position",
+      "mutations": [
+        {
+          "op": "set",
+          "path": ["events", 3, "item"],
+          "value": {
+            "source_item_id": "tldr-demo-001",
+            "title": "First exact headline",
+            "url": "https://example.com/first"
+          }
+        }
+      ]
+    },
+    {
+      "id": "foreign-announced-item",
+      "description": "An announcement from another queue cannot enter this session.",
+      "input_filename": "202607200745-morning-commute-session-bundle.txt",
+      "expected": "rejected",
+      "error": "is not present in the embedded queue snapshot",
+      "mutations": [
+        {
+          "op": "set",
+          "path": ["events", 3, "item", "source_item_id"],
+          "value": "foreign-queue-item"
+        }
+      ]
+    },
+    {
+      "id": "unmatched-announced-title",
+      "description": "A correct item id with a fabricated title is not an exact queue match.",
+      "input_filename": "202607200745-morning-commute-session-bundle.txt",
+      "expected": "rejected",
+      "error": "must exactly match title and url in the embedded queue snapshot",
+      "mutations": [
+        {
+          "op": "set",
+          "path": ["events", 3, "item", "title"],
+          "value": "Remembered but incorrect title"
+        }
+      ]
+    },
+    {
+      "id": "wrong-playback-count",
+      "description": "The queue item count must equal the canonical items array length.",
+      "input_filename": "202607200745-morning-commute-session-bundle.txt",
+      "expected": "rejected",
+      "error": "total_items must equal items.length",
+      "mutations": [
+        {
+          "op": "set",
+          "path": ["queue_snapshot", "queue", "total_items"],
+          "value": 3
+        }
+      ]
+    },
+    {
+      "id": "wrong-playback-literal",
+      "description": "The spoken N-of-M value must match the explicit queue cursor.",
+      "input_filename": "202607200745-morning-commute-session-bundle.txt",
+      "expected": "rejected",
+      "error": "must be the contiguous literal 1 of 2",
+      "mutations": [
+        {
+          "op": "set",
+          "path": ["queue_snapshot", "queue", "items", 0, "playback", "spoken"],
+          "value": "1 of 9"
+        }
+      ]
+    },
+    {
+      "id": "retired-split-section",
+      "description": "A v2 queue cannot reintroduce a headline-only section beside the canonical items array.",
+      "input_filename": "202607200745-morning-commute-session-bundle.txt",
+      "expected": "rejected",
+      "error": "queue_snapshot.queue contains unsupported fields: headline_only",
+      "mutations": [
+        {
+          "op": "set",
+          "path": ["queue_snapshot", "queue", "headline_only"],
+          "value": []
+        }
+      ]
+    },
+    {
+      "id": "chatgpt-memory-as-item-evidence",
+      "description": "A ChatGPT Memory interpretation is not an allowed exact-action evidence source.",
+      "input_filename": "202607200745-morning-commute-session-bundle.txt",
+      "expected": "rejected",
+      "error": "events[1].evidence[0].source must be one of",
+      "mutations": [
+        {
+          "op": "set",
+          "path": ["events", 1, "evidence", 0, "source"],
+          "value": "chatgpt_memory"
+        }
+      ]
+    },
+    {
+      "id": "final-export-failure-is-not-a-bundle",
+      "description": "A plain failure statement cannot be imported as a successful bundle artifact.",
+      "input_filename": "202607200845-morning-commute-session-bundle.txt",
+      "expected": "rejected",
+      "error": "not valid JSON",
+      "text": "session export failed: no downloadable bundle was created",
+      "mutations": []
+    }
+  ]
+}

@@ -27,19 +27,19 @@
       monotonic item/action transitions.
 - [x] 1.2 Specify the exact distinction between item-specific events and
       `unresolved_capture` records.
-- [ ] 1.3 Add fixtures for a valid single-queue bundle, a partial-evidence
+- [x] 1.3 Add fixtures for a valid single-queue bundle, a partial-evidence
       recovery bundle, an unresolved capture, and multiple independent bundles.
-- [ ] 1.4 Add regression fixtures for lost queue after restart, invented item,
+- [x] 1.4 Add regression fixtures for lost queue after restart, invented item,
       partial ledger falsely represented as complete, and feedback bound to the
       wrong item, including a `next` transition that incorrectly names its
       destination rather than its departing item.
-- [ ] 1.5 Add fixtures for same filename with different queue content, terminal
+- [x] 1.5 Add fixtures for same filename with different queue content, terminal
       Voice restart, final-bundle creation failure, duplicate feedback utterance,
       and a ChatGPT Memory misinterpretation.
-- [ ] 1.6 Define and test queue-v2's single N-of-M playback order, including
+- [x] 1.6 Define and test queue-v2's single N-of-M playback order, including
       rejection/audit fixtures for wrong section/count, repeated, foreign, and
       unmatched announced items.
-- [ ] 1.7 Require and validate unique timestamped session-bundle filenames,
+- [x] 1.7 Require and validate unique timestamped session-bundle filenames,
       including two same-day export fixtures and Library-added numeric suffixes.
 
 ## 2. Live Project Instructions And Real-Car Tests
@@ -82,7 +82,7 @@ combine unrelated conversations or queues into one queue.
 - [ ] 3.4 Store each no-change, inaccessible-source, and unresolved maintenance
       result in the private import record keyed by bundle, event, and source URL
       so that it can be retried without becoming a new untracked candidate.
-- [ ] 3.5 Add focused importer tests for every session-contract fixture.
+- [x] 3.5 Add focused importer tests for every session-contract fixture.
 
 ## 4. Source Retrieval And Wiki Maintenance
 
