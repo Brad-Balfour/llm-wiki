@@ -1,12 +1,17 @@
-## Current Implementation Priority (2026-07-12)
+## Current Implementation Priority (reconciled 2026-07-26)
 
-The successful manual ChatGPT Project + Gmail connector + Library + Voice proof
-of concept changes execution order without removing the automated runtime work:
+The working product path is now ChatGPT Project + Gmail + downloadable v2 queue
+artifacts + one-queue Voice sessions + downloadable session bundles. At home,
+Brad supplies the original queue(s) and bundle(s) to a maintenance chat; the
+agent invokes the repository's package scripts to validate, import, debug, and
+maintain the wiki. That user workflow is the non-regression baseline.
 
-1. Monday-ready OKF scaffold and structured post-commute handoff.
-2. Finish and merge the current TLDR ingestion work safely.
-3. Compile one approved source and establish the reviewed Pages read path.
-4. Resume provider-neutral classification and deterministic queue automation.
+The provider-neutral classifier and a local deterministic queue generator were
+part of the original unattended-runtime plan. They remain possible resilience
+work, not an automatic replacement for the working Project path. Do not build
+sections 4 or 5 merely because their original boxes remain open. First decide,
+from the scheduled-task diagnosis and real workflow evidence, whether the local
+runtime is needed as a fallback, a validation control, or the future default.
 
 ## 1. Schema Foundation
 
@@ -35,32 +40,74 @@ of concept changes execution order without removing the automated runtime work:
 
 ## 4. Classifier And Routing
 
-- [ ] 4.1 Implement provider-neutral LLM adapter interfaces with model ids, provider choice, and classifier batch size supplied by config.
-- [ ] 4.2 Implement batch-capable classification with one score-first classification record per item and structured-output validation.
-- [ ] 4.3 Reject or quarantine outputs that include `voice_behavior`, route, wiki destination, or other downstream behavior.
-- [ ] 4.4 Derive route decisions in application code from `interest_level` and `consumption_depth`.
-- [ ] 4.5 Persist classification scores, derived labels, profile version, prompt version, provider, model, and derived route for auditability and threshold tuning.
-- [ ] 4.6 Route `maybe` items and validation-failed items to review when the safer destination is unclear.
+**Scope:** classifier calibration and an optional local model-execution
+runtime. This section does not describe Voice playback defects, bundle
+generation failures, queue discovery, or other product-quality incidents.
+
+- [ ] 4.1 Decide whether a local provider-neutral classifier is still needed
+      after comparing the working Project classifier with the scheduled-task
+      failure evidence. If accepted, implement adapter interfaces with model
+      ids, provider choice, and classifier batch size supplied by config.
+- [ ] 4.2 If task 4.1 is accepted, implement batch-capable model execution with
+      one score-first classification record per item and structured-output
+      validation. Existing batch validation alone does not satisfy this task.
+- [x] 4.3 Reject or quarantine outputs that include `voice_behavior`, route, wiki destination, or other downstream behavior.
+- [x] 4.4 Derive route decisions in application code from `interest_level` and `consumption_depth`.
+- [ ] 4.5 If the local classifier is retained, persist its scores, derived
+      labels, profile version, prompt version, provider, model, and derived
+      route for auditability and threshold tuning. Session-bundle incidents are
+      not classification persistence.
+- [x] 4.6 Route `maybe` items and validation-failed items to review when the safer destination is unclear.
 
 ## 5. Commute Queue
 
-- [ ] 5.1 Generate a daily commute queue ordered by `interested/headline_only`, `interested/in_depth`, `maybe/headline_only`, then `maybe/in_depth`.
-- [ ] 5.2 Separate discuss items from quick-read awareness items in the queue file.
-- [x] 5.2a Define manual-project duplicate resolution by interest score, depth score, then source order, with mutually exclusive queue sections.
-- [ ] 5.3 Include source item ids, title, summary, URL, classification scores, derived commute behavior, reason, and version metadata.
-- [ ] 5.4 Keep manual ChatGPT/Claude voice review as the MVP voice path.
-- [ ] 5.5 Queue explicit voice notes or commute corrections for review before wiki compile or external sending.
-- [ ] 5.6 Use at least one prepared queue in a real car session or equivalent manual voice test.
-- [x] 5.7 Define private-by-default v1 and v2 commute handoff contracts and a backward-compatible local importer for explicit feedback, saved review notes, per-queue resume state, and session issues from the manual ChatGPT Voice workflow.
-- [x] 5.7a Define an append-only ChatGPT session ledger, current-pass artifact reconstruction and validation, create-only revisions, and preload/cursor safety rules.
-- [ ] 5.8 Use the handoff contract in a real commute and import the generated `.txt` artifact without manual JSON repair.
+**Scope:** v2 queue production. The live/manual Project generator is the
+current working producer. Tasks 5.1-5.3 describe a possible deterministic local
+producer and are gated by the same fallback/default decision as task 4.1; they
+must not displace the working manual path without comparative evidence.
 
-## 6. Feedback Labels
+- [ ] 5.1 If a local producer is accepted, generate a daily v2 commute queue
+      with one canonical `items` array ordered by `interested/headline_only`,
+      `interested/in_depth`, `maybe/headline_only`, then `maybe/in_depth`.
+- [ ] 5.2 If a local producer is accepted, preserve quick-read versus discuss
+      behavior as per-item metadata in that one ordered array; do not recreate
+      the retired split-array/two-cursor format.
+- [x] 5.2a Define manual-Project duplicate resolution by interest score, depth
+      score, then source order, producing one winning item in the canonical v2
+      array rather than competing queue sections.
+- [ ] 5.3 If a local producer is accepted, include source item ids, title,
+      summary, URL, classification scores, derived commute behavior, reason,
+      playback position, and version metadata required by queue v2.
+- [x] 5.4 Keep manual ChatGPT/Claude voice review as the MVP voice path.
+- [x] 5.5 Keep exact classifier corrections, playback/product incidents,
+      presentation preferences, duplicate/prior-awareness observations, wiki
+      captures, and assistant synthesis in separate bundle/import outputs.
+      Only an exact `wiki this` capture enters wiki maintenance; classifier
+      corrections do not silently become public content.
+- [x] 5.6 Use at least one prepared queue in a real car session or equivalent manual voice test.
+- [x] 5.7 Define private-by-default v1/v2 legacy handoff contracts and a
+      backward-compatible importer. This remains compatibility code; new
+      sessions use the operating-loop session-bundle contract.
+- [x] 5.7a Historical completion only: define and test the former append-only
+      ChatGPT ledger/reconstruction design. Real commute evidence superseded it
+      for new sessions; do not revive it as current work.
+- [x] 5.8 Historical acceptance evidence: use a legacy handoff in a real
+      commute and import its `.txt` artifact without manual JSON repair. Current
+      acceptance evidence is the real session-bundle flow in the successor
+      change.
+
+## 6. Classifier Correction Labels
+
+**Scope:** this is the classifier-learning loop only. It records Brad's
+item-bound interest/depth/routing corrections. Car/Voice defects, failed
+artifact writes, queue-recovery failures, presentation preferences, duplicate
+observations, and assistant-generated synthesis belong to quality-incident or
+other dedicated records, not classifier labels.
 
 - [ ] 6.1 Create JSONL feedback label storage with source item id, correction type, original scores/labels, corrected interest, corrected depth, corrected route, reason, timestamp, profile version, prompt version, provider, and model.
 - [ ] 6.2 Add a command or documented file workflow for recording manual feedback.
 - [ ] 6.3 Load recent correction labels into the next day's classifier context as examples or lightweight routing overrides where appropriate.
-- [ ] 6.4 Keep canonical profile updates on a cadence from repeated or high-harm patterns, not from every one-off correction.
+- [x] 6.4 Keep canonical profile updates on a cadence from repeated or high-harm patterns, not from every one-off correction.
 - [ ] 6.5 Add fixture tests for feedback parsing and feedback-derived routing behavior.
 
 ## 7. Wiki Compilation
