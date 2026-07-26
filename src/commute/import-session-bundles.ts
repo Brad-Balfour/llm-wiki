@@ -164,7 +164,11 @@ export function reconcileSessionBundles(
             queue_fingerprint: recovered.queueFingerprint,
           });
           for (const capture of recovered.wikiCaptures) {
-            const maintenanceKey = [recovered.sessionId, capture.eventId, capture.url].join(':');
+            const maintenanceKey = maintenanceCandidateKey(
+              recovered.sessionId,
+              capture.eventId,
+              capture.url
+            );
             if (maintenanceKeys.has(maintenanceKey)) continue;
             maintenanceKeys.add(maintenanceKey);
             result.maintenance_candidates.push({
@@ -214,8 +218,10 @@ export function reconcileSessionBundles(
 
       if (event.kind === 'item_action') {
         if (event.action === 'wiki_this') {
-          const maintenanceKey = [bundle.session.session_id, event.event_id, event.item.url].join(
-            ':'
+          const maintenanceKey = maintenanceCandidateKey(
+            bundle.session.session_id,
+            event.event_id,
+            event.item.url
           );
           if (!maintenanceKeys.has(maintenanceKey)) {
             maintenanceKeys.add(maintenanceKey);
@@ -271,6 +277,15 @@ export function reconcileSessionBundles(
   }
 
   return result;
+}
+
+export function maintenanceCandidateKey(
+  bundleSessionId: string,
+  eventId: string,
+  sourceUrl: string
+): string {
+  const identity = JSON.stringify([bundleSessionId, eventId, sourceUrl]);
+  return `sha256:${createHash('sha256').update(identity, 'utf8').digest('hex')}`;
 }
 
 export function recordMaintenanceAttempts(

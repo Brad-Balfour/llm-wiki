@@ -5,6 +5,7 @@ import {
   buildMaintainerPrompt,
   maintenanceAttemptsFromAgentResult,
   maintenanceAttemptsFromRetrieval,
+  maintenanceCandidatesForAttempt,
   parseAgentResult,
   resolveMaintainerCodexExecutable,
 } from '../src/wiki/maintain-commute.js';
@@ -157,4 +158,72 @@ test('rejects maintainer results that omit a retrievable candidate', () => {
       ),
     /missing maintenance candidate/
   );
+});
+
+test('retries only pending or retryable maintenance candidates', () => {
+  const completedKey = 'completed-candidate';
+  const retryableKey = 'retryable-candidate';
+  const candidate = (maintenanceKey: string) => ({
+    maintenance_key: maintenanceKey,
+    session_id: `session-${maintenanceKey}`,
+    event_id: `event-${maintenanceKey}`,
+    source_item_id: `item-${maintenanceKey}`,
+    title: `Title ${maintenanceKey}`,
+    url: `https://example.com/${maintenanceKey}`,
+    status: 'pending' as const,
+  });
+
+  const candidates = maintenanceCandidatesForAttempt({
+    maintenance_candidates: [candidate(completedKey), candidate(retryableKey)],
+    maintenance_results: [
+      {
+        maintenance_key: completedKey,
+        bundle_session_id: 'session-completed-candidate',
+        event_id: 'event-completed-candidate',
+        source_url: 'https://example.com/completed-candidate',
+        latest_status: 'pr_created',
+        latest_detail: 'PR created.',
+        latest_attempted_at: '2026-07-20T12:00:00.000Z',
+        attempt_count: 1,
+        retryable: false,
+      },
+      {
+        maintenance_key: retryableKey,
+        bundle_session_id: 'session-retryable-candidate',
+        event_id: 'event-retryable-candidate',
+        source_url: 'https://example.com/retryable-candidate',
+        latest_status: 'inaccessible_source',
+        latest_detail: 'HTTP 404',
+        latest_attempted_at: '2026-07-20T12:00:00.000Z',
+        attempt_count: 1,
+        retryable: true,
+      },
+    ],
+  });
+
+  assert.deepEqual(
+    candidates.map((entry) => entry.maintenance_key),
+    [retryableKey]
+  );
+});
+
+test('records every candidate as failed when the overall maintainer pass fails', () => {
+  const attempts = maintenanceAttemptsFromAgentResult(
+    {
+      schema_version: 'commute-maintenance-result.v1',
+      status: 'failed',
+      branch: 'commute-maintenance-20260720120000',
+      results: [
+        {
+          maintenance_key: 'candidate',
+          status: 'no_change',
+          detail: 'Partial result before the pass failed.',
+        },
+      ],
+    },
+    ['candidate'],
+    '2026-07-20T12:00:00.000Z'
+  );
+
+  assert.equal(attempts[0]?.status, 'failed');
 });

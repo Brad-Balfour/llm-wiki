@@ -125,7 +125,8 @@ attempts and a derived latest result for every attempted maintenance candidate.
 When retrying the same bundle/event/URL candidate in a new private output
 directory, the agent passes the earlier record with
 `--prior-intake .private/.../intake.json`. The command rejects mismatched prior
-candidate identity instead of treating it as unrelated history.
+candidate identity instead of treating it as unrelated history, and it skips
+candidates whose latest result already created a PR.
 
 Before the first real bundle-to-PR run, confirm that the local maintainer can
 launch the installed Codex command without changing the repository:

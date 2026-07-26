@@ -7,6 +7,8 @@ import { promisify } from 'node:util';
 
 import {
   carryForwardMaintenanceHistory,
+  type CommuteSessionImport,
+  type MaintenanceCandidate,
   type MaintenanceAttemptInput,
   reconcileSessionBundles,
   recordMaintenanceAttempts,
@@ -43,6 +45,7 @@ interface MaintainerOutcome {
     | 'pr_created'
     | 'no_change'
     | 'insufficient_source'
+    | 'no_retryable_candidates'
     | 'agent_failed';
   intake_path: string;
   retrieval_path: string;
@@ -123,7 +126,8 @@ async function main(): Promise<void> {
   }
   const intakePath = path.join(outputDir, 'intake.json');
   await writeJsonExclusive(intakePath, intake);
-  const retrieval = await retrieveMaintenanceSources(intake.maintenance_candidates);
+  const candidatesToAttempt = maintenanceCandidatesForAttempt(intake);
+  const retrieval = await retrieveMaintenanceSources(candidatesToAttempt);
   const retrievalPath = path.join(outputDir, 'sources.json');
   await writeJsonExclusive(retrievalPath, retrieval);
   intake = recordMaintenanceAttempts(intake, maintenanceAttemptsFromRetrieval(retrieval));
@@ -131,15 +135,22 @@ async function main(): Promise<void> {
 
   const viableSources = retrieval.sources.filter((source) => source.status === 'retrieved');
   if (viableSources.length === 0) {
+    const noRetryableCandidates = candidatesToAttempt.length === 0;
     const outcome: MaintainerOutcome = {
       schema_version: 'commute-maintenance-outcome.v1',
-      status: 'no_retrievable_sources',
+      status: noRetryableCandidates ? 'no_retryable_candidates' : 'no_retrievable_sources',
       intake_path: intakePath,
       retrieval_path: retrievalPath,
-      detail: 'No exact wiki_this capture had a retrievable text source.',
+      detail: noRetryableCandidates
+        ? 'Every maintenance candidate already has a non-retryable successful result.'
+        : 'No exact wiki_this capture had a retrievable text source.',
     };
     await writeJsonExclusive(path.join(outputDir, 'outcome.json'), outcome);
-    process.stdout.write(`${outputDir}\nNo retrievable wiki sources; no PR created.\n`);
+    process.stdout.write(
+      noRetryableCandidates
+        ? `${outputDir}\nNo retryable maintenance candidates; no PR created.\n`
+        : `${outputDir}\nNo retrievable wiki sources; no PR created.\n`
+    );
     return;
   }
 
@@ -265,6 +276,17 @@ export function maintenanceAttemptsFromRetrieval(
   });
 }
 
+export function maintenanceCandidatesForAttempt(
+  record: Pick<CommuteSessionImport, 'maintenance_candidates' | 'maintenance_results'>
+): MaintenanceCandidate[] {
+  const latestByKey = new Map(
+    record.maintenance_results.map((result) => [result.maintenance_key, result])
+  );
+  return record.maintenance_candidates.filter(
+    (candidate) => latestByKey.get(candidate.maintenance_key)?.retryable !== false
+  );
+}
+
 export function maintenanceAttemptsFromAgentResult(
   result: AgentResult,
   expectedMaintenanceKeys: string[],
@@ -305,6 +327,7 @@ function normalizedAgentAttemptStatus(
   overallStatus: AgentResult['status'],
   entryStatus: string
 ): MaintenanceAttemptInput['status'] {
+  if (overallStatus === 'failed') return 'failed';
   if (
     entryStatus === 'no_change' ||
     entryStatus === 'insufficient_source' ||
