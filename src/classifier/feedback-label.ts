@@ -4,7 +4,11 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { queueSnapshotFingerprint, validateTldrCommuteQueueV2 } from '../commute/session-bundle.js';
-import { deriveRouteFromClassification, type CommuteBehavior } from '../routing/derive.js';
+import {
+  deriveRouteFromClassification,
+  ROUTE_VERSION,
+  type CommuteBehavior,
+} from '../routing/derive.js';
 import {
   CONSUMPTION_DEPTHS,
   INTEREST_LEVELS,
@@ -52,6 +56,7 @@ export interface ClassifierFeedbackLabelInput {
   prompt_version: string;
   provider: string;
   model: string;
+  route_version: typeof ROUTE_VERSION;
   evidence_kind: 'verbatim_user_feedback';
 }
 
@@ -174,6 +179,12 @@ export function bindClassifierFeedbackLabels(
     for (const field of ['profile_version', 'prompt_version', 'provider', 'model'] as const) {
       requireExactQueueValue(item[field], input[field], field, input.source_item_id);
     }
+    requireExactQueueValue(
+      item.route_version,
+      input.route_version,
+      'route_version',
+      input.source_item_id
+    );
     const queueSha256 = queueSnapshotFingerprint(queue);
     return {
       ...input,
@@ -187,6 +198,7 @@ export async function appendClassifierFeedbackLabels(
   outputPath: string,
   labels: ClassifierFeedbackLabel[]
 ): Promise<void> {
+  ensurePrivateOutput(outputPath);
   if (labels.length === 0) throw new Error('No classifier feedback labels to record');
   const incomingIds = new Set<string>();
   for (const label of labels) {
@@ -276,6 +288,7 @@ function parseLabelInput(candidate: unknown, stored: boolean): ClassifierFeedbac
       'prompt_version',
       'provider',
       'model',
+      'route_version',
       'evidence_kind',
     ],
     'label'
@@ -284,6 +297,9 @@ function parseLabelInput(candidate: unknown, stored: boolean): ClassifierFeedbac
     throw new Error(`label.schema_version must be ${CLASSIFIER_FEEDBACK_LABEL_SCHEMA_VERSION}`);
   }
   const queueFilename = requireNonEmptyString(input.queue_filename, 'label.queue_filename');
+  if (queueFilename !== queueFilename.trim()) {
+    throw new Error('label.queue_filename must not have leading or trailing whitespace');
+  }
   if (path.basename(queueFilename) !== queueFilename) {
     throw new Error('label.queue_filename must be a filename without directory components');
   }
@@ -340,6 +356,13 @@ function parseLabelInput(candidate: unknown, stored: boolean): ClassifierFeedbac
     throw new Error('label.evidence_kind must be verbatim_user_feedback');
   }
 
+  const routeVersion = requireNonEmptyString(input.route_version, 'label.route_version');
+  if (routeVersion !== ROUTE_VERSION) {
+    throw new Error(
+      `label.route_version must be ${ROUTE_VERSION}; historical route policies require an explicit migration`
+    );
+  }
+
   return {
     schema_version: CLASSIFIER_FEEDBACK_LABEL_SCHEMA_VERSION,
     queue_filename: queueFilename,
@@ -356,6 +379,7 @@ function parseLabelInput(candidate: unknown, stored: boolean): ClassifierFeedbac
     prompt_version: requireNonEmptyString(input.prompt_version, 'label.prompt_version'),
     provider: requireNonEmptyString(input.provider, 'label.provider'),
     model: requireNonEmptyString(input.model, 'label.model'),
+    route_version: ROUTE_VERSION,
     evidence_kind: 'verbatim_user_feedback',
   };
 }

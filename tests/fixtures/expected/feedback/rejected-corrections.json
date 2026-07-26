@@ -5,6 +5,11 @@
     "error": "source_item_id must be a non-empty string"
   },
   {
+    "id": "whitespace-padded-queue-filename",
+    "change": { "queue_filename": " 20260701-sanitized-feedback.txt " },
+    "error": "queue_filename must not have leading or trailing whitespace"
+  },
+  {
     "id": "playback-incident-is-not-user-feedback",
     "change": { "evidence_kind": "playback_incident" },
     "error": "evidence_kind must be verbatim_user_feedback"
@@ -46,6 +51,11 @@
     "id": "invalid-timestamp-calendar-date",
     "change": { "recorded_at": "2026-02-30T12:30:00Z" },
     "error": "recorded_at date must be a real calendar date"
+  },
+  {
+    "id": "unsupported-historical-route-version",
+    "change": { "route_version": "routing-rules.v0" },
+    "error": "route_version must be routing-rules.v1"
   },
   {
     "id": "unchanged-label-is-not-a-correction",

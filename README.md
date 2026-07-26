@@ -77,10 +77,12 @@ npm run record:classifier-feedback -- \
 The input may be one JSON object, a JSON array, or JSONL. Records must identify
 the exact queue filename, item ID, title, and URL; include the original scores
 and labels; preserve verbatim user feedback; and use routes consistent with the
-deterministic routing table. Repeat `--queue` when one input contains labels from
-multiple queues. The recorder validates every queue and matches the label's
-identity, original classifier output, and model metadata before appending the
-queue fingerprint and label to the gitignored
+named `route_version`. The v1 label contract accepts `routing-rules.v1`; an older
+or future routing policy requires an explicit migration rather than being
+reinterpreted with current code. Repeat `--queue` when one input contains labels
+from multiple queues. The recorder validates every queue and matches the label's
+identity, original classifier output, routing version, and model metadata before
+appending the queue fingerprint and label to the gitignored
 `.private/classifier-feedback/labels.jsonl`. Playback defects, presentation
 preferences, duplicate/prior-awareness signals, and assistant summaries are
 rejected as classifier labels.

@@ -25,6 +25,7 @@
     "prompt_version": "classifier-instructions.v1",
     "provider": "OpenAI",
     "model": "fixture-model",
+    "route_version": "routing-rules.v1",
     "evidence_kind": "verbatim_user_feedback"
   },
   {
@@ -53,6 +54,7 @@
     "prompt_version": "classifier-instructions.v1",
     "provider": "OpenAI",
     "model": "fixture-model",
+    "route_version": "routing-rules.v1",
     "evidence_kind": "verbatim_user_feedback"
   }
 ]

@@ -22,6 +22,7 @@
     "prompt_version",
     "provider",
     "model",
+    "route_version",
     "evidence_kind"
   ],
   "properties": {
@@ -31,7 +32,11 @@
     "queue_filename": { "type": "string", "minLength": 1, "pattern": "^[^/\\\\]+$" },
     "source_item_id": { "type": "string", "minLength": 1 },
     "title": { "type": "string", "minLength": 1 },
-    "url": { "type": "string", "format": "uri", "pattern": "^https?://" },
+    "url": {
+      "type": "string",
+      "format": "uri",
+      "pattern": "^https?://(?![^/?#\\s]*@)\\S+$"
+    },
     "correction_type": { "enum": ["interest", "depth", "route"] },
     "original": { "$ref": "#/$defs/original_values" },
     "corrected": { "$ref": "#/$defs/corrected_values" },
@@ -42,6 +47,7 @@
     "prompt_version": { "type": "string", "minLength": 1 },
     "provider": { "type": "string", "minLength": 1 },
     "model": { "type": "string", "minLength": 1 },
+    "route_version": { "const": "routing-rules.v1" },
     "evidence_kind": { "const": "verbatim_user_feedback" }
   },
   "$defs": {

@@ -69,6 +69,19 @@ test('rejects wrong queue filenames, item ids, titles, URLs, and original classi
       ),
     /depth_score does not match/
   );
+
+  const wrongRouteQueue = JSON.parse(queue.text) as {
+    items: Array<{ route_version: string }>;
+  };
+  wrongRouteQueue.items[0]!.route_version = 'routing-rules.v2';
+  assert.throws(
+    () =>
+      bindClassifierFeedbackLabels(
+        [inputs[0]!],
+        [{ filename: queue.filename, text: JSON.stringify(wrongRouteQueue) }]
+      ),
+    /route_version does not match/
+  );
 });
 
 test('rejects incidents, synthesis, duplicates, mixed dimensions, and invalid dates', async () => {
@@ -198,9 +211,24 @@ test('keeps URL spelling exact while rejecting schema-incompatible forms', async
       ),
     /credential-free HTTP\(S\) URL/
   );
+
+  const schema = JSON.parse(
+    await readFile('schema/classifier-feedback-label-v1.schema.json', 'utf8')
+  ) as { properties: { url: { pattern: string } } };
+  const schemaPattern = new RegExp(schema.properties.url.pattern);
+  assert.equal(schemaPattern.test('https://example.com/article'), true);
+  assert.equal(schemaPattern.test('https://user:secret@example.com/article'), false);
+  assert.equal(schemaPattern.test('https://example.com/has space'), false);
 });
 
 test('refuses to write feedback outside a private directory', async () => {
+  const inputs = await validInputs();
+  const [label] = bindClassifierFeedbackLabels(inputs, [queueInput(inputs)]);
+  await assert.rejects(
+    appendClassifierFeedbackLabels(path.join(tmpdir(), 'tracked-looking-feedback.jsonl'), [label!]),
+    /must be under a \.private directory/
+  );
+
   await assert.rejects(
     runClassifierFeedbackCommand([
       '--input',
@@ -236,7 +264,7 @@ function queueInput(inputs: ClassifierFeedbackLabelInput[]): { filename: string;
     provider: input.provider,
     model: input.model,
     parser_version: 'fixture-parser.v1',
-    route_version: 'routing-rules.v1',
+    route_version: input.route_version,
     classified_at: '2026-07-01T11:00:00Z',
     routed_at: '2026-07-01T11:00:01Z',
     playback: {
