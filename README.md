@@ -65,6 +65,33 @@ The normalized record is written under gitignored
 `.private/commute-handoffs/`. See `docs/commute-voice-handoff.md` for the Monday
 workflow and `docs/replan-2026-07-12.md` for the current implementation order.
 
+Record one or more exact classifier corrections without changing the live
+profile or classifier:
+
+```bash
+npm run record:classifier-feedback -- \
+  --input path/to/labels.json \
+  --queue path/to/the-exact-queue.txt
+```
+
+The input may be one JSON object, a JSON array, or JSONL. Records must identify
+the exact queue filename, item ID, title, and URL; include the original scores
+and labels; preserve verbatim user feedback; and use routes consistent with the
+named `route_version`. The v1 label contract accepts `routing-rules.v1`; an older
+or future routing policy requires an explicit migration rather than being
+reinterpreted with current code. Repeat `--queue` when one input contains labels
+from multiple queues. The recorder validates every queue and matches the label's
+identity, original classifier output, routing version, and model metadata before
+appending the queue fingerprint and label to the gitignored
+`.private/classifier-feedback/labels.jsonl`. Playback defects, presentation
+preferences, duplicate/prior-awareness signals, and assistant summaries are
+rejected as classifier labels.
+
+The recorder serializes writes with a sibling `.lock` file containing its PID
+and start time. If it reports a stale or unreadable lock after a crash, first
+confirm that no recorder is running, then remove only that named `.lock` file
+and retry; the JSONL store itself remains append-only.
+
 Compile one explicitly approved TLDR source into the OKF wiki:
 
 ```bash

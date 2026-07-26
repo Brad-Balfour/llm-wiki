@@ -1,0 +1,60 @@
+[
+  {
+    "schema_version": "classifier-feedback-label.v1",
+    "queue_filename": "20260701-sanitized-feedback.txt",
+    "source_item_id": "fixture-robotics-01",
+    "title": "Practical Robotics Systems",
+    "url": "https://example.com/practical-robotics",
+    "correction_type": "depth",
+    "original": {
+      "interest_level": "interested",
+      "interest_score": 0.82,
+      "consumption_depth": "headline_only",
+      "depth_score": 0.52,
+      "route": "quick_read"
+    },
+    "corrected": {
+      "interest_level": "interested",
+      "consumption_depth": "in_depth",
+      "route": "discuss"
+    },
+    "reason": "This item should be in-depth, not headline only.",
+    "session_date": "2026-07-01",
+    "recorded_at": "2026-07-01T12:30:00Z",
+    "profile_version": "fixture-profile.v1",
+    "prompt_version": "classifier-instructions.v1",
+    "provider": "OpenAI",
+    "model": "fixture-model",
+    "route_version": "routing-rules.v1",
+    "evidence_kind": "verbatim_user_feedback"
+  },
+  {
+    "schema_version": "classifier-feedback-label.v1",
+    "queue_filename": "20260701-sanitized-feedback.txt",
+    "source_item_id": "fixture-service-02",
+    "title": "A Proprietary Model Service",
+    "url": "https://example.com/model-service",
+    "correction_type": "interest",
+    "original": {
+      "interest_level": "interested",
+      "interest_score": 0.82,
+      "consumption_depth": "headline_only",
+      "depth_score": 0.57,
+      "route": "quick_read"
+    },
+    "corrected": {
+      "interest_level": "uninterested",
+      "consumption_depth": "headline_only",
+      "route": "skip"
+    },
+    "reason": "This is not of interest because it is not readily available.",
+    "session_date": "2026-07-01",
+    "recorded_at": "2026-07-01T12:31:00Z",
+    "profile_version": "fixture-profile.v1",
+    "prompt_version": "classifier-instructions.v1",
+    "provider": "OpenAI",
+    "model": "fixture-model",
+    "route_version": "routing-rules.v1",
+    "evidence_kind": "verbatim_user_feedback"
+  }
+]

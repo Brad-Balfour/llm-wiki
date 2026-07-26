@@ -122,7 +122,7 @@ combine unrelated conversations or queues into one queue.
 
 ### 5B. Classifier Calibration
 
-- [ ] 5.2 Define feedback-label storage that requires exact item identity for
+- [x] 5.2 Define feedback-label storage that requires exact item identity for
       item-specific interest, depth, or routing corrections. Do not include
       playback defects, presentation preferences, duplicate/prior-awareness
       observations, general car bugs, or assistant synthesis.
