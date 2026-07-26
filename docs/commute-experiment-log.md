@@ -14,6 +14,9 @@ found a queue as proof.
 - The two downloaded July 22 queues and two downloaded session bundles.
 - The three July 24 shared commute transcripts and the three downloaded
   session bundles inspected during the July 25 post-mortem.
+- The live `Weekday TLDR Queues` Task conversation/configuration, the July
+  21-24 Task Update emails, the July 24 manual queue-generation control, and
+  the live Project settings/sources inspected on July 26.
 - The versioned project prompt, schemas, OpenSpec changes, source code, tests,
   commits, and merged pull requests in this repository.
 
@@ -43,10 +46,14 @@ retrieve sources, and preserve history after the drive.
 | Jul. 19    | Queue v2 cutover and Prompt 2.2                                                                | Move to one selected queue and a self-contained `commute-session-bundle.v1`; retire legacy ledger and handoff sources from the live Project.                                                | A self-contained bundle is the right home-side artifact, but one selected queue did not by itself make Voice retain or rediscover it.                                                                                                                                                                        |
 | Jul. 19    | Prompt 2.3 and 2.7                                                                             | Tighten event lifecycle, one-cursor playback, bundle filenames, and end-of-session behavior.                                                                                                | These changes improved what a valid bundle should look like. They did not prove that Voice could remember the queue or record every action.                                                                                                                                                                  |
 | Jul. 20    | Prompt 2.8                                                                                     | Reintroduce recovery of the already requested canonical file during playback/export, instead of refusing a bundle merely because the event record was incomplete.                           | This was a useful correction to the earlier stop-on-loss behavior, but the exact-name lookup is still unreliable in some Voice sessions.                                                                                                                                                                     |
+| Jul. 20    | Scheduled queue-v2 run                                                                         | Generate that day's General, Dev, AI, and Fintech queues in the live Project.                                                                                                               | Four real artifacts were created. The conversation then anomalously said the recurring task had been disabled because the run succeeded.                                                                                                                                                                     |
 | Jul. 21    | Natural-language save support, explicit-end behavior, and supplied-queue recovery (PRs #30–31) | Accept genuine "save this" wording when a bundle binds it to the current item; repair older malformed bundles only when they contain an explicit wiki marker and a matching supplied queue. | The local path is safer and more useful, but it cannot recover a natural-language save that Voice never put in the bundle.                                                                                                                                                                                   |
+| Jul. 21-24 | Scheduled queue-v2 runs                                                                        | Continue the weekday Gmail-to-queue path with the same managed prompt.                                                                                                                      | Gmail discovery found the expected three or four editions on every run, but every scheduled artifact-writing path failed with the same generic `oai_http_clients.client.ClientError`.                                                                                                                        |
 | Jul. 22    | General and Dev sessions                                                                       | Use real queues, discuss high-value items, save two for later team sharing, and export bundles.                                                                                             | The sessions retained valuable discussion, but failed to preserve the two saves. Exact Library lookup failed despite the files being attachable by Brad. The available queues also conflict with some transcript item identities.                                                                            |
 | Jul. 24    | General, Dev, and AI sessions                                                                  | Exercise queue-v2 playback, article discussion, wiki captures, exact-name recovery, and self-contained bundle export.                                                                       | All three bundles preserved exact canonical queue snapshots; Dev and AI exported on the first attempt. General recovered after an avoidable refusal. Several spoken modes and summaries diverged from the embedded queues, proving that correct queue identity does not guarantee per-item field projection. |
+| Jul. 24    | Manual Gmail-to-queue control                                                                  | Run the same Project queue-generation behavior manually after the scheduled run failed.                                                                                                     | The manual chat created real General, Dev, and AI queue downloads. Same-day scheduled failure plus manual success isolates the defect to scheduled/background artifact generation rather than Gmail discovery or the v2 queue contract.                                                                      |
 | Jul. 25    | Prompt 3.0 and fail-soft local conversion                                                      | Project every initial announcement from the literal current queue item and preserve semantically contradictory feedback as a quality incident rather than classifier evidence.              | All three reattached bundles imported as accepted recovered sessions. Their embedded queues matched the three downloaded canonical queues exactly. The contradictory state-management promotion was preserved and converted into a quality incident without rejecting any session.                           |
+| Jul. 26    | Live configuration audit                                                                       | Compare repository prompts with the signed-in Task and Project, inspect sources, conversations, and failure emails, and reconcile OpenSpec.                                                 | Prompt 3.0 is live, all six sources are present, and the Task body exactly matches the committed v2 body. The deployment cutover is verified; only scheduled artifact reliability remains unproven.                                                                                                          |
 
 ### July 24 Bundle Acceptance Result
 
@@ -73,9 +80,13 @@ behavior, not the raw commute transcript or private intake record.
 
 ## What Worked
 
-- The weekday Task has produced real dated, parseable queues and a useful task
-  completion email in at least one observed run. The Jul. 15 result remains the
-  acceptance baseline; a scheduler UI "last ran" value alone is not evidence.
+- The weekday Task has produced real dated, parseable queues, including four
+  artifacts on July 20. A scheduler UI "last ran" value alone is not evidence,
+  and July 21-24 repeated failures mean the scheduled path is currently
+  unreliable.
+- A manual chat in the same Project created the expected July 24 queues after
+  that day's scheduled failure. It is the current operational control and
+  fallback.
 - A manually attached queue restores grounded playback after Voice claims it
   cannot find the same file in the Project Library.
 - Long-form discussion can identify genuinely valuable material. On Jul. 22,
@@ -95,6 +106,15 @@ behavior, not the raw commute transcript or private intake record.
 The live ledger experiment failed repeatedly. Artifacts did not substantiate
 the claimed sequence of writes, and later reconstructions introduced incorrect
 headlines, URLs, or item associations. Do not revive the ledger as a remedy.
+
+### Scheduled artifact generation
+
+The July 21-24 scheduled runs completed Gmail discovery, then failed every
+artifact-writing path with the same generic
+`oai_http_clients.client.ClientError`. The same Project and v2 sources produced
+real queues in a manual July 24 control. Treat this as a scheduled/background
+platform-boundary defect unless later evidence identifies a repository input
+that differs. Do not rewrite classification or queue logic as the first remedy.
 
 ### Library discovery in Voice
 

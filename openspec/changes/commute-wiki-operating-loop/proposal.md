@@ -1,11 +1,16 @@
 ## Why
 
-The manual ChatGPT commute path has proven two important things: scheduled
-Tasks can create real dated queues in the Project Library, and a public
-GitHub-Pages wiki is a viable reading surface. It has also exposed a boundary
-problem: long Voice conversations cannot be treated as reliable mutable state.
-They have lost loaded queues, invented items, misbound feedback, and claimed
-writes to a session ledger that the resulting artifact did not contain.
+The manual ChatGPT commute path has proven that the Project can create real
+dated queues, one-queue Voice sessions can produce usable bundles, and a public
+GitHub-Pages wiki is a viable reading surface. Scheduled Tasks have also created
+real queues, but are not a reliable default: July 21-24 runs found the expected
+Gmail messages and then failed every artifact-writing path, while a manual
+same-Project control succeeded on July 24.
+
+The commute has exposed a separate boundary problem: long Voice conversations
+cannot be treated as reliable mutable state. They have lost loaded queues,
+invented items, misbound feedback, and claimed writes to a session ledger that
+the resulting artifact did not contain.
 
 The current bootstrap change treats commute work as one broad capability. That
 is insufficient for the product now being tested: a car interaction feeds a
@@ -63,7 +68,7 @@ runtime changes are made.
 - A custom Realtime/Voice API agent.
 - Programmatic access to ChatGPT Project Library or guaranteed platform support
   for updating a Library file during a Voice session.
-- Unattended Gmail ingestion outside the currently observed ChatGPT Task path.
+- Unattended Gmail ingestion outside the ChatGPT Task/manual Project paths.
 - A custom review UI, Drive archive, or a new external database.
 - Auto-merging knowledge-maintenance PRs before their usefulness and failure
   modes are established.
@@ -74,8 +79,9 @@ runtime changes are made.
 
 - Affects `chatgpt-project/`, `schema/`, `src/commute/`, `src/wiki/`, test
   fixtures, and operator documentation in follow-on implementation changes.
-- Leaves the currently working Gmail -> Task -> Library queue-generation path
-  intact while making its observable result the contract.
+- Leaves the manual Project queue-generation control intact, preserves the
+  scheduled path as a convenience producer, and makes a real downloadable
+  artifact—not scheduler status—the acceptance boundary.
 - Creates a successor planning contract; it does not mark existing bootstrap
   implementation tasks complete or silently alter deployed behavior.
 - Includes an explicit compatibility map so reviewers and future agents can

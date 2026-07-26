@@ -17,5 +17,13 @@ Directories:
 - `commute-bundles/`: sanitized, versioned session-bundle examples used to test
   exact queue binding, recovery states, and integrity validation.
 
+`commute-bundles/session-contract-cases.json` is a mutation manifest over the
+sanitized valid partial bundle. It keeps each regression small and reviewable
+while exercising the resulting complete fixture through both the session
+validator and multi-bundle importer. The cases cover terminal restart,
+unresolved and duplicate recognition, false completeness, invented or
+misbound items, playback-order drift, same-name/different-content queues,
+same-day exports, Library suffixes, and explicit export failure.
+
 Use stable source item ids and keep cross-edition duplicate instances distinct
 when a fixture is intended to exercise validation behavior.

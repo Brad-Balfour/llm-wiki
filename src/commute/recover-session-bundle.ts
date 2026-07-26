@@ -1,6 +1,6 @@
 import { createHash } from 'node:crypto';
 
-import { validateTldrCommuteQueueV2 } from './session-bundle.js';
+import { queueSnapshotFingerprint, validateTldrCommuteQueueV2 } from './session-bundle.js';
 
 export interface SuppliedQueueRecoveryInput {
   bundleFilename: string;
@@ -19,6 +19,7 @@ export interface RecoveredWikiCapture {
 export interface RecoveredSessionBundle {
   sessionId: string;
   queueFilename: string;
+  queueFingerprint: string;
   wikiCaptures: RecoveredWikiCapture[];
 }
 
@@ -65,7 +66,12 @@ export function recoverSessionBundleWithSuppliedQueue(
     });
   }
 
-  return { sessionId, queueFilename: input.queueFilename, wikiCaptures };
+  return {
+    sessionId,
+    queueFilename: input.queueFilename,
+    queueFingerprint: queueSnapshotFingerprint(queue),
+    wikiCaptures,
+  };
 }
 
 interface ExactQueueItem {

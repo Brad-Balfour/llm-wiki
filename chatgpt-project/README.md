@@ -29,7 +29,17 @@ Upload exactly these files to `LLM-Wiki-Car`:
 
 The scheduled **Weekday TLDR Queues** Task uses
 `chatgpt-project/WEEKDAY_TLDR_QUEUE_TASK_PROMPT_V2.md` as its managed prompt.
-That Task remains Monday–Friday at 11:00 AM.
+The live body was verified as an exact match on July 26, 2026. The Task remains
+Monday–Friday at 11:00 AM and is active.
+
+Scheduled execution is currently unreliable at the artifact boundary. July
+21-24 runs found the expected Gmail messages, then every file-generation path
+failed with the same generic `oai_http_clients.client.ClientError`. A manual
+July 24 control in this same Project created the three expected queue files.
+Until issue #37 passes its acceptance runs, generate queues in a manual Project
+chat with the same prompt when the scheduled run does not produce real
+downloads. Do not rewrite queue logic or claim success from the Task's `Last
+ran` status. See `docs/live-workflow-audit-2026-07-26.md`.
 
 Voice may start a queue by an exact filename or an unambiguous date plus
 newsletter name, such as `July 16 TLDR Dev`. The Project normalizes that request
@@ -81,11 +91,18 @@ npm run validate:commute-queue -- /path/to/queue.txt
 
 ## Post-Commute Bundle Intake
 
-One command accepts one or more downloaded session bundles, keeps every valid
-session even when another is malformed, and writes a private normalized intake
-record. Exact `wiki this` captures become pending maintenance candidates without
-another approval step; other feedback, incidents, and unresolved captures stay
-in their separate private lists.
+The supported user workflow is chat-mediated: supply the original downloaded
+queue file(s) and session bundle(s) to a repository maintenance/debug chat and
+ask the agent to debug and process them. The agent invokes the package scripts
+below to validate and import each session independently. Brad does not need to
+combine queues, bundles, or conversations, and does not need to run a
+human-facing consolidated CLI.
+
+The importer keeps every valid session even when another is malformed and
+writes a private normalized intake record. Exact `wiki this` captures become
+pending maintenance candidates without another approval step; classifier
+corrections, product-quality incidents, and unresolved captures stay in their
+separate private lists.
 
 ```sh
 npm run import:commute-session-bundles -- \
@@ -97,11 +114,13 @@ npm run import:commute-session-bundles -- \
 The top-level maintainer accepts the same adjacent `--recover-with` form when
 you want recovery and wiki maintenance in one run.
 
-This command is an internal/diagnostic stage, not a user approval gate. The
-top-level `maintain:commute` command invokes this intake, retrieves nominated
-sources, inspects the existing wiki, and creates a branch/PR automatically. Its
-normal human decision point is the resulting PR—not an intermediate review of
-this private record.
+These commands are agent-invoked implementation stages and diagnostics, not
+user approval gates. Keep them available rather than combining or removing
+them solely to create a human-facing command surface. The
+`maintain:commute` command composes intake, retrieval, existing-wiki inspection,
+and branch/PR creation when that full pass is appropriate. Its normal human
+decision point is the resulting PR—not an intermediate review of the private
+record.
 
 Before the first real bundle-to-PR run, confirm that the local maintainer can
 launch the installed Codex command without changing the repository:
