@@ -159,8 +159,10 @@ test('records to locked private JSONL, repairs a missing newline, and rejects se
     `${stalePath}.lock`,
     `${JSON.stringify({ pid: 999_999_999, created_at: '2026-07-01T00:00:00Z' })}\n`
   );
-  await appendClassifierFeedbackLabels(stalePath, [labels[0]!]);
-  assert.equal((await readFile(stalePath, 'utf8')).trim().split('\n').length, 1);
+  await assert.rejects(
+    appendClassifierFeedbackLabels(stalePath, [labels[0]!]),
+    /has a stale lock.*inspect and remove it/
+  );
 
   const lockedPath = path.join(root, '.private/classifier-feedback/locked.jsonl');
   await writeFile(
@@ -170,6 +172,24 @@ test('records to locked private JSONL, repairs a missing newline, and rejects se
   await assert.rejects(
     appendClassifierFeedbackLabels(lockedPath, [labels[0]!]),
     /locked by recorder process/
+  );
+});
+
+test('keeps URL spelling exact while rejecting schema-incompatible forms', async () => {
+  const [input] = await validInputs();
+  assert.throws(
+    () =>
+      parseClassifierFeedbackInput(
+        JSON.stringify({ ...input!, url: 'HTTPS://example.com/article' })
+      ),
+    /credential-free HTTP\(S\) URL/
+  );
+  assert.throws(
+    () =>
+      parseClassifierFeedbackInput(
+        JSON.stringify({ ...input!, url: ' https://example.com/article ' })
+      ),
+    /credential-free HTTP\(S\) URL/
   );
 });
 

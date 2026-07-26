@@ -296,6 +296,7 @@ function parseLabelInput(candidate: unknown, stored: boolean): ClassifierFeedbac
     throw new Error('label.url must be a credential-free HTTP(S) URL');
   }
   if (
+    !/^https?:\/\/\S+$/.test(url) ||
     !['http:', 'https:'].includes(parsedUrl.protocol) ||
     parsedUrl.username ||
     parsedUrl.password
@@ -551,12 +552,9 @@ async function acquireStoreLock(lockPath: string): Promise<FileHandle> {
           `Feedback store is locked by recorder process ${owner.pid} since ${owner.created_at}: ${lockPath}`
         );
       }
-      try {
-        await unlink(lockPath);
-      } catch (unlinkError) {
-        if (!isMissingFile(unlinkError)) throw unlinkError;
-      }
-      continue;
+      throw new Error(
+        `Feedback store has a stale lock from process ${owner.pid} since ${owner.created_at}; inspect and remove it before retrying: ${lockPath}`
+      );
     }
 
     try {
