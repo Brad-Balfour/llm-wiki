@@ -126,6 +126,10 @@ the task introduces that surface.
   thread. An absent review result while the workflow is running is never
   clearance to merge; address actionable findings in that PR or a clearly linked
   follow-up before publishing.
+- After addressing a PR review comment, reply in that thread with the fix and
+  validation evidence, then resolve the thread. The user has given standing
+  authorization for this review follow-through; do not leave fixed comments
+  merely outdated and unresolved.
 
 ## Failure-driven improvements
 
