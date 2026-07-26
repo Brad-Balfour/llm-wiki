@@ -161,6 +161,11 @@ export function reconcileSessionBundles(
           if (sessionIds.has(recovered.sessionId)) {
             throw new Error(`Duplicate session_id ${recovered.sessionId}`);
           }
+          if (!bundleArtifactFilenameMatches(input.filename, recovered.artifactFilename)) {
+            throw new Error(
+              'Recovery bundle filename does not match its declared session.artifact_filename (except a Library-added numeric suffix)'
+            );
+          }
           claimArtifactFilename(artifactFilenames, recovered.artifactFilename, recovered.sessionId);
           sessionIds.add(recovered.sessionId);
           result.sessions.push({
