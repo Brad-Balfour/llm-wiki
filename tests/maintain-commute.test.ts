@@ -3,6 +3,8 @@ import test from 'node:test';
 
 import {
   buildMaintainerPrompt,
+  maintenanceAttemptsFromAgentResult,
+  maintenanceAttemptsFromRetrieval,
   parseAgentResult,
   resolveMaintainerCodexExecutable,
 } from '../src/wiki/maintain-commute.js';
@@ -70,5 +72,89 @@ test('rejects a PR result that does not identify its pull request', () => {
         'commute-maintenance-20260720120000'
       ),
     /pr_created requires pr_url/
+  );
+});
+
+test('maps inaccessible and unsupported retrievals into retryable maintenance attempts', () => {
+  const attempts = maintenanceAttemptsFromRetrieval({
+    schema_version: 'commute-source-retrieval.v1',
+    retrieved_at: '2026-07-20T12:00:00.000Z',
+    sources: [
+      {
+        maintenance_key: 'session:event:https://example.com/missing',
+        source_item_id: 'missing',
+        requested_url: 'https://example.com/missing',
+        status: 'inaccessible',
+        retrieved_at: '2026-07-20T12:00:00.000Z',
+        error: 'HTTP 404',
+      },
+      {
+        maintenance_key: 'session:event:https://example.com/file',
+        source_item_id: 'file',
+        requested_url: 'https://example.com/file',
+        status: 'unsupported_content',
+        retrieved_at: '2026-07-20T12:00:00.000Z',
+        content_type: 'application/pdf',
+      },
+      {
+        maintenance_key: 'session:event:https://example.com/article',
+        source_item_id: 'article',
+        requested_url: 'https://example.com/article',
+        status: 'retrieved',
+        retrieved_at: '2026-07-20T12:00:00.000Z',
+        extracted_text: 'Useful source text.',
+      },
+    ],
+  });
+
+  assert.deepEqual(
+    attempts.map((attempt) => attempt.status),
+    ['inaccessible_source', 'unsupported_source']
+  );
+});
+
+test('retains no-change and unresolved maintainer results with exact candidate coverage', () => {
+  const attempts = maintenanceAttemptsFromAgentResult(
+    {
+      schema_version: 'commute-maintenance-result.v1',
+      status: 'no_change',
+      branch: 'commute-maintenance-20260720120000',
+      results: [
+        {
+          maintenance_key: 'session:event:https://example.com/covered',
+          status: 'no_change',
+          detail: 'The wiki already covers this source.',
+        },
+        {
+          maintenance_key: 'session:event:https://example.com/unclear',
+          status: 'unresolved',
+          detail: 'The source does not establish a safe useful change.',
+        },
+      ],
+    },
+    ['session:event:https://example.com/covered', 'session:event:https://example.com/unclear'],
+    '2026-07-20T12:00:00.000Z'
+  );
+
+  assert.deepEqual(
+    attempts.map((attempt) => attempt.status),
+    ['no_change', 'unresolved']
+  );
+});
+
+test('rejects maintainer results that omit a retrievable candidate', () => {
+  assert.throws(
+    () =>
+      maintenanceAttemptsFromAgentResult(
+        {
+          schema_version: 'commute-maintenance-result.v1',
+          status: 'no_change',
+          branch: 'commute-maintenance-20260720120000',
+          results: [],
+        },
+        ['session:event:https://example.com/article'],
+        '2026-07-20T12:00:00.000Z'
+      ),
+    /missing maintenance candidate/
   );
 });

@@ -81,9 +81,11 @@ combine unrelated conversations or queues into one queue.
       independent per-session results.
 - [x] 3.3 Persist valid feedback and quality incidents privately, preserving
       unresolved records for recovery rather than dropping them.
-- [ ] 3.4 Store each no-change, inaccessible-source, and unresolved maintenance
+- [x] 3.4 Store each no-change, inaccessible-source, and unresolved maintenance
       result in the private import record keyed by bundle, event, and source URL
       so that it can be retried without becoming a new untracked candidate.
+      Attempts are append-only, latest status is derived, and a retry may carry
+      forward only an exactly matching prior intake record.
 - [x] 3.5 Add focused importer tests for every session-contract fixture.
 
 ## 4. Source Retrieval And Wiki Maintenance

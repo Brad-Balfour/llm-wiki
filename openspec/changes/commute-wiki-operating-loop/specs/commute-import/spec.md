@@ -87,5 +87,19 @@ maintenance outcomes in its private normalized record.
 - **WHEN** retrieval is insufficient or the maintainer finds no useful wiki
   change
 - **THEN** the result SHALL be keyed by bundle, capture event, and source URL
+- **AND** the private import record SHALL append an immutable attempt containing
+  the result status, detail, source boundary, and timestamp
+- **AND** it SHALL derive the candidate's latest status and attempt count from
+  the append-only attempts rather than overwrite prior outcomes
 - **AND** it SHALL remain available for a later retry without appearing as an
   unrelated new candidate.
+
+#### Scenario: Retry a prior maintenance candidate
+
+- **WHEN** a later maintenance pass supplies the prior private import record
+  with the same bundle session, capture event, source URL, and maintenance key
+- **THEN** local intake SHALL carry the earlier attempts into the new private
+  record
+- **AND** it SHALL append the retry result under that existing candidate
+- **AND** it SHALL reject prior history whose candidate set or exact identity
+  differs from the newly reconciled bundle input.
