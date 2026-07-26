@@ -1,0 +1,38 @@
+[
+  {
+    "id": "missing-exact-item-identity",
+    "change": { "source_item_id": "" },
+    "error": "source_item_id must be a non-empty string"
+  },
+  {
+    "id": "playback-incident-is-not-user-feedback",
+    "change": { "evidence_kind": "playback_incident" },
+    "error": "evidence_kind must be verbatim_user_feedback"
+  },
+  {
+    "id": "assistant-synthesis-is-not-user-feedback",
+    "change": { "evidence_kind": "assistant_synthesis" },
+    "error": "evidence_kind must be verbatim_user_feedback"
+  },
+  {
+    "id": "duplicate-observation-is-not-a-correction",
+    "change": {
+      "correction_type": "duplicate",
+      "reason": "This was already consumed earlier today."
+    },
+    "error": "correction_type must be one of"
+  },
+  {
+    "id": "route-must-match-corrected-labels",
+    "change": { "corrected.route": "quick_read" },
+    "error": "corrected.route must be discuss"
+  },
+  {
+    "id": "unchanged-label-is-not-a-correction",
+    "change": {
+      "corrected.consumption_depth": "headline_only",
+      "corrected.route": "quick_read"
+    },
+    "error": "corrected must differ from label.original"
+  }
+]

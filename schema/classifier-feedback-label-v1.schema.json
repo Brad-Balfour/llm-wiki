@@ -1,0 +1,81 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://brad-balfour.github.io/llm-wiki/schema/classifier-feedback-label-v1.schema.json",
+  "title": "Classifier Feedback Label v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "label_id",
+    "queue_filename",
+    "source_item_id",
+    "title",
+    "url",
+    "correction_type",
+    "original",
+    "corrected",
+    "reason",
+    "session_date",
+    "recorded_at",
+    "profile_version",
+    "prompt_version",
+    "provider",
+    "model",
+    "evidence_kind"
+  ],
+  "properties": {
+    "schema_version": { "const": "classifier-feedback-label.v1" },
+    "label_id": { "type": "string", "pattern": "^feedback_[a-f0-9]{20}$" },
+    "queue_filename": { "type": "string", "minLength": 1, "pattern": "^[^/\\\\]+$" },
+    "source_item_id": { "type": "string", "minLength": 1 },
+    "title": { "type": "string", "minLength": 1 },
+    "url": { "type": "string", "format": "uri", "pattern": "^https?://" },
+    "correction_type": { "enum": ["interest", "depth", "route"] },
+    "original": { "$ref": "#/$defs/original_values" },
+    "corrected": { "$ref": "#/$defs/corrected_values" },
+    "reason": { "type": "string", "minLength": 1 },
+    "session_date": { "type": "string", "format": "date" },
+    "recorded_at": { "type": "string", "format": "date-time" },
+    "profile_version": { "type": "string", "minLength": 1 },
+    "prompt_version": { "type": "string", "minLength": 1 },
+    "provider": { "type": "string", "minLength": 1 },
+    "model": { "type": "string", "minLength": 1 },
+    "evidence_kind": { "const": "verbatim_user_feedback" }
+  },
+  "$defs": {
+    "interest_level": { "enum": ["interested", "maybe", "uninterested"] },
+    "consumption_depth": { "enum": ["headline_only", "in_depth"] },
+    "route": {
+      "enum": [
+        "none",
+        "skip",
+        "quick_read",
+        "discuss",
+        "optional_quick_read",
+        "optional_discuss_or_teaser"
+      ]
+    },
+    "original_values": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["interest_level", "interest_score", "consumption_depth", "depth_score", "route"],
+      "properties": {
+        "interest_level": { "$ref": "#/$defs/interest_level" },
+        "interest_score": { "type": "number", "minimum": 0, "maximum": 1 },
+        "consumption_depth": { "$ref": "#/$defs/consumption_depth" },
+        "depth_score": { "type": "number", "minimum": 0, "maximum": 1 },
+        "route": { "$ref": "#/$defs/route" }
+      }
+    },
+    "corrected_values": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["interest_level", "consumption_depth", "route"],
+      "properties": {
+        "interest_level": { "$ref": "#/$defs/interest_level" },
+        "consumption_depth": { "$ref": "#/$defs/consumption_depth" },
+        "route": { "$ref": "#/$defs/route" }
+      }
+    }
+  }
+}

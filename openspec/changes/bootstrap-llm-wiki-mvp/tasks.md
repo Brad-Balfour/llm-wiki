@@ -104,11 +104,15 @@ artifact writes, queue-recovery failures, presentation preferences, duplicate
 observations, and assistant-generated synthesis belong to quality-incident or
 other dedicated records, not classifier labels.
 
-- [ ] 6.1 Create JSONL feedback label storage with source item id, correction type, original scores/labels, corrected interest, corrected depth, corrected route, reason, timestamp, profile version, prompt version, provider, and model.
-- [ ] 6.2 Add a command or documented file workflow for recording manual feedback.
+- [x] 6.1 Create JSONL feedback label storage with source item id, correction type, original scores/labels, corrected interest, corrected depth, corrected route, reason, timestamp, profile version, prompt version, provider, and model.
+- [x] 6.2 Add a command or documented file workflow for recording manual feedback.
 - [ ] 6.3 Load recent correction labels into the next day's classifier context as examples or lightweight routing overrides where appropriate.
 - [x] 6.4 Keep canonical profile updates on a cadence from repeated or high-harm patterns, not from every one-off correction.
-- [ ] 6.5 Add fixture tests for feedback parsing and feedback-derived routing behavior.
+- [x] 6.5a Add fixture tests for feedback parsing, exact item identity, private
+      append-only persistence, duplicates, and non-classifier exclusions.
+- [ ] 6.5b Add feedback-derived routing behavior tests when task 6.3 introduces
+      an explicit label-consumption policy; recording labels alone must not
+      affect live routing.
 
 ## 7. Wiki Compilation
 

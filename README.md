@@ -65,6 +65,21 @@ The normalized record is written under gitignored
 `.private/commute-handoffs/`. See `docs/commute-voice-handoff.md` for the Monday
 workflow and `docs/replan-2026-07-12.md` for the current implementation order.
 
+Record one or more exact classifier corrections without changing the live
+profile or classifier:
+
+```bash
+npm run record:classifier-feedback -- --input path/to/labels.json
+```
+
+The input may be one JSON object, a JSON array, or JSONL. Records must identify
+the exact queue filename, item ID, title, and URL; include the original scores
+and labels; preserve verbatim user feedback; and use routes consistent with the
+deterministic routing table. Valid labels are appended to the gitignored
+`.private/classifier-feedback/labels.jsonl`. Playback defects, presentation
+preferences, duplicate/prior-awareness signals, and assistant summaries are
+rejected as classifier labels.
+
 Compile one explicitly approved TLDR source into the OKF wiki:
 
 ```bash
