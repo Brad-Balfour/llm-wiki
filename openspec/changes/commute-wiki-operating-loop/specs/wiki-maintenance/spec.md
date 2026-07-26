@@ -32,6 +32,22 @@ relevant existing wiki pages before deciding a change.
   more useful than creating a duplicate page
 - **AND** it SHALL include the source relationship in the resulting PR.
 
+#### Scenario: Saved source duplicates an existing concept
+
+- **WHEN** a retrieved saved source names a concept the wiki already covers and
+  adds no material information or useful relationship
+- **THEN** the maintainer SHALL record `no_change` naming the existing page
+- **AND** it SHALL NOT create a duplicate concept page.
+
+#### Scenario: Saved source justifies a link-only change
+
+- **WHEN** the useful maintenance effect is a meaningful relationship between
+  existing wiki concepts rather than new prose
+- **THEN** the maintainer MAY create a link-only PR that identifies the affected
+  pages
+- **AND** it SHALL NOT create cosmetic link churn, filler prose, or a duplicate
+  page.
+
 ### Requirement: Source Retrieval Before Synthesis
 
 The maintainer SHALL retrieve a saved HTTP(S) URL when feasible before relying
@@ -67,6 +83,15 @@ an additional pre-write confirmation step.
 - **WHEN** the maintainer identifies page, link, or organization changes
 - **THEN** it SHALL create one inspectable PR containing those changes
 - **AND** the PR diff SHALL be the normal review point before merge.
+
+#### Scenario: Early maintainer PR is reviewed
+
+- **WHEN** an early maintainer PR creates, updates, or interlinks wiki pages
+- **THEN** review guidance SHALL check source grounding, duplicate avoidance,
+  provenance preservation, useful link relationships, content safeguards, and
+  Jekyll validity
+- **AND** fixture coverage SHALL NOT be treated as defining an auto-merge
+  subset.
 
 ### Requirement: Content Safeguards Without Approval Ceremony
 

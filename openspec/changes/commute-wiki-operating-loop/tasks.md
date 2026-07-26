@@ -99,7 +99,7 @@ combine unrelated conversations or queues into one queue.
       Markdown as appropriate, or an observable no-change/insufficient-source
       result when no PR is useful. Compose it with private bundle intake as one
       top-level user-facing command, with no intermediate intake review gate.
-- [ ] 4.3 Add fixtures and review guidance for inaccessible URLs, duplicate
+- [x] 4.3 Add fixtures and review guidance for inaccessible URLs, duplicate
       source concepts, updates to existing concepts, and link-only changes.
 - [ ] 4.4 Review early maintainer PRs manually before defining any auto-merge
       subset.

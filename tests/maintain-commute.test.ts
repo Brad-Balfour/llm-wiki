@@ -39,6 +39,10 @@ test('builds a maintainer prompt with no intermediate approval gate', () => {
   assert.match(prompt, /create one GitHub PR with gh/);
   assert.match(prompt, /\/private\/sources\.json/);
   assert.match(prompt, /Use per-candidate status "pr_created" only/);
+  assert.match(prompt, /Do not create a second page for a concept the wiki already covers/);
+  assert.match(prompt, /preserving its useful content and provenance/);
+  assert.match(prompt, /link-only change is useful only when it materially improves navigation/);
+  assert.match(prompt, /name the affected wiki path/);
   assert.doesNotMatch(prompt, /updated_existing_page/);
 });
 

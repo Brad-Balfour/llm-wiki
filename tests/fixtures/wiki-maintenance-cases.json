@@ -1,0 +1,62 @@
+{
+  "fixture_version": 1,
+  "cases": [
+    {
+      "id": "inaccessible-url",
+      "description": "An inaccessible saved URL remains observable and retryable without invented synthesis.",
+      "boundary": "retrieval",
+      "maintenance_key": "fixture:inaccessible-url",
+      "requested_url": "https://example.com/unavailable",
+      "retrieval_status": "inaccessible",
+      "detail": "HTTP 404",
+      "expected_attempt_status": "inaccessible_source",
+      "review_checks": [
+        "No detailed summary is inferred from the queue headline.",
+        "No filler page or PR is created from the inaccessible source alone."
+      ]
+    },
+    {
+      "id": "duplicate-source-concept",
+      "description": "A source that duplicates an existing concept without adding useful information produces no change.",
+      "boundary": "maintainer",
+      "maintenance_key": "fixture:duplicate-source-concept",
+      "overall_status": "no_change",
+      "candidate_status": "no_change",
+      "detail": "wiki/concepts/agentic-workflows.md already covers the source without a material addition.",
+      "expected_attempt_status": "no_change",
+      "review_checks": [
+        "No duplicate slug or second concept page is created.",
+        "The result names the existing page and explains why no change is useful."
+      ]
+    },
+    {
+      "id": "existing-concept-update",
+      "description": "A source that materially improves an existing concept updates that page instead of creating a duplicate.",
+      "boundary": "maintainer",
+      "maintenance_key": "fixture:existing-concept-update",
+      "overall_status": "pr_created",
+      "candidate_status": "pr_created",
+      "detail": "Updated wiki/concepts/agentic-workflows.md with new source-grounded synthesis and its source relationship.",
+      "expected_attempt_status": "pr_created",
+      "review_checks": [
+        "Existing useful content and provenance remain intact.",
+        "New prose is concise original synthesis and the source relationship is visible.",
+        "No duplicate concept page is introduced."
+      ]
+    },
+    {
+      "id": "useful-link-only-change",
+      "description": "A source may justify only a meaningful relationship link without unnecessary prose or a new page.",
+      "boundary": "maintainer",
+      "maintenance_key": "fixture:useful-link-only-change",
+      "overall_status": "pr_created",
+      "candidate_status": "pr_created",
+      "detail": "Added a useful relationship link from wiki/concepts/agentic-workflows.md to wiki/concepts/evaluation.md.",
+      "expected_attempt_status": "pr_created",
+      "review_checks": [
+        "The link explains or improves a real navigational relationship.",
+        "The diff does not add cosmetic reciprocal links, filler prose, or a duplicate page."
+      ]
+    }
+  ]
+}
