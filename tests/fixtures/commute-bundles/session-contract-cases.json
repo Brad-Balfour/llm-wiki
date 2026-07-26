@@ -175,6 +175,19 @@
       ]
     },
     {
+      "id": "distinct-session-reuses-canonical-filename",
+      "description": "A distinct session is individually valid but collides when imported with the session that already declared its canonical filename.",
+      "input_filename": "202607200745-morning-commute-session-bundle (1).txt",
+      "expected": "accepted",
+      "mutations": [
+        {
+          "op": "set",
+          "path": ["session", "session_id"],
+          "value": "2026-07-20-morning-tldr-dev-filename-collision"
+        }
+      ]
+    },
+    {
       "id": "invented-item-identity",
       "description": "An item identifier absent from the embedded queue is rejected.",
       "input_filename": "202607200745-morning-commute-session-bundle.txt",

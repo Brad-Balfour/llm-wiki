@@ -128,6 +128,7 @@ export function reconcileSessionBundles(
     event_conversions: [],
   };
   const sessionIds = new Set<string>();
+  const artifactFilenames = new Map<string, string>();
   const maintenanceKeys = new Set<string>();
 
   for (const input of inputs) {
@@ -142,6 +143,11 @@ export function reconcileSessionBundles(
       if (sessionIds.has(bundle.session.session_id)) {
         throw new Error(`Duplicate session_id ${bundle.session.session_id}`);
       }
+      claimArtifactFilename(
+        artifactFilenames,
+        bundle.session.artifact_filename,
+        bundle.session.session_id
+      );
       sessionIds.add(bundle.session.session_id);
     } catch (error) {
       if (input.recoveryQueue) {
@@ -155,6 +161,7 @@ export function reconcileSessionBundles(
           if (sessionIds.has(recovered.sessionId)) {
             throw new Error(`Duplicate session_id ${recovered.sessionId}`);
           }
+          claimArtifactFilename(artifactFilenames, input.filename, recovered.sessionId);
           sessionIds.add(recovered.sessionId);
           result.sessions.push({
             input_filename: input.filename,
@@ -287,6 +294,21 @@ export function maintenanceCandidateKey(
 ): string {
   const identity = JSON.stringify([bundleSessionId, eventId, sourceUrl]);
   return `sha256:${createHash('sha256').update(identity, 'utf8').digest('hex')}`;
+}
+
+function claimArtifactFilename(
+  claimedFilenames: Map<string, string>,
+  artifactFilename: string,
+  sessionId: string
+): void {
+  const canonicalFilename = artifactFilename.replace(/ ?\([1-9][0-9]*\)\.txt$/, '.txt');
+  const priorSessionId = claimedFilenames.get(canonicalFilename);
+  if (priorSessionId !== undefined && priorSessionId !== sessionId) {
+    throw new Error(
+      `Canonical artifact filename ${canonicalFilename} is already declared by distinct session ${priorSessionId}`
+    );
+  }
+  claimedFilenames.set(canonicalFilename, sessionId);
 }
 
 export function recordMaintenanceAttempts(

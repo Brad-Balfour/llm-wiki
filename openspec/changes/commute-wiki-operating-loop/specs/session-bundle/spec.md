@@ -56,6 +56,10 @@ is `morning`; 12:00 or later is `evening`.
   be accepted as the same exported artifact rather than treated as an export
   failure. The bundle records the canonical requested filename because it may
   not be able to observe a suffix assigned after its JSON is written.
+- **AND** local multi-bundle intake SHALL reject a distinct session that
+  declares a canonical artifact filename already claimed by another supplied
+  session, including when the second downloaded file has a Library numeric
+  suffix.
 
 #### Scenario: New York time differs from UTC
 
