@@ -537,54 +537,51 @@ function requireQueueFingerprint(value: unknown, field: string): string {
 }
 
 async function acquireStoreLock(lockPath: string): Promise<FileHandle> {
-  for (let attempt = 0; attempt < 2; attempt += 1) {
-    let handle: FileHandle;
-    try {
-      handle = await open(lockPath, 'wx');
-    } catch (error) {
-      if (!isExistingFile(error)) throw error;
-      const owner = await readLockOwner(lockPath);
-      if (owner === undefined) {
-        throw new Error(`Feedback store has an unreadable lock requiring review: ${lockPath}`);
-      }
-      if (isProcessAlive(owner.pid)) {
-        throw new Error(
-          `Feedback store is locked by recorder process ${owner.pid} since ${owner.created_at}: ${lockPath}`
-        );
-      }
+  let handle: FileHandle;
+  try {
+    handle = await open(lockPath, 'wx');
+  } catch (error) {
+    if (!isExistingFile(error)) throw error;
+    const owner = await readLockOwner(lockPath);
+    if (owner === undefined) {
+      throw new Error(`Feedback store has an unreadable lock requiring review: ${lockPath}`);
+    }
+    if (isProcessAlive(owner.pid)) {
       throw new Error(
-        `Feedback store has a stale lock from process ${owner.pid} since ${owner.created_at}; inspect and remove it before retrying: ${lockPath}`
+        `Feedback store is locked by recorder process ${owner.pid} since ${owner.created_at}: ${lockPath}`
       );
     }
-
-    try {
-      await handle.writeFile(
-        `${JSON.stringify({ pid: process.pid, created_at: new Date().toISOString() })}\n`,
-        'utf8'
-      );
-      return handle;
-    } catch (error) {
-      const cleanupErrors: unknown[] = [];
-      try {
-        await handle.close();
-      } catch (closeError) {
-        cleanupErrors.push(closeError);
-      }
-      try {
-        await unlink(lockPath);
-      } catch (unlinkError) {
-        if (!isMissingFile(unlinkError)) cleanupErrors.push(unlinkError);
-      }
-      if (cleanupErrors.length > 0) {
-        throw new AggregateError(
-          [error, ...cleanupErrors],
-          'Failed to initialize and clean up the feedback store lock'
-        );
-      }
-      throw error;
-    }
+    throw new Error(
+      `Feedback store has a stale lock from process ${owner.pid} since ${owner.created_at}; inspect and remove it before retrying: ${lockPath}`
+    );
   }
-  throw new Error(`Feedback store lock could not be acquired: ${lockPath}`);
+
+  try {
+    await handle.writeFile(
+      `${JSON.stringify({ pid: process.pid, created_at: new Date().toISOString() })}\n`,
+      'utf8'
+    );
+    return handle;
+  } catch (error) {
+    const cleanupErrors: unknown[] = [];
+    try {
+      await handle.close();
+    } catch (closeError) {
+      cleanupErrors.push(closeError);
+    }
+    try {
+      await unlink(lockPath);
+    } catch (unlinkError) {
+      if (!isMissingFile(unlinkError)) cleanupErrors.push(unlinkError);
+    }
+    if (cleanupErrors.length > 0) {
+      throw new AggregateError(
+        [error, ...cleanupErrors],
+        'Failed to initialize and clean up the feedback store lock'
+      );
+    }
+    throw error;
+  }
 }
 
 async function readLockOwner(
