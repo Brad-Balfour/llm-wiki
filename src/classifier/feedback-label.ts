@@ -1,5 +1,5 @@
 import { createHash } from 'node:crypto';
-import { appendFile, mkdir, open, readFile, unlink } from 'node:fs/promises';
+import { appendFile, mkdir, open, readFile, unlink, type FileHandle } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -198,15 +198,7 @@ export async function appendClassifierFeedbackLabels(
 
   await mkdir(path.dirname(outputPath), { recursive: true });
   const lockPath = `${outputPath}.lock`;
-  let lock;
-  try {
-    lock = await open(lockPath, 'wx');
-  } catch (error) {
-    if (isExistingFile(error)) {
-      throw new Error(`Feedback store is locked by another recorder: ${lockPath}`);
-    }
-    throw error;
-  }
+  const lock = await acquireStoreLock(lockPath);
 
   try {
     let existing = '';
@@ -229,8 +221,11 @@ export async function appendClassifierFeedbackLabels(
       'utf8'
     );
   } finally {
-    await lock.close();
-    await unlink(lockPath);
+    try {
+      await lock.close();
+    } finally {
+      await unlink(lockPath);
+    }
   }
 }
 
@@ -349,7 +344,7 @@ function parseLabelInput(candidate: unknown, stored: boolean): ClassifierFeedbac
     queue_filename: queueFilename,
     source_item_id: requireNonEmptyString(input.source_item_id, 'label.source_item_id'),
     title: requireNonEmptyString(input.title, 'label.title'),
-    url: parsedUrl.toString(),
+    url,
     correction_type: correctionType,
     original,
     corrected,
@@ -538,6 +533,93 @@ function requireQueueFingerprint(value: unknown, field: string): string {
     throw new Error(`${field} must be a sha256 queue fingerprint`);
   }
   return value;
+}
+
+async function acquireStoreLock(lockPath: string): Promise<FileHandle> {
+  for (let attempt = 0; attempt < 2; attempt += 1) {
+    let handle: FileHandle;
+    try {
+      handle = await open(lockPath, 'wx');
+    } catch (error) {
+      if (!isExistingFile(error)) throw error;
+      const owner = await readLockOwner(lockPath);
+      if (owner === undefined) {
+        throw new Error(`Feedback store has an unreadable lock requiring review: ${lockPath}`);
+      }
+      if (isProcessAlive(owner.pid)) {
+        throw new Error(
+          `Feedback store is locked by recorder process ${owner.pid} since ${owner.created_at}: ${lockPath}`
+        );
+      }
+      try {
+        await unlink(lockPath);
+      } catch (unlinkError) {
+        if (!isMissingFile(unlinkError)) throw unlinkError;
+      }
+      continue;
+    }
+
+    try {
+      await handle.writeFile(
+        `${JSON.stringify({ pid: process.pid, created_at: new Date().toISOString() })}\n`,
+        'utf8'
+      );
+      return handle;
+    } catch (error) {
+      const cleanupErrors: unknown[] = [];
+      try {
+        await handle.close();
+      } catch (closeError) {
+        cleanupErrors.push(closeError);
+      }
+      try {
+        await unlink(lockPath);
+      } catch (unlinkError) {
+        if (!isMissingFile(unlinkError)) cleanupErrors.push(unlinkError);
+      }
+      if (cleanupErrors.length > 0) {
+        throw new AggregateError(
+          [error, ...cleanupErrors],
+          'Failed to initialize and clean up the feedback store lock'
+        );
+      }
+      throw error;
+    }
+  }
+  throw new Error(`Feedback store lock could not be acquired: ${lockPath}`);
+}
+
+async function readLockOwner(
+  lockPath: string
+): Promise<{ pid: number; created_at: string } | undefined> {
+  let candidate: unknown;
+  try {
+    candidate = JSON.parse(await readFile(lockPath, 'utf8')) as unknown;
+  } catch {
+    return undefined;
+  }
+  if (typeof candidate !== 'object' || candidate === null || Array.isArray(candidate)) {
+    return undefined;
+  }
+  const owner = candidate as Record<string, unknown>;
+  if (
+    !Number.isInteger(owner.pid) ||
+    (owner.pid as number) <= 0 ||
+    typeof owner.created_at !== 'string' ||
+    Number.isNaN(Date.parse(owner.created_at))
+  ) {
+    return undefined;
+  }
+  return { pid: owner.pid as number, created_at: owner.created_at };
+}
+
+function isProcessAlive(pid: number): boolean {
+  try {
+    process.kill(pid, 0);
+    return true;
+  } catch (error) {
+    return errorCode(error) !== 'ESRCH';
+  }
 }
 
 function readValue(argv: string[], index: number, arg: string): string {

@@ -25,6 +25,15 @@ test('binds exact corrections to a validated queue and derives stable label ids'
   assert.equal(labels[0]?.corrected.route, 'discuss');
   assert.equal(labels[1]?.corrected.route, 'skip');
   assert.equal(parseClassifierFeedbackLabel(labels[0]).label_id, labels[0]?.label_id);
+
+  const bareOrigin = parseClassifierFeedbackInput(
+    JSON.stringify({ ...inputs[0]!, url: 'https://example.com' })
+  );
+  assert.equal(bareOrigin[0]?.url, 'https://example.com');
+  assert.equal(
+    bindClassifierFeedbackLabels(bareOrigin, [queueInput(bareOrigin)])[0]?.url,
+    'https://example.com'
+  );
 });
 
 test('rejects wrong queue filenames, item ids, titles, URLs, and original classifier data', async () => {
@@ -145,11 +154,22 @@ test('records to locked private JSONL, repairs a missing newline, and rejects se
   await appendClassifierFeedbackLabels(noNewlinePath, [labels[1]!]);
   assert.equal((await readFile(noNewlinePath, 'utf8')).trim().split('\n').length, 2);
 
+  const stalePath = path.join(root, '.private/classifier-feedback/stale.jsonl');
+  await writeFile(
+    `${stalePath}.lock`,
+    `${JSON.stringify({ pid: 999_999_999, created_at: '2026-07-01T00:00:00Z' })}\n`
+  );
+  await appendClassifierFeedbackLabels(stalePath, [labels[0]!]);
+  assert.equal((await readFile(stalePath, 'utf8')).trim().split('\n').length, 1);
+
   const lockedPath = path.join(root, '.private/classifier-feedback/locked.jsonl');
-  await writeFile(`${lockedPath}.lock`, 'held');
+  await writeFile(
+    `${lockedPath}.lock`,
+    `${JSON.stringify({ pid: process.pid, created_at: new Date().toISOString() })}\n`
+  );
   await assert.rejects(
     appendClassifierFeedbackLabels(lockedPath, [labels[0]!]),
-    /locked by another recorder/
+    /locked by recorder process/
   );
 });
 
