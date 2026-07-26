@@ -7,6 +7,7 @@
   "required": [
     "schema_version",
     "label_id",
+    "queue_sha256",
     "queue_filename",
     "source_item_id",
     "title",
@@ -26,6 +27,7 @@
   "properties": {
     "schema_version": { "const": "classifier-feedback-label.v1" },
     "label_id": { "type": "string", "pattern": "^feedback_[a-f0-9]{20}$" },
+    "queue_sha256": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
     "queue_filename": { "type": "string", "minLength": 1, "pattern": "^[^/\\\\]+$" },
     "source_item_id": { "type": "string", "minLength": 1 },
     "title": { "type": "string", "minLength": 1 },

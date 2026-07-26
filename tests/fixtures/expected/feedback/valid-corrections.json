@@ -1,10 +1,10 @@
 [
   {
     "schema_version": "classifier-feedback-label.v1",
-    "queue_filename": "20260724-tldr.txt",
-    "source_item_id": "general-20260724-03",
-    "title": "The Robots Cometh",
-    "url": "https://time.com/article/2026/07/23/unitree-china-human-robotics/",
+    "queue_filename": "20260701-sanitized-feedback.txt",
+    "source_item_id": "fixture-robotics-01",
+    "title": "Practical Robotics Systems",
+    "url": "https://example.com/practical-robotics",
     "correction_type": "depth",
     "original": {
       "interest_level": "interested",
@@ -18,21 +18,21 @@
       "consumption_depth": "in_depth",
       "route": "discuss"
     },
-    "reason": "Feedback, this item should be in-depth, not headline only.",
-    "session_date": "2026-07-24",
-    "recorded_at": "2026-07-25T15:37:08Z",
-    "profile_version": "1.4",
+    "reason": "This item should be in-depth, not headline only.",
+    "session_date": "2026-07-01",
+    "recorded_at": "2026-07-01T12:30:00Z",
+    "profile_version": "fixture-profile.v1",
     "prompt_version": "classifier-instructions.v1",
     "provider": "OpenAI",
-    "model": "GPT-5.6 Thinking",
+    "model": "fixture-model",
     "evidence_kind": "verbatim_user_feedback"
   },
   {
     "schema_version": "classifier-feedback-label.v1",
-    "queue_filename": "20260724-tldr-ai.txt",
-    "source_item_id": "ai-20260724-02",
-    "title": "Fugu-Ultra 1.1",
-    "url": "https://sakana.ai/fugu/",
+    "queue_filename": "20260701-sanitized-feedback.txt",
+    "source_item_id": "fixture-service-02",
+    "title": "A Proprietary Model Service",
+    "url": "https://example.com/model-service",
     "correction_type": "interest",
     "original": {
       "interest_level": "interested",
@@ -46,13 +46,13 @@
       "consumption_depth": "headline_only",
       "route": "skip"
     },
-    "reason": "This is not really of interest because it is not easily available at work or home.",
-    "session_date": "2026-07-24",
-    "recorded_at": "2026-07-25T15:37:08Z",
-    "profile_version": "1.4",
+    "reason": "This is not of interest because it is not readily available.",
+    "session_date": "2026-07-01",
+    "recorded_at": "2026-07-01T12:31:00Z",
+    "profile_version": "fixture-profile.v1",
     "prompt_version": "classifier-instructions.v1",
     "provider": "OpenAI",
-    "model": "GPT-5.6 Thinking",
+    "model": "fixture-model",
     "evidence_kind": "verbatim_user_feedback"
   }
 ]

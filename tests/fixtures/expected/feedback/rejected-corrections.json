@@ -28,6 +28,26 @@
     "error": "corrected.route must be discuss"
   },
   {
+    "id": "depth-correction-cannot-change-interest",
+    "change": { "corrected.interest_level": "maybe" },
+    "error": "depth correction must not change corrected.interest_level"
+  },
+  {
+    "id": "invalid-calendar-date",
+    "change": { "session_date": "2026-02-30" },
+    "error": "session_date must be a real calendar date"
+  },
+  {
+    "id": "non-rfc3339-timestamp",
+    "change": { "recorded_at": "July 1 2026 12:30Z" },
+    "error": "recorded_at must be an RFC 3339 timestamp"
+  },
+  {
+    "id": "invalid-timestamp-calendar-date",
+    "change": { "recorded_at": "2026-02-30T12:30:00Z" },
+    "error": "recorded_at date must be a real calendar date"
+  },
+  {
     "id": "unchanged-label-is-not-a-correction",
     "change": {
       "corrected.consumption_depth": "headline_only",

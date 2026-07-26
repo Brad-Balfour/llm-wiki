@@ -1,15 +1,16 @@
 import { createHash } from 'node:crypto';
-import { appendFile, mkdir, readFile } from 'node:fs/promises';
+import { appendFile, mkdir, open, readFile, unlink } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import { queueSnapshotFingerprint, validateTldrCommuteQueueV2 } from '../commute/session-bundle.js';
+import { deriveRouteFromClassification, type CommuteBehavior } from '../routing/derive.js';
 import {
   CONSUMPTION_DEPTHS,
   INTEREST_LEVELS,
   type ConsumptionDepth,
   type InterestLevel,
 } from './types.js';
-import { deriveRouteFromClassification, type CommuteBehavior } from '../routing/derive.js';
 
 export const CLASSIFIER_FEEDBACK_LABEL_SCHEMA_VERSION = 'classifier-feedback-label.v1';
 const CORRECTION_TYPES = ['interest', 'depth', 'route'] as const;
@@ -55,31 +56,217 @@ export interface ClassifierFeedbackLabelInput {
 }
 
 export interface ClassifierFeedbackLabel extends ClassifierFeedbackLabelInput {
+  queue_sha256: string;
   label_id: string;
 }
 
 interface CliOptions {
   input?: string;
+  queues: string[];
   output: string;
   help: boolean;
 }
 
-const USAGE = `Usage: record:classifier-feedback -- --input <labels.json|labels.jsonl|-> [options]
+const USAGE = `Usage: record:classifier-feedback -- --input <labels.json|labels.jsonl|-> --queue <queue.txt> [options]
 
 Options:
   --input <path|->  JSON object, JSON array, JSONL file, or - for stdin.
+  --queue <path>    Validated queue named by the label. Repeat for multiple queues.
   --output <path>   Append-only JSONL path under .private/.
                     Defaults to .private/classifier-feedback/labels.jsonl.
   --help            Show this help text.
 `;
 
 export function parseClassifierFeedbackLabel(candidate: unknown): ClassifierFeedbackLabel {
+  const record = requireRecord(candidate, 'label');
+  const input = parseLabelInput(record, true);
+  const queueSha256 = requireQueueFingerprint(record.queue_sha256, 'label.queue_sha256');
+  const labelId = deriveLabelId(input, queueSha256);
+  if (record.label_id !== labelId) {
+    throw new Error(`label.label_id must equal the derived id ${labelId}`);
+  }
+  return { ...input, queue_sha256: queueSha256, label_id: labelId };
+}
+
+export function parseClassifierFeedbackInput(text: string): ClassifierFeedbackLabelInput[] {
+  const trimmed = text.trim();
+  if (trimmed.length === 0) throw new Error('Feedback input is empty');
+
+  let candidates: unknown[];
+  try {
+    const parsed = JSON.parse(trimmed) as unknown;
+    candidates = Array.isArray(parsed) ? parsed : [parsed];
+  } catch {
+    candidates = trimmed.split(/\r?\n/).map((line, index) => {
+      try {
+        return JSON.parse(line) as unknown;
+      } catch (error) {
+        throw new Error(`Feedback JSONL line ${index + 1} is invalid: ${errorMessage(error)}`);
+      }
+    });
+  }
+  if (candidates.length === 0) throw new Error('Feedback input contains no labels');
+  return candidates.map((candidate) => parseLabelInput(candidate, false));
+}
+
+export function bindClassifierFeedbackLabels(
+  inputs: ClassifierFeedbackLabelInput[],
+  queues: Array<{ filename: string; text: string }>
+): ClassifierFeedbackLabel[] {
+  const byFilename = new Map<string, Record<string, unknown>>();
+  for (const supplied of queues) {
+    if (byFilename.has(supplied.filename)) {
+      throw new Error(`Queue supplied more than once: ${supplied.filename}`);
+    }
+    let candidate: unknown;
+    try {
+      candidate = JSON.parse(supplied.text) as unknown;
+    } catch (error) {
+      throw new Error(`Queue ${supplied.filename} is invalid JSON: ${errorMessage(error)}`);
+    }
+    byFilename.set(supplied.filename, validateTldrCommuteQueueV2(candidate));
+  }
+
+  return inputs.map((input) => {
+    const queue = byFilename.get(input.queue_filename);
+    if (queue === undefined) {
+      throw new Error(`No --queue file supplied for ${input.queue_filename}`);
+    }
+    const items = queue.items as Record<string, unknown>[];
+    const item = items.find((candidate) => candidate.source_item_id === input.source_item_id);
+    if (item === undefined) {
+      throw new Error(
+        `${input.queue_filename} has no item with source_item_id ${input.source_item_id}`
+      );
+    }
+    requireExactQueueValue(item.title, input.title, 'title', input.source_item_id);
+    requireExactQueueValue(item.url, input.url, 'url', input.source_item_id);
+    requireExactQueueValue(
+      item.interest_level,
+      input.original.interest_level,
+      'interest_level',
+      input.source_item_id
+    );
+    requireExactQueueValue(
+      item.interest_score,
+      input.original.interest_score,
+      'interest_score',
+      input.source_item_id
+    );
+    requireExactQueueValue(
+      item.consumption_depth,
+      input.original.consumption_depth,
+      'consumption_depth',
+      input.source_item_id
+    );
+    requireExactQueueValue(
+      item.depth_score,
+      input.original.depth_score,
+      'depth_score',
+      input.source_item_id
+    );
+    requireExactQueueValue(
+      item.commute_behavior,
+      input.original.route,
+      'commute_behavior',
+      input.source_item_id
+    );
+    for (const field of ['profile_version', 'prompt_version', 'provider', 'model'] as const) {
+      requireExactQueueValue(item[field], input[field], field, input.source_item_id);
+    }
+    const queueSha256 = queueSnapshotFingerprint(queue);
+    return {
+      ...input,
+      queue_sha256: queueSha256,
+      label_id: deriveLabelId(input, queueSha256),
+    };
+  });
+}
+
+export async function appendClassifierFeedbackLabels(
+  outputPath: string,
+  labels: ClassifierFeedbackLabel[]
+): Promise<void> {
+  if (labels.length === 0) throw new Error('No classifier feedback labels to record');
+  const incomingIds = new Set<string>();
+  for (const label of labels) {
+    if (incomingIds.has(label.label_id)) {
+      throw new Error(`Duplicate feedback label in input: ${label.label_id}`);
+    }
+    incomingIds.add(label.label_id);
+  }
+
+  await mkdir(path.dirname(outputPath), { recursive: true });
+  const lockPath = `${outputPath}.lock`;
+  let lock;
+  try {
+    lock = await open(lockPath, 'wx');
+  } catch (error) {
+    if (isExistingFile(error)) {
+      throw new Error(`Feedback store is locked by another recorder: ${lockPath}`);
+    }
+    throw error;
+  }
+
+  try {
+    let existing = '';
+    try {
+      existing = await readFile(outputPath, 'utf8');
+    } catch (error) {
+      if (!isMissingFile(error)) throw error;
+    }
+    if (existing.trim().length > 0) {
+      for (const label of parseStoredJsonl(existing)) {
+        if (incomingIds.has(label.label_id)) {
+          throw new Error(`Feedback label already recorded: ${label.label_id}`);
+        }
+      }
+    }
+    const separator = existing.length > 0 && !existing.endsWith('\n') ? '\n' : '';
+    await appendFile(
+      outputPath,
+      `${separator}${labels.map((label) => JSON.stringify(label)).join('\n')}\n`,
+      'utf8'
+    );
+  } finally {
+    await lock.close();
+    await unlink(lockPath);
+  }
+}
+
+export async function runClassifierFeedbackCommand(argv: string[]): Promise<number> {
+  const options = parseOptions(argv);
+  if (options.help) {
+    process.stdout.write(USAGE);
+    return 0;
+  }
+  if (options.input === undefined || options.queues.length === 0) {
+    process.stderr.write(USAGE);
+    return 1;
+  }
+  ensurePrivateOutput(options.output);
+  const text =
+    options.input === '-' ? await readStdin() : await readFile(path.resolve(options.input), 'utf8');
+  const queueInputs = await Promise.all(
+    options.queues.map(async (queuePath) => ({
+      filename: path.basename(queuePath),
+      text: await readFile(path.resolve(queuePath), 'utf8'),
+    }))
+  );
+  const labels = bindClassifierFeedbackLabels(parseClassifierFeedbackInput(text), queueInputs);
+  const outputPath = path.resolve(options.output);
+  await appendClassifierFeedbackLabels(outputPath, labels);
+  process.stdout.write(`${outputPath}\n${labels.length} classifier feedback label(s) recorded\n`);
+  return 0;
+}
+
+function parseLabelInput(candidate: unknown, stored: boolean): ClassifierFeedbackLabelInput {
   const input = requireRecord(candidate, 'label');
   rejectUnknownKeys(
     input,
     [
       'schema_version',
-      'label_id',
+      ...(stored ? ['label_id', 'queue_sha256'] : []),
       'queue_filename',
       'source_item_id',
       'title',
@@ -101,13 +288,18 @@ export function parseClassifierFeedbackLabel(candidate: unknown): ClassifierFeed
   if (input.schema_version !== CLASSIFIER_FEEDBACK_LABEL_SCHEMA_VERSION) {
     throw new Error(`label.schema_version must be ${CLASSIFIER_FEEDBACK_LABEL_SCHEMA_VERSION}`);
   }
-
   const queueFilename = requireNonEmptyString(input.queue_filename, 'label.queue_filename');
   if (path.basename(queueFilename) !== queueFilename) {
     throw new Error('label.queue_filename must be a filename without directory components');
   }
+
   const url = requireNonEmptyString(input.url, 'label.url');
-  const parsedUrl = new URL(url);
+  let parsedUrl: URL;
+  try {
+    parsedUrl = new URL(url);
+  } catch {
+    throw new Error('label.url must be a credential-free HTTP(S) URL');
+  }
   if (
     !['http:', 'https:'].includes(parsedUrl.protocol) ||
     parsedUrl.username ||
@@ -124,22 +316,35 @@ export function parseClassifierFeedbackLabel(candidate: unknown): ClassifierFeed
   const original = parseOriginalValues(input.original);
   const corrected = parseCorrectedValues(input.corrected);
   validateRoute(original, 'label.original');
-  validateRoute(corrected, 'label.corrected');
   validateCorrection(correctionType, original, corrected);
+  if (correctionType === 'route') {
+    if (
+      original.interest_level !== corrected.interest_level ||
+      original.consumption_depth !== corrected.consumption_depth
+    ) {
+      throw new Error('route correction must not change interest or depth labels');
+    }
+  } else {
+    validateRoute(corrected, 'label.corrected');
+  }
 
   const sessionDate = requireNonEmptyString(input.session_date, 'label.session_date');
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(sessionDate)) {
-    throw new Error('label.session_date must use YYYY-MM-DD');
-  }
+  validateCalendarDate(sessionDate, 'label.session_date');
   const recordedAt = requireNonEmptyString(input.recorded_at, 'label.recorded_at');
-  if (Number.isNaN(Date.parse(recordedAt)) || !/[zZ]|[+-]\d{2}:\d{2}$/.test(recordedAt)) {
+  if (
+    !/^\d{4}-\d{2}-\d{2}T(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z|[+-](?:[01]\d|2[0-3]):[0-5]\d)$/.test(
+      recordedAt
+    ) ||
+    Number.isNaN(Date.parse(recordedAt))
+  ) {
     throw new Error('label.recorded_at must be an RFC 3339 timestamp with a timezone');
   }
+  validateCalendarDate(recordedAt.slice(0, 10), 'label.recorded_at date');
   if (input.evidence_kind !== 'verbatim_user_feedback') {
     throw new Error('label.evidence_kind must be verbatim_user_feedback');
   }
 
-  const withoutId: ClassifierFeedbackLabelInput = {
+  return {
     schema_version: CLASSIFIER_FEEDBACK_LABEL_SCHEMA_VERSION,
     queue_filename: queueFilename,
     source_item_id: requireNonEmptyString(input.source_item_id, 'label.source_item_id'),
@@ -157,86 +362,6 @@ export function parseClassifierFeedbackLabel(candidate: unknown): ClassifierFeed
     model: requireNonEmptyString(input.model, 'label.model'),
     evidence_kind: 'verbatim_user_feedback',
   };
-  const labelId = deriveLabelId(withoutId);
-  if (input.label_id !== undefined && input.label_id !== labelId) {
-    throw new Error(`label.label_id must equal the derived id ${labelId}`);
-  }
-  return { ...withoutId, label_id: labelId };
-}
-
-export function parseClassifierFeedbackInput(text: string): ClassifierFeedbackLabel[] {
-  const trimmed = text.trim();
-  if (trimmed.length === 0) throw new Error('Feedback input is empty');
-
-  let candidates: unknown[];
-  try {
-    const parsed = JSON.parse(trimmed) as unknown;
-    candidates = Array.isArray(parsed) ? parsed : [parsed];
-  } catch {
-    candidates = trimmed.split(/\r?\n/).map((line, index) => {
-      try {
-        return JSON.parse(line) as unknown;
-      } catch (error) {
-        throw new Error(`Feedback JSONL line ${index + 1} is invalid: ${errorMessage(error)}`);
-      }
-    });
-  }
-  if (candidates.length === 0) throw new Error('Feedback input contains no labels');
-  return candidates.map(parseClassifierFeedbackLabel);
-}
-
-export async function appendClassifierFeedbackLabels(
-  outputPath: string,
-  labels: ClassifierFeedbackLabel[]
-): Promise<void> {
-  const incomingIds = new Set<string>();
-  for (const label of labels) {
-    if (incomingIds.has(label.label_id)) {
-      throw new Error(`Duplicate feedback label in input: ${label.label_id}`);
-    }
-    incomingIds.add(label.label_id);
-  }
-
-  let existing = '';
-  try {
-    existing = await readFile(outputPath, 'utf8');
-  } catch (error) {
-    if (!isMissingFile(error)) throw error;
-  }
-  if (existing.trim().length > 0) {
-    for (const label of parseStoredJsonl(existing)) {
-      if (incomingIds.has(label.label_id)) {
-        throw new Error(`Feedback label already recorded: ${label.label_id}`);
-      }
-    }
-  }
-
-  await mkdir(path.dirname(outputPath), { recursive: true });
-  await appendFile(
-    outputPath,
-    `${labels.map((label) => JSON.stringify(label)).join('\n')}\n`,
-    'utf8'
-  );
-}
-
-export async function runClassifierFeedbackCommand(argv: string[]): Promise<number> {
-  const options = parseOptions(argv);
-  if (options.help) {
-    process.stdout.write(USAGE);
-    return 0;
-  }
-  if (options.input === undefined) {
-    process.stderr.write(USAGE);
-    return 1;
-  }
-  ensurePrivateOutput(options.output);
-  const text =
-    options.input === '-' ? await readStdin() : await readFile(path.resolve(options.input), 'utf8');
-  const labels = parseClassifierFeedbackInput(text);
-  const outputPath = path.resolve(options.output);
-  await appendClassifierFeedbackLabels(outputPath, labels);
-  process.stdout.write(`${outputPath}\n${labels.length} classifier feedback label(s) recorded\n`);
-  return 0;
 }
 
 function parseOriginalValues(candidate: unknown): OriginalClassifierFeedbackValues {
@@ -308,19 +433,35 @@ function validateCorrection(
   ) {
     throw new Error('label.corrected must differ from label.original');
   }
-  if (correctionType === 'interest' && original.interest_level === corrected.interest_level) {
-    throw new Error('interest correction must change corrected.interest_level');
+  if (correctionType === 'interest') {
+    if (original.interest_level === corrected.interest_level) {
+      throw new Error('interest correction must change corrected.interest_level');
+    }
+    if (original.consumption_depth !== corrected.consumption_depth) {
+      throw new Error('interest correction must not change corrected.consumption_depth');
+    }
   }
-  if (correctionType === 'depth' && original.consumption_depth === corrected.consumption_depth) {
-    throw new Error('depth correction must change corrected.consumption_depth');
+  if (correctionType === 'depth') {
+    if (original.consumption_depth === corrected.consumption_depth) {
+      throw new Error('depth correction must change corrected.consumption_depth');
+    }
+    if (original.interest_level !== corrected.interest_level) {
+      throw new Error('depth correction must not change corrected.interest_level');
+    }
   }
   if (correctionType === 'route' && original.route === corrected.route) {
     throw new Error('route correction must change corrected.route');
   }
 }
 
-function deriveLabelId(input: ClassifierFeedbackLabelInput): string {
-  const digest = createHash('sha256').update(JSON.stringify(input)).digest('hex').slice(0, 20);
+function deriveLabelId(input: ClassifierFeedbackLabelInput, queueSha256: string): string {
+  const semanticInput = Object.fromEntries(
+    Object.entries(input).filter(([key]) => key !== 'recorded_at')
+  );
+  const digest = createHash('sha256')
+    .update(JSON.stringify({ ...semanticInput, queue_sha256: queueSha256 }))
+    .digest('hex')
+    .slice(0, 20);
   return `feedback_${digest}`;
 }
 
@@ -341,6 +482,7 @@ function parseStoredJsonl(text: string): ClassifierFeedbackLabel[] {
 
 function parseOptions(argv: string[]): CliOptions {
   const options: CliOptions = {
+    queues: [],
     output: '.private/classifier-feedback/labels.jsonl',
     help: false,
   };
@@ -348,6 +490,9 @@ function parseOptions(argv: string[]): CliOptions {
     const arg = argv[index];
     if (arg === '--input') {
       options.input = readValue(argv, index, arg);
+      index += 1;
+    } else if (arg === '--queue') {
+      options.queues.push(readValue(argv, index, arg));
       index += 1;
     } else if (arg === '--output') {
       options.output = readValue(argv, index, arg);
@@ -361,6 +506,40 @@ function parseOptions(argv: string[]): CliOptions {
   return options;
 }
 
+function validateCalendarDate(value: string, field: string): void {
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
+  if (match === null) throw new Error(`${field} must use YYYY-MM-DD`);
+  const year = Number(match[1]);
+  const month = Number(match[2]);
+  const day = Number(match[3]);
+  const date = new Date(Date.UTC(year, month - 1, day));
+  if (
+    date.getUTCFullYear() !== year ||
+    date.getUTCMonth() !== month - 1 ||
+    date.getUTCDate() !== day
+  ) {
+    throw new Error(`${field} must be a real calendar date`);
+  }
+}
+
+function requireExactQueueValue(
+  actual: unknown,
+  expected: unknown,
+  field: string,
+  sourceItemId: string
+): void {
+  if (actual !== expected) {
+    throw new Error(`Queue item ${sourceItemId} ${field} does not match the feedback label`);
+  }
+}
+
+function requireQueueFingerprint(value: unknown, field: string): string {
+  if (typeof value !== 'string' || !/^sha256:[a-f0-9]{64}$/.test(value)) {
+    throw new Error(`${field} must be a sha256 queue fingerprint`);
+  }
+  return value;
+}
+
 function readValue(argv: string[], index: number, arg: string): string {
   const value = argv[index + 1];
   if (value === undefined || value.startsWith('--')) {
@@ -370,8 +549,7 @@ function readValue(argv: string[], index: number, arg: string): string {
 }
 
 function ensurePrivateOutput(output: string): void {
-  const segments = path.resolve(output).split(path.sep);
-  if (!segments.includes('.private')) {
+  if (!path.resolve(output).split(path.sep).includes('.private')) {
     throw new Error('--output must be under a .private directory');
   }
 }
@@ -418,12 +596,17 @@ function requireEnum<const T extends readonly string[]>(
 }
 
 function isMissingFile(error: unknown): boolean {
-  return (
-    typeof error === 'object' &&
-    error !== null &&
-    'code' in error &&
-    (error as { code?: unknown }).code === 'ENOENT'
-  );
+  return errorCode(error) === 'ENOENT';
+}
+
+function isExistingFile(error: unknown): boolean {
+  return errorCode(error) === 'EEXIST';
+}
+
+function errorCode(error: unknown): unknown {
+  return typeof error === 'object' && error !== null && 'code' in error
+    ? (error as { code?: unknown }).code
+    : undefined;
 }
 
 function errorMessage(error: unknown): string {
