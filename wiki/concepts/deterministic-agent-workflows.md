@@ -7,7 +7,7 @@ aliases: ["Reducing Agent Token Spend"]
 tags: ["ai-agents","deterministic-tools","token-efficiency","workflow-design"]
 wiki_slug: deterministic-agent-workflows
 created: 2026-07-21
-updated: 2026-07-21
+updated: 2026-07-28
 confidence: medium
 ---
 
@@ -35,5 +35,6 @@ Saved from TLDR Dev, 2026-07-20.
 
 ## Related
 
+- {% include wiki-related-link.md slug="adaptive-context-engineering" %}
 - {% include wiki-related-link.md slug="production-ai-agent-architecture" %}
 - {% include wiki-related-link.md slug="ai-native-software-engineering" %}

@@ -2,7 +2,7 @@
   "manifest_version": 1,
   "schema_version": "compile-state.v1",
   "created": "2026-07-05",
-  "updated": "2026-07-25T16:07:25.227Z",
+  "updated": "2026-07-28T02:15:59.667Z",
   "processed_sources": {
     "sources/tldr/2026-06-23-transformer-architecture-for-senior-engineers.txt": {
       "hash": "sha256:f9a592761c47b368e73c13dd97d27b02bc875433b632a582a40ec6419643e631",
@@ -69,6 +69,12 @@
       "output_path": "wiki/concepts/state-ownership-before-state-management.md",
       "source_item_id": "dev-20260724-02",
       "processed_at": "2026-07-25T16:07:25.227Z"
+    },
+    "sources/tldr/2026-07-27-adaptive-context-engineering.txt": {
+      "hash": "sha256:b492752decefa6fabe3cae10c7a5995bcef54df4af282024be6e360b8dc35142",
+      "output_path": "wiki/concepts/adaptive-context-engineering.md",
+      "source_item_id": "19fa340bcb6a5879-13",
+      "processed_at": "2026-07-28T02:15:59.667Z"
     }
   },
   "wiki_outputs": {
@@ -120,6 +126,11 @@
     "wiki/concepts/state-ownership-before-state-management.md": {
       "hash": "sha256:d4d75ec2a2cb4c1c97a45329a8361f77d3d42664e27b23eaf259ee092d0a9537",
       "updated": "2026-07-25T16:07:25.227Z",
+      "provenance_count": 1
+    },
+    "wiki/concepts/adaptive-context-engineering.md": {
+      "hash": "sha256:cfcc4fdec9969e2d4067872141cd698773ac4aea51b791483113fa696863c258",
+      "updated": "2026-07-28T02:15:59.667Z",
       "provenance_count": 1
     }
   },
@@ -302,6 +313,12 @@
       "timestamp": "2026-07-25T16:07:25.227Z",
       "source_path": "sources/tldr/2026-07-24-state-ownership.txt",
       "output_path": "wiki/concepts/state-ownership-before-state-management.md",
+      "status": "created"
+    },
+    {
+      "timestamp": "2026-07-28T02:15:59.667Z",
+      "source_path": "sources/tldr/2026-07-27-adaptive-context-engineering.txt",
+      "output_path": "wiki/concepts/adaptive-context-engineering.md",
       "status": "created"
     }
   ]

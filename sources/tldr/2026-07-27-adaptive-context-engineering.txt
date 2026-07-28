@@ -1,0 +1,54 @@
+{
+  "schema_version": "approved-wiki-source.v1",
+  "approval": {
+    "status": "approved",
+    "public": true,
+    "approved_at": "2026-07-28T02:15:33Z",
+    "reviewed_by": "brad",
+    "safety_review": {
+      "privacy": "cleared",
+      "publication_rights": "cleared",
+      "dual_use": "cleared"
+    }
+  },
+  "source": {
+    "source_item_id": "19fa340bcb6a5879-13",
+    "source_path": "sources/tldr/2026-07-27-adaptive-context-engineering.txt",
+    "source_type": "tldr",
+    "title": "The new rules of context engineering for Claude 5 generation models",
+    "url": "https://claude.com/blog/the-new-rules-of-context-engineering-for-claude-5-generation-models",
+    "newsletter": "TLDR",
+    "edition_date": "2026-07-27"
+  },
+  "entry": {
+    "type": "concept",
+    "slug": "adaptive-context-engineering",
+    "title": "Adaptive Context Engineering",
+    "aliases": [
+      "Context engineering for capable models",
+      "The new rules of context engineering for Claude 5 generation models"
+    ],
+    "tags": [
+      "ai-agents",
+      "context-management",
+      "progressive-disclosure",
+      "skills",
+      "tool-design"
+    ],
+    "confidence": "medium",
+    "summary": "Context engineering should evolve with model capability: remove inherited constraints that no longer improve measured outcomes, keep durable instructions focused on non-obvious context, and expose specialized guidance progressively through well-designed tools, skills, and references.",
+    "key_ideas": [
+      "System prompts, repository instructions, skills, memory, tools, and references form one context system whose layers can conflict or duplicate each other.",
+      "Constraints that compensated for older model weaknesses should be reevaluated against current behavior instead of accumulating indefinitely.",
+      "Expressive interfaces and typed tool parameters can communicate intended behavior more flexibly than narrow example-heavy instructions.",
+      "Progressive disclosure keeps specialized procedures and tool definitions available without loading all of them into every request.",
+      "Simplification should be evidence-driven because Anthropic's reported system-prompt reduction is specific to its models, product, and evaluations."
+    ],
+    "related": [
+      "agent-context-handoff",
+      "claude-code-subagents",
+      "deterministic-agent-workflows",
+      "review-driven-software-factories"
+    ]
+  }
+}
