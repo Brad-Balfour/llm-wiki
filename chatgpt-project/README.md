@@ -33,13 +33,15 @@ The live body was verified as an exact match on July 26, 2026. The Task remains
 Monday–Friday at 11:00 AM and is active.
 
 Scheduled execution is currently unreliable at the artifact boundary. July
-21-24 runs found the expected Gmail messages, then every file-generation path
-failed with the same generic `oai_http_clients.client.ClientError`. A manual
-July 24 control in this same Project created the three expected queue files.
-Until issue #37 passes its acceptance runs, generate queues in a manual Project
-chat with the same prompt when the scheduled run does not produce real
-downloads. Do not rewrite queue logic or claim success from the Task's `Last
-ran` status. See `docs/live-workflow-audit-2026-07-26.md`.
+21-24 and July 28 runs found the expected Gmail messages, then every
+file-generation path failed with the same generic
+`oai_http_clients.client.ClientError`. Manual July 24 and July 28 controls in
+this same Project created the expected queue files. Until issue #37 passes its
+acceptance runs, generate queues in a manual Project chat with the same prompt
+when the scheduled run does not produce real downloads. Do not rewrite queue
+logic or claim success from the Task's `Last ran` status. See
+`docs/live-workflow-audit-2026-07-26.md` and
+`docs/commute-experiment-log.md`.
 
 Voice may start a queue by an exact filename or an unambiguous date plus
 newsletter name, such as `July 16 TLDR Dev`. The Project normalizes that request

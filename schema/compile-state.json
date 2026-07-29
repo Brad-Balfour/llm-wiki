@@ -2,7 +2,7 @@
   "manifest_version": 1,
   "schema_version": "compile-state.v1",
   "created": "2026-07-05",
-  "updated": "2026-07-28T02:15:59.667Z",
+  "updated": "2026-07-29T02:04:27.154Z",
   "processed_sources": {
     "sources/tldr/2026-06-23-transformer-architecture-for-senior-engineers.txt": {
       "hash": "sha256:f9a592761c47b368e73c13dd97d27b02bc875433b632a582a40ec6419643e631",
@@ -75,6 +75,12 @@
       "output_path": "wiki/concepts/adaptive-context-engineering.md",
       "source_item_id": "19fa340bcb6a5879-13",
       "processed_at": "2026-07-28T02:15:59.667Z"
+    },
+    "sources/tldr/2026-07-28-architecture-must-earn-its-keep.txt": {
+      "hash": "sha256:d111ae1b48fa6d7def270f1e3dc78e4b6d4645cd4359bdb2cf791a5cbc489aa6",
+      "output_path": "wiki/concepts/architecture-must-earn-its-keep.md",
+      "source_item_id": "19fa86ef4f3e7e84-07",
+      "processed_at": "2026-07-29T02:04:27.154Z"
     }
   },
   "wiki_outputs": {
@@ -131,6 +137,11 @@
     "wiki/concepts/adaptive-context-engineering.md": {
       "hash": "sha256:cfcc4fdec9969e2d4067872141cd698773ac4aea51b791483113fa696863c258",
       "updated": "2026-07-28T02:15:59.667Z",
+      "provenance_count": 1
+    },
+    "wiki/concepts/architecture-must-earn-its-keep.md": {
+      "hash": "sha256:28344fa2f04df0382365b781cdbbc9d60c30d8ff2d331b030895c2b6c68aab5d",
+      "updated": "2026-07-29T02:04:27.154Z",
       "provenance_count": 1
     }
   },
@@ -319,6 +330,12 @@
       "timestamp": "2026-07-28T02:15:59.667Z",
       "source_path": "sources/tldr/2026-07-27-adaptive-context-engineering.txt",
       "output_path": "wiki/concepts/adaptive-context-engineering.md",
+      "status": "created"
+    },
+    {
+      "timestamp": "2026-07-29T02:04:27.154Z",
+      "source_path": "sources/tldr/2026-07-28-architecture-must-earn-its-keep.txt",
+      "output_path": "wiki/concepts/architecture-must-earn-its-keep.md",
       "status": "created"
     }
   ]
