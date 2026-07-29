@@ -2,9 +2,10 @@
 
 > Live configuration verified 2026-07-26. The managed body below exactly
 > matches the active **Weekday TLDR Queues** Task. The Task is scheduled Monday
-> through Friday at 11:00 AM. July 21-24 runs found the expected Gmail messages
-> but failed at scheduled artifact generation; see
-> `docs/live-workflow-audit-2026-07-26.md`.
+> through Friday at 11:00 AM. July 21-24 and July 28 runs found the expected
+> Gmail messages but failed at scheduled artifact generation; see
+> `docs/live-workflow-audit-2026-07-26.md` and
+> `docs/commute-experiment-log.md`.
 
 ```text
 Using the Gmail connector, find all TLDR newsletter emails delivered on the day
