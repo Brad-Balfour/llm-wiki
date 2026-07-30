@@ -1,0 +1,54 @@
+{
+  "schema_version": "approved-wiki-source.v1",
+  "approval": {
+    "status": "approved",
+    "public": true,
+    "approved_at": "2026-07-29T17:44:00-04:00",
+    "reviewed_by": "brad",
+    "safety_review": {
+      "privacy": "cleared",
+      "publication_rights": "cleared",
+      "dual_use": "cleared"
+    }
+  },
+  "source": {
+    "source_item_id": "19fad8d9ff2bc642-08",
+    "source_path": "sources/tldr/2026-07-29-orchestrator-working-memory.txt",
+    "source_type": "tldr",
+    "title": "The Orchestrator's Tax",
+    "url": "https://martinfowler.com/articles/orchestrator-tax.html",
+    "newsletter": "TLDR",
+    "edition_date": "2026-07-29"
+  },
+  "entry": {
+    "type": "concept",
+    "slug": "orchestrator-working-memory",
+    "title": "Orchestrator Working Memory",
+    "aliases": [
+      "The Orchestrator's Tax",
+      "Cognitive locality in multi-agent work"
+    ],
+    "tags": [
+      "ai-agents",
+      "context-management",
+      "multi-agent-systems",
+      "delegation",
+      "workflow-design"
+    ],
+    "confidence": "medium",
+    "summary": "Subagents are most valuable when they protect the orchestrator's accumulated working memory: disposable exploration stays isolated, while only decision-relevant results return to the main context.",
+    "key_ideas": [
+      "Context pollution differs from one-time token spend because imported noise competes for attention throughout every later turn.",
+      "Delegate by cognitive locality: work that requires the same mental model often belongs together even when it contains several nominal tasks.",
+      "Worker exploration, repeated reads, failed approaches, and raw transcripts should remain disposable; the orchestrator should receive concise, decision-relevant results.",
+      "Narrow delegation contracts should define inputs, permissions, ownership, and returned evidence without prescribing every implementation detail.",
+      "The source establishes architectural principles and open questions, not a framework or a settled rule for permanent specialists versus dynamically created task agents."
+    ],
+    "related": [
+      "adaptive-context-engineering",
+      "claude-code-subagents",
+      "deterministic-agent-workflows",
+      "agent-context-handoff"
+    ]
+  }
+}

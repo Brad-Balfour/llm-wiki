@@ -2,26 +2,28 @@
 type: concept
 title: 'AI-Native Software Engineering'
 # prettier-ignore
-aliases: ["Control the ideas, not the code","Engineer away the slop"]
+aliases: ["Control the ideas, not the code","Engineer away the slop","How building software is changing at Anthropic"]
 # prettier-ignore
-tags: ["ai-engineering","software-design","correctness","code-review","formal-verification","quality-gates"]
+tags: ["ai-engineering","software-design","correctness","code-review","formal-verification","quality-gates","multi-agent-systems"]
 wiki_slug: ai-native-software-engineering
 created: 2026-07-16
-updated: 2026-07-25
+updated: 2026-07-29
 confidence: high
 # prettier-ignore
-provenance: [{"source_item_id":"19f6057544b9bae7-06","source_path":"sources/tldr/2026-07-14-ai-native-software-engineering.txt","url":"https://antirez.com/news/169"},{"source_item_id":"general-20260724-05","source_path":"sources/tldr/2026-07-24-engineer-away-the-slop.txt","url":"https://ghuntley.com/slop/"}]
+provenance: [{"source_item_id":"19f6057544b9bae7-06","source_path":"sources/tldr/2026-07-14-ai-native-software-engineering.txt","url":"https://antirez.com/news/169"},{"source_item_id":"general-20260724-05","source_path":"sources/tldr/2026-07-24-engineer-away-the-slop.txt","url":"https://ghuntley.com/slop/"},{"source_item_id":"19fadaee19e22a31-18","source_path":"sources/tldr/2026-07-29-ai-native-software-engineering-anthropic.txt","url":"https://newsletter.pragmaticengineer.com/p/inside-anthropic"}]
 ---
 
 # AI-Native Software Engineering
 
-AI-native software engineering shifts the developer's center of gravity from manually producing and inspecting every line of code toward specifying behavior, making design choices, and verifying correctness and performance.
+AI-native software engineering shifts the developer's center of gravity from manually producing every line toward specifying intent, decomposing parallel work, building agent-ready context, and verifying correctness.
 
 ## Key Ideas
 
 - A developer remains accountable for the system's behavior even when an LLM generates much of its code.
 - Design constraints, correctness criteria, and performance goals become primary control surfaces.
 - Review should focus on evidence that the system meets its intended behavior rather than only line-by-line authorship.
+- Multiple background or cloud agents turn development into a decomposition and orchestration problem rather than a one-assistant pairing workflow.
+- Faster implementation does not remove the need for planning, interfaces, or architecture on complex systems.
 
 ## Verification as a Feedback Loop
 
@@ -38,6 +40,44 @@ organization-specific AST check, or a pre-commit gate.
 - Formal methods and deterministic system testing may become easier to apply as
   tooling improves, but availability of tools does not eliminate the need for
   engineering judgment or evidence.
+
+## From Coding Assistant to Managed Work
+
+The saved report from inside Anthropic describes engineers routinely running
+several agents in the background or cloud. The scarce work shifts away from
+typing implementation and toward discovering unknowns, preparing context,
+decomposing work that can proceed independently, and judging the results.
+
+That is a different operating model from pair programming with one assistant:
+
+- the engineer defines intent, architecture, constraints, and success evidence;
+- several workers may explore, prototype, implement, review, or test in
+  parallel;
+- independent contexts can separate implementation from verification; and
+- the engineer manages interfaces and quality across the resulting work.
+
+The commute discussion recognized this as an operating model already visible
+inside frontier teams, not merely a future prediction. It also emphasized that
+the interesting engineering questions are increasingly decomposition,
+orchestration, verification, context, and evaluation—not a contest between
+model brands.
+
+## Planning Still Scales Coordination
+
+Cheap prototypes do not make every project improvisational. The report's
+Managed Agents case retained deliberate planning, a product requirements
+document, cross-team interface work, an internal-customer spike, and a later
+re-architecture. AI shortened implementation and made collaboration more fluid,
+but did not eliminate the coordination required for a multi-cloud,
+security-sensitive service.
+
+The durable principle is to match process to uncertainty:
+
+- use prototypes to discover requirements and test interfaces quickly;
+- preserve explicit design and stakeholder alignment where the blast radius is
+  large;
+- expect architecture to change when a spike reveals better boundaries; and
+- revisit workflow assumptions as model capability changes.
 
 ## Source Notes
 
@@ -57,7 +97,22 @@ The source argues that formal verification and deterministic testing are
 crossing an accessibility threshold. That forecast is directional and should
 not be treated as proof that these methods are already routine.
 
+### [How Building Software Is Changing at Anthropic](https://newsletter.pragmaticengineer.com/p/inside-anthropic)
+
+<!-- source-item-id: 19fadaee19e22a31-18 -->
+
+TLDR Dev, 2026-07-29.
+
+The Pragmatic Engineer report distinguishes fast generation from the harder
+work of validation. One case study attributes only a small share of a large
+rewrite to initial implementation, with most effort going to compilation,
+tests, fixes, and verification. It also describes automated code review,
+security scanning, fuzzing, independent test processes, and durable merge gates
+as ways to build confidence when humans cannot read every generated line.
+
 ## Related
 
 - {% include wiki-related-link.md slug="deterministic-agent-workflows" %}
 - {% include wiki-related-link.md slug="review-driven-software-factories" %}
+- {% include wiki-related-link.md slug="orchestrator-working-memory" %}
+- {% include wiki-related-link.md slug="adaptive-context-engineering" %}

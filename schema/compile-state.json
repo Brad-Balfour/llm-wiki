@@ -2,7 +2,7 @@
   "manifest_version": 1,
   "schema_version": "compile-state.v1",
   "created": "2026-07-05",
-  "updated": "2026-07-29T02:04:27.154Z",
+  "updated": "2026-07-30T00:46:12.114Z",
   "processed_sources": {
     "sources/tldr/2026-06-23-transformer-architecture-for-senior-engineers.txt": {
       "hash": "sha256:f9a592761c47b368e73c13dd97d27b02bc875433b632a582a40ec6419643e631",
@@ -81,6 +81,24 @@
       "output_path": "wiki/concepts/architecture-must-earn-its-keep.md",
       "source_item_id": "19fa86ef4f3e7e84-07",
       "processed_at": "2026-07-29T02:04:27.154Z"
+    },
+    "sources/tldr/2026-07-29-orchestrator-working-memory.txt": {
+      "hash": "sha256:34a639b899d50f2b417431ff3fdc77174d31b96e3364056d94e0aa9a0e0fdb6d",
+      "output_path": "wiki/concepts/orchestrator-working-memory.md",
+      "source_item_id": "19fad8d9ff2bc642-08",
+      "processed_at": "2026-07-30T00:46:05.043Z"
+    },
+    "sources/tldr/2026-07-29-llm-search-integration-depth.txt": {
+      "hash": "sha256:008534ad71a819e53c587596e3b3321c714b2b27e1b109d2c41d08956fb0c1d2",
+      "output_path": "wiki/concepts/llm-search-integration-depth.md",
+      "source_item_id": "19fad8d9ff2bc642-15",
+      "processed_at": "2026-07-30T00:46:08.795Z"
+    },
+    "sources/tldr/2026-07-29-ai-native-software-engineering-anthropic.txt": {
+      "hash": "sha256:228e6cd614eea6be9ea24e0b97982f803408bddf7a6f03ab665f147367daf30b",
+      "output_path": "wiki/concepts/ai-native-software-engineering.md",
+      "source_item_id": "19fadaee19e22a31-18",
+      "processed_at": "2026-07-30T00:46:12.114Z"
     }
   },
   "wiki_outputs": {
@@ -95,9 +113,9 @@
       "provenance_count": 1
     },
     "wiki/concepts/ai-native-software-engineering.md": {
-      "hash": "sha256:e2fdba406fd4a37f79228f7e2d3cb3774f60dc54346ba1c05023509b8343fe5b",
-      "updated": "2026-07-25T16:07:12.245Z",
-      "provenance_count": 2
+      "hash": "sha256:ccb7e7ebdda1d2c745e64d4edf43d33530c96bc9f76f3ea492ce58d77832cc90",
+      "updated": "2026-07-30T00:46:12.114Z",
+      "provenance_count": 3
     },
     "wiki/tools/clawk.md": {
       "hash": "sha256:f94e4b7517a3126563fae82604555a3b7baf8aa7bcfe16f2ec68f7b81baf1a8d",
@@ -142,6 +160,16 @@
     "wiki/concepts/architecture-must-earn-its-keep.md": {
       "hash": "sha256:28344fa2f04df0382365b781cdbbc9d60c30d8ff2d331b030895c2b6c68aab5d",
       "updated": "2026-07-29T02:04:27.154Z",
+      "provenance_count": 1
+    },
+    "wiki/concepts/orchestrator-working-memory.md": {
+      "hash": "sha256:0da5af4b4f808b041b43be856bd8606a16f44c4ce3d1ffa6babead5378378711",
+      "updated": "2026-07-30T00:46:05.043Z",
+      "provenance_count": 1
+    },
+    "wiki/concepts/llm-search-integration-depth.md": {
+      "hash": "sha256:70ff76b2c66db37c69fdbb606a388b2c67761d0bda6fd0b3f6bd4e3f4cff018f",
+      "updated": "2026-07-30T00:46:08.795Z",
       "provenance_count": 1
     }
   },
@@ -337,6 +365,24 @@
       "source_path": "sources/tldr/2026-07-28-architecture-must-earn-its-keep.txt",
       "output_path": "wiki/concepts/architecture-must-earn-its-keep.md",
       "status": "created"
+    },
+    {
+      "timestamp": "2026-07-30T00:46:05.043Z",
+      "source_path": "sources/tldr/2026-07-29-orchestrator-working-memory.txt",
+      "output_path": "wiki/concepts/orchestrator-working-memory.md",
+      "status": "created"
+    },
+    {
+      "timestamp": "2026-07-30T00:46:08.795Z",
+      "source_path": "sources/tldr/2026-07-29-llm-search-integration-depth.txt",
+      "output_path": "wiki/concepts/llm-search-integration-depth.md",
+      "status": "created"
+    },
+    {
+      "timestamp": "2026-07-30T00:46:12.114Z",
+      "source_path": "sources/tldr/2026-07-29-ai-native-software-engineering-anthropic.txt",
+      "output_path": "wiki/concepts/ai-native-software-engineering.md",
+      "status": "updated"
     }
   ]
 }

@@ -7,7 +7,7 @@ aliases: ["Custom Claude Code subagents","Claude Code agent definitions"]
 tags: ["claude-code","ai-agents","developer-workflows","context-management"]
 wiki_slug: claude-code-subagents
 created: 2026-07-22
-updated: 2026-07-28
+updated: 2026-07-29
 confidence: high
 ---
 
@@ -74,4 +74,5 @@ organization's agent-governance process.
 - {% include wiki-related-link.md slug="adaptive-context-engineering" %}
 - {% include wiki-related-link.md slug="ai-native-software-engineering" %}
 - {% include wiki-related-link.md slug="mantis-skills" %}
+- {% include wiki-related-link.md slug="orchestrator-working-memory" %}
 - {% include wiki-related-link.md slug="production-ai-agent-architecture" %}

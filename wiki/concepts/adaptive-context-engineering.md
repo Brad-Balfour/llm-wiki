@@ -7,7 +7,7 @@ aliases: ["Context engineering for capable models","The new rules of context eng
 tags: ["ai-agents","context-management","progressive-disclosure","skills","tool-design"]
 wiki_slug: adaptive-context-engineering
 created: 2026-07-28
-updated: 2026-07-28
+updated: 2026-07-29
 confidence: medium
 # prettier-ignore
 provenance: [{"source_item_id":"19fa340bcb6a5879-13","source_path":"sources/tldr/2026-07-27-adaptive-context-engineering.txt","url":"https://claude.com/blog/the-new-rules-of-context-engineering-for-claude-5-generation-models"}]
@@ -38,4 +38,5 @@ TLDR, 2026-07-27.
 - {% include wiki-related-link.md slug="agent-context-handoff" %}
 - {% include wiki-related-link.md slug="claude-code-subagents" %}
 - {% include wiki-related-link.md slug="deterministic-agent-workflows" %}
+- {% include wiki-related-link.md slug="orchestrator-working-memory" %}
 - {% include wiki-related-link.md slug="review-driven-software-factories" %}
