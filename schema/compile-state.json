@@ -113,7 +113,7 @@
       "provenance_count": 1
     },
     "wiki/concepts/ai-native-software-engineering.md": {
-      "hash": "sha256:ccb7e7ebdda1d2c745e64d4edf43d33530c96bc9f76f3ea492ce58d77832cc90",
+      "hash": "sha256:8a89833dcc4ebe5c76ddb0bda23017d988d9f060348971dc5a7578c8a387dded",
       "updated": "2026-07-30T00:46:12.114Z",
       "provenance_count": 3
     },
@@ -153,7 +153,7 @@
       "provenance_count": 1
     },
     "wiki/concepts/adaptive-context-engineering.md": {
-      "hash": "sha256:cfcc4fdec9969e2d4067872141cd698773ac4aea51b791483113fa696863c258",
+      "hash": "sha256:c21d542cefb038bcd51c6a3f8eb9173b324dcc88b09b017052d1e2ff4fb6a624",
       "updated": "2026-07-28T02:15:59.667Z",
       "provenance_count": 1
     },
@@ -163,12 +163,12 @@
       "provenance_count": 1
     },
     "wiki/concepts/orchestrator-working-memory.md": {
-      "hash": "sha256:0da5af4b4f808b041b43be856bd8606a16f44c4ce3d1ffa6babead5378378711",
+      "hash": "sha256:208e885c879e03fac99a013cc9d49d90d6f338428f6192fe311988c428197cba",
       "updated": "2026-07-30T00:46:05.043Z",
       "provenance_count": 1
     },
     "wiki/concepts/llm-search-integration-depth.md": {
-      "hash": "sha256:70ff76b2c66db37c69fdbb606a388b2c67761d0bda6fd0b3f6bd4e3f4cff018f",
+      "hash": "sha256:83bd754bf3f17ff4d3f49b8816439161c4a76708c1c9865cb6d6a6883b476aa5",
       "updated": "2026-07-30T00:46:08.795Z",
       "provenance_count": 1
     }
