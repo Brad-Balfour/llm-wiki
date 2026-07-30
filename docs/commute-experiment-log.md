@@ -17,6 +17,9 @@ found a queue as proof.
 - The July 28 Task screenshot and scheduled output chat, the five downloaded
   session bundles, the four original queues, and the corresponding source
   newsletters read through Gmail for the queue-selection audit.
+- The three downloaded July 29 queues, two downloaded session bundles, and four
+  unique shared conversations covering the General and Dev sessions. The fifth
+  supplied URL duplicated one of those conversations.
 - The live `Weekday TLDR Queues` Task conversation/configuration, the July
   21-24 Task Update emails, the July 24 manual queue-generation control, and
   the live Project settings/sources inspected on July 26.
@@ -58,6 +61,7 @@ retrieve sources, and preserve history after the drive.
 | Jul. 25    | Prompt 3.0 and fail-soft local conversion                                                      | Project every initial announcement from the literal current queue item and preserve semantically contradictory feedback as a quality incident rather than classifier evidence.              | All three reattached bundles imported as accepted recovered sessions. Their embedded queues matched the three downloaded canonical queues exactly. The contradictory state-management promotion was preserved and converted into a quality incident without rejecting any session.                                                |
 | Jul. 26    | Live configuration audit                                                                       | Compare repository prompts with the signed-in Task and Project, inspect sources, conversations, and failure emails, and reconcile OpenSpec.                                                 | Prompt 3.0 is live, all six sources are present, and the Task body exactly matches the committed v2 body. The deployment cutover is verified; only scheduled artifact reliability remains unproven.                                                                                                                               |
 | Jul. 28    | Scheduled failure, manual control, and queue-selection audit                                   | Re-run the weekday Task, validate its manual outputs, process five commute bundles, and compare the queues with the source newsletters and profile.                                         | The 11:05 AM scheduled run found General, Dev, and AI but failed both file-writing paths with the same `ClientError`; the 12:43 PM manual control created three valid queues. All five sessions were locally recoverable, but the General and Dev queues each contained only one item and omitted several direct profile matches. |
+| Jul. 29    | General and Dev sessions plus source-grounded wiki maintenance                                 | Validate three four-item queues, reconcile two downloaded bundles, recover explicit saves from the shared conversations, and preserve the commute discussion in the wiki.                   | The queue artifacts were valid, but both session bundles violated the contract. Supplied-queue recovery retained the two General saves; the empty Dev bundle lost its save entirely, so the user-provided chat was required to prove the exact item-specific action.                                                              |
 
 ### July 24 Bundle Acceptance Result
 
@@ -118,6 +122,41 @@ at 6:08 PM Eastern exported as `202607282209...`, using a UTC-derived prefix
 despite the explicit New York wall-clock rule. A session shown at 5:50 PM
 exported as `202607281700...`, which did not preserve the actual local minute.
 Syntactic `HHmm` validation alone cannot detect either false timestamp.
+
+### July 29 Acceptance And Maintenance Result
+
+All three downloaded queues passed the local v2 validator with four items each:
+General, Dev, and AI. Only General and Dev had supplied session bundles.
+
+Neither bundle passed strict validation:
+
+- the General bundle marked playback `completed` while also declaring
+  `resume_source_item_id`, an explicitly forbidden state; and
+- the Dev bundle embedded a placeholder note instead of a v2 queue snapshot and
+  contained no events despite a completed four-item conversation.
+
+The bounded `--recover-with` path accepted both sessions against their exact
+named queues. It retained the two General `wiki_this` events with no classifier
+feedback or unresolved captures. The Dev fallback could not retain the missing
+save because the downloaded artifact contained no event to bind.
+
+The shared conversations supplied independent user-observation evidence:
+
+- General explicitly saved _The Orchestrator's Tax_ and the DoorDash,
+  Instacart, and Uber Eats search comparison. The discussion required the first
+  page to preserve the persistent-versus-dynamic subagent question and the
+  second to treat all three underlying engineering sources as first-class
+  references.
+- Dev explicitly said "Save this for the wiki" while item four, _How Building
+  Software Is Changing at Anthropic_, was current. The original source URL and
+  queue identity agreed, so the save was processed as a recovered
+  user-provided chat observation rather than attributed to the empty bundle.
+
+The resulting maintenance created two concepts—one about orchestrator working
+memory and one comparing LLM integration depth in production search—and
+materially updated the existing AI-native software engineering concept. The
+unrelated iOS audio-playback tail was intentionally excluded from workflow
+analysis at Brad's direction.
 
 ## What Worked
 
@@ -191,6 +230,14 @@ sharing. The Dev session explicitly saved the Claude Code subagents discussion
 and marked it high priority for team sharing. Neither downloaded bundle retained
 the capture. A later bundle must not manufacture their item IDs from a
 conflicting queue merely to look complete.
+
+The July 29 Dev bundle repeated the failure in a stronger form: it exported no
+events at all after an explicit save on a queue item that the shared
+conversation and original queue identify exactly. Supplied-queue fallback alone
+correctly retained nothing, because the malformed artifact contained no marker
+to recover. A user-provided chat observation can support a separate recovered
+capture when it includes the literal save, current item, and matching queue
+identity; the importer must not pretend that evidence came from the bundle.
 
 ### False reconstruction and weak grounding
 
