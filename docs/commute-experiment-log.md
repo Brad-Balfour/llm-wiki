@@ -199,6 +199,13 @@ declared that invented queue complete. Those saves remain unresolved because
 neither title can be bound to a canonical item. AI and Fintech otherwise reached
 their final items and exported without a conversational refusal.
 
+Brad's contemporaneous impression that the drives were generally smooth is
+compatible with this evidence. Audio problems prevented him from hearing enough
+of the real Dev queue to recognize the later substitution while driving. The
+defect became visible only when the downloaded queue, bundle, and shared
+conversation were compared at home; it was not a missed correction the driver
+could reasonably have supplied in the moment.
+
 The Fintech conversation also identified a repeated timestamp defect:
 `202607302229...` used UTC instead of the required America/New_York wall clock;
 the corresponding local time was about 18:29 EDT.
@@ -291,6 +298,11 @@ instead of manufacturing queue IDs. That artifact behavior was correct, but the
 underlying Voice session was not: resumed playback substituted an entirely
 different four-item sequence after the exact five-item queue had already been
 attached and read.
+
+Because the same session also suffered audible playback loss, subjective
+smoothness cannot be used as the only grounding signal. Home-side comparison of
+the transcript, canonical queue, and bundle remains necessary until Voice can
+prove queue identity across interruptions.
 
 ### False reconstruction and weak grounding
 
