@@ -1,0 +1,53 @@
+{
+  "schema_version": "approved-wiki-source.v1",
+  "approval": {
+    "status": "approved",
+    "public": true,
+    "approved_at": "2026-07-30T18:29:00-04:00",
+    "reviewed_by": "brad",
+    "safety_review": {
+      "privacy": "cleared",
+      "publication_rights": "cleared",
+      "dual_use": "cleared"
+    }
+  },
+  "source": {
+    "source_item_id": "19fb33942bb1cc3e-04",
+    "source_path": "sources/tldr/2026-07-30-ai-native-fintech-architecture.txt",
+    "source_type": "tldr",
+    "title": "What fintech founders get wrong about AI-native development",
+    "url": "https://hackernoon.com/what-fintech-founders-get-wrong-about-ai-native-development",
+    "newsletter": "TLDR Fintech",
+    "edition_date": "2026-07-30"
+  },
+  "entry": {
+    "type": "concept",
+    "slug": "ai-native-software-engineering",
+    "title": "AI-Native Software Engineering",
+    "aliases": [
+      "AI-native fintech architecture"
+    ],
+    "tags": [
+      "ai-engineering",
+      "software-design",
+      "fintech",
+      "compliance",
+      "auditability"
+    ],
+    "confidence": "high",
+    "summary": "AI-native describes where intelligence sits in the product architecture, not whether AI tools helped write the code; in regulated systems, the AI decision loop and its compliance, fallback, review, and audit boundaries must be designed together.",
+    "key_ideas": [
+      "The removal test separates AI-native products from AI-enabled ones: if removing the intelligence layer leaves the core value intact, AI is an enhancement rather than the product's operating core.",
+      "Using an AI coding assistant changes the development process but does not by itself make the resulting product AI-native.",
+      "Positioning debt accumulates when an AI-native marketing claim outruns what the architecture can demonstrate under technical, investor, or regulatory inspection.",
+      "Regulated products should design compliance checks, audit trails, fallback behavior, and human-review boundaries alongside the AI decision loop rather than bolt them on later.",
+      "AI-enabled is a legitimate architecture when described precisely; the durable requirement is evidence that product claims match the system that was built."
+    ],
+    "related": [
+      "production-ai-agent-architecture",
+      "deterministic-agent-workflows",
+      "reality-driven-ai-product-development",
+      "state-ownership-before-state-management"
+    ]
+  }
+}

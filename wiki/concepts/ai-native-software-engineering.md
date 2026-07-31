@@ -2,15 +2,15 @@
 type: concept
 title: 'AI-Native Software Engineering'
 # prettier-ignore
-aliases: ["Control the ideas, not the code","Engineer away the slop","How building software is changing at Anthropic"]
+aliases: ["Control the ideas, not the code","Engineer away the slop","How building software is changing at Anthropic","AI-native fintech architecture"]
 # prettier-ignore
-tags: ["ai-engineering","software-design","correctness","code-review","formal-verification","quality-gates","multi-agent-systems"]
+tags: ["ai-engineering","software-design","correctness","code-review","formal-verification","quality-gates","multi-agent-systems","fintech","compliance","auditability"]
 wiki_slug: ai-native-software-engineering
 created: 2026-07-16
-updated: 2026-07-29
+updated: 2026-07-31
 confidence: high
 # prettier-ignore
-provenance: [{"source_item_id":"19f6057544b9bae7-06","source_path":"sources/tldr/2026-07-14-ai-native-software-engineering.txt","url":"https://antirez.com/news/169"},{"source_item_id":"general-20260724-05","source_path":"sources/tldr/2026-07-24-engineer-away-the-slop.txt","url":"https://ghuntley.com/slop/"},{"source_item_id":"19fadaee19e22a31-18","source_path":"sources/tldr/2026-07-29-ai-native-software-engineering-anthropic.txt","url":"https://newsletter.pragmaticengineer.com/p/inside-anthropic"}]
+provenance: [{"source_item_id":"19f6057544b9bae7-06","source_path":"sources/tldr/2026-07-14-ai-native-software-engineering.txt","url":"https://antirez.com/news/169"},{"source_item_id":"general-20260724-05","source_path":"sources/tldr/2026-07-24-engineer-away-the-slop.txt","url":"https://ghuntley.com/slop/"},{"source_item_id":"19fadaee19e22a31-18","source_path":"sources/tldr/2026-07-29-ai-native-software-engineering-anthropic.txt","url":"https://newsletter.pragmaticengineer.com/p/inside-anthropic"},{"source_item_id":"19fb33942bb1cc3e-04","source_path":"sources/tldr/2026-07-30-ai-native-fintech-architecture.txt","url":"https://hackernoon.com/what-fintech-founders-get-wrong-about-ai-native-development"}]
 ---
 
 # AI-Native Software Engineering
@@ -79,6 +79,30 @@ The durable principle is to match process to uncertainty:
 - expect architecture to change when a spike reveals better boundaries; and
 - revisit workflow assumptions as model capability changes.
 
+## AI-Native Is a Product Architecture Claim
+
+Using AI to build software and building a product whose operating core is AI
+are different claims. The source proposes a useful removal test: if the
+intelligence layer disappears and the product's core value still works, the
+product is AI-enabled rather than AI-native. Either architecture can be valid,
+but the label should describe what the system actually depends on.
+
+That distinction is especially important in regulated systems. An AI decision
+loop cannot be separated from the architecture that makes its decisions
+reviewable:
+
+- compliance checks and policy boundaries should be designed with the product,
+  not added after the AI path is established;
+- material decisions need an audit trail that survives technical and
+  regulatory inspection;
+- fallback behavior should be explicit when the intelligence layer is
+  unavailable or uncertain; and
+- the boundary between automated decisions and human review should be visible
+  in the system design.
+
+When positioning gets ahead of this evidence, the gap becomes architectural
+debt rather than a messaging problem.
+
 ## Source Notes
 
 ### [Control the ideas, not the code](https://antirez.com/news/169)
@@ -110,9 +134,22 @@ tests, fixes, and verification. It also describes automated code review,
 security scanning, fuzzing, independent test processes, and durable merge gates
 as ways to build confidence when humans cannot read every generated line.
 
+### [What fintech founders get wrong about AI-native development](https://hackernoon.com/what-fintech-founders-get-wrong-about-ai-native-development)
+
+<!-- source-item-id: 19fb33942bb1cc3e-04 -->
+
+TLDR Fintech, 2026-07-30.
+
+The source distinguishes AI-assisted development from AI-native product
+architecture and argues that compliance and auditability must be built
+alongside the intelligence layer in fintech systems.
+
 ## Related
 
 - {% include wiki-related-link.md slug="deterministic-agent-workflows" %}
 - {% include wiki-related-link.md slug="review-driven-software-factories" %}
 - {% include wiki-related-link.md slug="orchestrator-working-memory" %}
 - {% include wiki-related-link.md slug="adaptive-context-engineering" %}
+- {% include wiki-related-link.md slug="production-ai-agent-architecture" %}
+- {% include wiki-related-link.md slug="reality-driven-ai-product-development" %}
+- {% include wiki-related-link.md slug="state-ownership-before-state-management" %}

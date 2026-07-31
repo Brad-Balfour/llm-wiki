@@ -20,6 +20,9 @@ found a queue as proof.
 - The three downloaded July 29 queues, two downloaded session bundles, and four
   unique shared conversations covering the General and Dev sessions. The fifth
   supplied URL duplicated one of those conversations.
+- The four downloaded July 30 queues, four downloaded session bundles, and five
+  shared conversations covering General, Dev, AI, and Fintech. Dev was split
+  across its initial queue-load chat and a resumed playback/export chat.
 - The live `Weekday TLDR Queues` Task conversation/configuration, the July
   21-24 Task Update emails, the July 24 manual queue-generation control, and
   the live Project settings/sources inspected on July 26.
@@ -62,6 +65,7 @@ retrieve sources, and preserve history after the drive.
 | Jul. 26    | Live configuration audit                                                                       | Compare repository prompts with the signed-in Task and Project, inspect sources, conversations, and failure emails, and reconcile OpenSpec.                                                 | Prompt 3.0 is live, all six sources are present, and the Task body exactly matches the committed v2 body. The deployment cutover is verified; only scheduled artifact reliability remains unproven.                                                                                                                               |
 | Jul. 28    | Scheduled failure, manual control, and queue-selection audit                                   | Re-run the weekday Task, validate its manual outputs, process five commute bundles, and compare the queues with the source newsletters and profile.                                         | The 11:05 AM scheduled run found General, Dev, and AI but failed both file-writing paths with the same `ClientError`; the 12:43 PM manual control created three valid queues. All five sessions were locally recoverable, but the General and Dev queues each contained only one item and omitted several direct profile matches. |
 | Jul. 29    | General and Dev sessions plus source-grounded wiki maintenance                                 | Validate three four-item queues, reconcile two downloaded bundles, recover explicit saves from the shared conversations, and preserve the commute discussion in the wiki.                   | The queue artifacts were valid, but both session bundles violated the contract. Supplied-queue recovery retained the two General saves; the empty Dev bundle lost its save entirely, so the user-provided chat was required to prove the exact item-specific action.                                                              |
+| Jul. 30    | Four-queue commute and bundle-grounding audit                                                  | Validate General, Dev, AI, and Fintech queues; reconcile four bundles; and compare recovered saves with the five shared conversations.                                                      | The four queues were valid and most spoken playback was smooth, but only the Dev bundle was strictly valid. General and AI exported placeholder snapshots, Fintech used an unsupported pseudo-ID and UTC filename, and resumed Dev playback replaced its canonical queue with four unrelated items.                               |
 
 ### July 24 Bundle Acceptance Result
 
@@ -158,6 +162,47 @@ materially updated the existing AI-native software engineering concept. The
 unrelated iOS audio-playback tail was intentionally excluded from workflow
 analysis at Brad's direction.
 
+### July 30 Acceptance And Maintenance Result
+
+All four downloaded queues passed the local v2 validator: four General items,
+five Dev items, four AI items, and four Fintech items.
+
+Only the Dev bundle passed strict validation. It embedded the exact canonical
+queue and honestly recorded two unresolved saves plus two quality incidents.
+General and AI embedded placeholder notes instead of their queues; supplied
+queue recovery accepted both. Fintech also embedded a placeholder, but its
+`wiki_this` event used `item-3` and an invalid placeholder URL, so the bounded
+importer rejected that session rather than interpreting the pseudo-ID.
+
+The fail-soft combined intake therefore retained three accepted sessions, one
+rejected session, one deterministic maintenance candidate, two unresolved
+captures, two quality incidents, and no classifier correction. The evidence
+supported two carefully separated maintenance decisions:
+
+- General's numeric item-four marker recovered exactly to _Treat prompt changes
+  like code deploys_. The shared conversation showed a grounding mismatch:
+  Voice discussed a different Langfuse prompt-CI/CD article under the same
+  title. The resulting wiki concept uses the canonical queue article as
+  provenance and the public Langfuse page only as a supporting implementation
+  reference.
+- Fintech's rejected bundle still contained Brad's explicit "Save this," the
+  exact canonical item-three title, and an unambiguous positional pseudo-ID.
+  That evidence was processed as a manual recovery, not reported as importer
+  acceptance. It materially expanded the existing AI-native software
+  engineering page instead of creating a duplicate.
+
+Dev exposed the day's largest product failure. The first chat could not discover
+the current queue until Brad attached it, after which it read the correct five
+headlines and item one. The resumed chat then announced four different articles
+that do not exist in the canonical queue, accepted saves for two of them, and
+declared that invented queue complete. Those saves remain unresolved because
+neither title can be bound to a canonical item. AI and Fintech otherwise reached
+their final items and exported without a conversational refusal.
+
+The Fintech conversation also identified a repeated timestamp defect:
+`202607302229...` used UTC instead of the required America/New_York wall clock;
+the corresponding local time was about 18:29 EDT.
+
 ## What Worked
 
 - The weekday Task has produced real dated, parseable queues, including four
@@ -174,6 +219,8 @@ analysis at Brad's direction.
   reasoning to improve the resulting wiki pages beyond a newsletter summary.
 - Public source retrieval and a local repository-backed wiki can turn an
   explicit commute save into durable, reviewable knowledge.
+- The July 30 General, AI, and Fintech conversations progressed through their
+  queues with little driver intervention once the queue was available.
 - The current local importer has useful defenses: it validates embedded queue
   snapshots, rejects unsupported state, accepts evidence-backed natural-language
   captures, and can recover certain malformed historical bundles from a supplied
@@ -239,6 +286,12 @@ to recover. A user-provided chat observation can support a separate recovered
 capture when it includes the literal save, current item, and matching queue
 identity; the importer must not pretend that evidence came from the bundle.
 
+The July 30 Dev bundle preserved both missing-identity saves as unresolved
+instead of manufacturing queue IDs. That artifact behavior was correct, but the
+underlying Voice session was not: resumed playback substituted an entirely
+different four-item sequence after the exact five-item queue had already been
+attached and read.
+
 ### False reconstruction and weak grounding
 
 - A Dev recovery claimed an item about Claude for Financial Services that is
@@ -251,6 +304,12 @@ identity; the importer must not pretend that evidence came from the bundle.
 - The earlier failed session included unwanted classifier-rationale narration;
   Brad's correction to omit that rationale was not reliably retained in the
   final artifact.
+- The July 30 General session discussed the Langfuse prompt-CI/CD article while
+  its canonical queue item and recovered maintenance candidate pointed to a
+  different article with the same title.
+- The July 30 Fintech export used a UTC-derived filename and an `item-3`
+  pseudo-ID with a placeholder URL, preventing deterministic supplied-queue
+  recovery even though the bundle's title matched canonical queue position 3.
 
 ## July 22 Transcript Crosswalk
 
