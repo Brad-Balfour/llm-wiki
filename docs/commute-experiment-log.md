@@ -265,10 +265,10 @@ code.
 
 Brad also set a topic-level preference: Martin Fowler articles should default to
 high interest and in-depth discussion. Interest Profile 1.5 records that strong
-prior with an off-topic/content-free exception. Because this changes queue
-behavior, the repository records the compatible prompt, schemas, routing,
-scheduled-task prompt, and runtime gap as one candidate behavioral release
-rather than describing the profile edit as a standalone deployment.
+prior with an off-topic/content-free exception. The project documentation also
+retains the discussion's lighter-weight process lesson: when materially coupled
+behavior changes together, recording the relevant versions can make rollback
+easier. It is a proportional design heuristic, not a hard release gate.
 
 ## What Worked
 
