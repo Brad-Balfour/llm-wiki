@@ -47,6 +47,27 @@ Avoid rolling back only the prompt when a schema, tool surface, routing policy,
 model, or runtime setting changed with it. The rollback unit should match the
 behavioral release unit.
 
+### Repository candidate: 2026-07-31
+
+The July 31 classifier preference update is represented as this compatibility
+set. It is a repository candidate until the changed Project source is uploaded;
+merging the Git change alone does not prove the live Project was updated.
+
+| Surface                     | Compatible revision                                                                |
+| --------------------------- | ---------------------------------------------------------------------------------- |
+| Project instructions        | Queue Contract v2 / Prompt Revision 3.0                                            |
+| Queue and bundle contracts  | `tldr-commute-queue.v2` / `commute-session-bundle.v1`                              |
+| Queue generation            | `queue-generation-v2.md`                                                           |
+| Interest and classification | Interest Profile 1.5 / classifier instructions Profile 1.5                         |
+| Routing                     | `routing-rules.v1`                                                                 |
+| Scheduled Task prompt       | `WEEKDAY_TLDR_QUEUE_TASK_PROMPT_V2.md`                                             |
+| Playback runtime            | ChatGPT Advanced Voice; exact model and managed runtime settings were not exported |
+
+The unknown runtime identity is a reproducibility gap, not permission to label
+the prompt or profile alone as a complete deployed release. After upload, record
+the available model/runtime settings and run queue generation, playback,
+capture, export, and local-intake checks against this set.
+
 The scheduled **Weekday TLDR Queues** Task uses
 `chatgpt-project/WEEKDAY_TLDR_QUEUE_TASK_PROMPT_V2.md` as its managed prompt.
 The live body was verified as an exact match on July 26, 2026. The Task remains

@@ -1,6 +1,6 @@
-# Brad TLDR Interest Profile v1.4
+# Brad TLDR Interest Profile v1.5
 
-Version: `1.4`
+Version: `1.5`
 Scope: TLDR newsletters only for the MVP (`TLDR`, `TLDR AI`, `TLDR Dev`,
 `TLDR Fintech`).
 
@@ -32,6 +32,11 @@ central to the title and summary.
 - General software-engineering craft, software history, career development, and
   computing-culture essays when framed as an argument with transferable insight.
   Dry organizational news does not qualify by subject alone.
+- Treat articles published on Martin Fowler's site as a strong prior for high
+  interest and in-depth reading because they consistently match Brad's interest
+  in transferable engineering arguments. Still classify the actual title and
+  summary, and send an obviously off-topic or content-free item to review rather
+  than overriding contradictory evidence.
 - AI's effect on software engineering practice, engineering roles, taste,
   judgment, labor markets, code quality, and the AI-native productivity divide.
 - Product experimentation and product judgment in the AI era, including A/B

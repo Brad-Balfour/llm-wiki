@@ -2,7 +2,7 @@
   "manifest_version": 1,
   "schema_version": "compile-state.v1",
   "created": "2026-07-05",
-  "updated": "2026-07-31T02:41:43.206Z",
+  "updated": "2026-08-04T01:44:00.000Z",
   "processed_sources": {
     "sources/tldr/2026-06-23-transformer-architecture-for-senior-engineers.txt": {
       "hash": "sha256:f9a592761c47b368e73c13dd97d27b02bc875433b632a582a40ec6419643e631",
@@ -111,6 +111,18 @@
       "output_path": "wiki/concepts/ai-native-software-engineering.md",
       "source_item_id": "19fb33942bb1cc3e-04",
       "processed_at": "2026-07-31T02:41:43.206Z"
+    },
+    "sources/tldr/2026-07-31-agent-autonomy-boundaries.txt": {
+      "hash": "sha256:ddf7764d53657824a4378c6e3219d07269daa48057d1b49ab326089221e7681e",
+      "output_path": "wiki/concepts/agent-autonomy-boundaries.md",
+      "source_item_id": "19fb2cd8ae0bed24-09",
+      "processed_at": "2026-08-04T01:44:00.000Z"
+    },
+    "sources/tldr/2026-07-31-code-structure-agent-context-economics.txt": {
+      "hash": "sha256:fbcce48f361038666181899dbb1641b55c382c61776701eee4fb8d00ac7b75e8",
+      "output_path": "wiki/concepts/code-structure-agent-context-economics.md",
+      "source_item_id": "19fb7fb144b8358d-01",
+      "processed_at": "2026-08-04T01:44:00.000Z"
     }
   },
   "wiki_outputs": {
@@ -187,6 +199,16 @@
     "wiki/concepts/prompt-deployment-gates.md": {
       "hash": "sha256:761b409199eada9b5a07f499841922aed4053f7df90a6a6242626dc99dcd1897",
       "updated": "2026-07-31T02:41:35.229Z",
+      "provenance_count": 1
+    },
+    "wiki/concepts/agent-autonomy-boundaries.md": {
+      "hash": "sha256:3960119f627ef17343879a02bdf37b4a766e3438340076b2f9e2bdf89d02ecc7",
+      "updated": "2026-08-04T01:44:00.000Z",
+      "provenance_count": 1
+    },
+    "wiki/concepts/code-structure-agent-context-economics.md": {
+      "hash": "sha256:cc79368ba5ece22e2ea478a86b111df0c75a5ab46c2601e3d15f2aaef20bac9e",
+      "updated": "2026-08-04T01:44:00.000Z",
       "provenance_count": 1
     }
   },
@@ -412,6 +434,18 @@
       "source_path": "sources/tldr/2026-07-30-ai-native-fintech-architecture.txt",
       "output_path": "wiki/concepts/ai-native-software-engineering.md",
       "status": "updated"
+    },
+    {
+      "timestamp": "2026-08-04T01:44:00.000Z",
+      "source_path": "sources/tldr/2026-07-31-agent-autonomy-boundaries.txt",
+      "output_path": "wiki/concepts/agent-autonomy-boundaries.md",
+      "status": "created"
+    },
+    {
+      "timestamp": "2026-08-04T01:44:00.000Z",
+      "source_path": "sources/tldr/2026-07-31-code-structure-agent-context-economics.txt",
+      "output_path": "wiki/concepts/code-structure-agent-context-economics.md",
+      "status": "created"
     }
   ]
 }
