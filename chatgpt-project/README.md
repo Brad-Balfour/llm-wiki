@@ -27,25 +27,20 @@ Upload exactly these files to `LLM-Wiki-Car`:
 - `schema/classifier-instructions.md`
 - `schema/routing-rules.md`
 
-## Behavioral Release Unit
+## Rollback-Aware Versioning
 
-Treat the live prompt, queue and bundle schemas, queue-generation instructions,
-interest profile, classifier instructions, routing rules, scheduled-task
-prompt, and relevant runtime/model settings as one behavioral configuration.
-A prompt revision alone is not sufficient release identity when another member
-of that set can change the same observable behavior.
+A prompt is not always the only thing changing observable behavior. Tool
+schemas, retrieval and context policy, model/runtime settings, classifier
+instructions, routing, and the interest profile may also matter. When several
+of these change together—or when a change has enough risk to justify the
+overhead—recording the materially coupled versions makes a failed experiment
+easier to understand and roll back.
 
-For every behavior-changing update:
-
-1. identify every coupled file or runtime setting;
-2. record the compatible versions as one reviewed change;
-3. validate queue generation, playback, capture, export, and local intake
-   against that exact set; and
-4. preserve enough version information to restore the set together.
-
-Avoid rolling back only the prompt when a schema, tool surface, routing policy,
-model, or runtime setting changed with it. The rollback unit should match the
-behavioral release unit.
+This is a design heuristic, not a mandatory release manifest or a requirement
+to run the entire workflow for every edit. Use judgment and validation
+proportional to the change. The practical goal is simply to avoid a partial
+rollback that restores a prompt while leaving another behavior-changing
+dependency behind.
 
 The scheduled **Weekday TLDR Queues** Task uses
 `chatgpt-project/WEEKDAY_TLDR_QUEUE_TASK_PROMPT_V2.md` as its managed prompt.
