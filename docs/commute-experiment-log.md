@@ -264,11 +264,13 @@ reduced to a public lesson about prioritizing entropy in agent-generated utility
 code.
 
 Brad also set a topic-level preference: Martin Fowler articles should default to
-high interest and in-depth discussion. Interest Profile 1.5 records that strong
-prior with an off-topic/content-free exception. The project documentation also
-retains the discussion's lighter-weight process lesson: when materially coupled
-behavior changes together, recording the relevant versions can make rollback
-easier. It is a proportional design heuristic, not a hard release gate.
+high interest and in-depth discussion. This remains calibration evidence rather
+than a production profile change until the successor's measured-review step can
+evaluate it with other repeated misses and false skips. The project
+documentation also retains the discussion's lighter-weight process lesson:
+when materially coupled behavior changes together, recording the relevant
+versions can make rollback easier. It is a proportional design heuristic, not
+a hard release gate.
 
 ## What Worked
 

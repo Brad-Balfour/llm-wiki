@@ -1,7 +1,7 @@
 # TLDR Classifier Instructions
 
 Version: `classifier-instructions.v1`
-Profile version: `1.5`
+Profile version: `1.4`
 Scope: Source-neutral classification of parsed TLDR editorial items.
 
 The classifier emits only a source-neutral request reference plus interest and
