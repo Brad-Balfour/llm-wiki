@@ -519,3 +519,240 @@ New coverage the plan adds, beyond keeping the 139 existing tests green:
 - Any change to `openspec/`.
 - Adding a runtime dependency (see the rejected option under R1).
 - Behavior changes beyond the two corrections named in R2.
+
+## 6. Audit of this plan against refactoring practice
+
+Sections 1-5 were written from a duplication-and-line-count reading of the code.
+This section audits that plan against the wider set of metrics and against
+Martin Fowler's refactoring practice (the smell catalog in _Refactoring_ 2nd ed.
+ch. 3, and the workflow guidance in ch. 2 and his "Workflows of Refactoring"
+writing). It records where the original plan left gains on the table.
+
+Everything below is measured, not asserted. Section 1 claimed to assess six
+quality attributes but only ever measured duplication and LOC; that is the first
+finding.
+
+### 6.1 Method gaps (Fowler's discipline, not his catalog)
+
+#### A1. No coverage precondition — the most serious gap
+
+Fowler's precondition for refactoring is self-testing code. The plan asserted
+"validated by the existing suite" for every item without ever measuring
+coverage. Measured now (`node --test --experimental-test-coverage`): **80.71%
+line, 75.09% branch, 89.40% function overall**, distributed almost exactly
+opposite to where the plan proposed the largest edits.
+
+| Module                                 | Line % | Func % | Plan item proposing a rewrite |
+| -------------------------------------- | ------ | ------ | ----------------------------- |
+| `wiki/ingest-handoff.ts`               | 27.66  | 41.67  | R7-adjacent                   |
+| `wiki/maintain-commute.ts`             | 38.72  | 65.63  | **R9 (decompose `main()`)**   |
+| `wiki/prepare-handoff-drafts.ts`       | 48.86  | 66.67  | R2                            |
+| `wiki/retrieve-maintenance-sources.ts` | 53.79  | 65.00  | R2, R4                        |
+| `classifier/validation.ts`             | 74.38  | 100.00 | **R5 (rewrite 131-line fn)**  |
+| `wiki/approved-source.ts`              | 77.73  | 95.24  | R1                            |
+| `routing/derive.ts`                    | 100.00 | 100.00 | R6 (ranked 6th, "very low")   |
+
+R9 is the sharpest case: it proposes restructuring `maintain-commute.ts`'s
+161-line `main()`, and coverage reports **lines 41-167 — that entire function —
+as uncovered**. Restructuring untested code is not refactoring; it is rewriting
+without a net.
+
+**New R0 (must precede R2, R5, R7, R9): characterization tests.** Write tests
+that pin current observable behavior of the low-coverage modules _before_
+touching them. The risk column in section 2 is wrong and should be recomputed as
+complexity × (1 − coverage), not intuition. On that basis R6 is the only item
+whose "very low risk" label survives.
+
+#### A2. Big-bang steps where Fowler prescribes small ones
+
+R1 as written changes 11 modules at once. Fowler's central discipline is a
+sequence of small behavior-preserving steps with a green suite between each. The
+plan should name and prescribe the applicable mechanics:
+
+- **Parallel Change / expand-migrate-contract** for R1 and R1b: add
+  `src/shared/`, migrate one module per commit, delete the local copy in that
+  same commit, contract only when the last module is migrated.
+- **Branch by Abstraction** for R1b specifically, so hand-rolled and zod
+  validators coexist while modules move across one at a time.
+
+This is a process correction, not a scope change, but without it R1 is a rewrite
+wearing a refactoring label.
+
+#### A3. No functional driver — "make the change easy, then make the easy change"
+
+The plan orders work by duplication count. Fowler orders it by the change you
+are about to make. The repository has two live OpenSpec changes
+(`bootstrap-llm-wiki-mvp`, `commute-wiki-operating-loop`, journeys J1-J6), and
+the plan never asks which refactorings unblock them. Preparatory refactoring
+aimed at the next J-journey almost certainly outranks a tidy-up of a module
+nobody is about to touch. **This ordering should be revisited against the active
+change set before implementation starts**; it is the largest single ROI gap in
+the plan and cannot be resolved from the code alone.
+
+#### A4. Refactoring and behavior change conflated
+
+R2 bundles a genuine refactoring with two behavior corrections (the `.private`
+guard, the flag-value parsing). Fowler is explicit that these must not share a
+commit: a refactoring commit that also changes behavior destroys the property
+that makes refactoring safe to review and revert. Land the two fixes as separate
+test-first commits before or after the structural change, never inside it.
+
+#### A5. No opportunistic-refactoring practice
+
+The plan is eleven scheduled batches with no standing rule. Fowler's litter-
+pickup / comprehension refactoring — improve what you touch, as you touch it —
+is what keeps the duplication from re-accumulating between batches. Pair this
+with R1's proposed lint guard as a standing convention in `AGENTS.md`.
+
+### 6.2 Smells the plan missed entirely
+
+#### B1. Primitive Obsession — the largest missed reliability gain
+
+Every domain identifier is a bare `string`. Measured declaration counts:
+
+| Identifier           | Declared as `string` |
+| -------------------- | -------------------- |
+| `source_item_id`     | 12                   |
+| `session_id`         | 7                    |
+| `event_id`           | 7                    |
+| `maintenance_key`    | 6                    |
+| `classifier_item_id` | 6                    |
+
+The sha256 fingerprint format is re-validated by regex in **7 places**.
+
+Nothing stops an `event_id` being passed where a `source_item_id` is expected.
+That is precisely the failure `validateExactItem`, `maintenanceCandidateKey`,
+and `parsePriorMaintenanceAttempt` defend against — **at runtime, with
+hand-written checks**. Branded types cost roughly 20 lines:
+
+```ts
+declare const brand: unique symbol;
+export type SourceItemId = string & { readonly [brand]: 'SourceItemId' };
+```
+
+and convert an entire class of runtime validation into a compile error, at zero
+runtime cost, under a tsconfig that is already strict enough to enforce it. This
+is a bigger reliability win than any item in section 2 and it was absent.
+
+#### B2. Data Clump — `{source_item_id, title, url}`
+
+The same triple is restated in nine types:
+
+`QueueItemIdentity` (the canonical 3-field version), `MaintenanceCandidate`
+(twice — see R4), `CommuteFeedback`, `CommuteReviewNote`, `WikiReviewDraft`,
+`ClassifierInputItem`, `ParsedTldrItem`, `ClassifierFeedbackLabelInput`, plus
+`ExactQueueItem` and `RecoveredWikiCapture` in the recovery path.
+
+`QueueItemIdentity` already exists and **nothing composes with it**. Fowler:
+Extract Class / Introduce Parameter Object. Make it the shared nucleus that the
+others embed rather than restate. Combined with B1 this is where the type system
+starts doing the work the runtime validators currently do by hand.
+
+#### B3. Divergent Change — `feedback-label.ts` is in the wrong package
+
+`src/classifier/feedback-label.ts` (734 lines, 5th-most-churned file) imports
+from `commute/session-bundle`, `routing/derive`, **and** `classifier/types`. It
+is a cross-cutting feedback workflow living inside the classifier package, and
+it creates a package-level cycle: `classifier → routing → classifier`.
+
+It also sits awkwardly against the `AGENTS.md` rule that classifier output stays
+source-neutral with routing derived in `src/routing/` — the classifier package
+now imports routing policy in order to validate it. Move to `src/feedback/`.
+
+**The plan never questioned module placement at all**, only module contents.
+Measured cross-package edges: `wiki → commute` (5), `tldr → routing` (2),
+`routing → classifier` (1), `classifier → routing` (1), `classifier → commute`
+(1).
+
+#### B4. Shotgun Surgery, measured from history — R4 is badly under-ranked
+
+The plan ranked R4 (single maintenance-candidate contract) fourth, at "~-60 LOC,
+low risk", framing it as a tidy-up. Git history says it is the hottest change
+axis in the repository:
+
+- `commute/import-session-bundles.ts` is the **most-changed** source file (12
+  commits); `wiki/maintain-commute.ts` is **second** (9).
+- They are the **most change-coupled pair in the repo** (4 co-changes) — more
+  than any other pairing.
+- They are exactly the two files that each declare their own copy of
+  `MaintenanceCandidate`.
+
+Duplication counts measure how much code exists; change coupling measures where
+edits actually land. **R4 should be promoted to the front of Phase 1**: cheap,
+low-risk, and aimed precisely at where change concentrates. Runner-up couplings:
+`compile-file ↔ compiler` (3, → R7) and `import-session-bundles ↔
+recover-session-bundle` (3, → R3).
+
+#### B5. Inconsistent error-handling strategy
+
+`classifier/validation.ts` accumulates every error into a structured
+`ClassifierValidationError[]` with a `code` enum. **Every other validating
+module throws on the first failure.** For an operator validating a 40-item
+session bundle, throw-on-first means fix-one, re-run, repeat.
+
+Fowler's Notification pattern is the named remedy, and it is the strategy
+`validation.ts` already uses. The plan should propose one deliberate,
+repository-wide answer rather than leaving two conventions in place. This also
+strengthens the zod case in section 2a — issue accumulation is native there —
+which the zod analysis itself missed.
+
+#### B6. Alternative Classes with Different Interfaces — naming
+
+Four names exist for "non-empty string": `requireString` (×8),
+`requireNonEmpty`, `requireNonEmptyString`, `requiredString`. Section 2 counted
+these as duplication but never named the vocabulary problem. Consolidation must
+also settle on one name (Fowler: Rename Function), or `src/shared/` simply
+inherits the confusion.
+
+#### B7. Missing seams — R9 is necessary but not sufficient
+
+Hidden global dependencies, measured (`new Date()` / `process.*` / direct
+fs-exec calls):
+
+| Module                         | Dates | `process.*` | IO calls |
+| ------------------------------ | ----- | ----------- | -------- |
+| `wiki/maintain-commute.ts`     | 3     | 6           | 17       |
+| `wiki/ingest-handoff.ts`       | 1     | 5           | 11       |
+| `classifier/feedback-label.ts` | 1     | 10          | 7        |
+| `wiki/compile-file.ts`         | 1     | 4           | 7        |
+
+R9 says "decompose `main()`" but not _how to make the pieces testable_. The
+codebase already contains the right pattern in two places — `retrieveMaintenanceSources`
+injects `fetchLike` and `resolveHost`, and `reconcileSessionBundles` injects
+`importedAt` — and it was never generalized. Extraction must also **inject the
+clock, the filesystem, and the process boundary**, or the extracted functions
+stay as untestable as the 161-line original.
+
+#### B8. Speculative Generality (minor)
+
+`ExactQueueItem.position` (`recover-session-bundle.ts:128`) is assigned and
+never read — a dead field. Several constants are exported but consumed only
+within their declaring module (verified: `COMMUTE_HANDOFF_SCHEMA_VERSION` has no
+reader at all; `FORBIDDEN_DOWNSTREAM_FIELDS` and `EVIDENCE_SOURCES` are used
+only internally). Narrow the public surface. Low value, near-zero cost.
+
+### 6.3 What the audit does not change
+
+The duplication analysis in R1, the drift evidence, the R3 split, and the R6
+decision table all survive. R1 remains correct in substance; the corrections are
+that it must be sequenced as a Parallel Change, that it must settle vocabulary
+(B6), and that it should carry branded types (B1) and the shared identity type
+(B2) with it, since those touch the same call sites.
+
+### 6.4 Revised ordering
+
+| Order | Item                                                     | Why it moved                               |
+| ----- | -------------------------------------------------------- | ------------------------------------------ |
+| 1     | **R0** characterization tests for <60%-covered modules   | New; precondition for R2, R5, R7, R9       |
+| 2     | **R4** single maintenance-candidate contract             | Promoted: highest measured change coupling |
+| 3     | **B1+B2** branded ids + shared identity type             | New; rides with R1's call-site edits       |
+| 4     | **R1a** shared primitives, as Parallel Change            | Unchanged in substance, resequenced        |
+| 5     | **R6** routing table                                     | Only item with 100% coverage               |
+| 6     | **B3** move `feedback-label.ts` out of `classifier/`     | New; breaks the package cycle              |
+| 7     | R8, R5, R1b (zod + schema generation)                    | Unchanged                                  |
+| 8     | R2 (refactor and behavior fixes as separate commits), R3 | Split per A4                               |
+| 9     | **B5** one repository-wide error strategy                | New; decide before R1b locks it in         |
+| 10    | R9 (with B7 seams), R7, R10, R11                         | R9 now depends on R0                       |
+
+Still open and not resolvable from the code: **A3** — the ordering above should
+be re-weighted against whatever J1-J6 work is actually next.
