@@ -3,20 +3,17 @@ import { lookup } from 'node:dns/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import {
+  parseMaintenanceCandidate as parseSharedMaintenanceCandidate,
+  type MaintenanceCandidate,
+} from '../commute/maintenance.js';
+
+export type { MaintenanceCandidate } from '../commute/maintenance.js';
+
 const RETRIEVAL_SCHEMA_VERSION = 'commute-source-retrieval.v1';
 const MAX_EXTRACTED_TEXT_LENGTH = 60_000;
 const MAX_SOURCE_BYTES = 2_000_000;
 const MAX_REDIRECTS = 5;
-
-export interface MaintenanceCandidate {
-  maintenance_key: string;
-  session_id: string;
-  event_id: string;
-  source_item_id: string;
-  title: string;
-  url: string;
-  status: 'pending';
-}
 
 interface ImportRecord {
   maintenance_candidates: MaintenanceCandidate[];
@@ -313,26 +310,7 @@ export function parseImportRecord(candidate: unknown): ImportRecord {
 }
 
 export function parseMaintenanceCandidate(candidate: unknown, field: string): MaintenanceCandidate {
-  if (typeof candidate !== 'object' || candidate === null || Array.isArray(candidate)) {
-    throw new Error(`${field} must be an object`);
-  }
-  const record = candidate as Record<string, unknown>;
-  const url = requireString(record.url, `${field}.url`);
-  try {
-    const parsed = new URL(url);
-    if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') throw new Error();
-  } catch {
-    throw new Error(`${field}.url must be an HTTP(S) URL`);
-  }
-  return {
-    maintenance_key: requireString(record.maintenance_key, `${field}.maintenance_key`),
-    session_id: requireString(record.session_id, `${field}.session_id`),
-    event_id: requireString(record.event_id, `${field}.event_id`),
-    source_item_id: requireString(record.source_item_id, `${field}.source_item_id`),
-    title: requireString(record.title, `${field}.title`),
-    url,
-    status: 'pending',
-  };
+  return parseSharedMaintenanceCandidate(candidate, field);
 }
 
 function ensurePrivatePath(filePath: string, option: string): void {
@@ -341,13 +319,6 @@ function ensurePrivatePath(filePath: string, option: string): void {
   if (!resolved.startsWith(`${privateRoot}${path.sep}`)) {
     throw new Error(`${option} must be inside the gitignored .private directory`);
   }
-}
-
-function requireString(candidate: unknown, field: string): string {
-  if (typeof candidate !== 'string' || candidate.trim().length === 0) {
-    throw new Error(`${field} must be a non-empty string`);
-  }
-  return candidate;
 }
 
 function errorMessage(error: unknown): string {
