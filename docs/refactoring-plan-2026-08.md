@@ -108,16 +108,131 @@ asserting tests in the same commit, listing each changed message in the PR body.
 The alternative — parameterizing the message per call site — preserves output
 exactly but keeps a chunk of the duplication, so it is not recommended.
 
-**Considered and rejected: adopt a schema library (zod/valibot).** It would
-delete more code than any proposal here, but the repository currently has zero
-runtime dependencies, and the CLI error text that operators read would become
-library-shaped. Keeping validation hand-rolled but centralized preserves both
-properties. Revisit only if contract count grows substantially.
+**Alternative: adopt zod instead of hand-rolled primitives.** Measured with a
+working spike rather than estimated — see section 2a below for the numbers. Short
+version: zod is worth adopting, but for the JSON Schema generation rather than
+the line count, and it does not remove the need for R1's structure.
 
 **Guard.** Per the failure-driven-improvements rule, add a focused test (or an
 ESLint `no-restricted-syntax` rule) that fails when a module outside
 `src/shared/` declares a function named like a shared primitive. Without it the
 duplication re-accumulates.
+
+## 2a. Measured evaluation of zod (spike result)
+
+The dependency question was raised and set aside, so the remaining question is
+purely how much simpler zod makes the code. This was measured, not estimated: a
+faithful zod 4.4 port of `src/commute/handoff.ts` was written and run against
+the unmodified `tests/commute-handoff.test.ts`. The spike was then removed; no
+zod dependency is committed.
+
+### What the spike showed
+
+| Measure                            | Hand-rolled today | zod port | Delta |
+| ---------------------------------- | ----------------- | -------- | ----- |
+| Whole module                       | 331               | 208      | -37%  |
+| Local validation primitives        | 78                | 0        | -100% |
+| Schema/field logic                 | ~179              | ~112     | -37%  |
+| Hand-written interfaces            | 33                | 0        | -100% |
+| Cross-field invariants             | ~60               | ~60      | ~0    |
+| Existing tests passing, unmodified | 9/9               | 7/9      | —     |
+
+Both failing tests were error-message wording, not behavior:
+`Unrecognized key: "transcript"` versus the asserted
+`unsupported fields: transcript`. Semantics were equivalent in every case.
+
+### Correcting for R1
+
+The 37% headline overstates the incremental gain, because 78 of the 123 removed
+lines are the local primitives that **R1 removes anyway, for free, in every
+module**. Against a post-R1 baseline the honest comparison is:
+
+- Today: 331 lines.
+- After R1 (shared primitives, no zod): ~252 lines.
+- After zod: 208 lines.
+
+So zod buys roughly **17-20% beyond R1** on a module that is mostly
+straightforward shape validation, plus deletion of the hand-written interfaces.
+
+### Extrapolation across the repository
+
+Only shape validation benefits. Categorizing the 6,723 lines:
+
+| Category                                                                             | LOC     | zod benefit                             |
+| ------------------------------------------------------------------------------------ | ------- | --------------------------------------- |
+| Shape/field validation (bundle, handoff, approved-source, feedback-label, etc.)      | ~1,500  | ~35% vs today, ~18% vs post-R1          |
+| Cross-field domain invariants (integrity rules, correction rules, queue-state rules) | ~400    | ~0 (becomes `superRefine`, same length) |
+| Playback lifecycle state machine, fingerprinting, artifact filename rules            | ~170    | none                                    |
+| TLDR text scanner (`tldr/parser.ts`)                                                 | 577     | none                                    |
+| Wiki Markdown render/merge (`wiki/compiler.ts`, `compile-file.ts`)                   | ~470    | none                                    |
+| CLI argument parsing                                                                 | ~335    | none (a parser is still needed first)   |
+| Orchestration, IO, types, routing                                                    | balance | none                                    |
+
+Expected saving: roughly **500-600 lines against today (~9% of the codebase)**,
+of which R1 already delivers about half without any dependency. Net incremental
+saving attributable to zod: **~250-320 lines, under 5%**.
+
+That is a real but modest simplification. The reason it is not larger is
+structural: what makes this codebase's validators long is not "is this a
+string" — it is the domain invariants, and those stay hand-written either way.
+
+### The strongest argument for zod, which is not line count
+
+`schema/` contains **856 lines of hand-maintained JSON Schema** across six files
+that restate contracts the TypeScript validators already enforce:
+
+| File                                       | Lines |
+| ------------------------------------------ | ----- |
+| `commute-session-bundle-v1.schema.json`    | 337   |
+| `commute-handoff-v2.schema.json`           | 135   |
+| `approved-wiki-source-v1.schema.json`      | 109   |
+| `tldr-commute-queue-v2.schema.json`        | 99    |
+| `classifier-feedback-label-v1.schema.json` | 89    |
+| `commute-handoff-v1.schema.json`           | 87    |
+
+Every contract therefore exists **twice** in executable form, and nothing keeps
+the two in sync. The only guard found in the suite is
+`tests/classifier-feedback-label.test.ts:215`, which spot-checks a single `url`
+pattern in a single file. The other five files and every other field are
+unverified against the code that actually runs.
+
+`z.toJSONSchema()` (confirmed present in zod 4.4) generates these from the
+validator, making the schema files build output instead of a parallel
+hand-maintained artifact. That removes ~856 lines of drift-prone duplication —
+**more than the entire validation-logic saving** — and eliminates a whole class
+of defect that no amount of hand-rolled refactoring addresses.
+
+### Costs found in the spike
+
+1. **Error-message wording is a migration cost.** 36 of the 51 `assert.throws`
+   calls in the suite assert message patterns. zod's default messages will not
+   match, so each schema needs custom messages, clawing back part of the saving.
+   This is a one-time cost, not a permanent one.
+2. **`exactOptionalPropertyTypes` needs a bridge.** zod emits present-but-
+   undefined keys; the repo's interfaces forbid them. A 6-line shared `compact()`
+   helper fixes it once, but it must exist.
+3. **Discriminated unions change the public type.** Modeling v1/v2 handoffs as
+   `z.discriminatedUnion` — the idiomatic choice — makes `z.infer` produce a
+   union, and `parsed.queue_states?.[0]` stops compiling at call sites. Verified
+   by the spike failing to type-check that way. Modeling it as a single
+   `strictObject` with `superRefine` for the version rules preserves today's
+   optional-property API and does type-check. Prescribe the latter.
+4. **Legacy-lenient parsing is a poor fit.** `recover-session-bundle.ts`
+   deliberately accepts malformed historical bundles and coerces positional
+   references. Leave it hand-written.
+
+### Recommendation
+
+Adopt zod, with the justification restated: take it for **JSON Schema
+generation** (the 856-line duplication), and treat the ~250-320 line validation
+saving as a secondary benefit.
+
+This changes R1's shape but does not remove it: `src/shared/` is still needed for
+`errorMessage`, the `compact()` bridge, the `formatIssues` translator, and the
+shared refinements (safe text, credential-free URL, real calendar date) that
+encode this project's actual rules. Sequence it as R1a (shared module, hand-
+rolled, unblocks everything) then R1b (zod migration, module by module, with
+schema generation) so the two land independently and either can stop early.
 
 ### R2. Unified CLI entrypoint layer
 
