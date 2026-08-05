@@ -11,6 +11,7 @@ import {
   captureRollbackError,
   formatRollbackFailure,
   resolveEnrichmentPath,
+  parseOptions,
 } from '../src/wiki/ingest-handoff.js';
 
 const execFileAsync = promisify(execFile);
@@ -255,3 +256,49 @@ function compileState(
     2
   )}\n`;
 }
+
+// --- Characterization tests (issue #55 item 1) ---
+// Pin the current CLI argument contract before item 11 replaces this parser.
+
+test('parses ingestion options and defaults the enrichment directory', () => {
+  const options = parseOptions(['--input', 'handoff.txt', '--confirm-public']);
+
+  assert.equal(options.input, 'handoff.txt');
+  assert.equal(options.enrichmentDir, '.private/wiki-enrichments');
+  assert.equal(options.confirmPublic, true);
+  assert.equal(Object.hasOwn(options, 'sourceItemId'), false);
+});
+
+test('accepts an explicit enrichment directory and single-item selection', () => {
+  const options = parseOptions([
+    '--input',
+    'handoff.txt',
+    '--enrichment-dir',
+    '.private/other',
+    '--source-item-id',
+    'tldr_abc123',
+  ]);
+
+  assert.equal(options.enrichmentDir, '.private/other');
+  assert.equal(options.sourceItemId, 'tldr_abc123');
+  assert.equal(options.confirmPublic, false);
+});
+
+test('requires an input handoff and rejects unknown arguments', () => {
+  assert.throws(() => parseOptions([]), /Usage: ingest:wiki/);
+  assert.throws(() => parseOptions(['--confirm-public']), /Usage: ingest:wiki/);
+  assert.throws(
+    () => parseOptions(['--input', 'handoff.txt', '--publish']),
+    /Unknown argument: --publish/
+  );
+});
+
+test('currently swallows a following flag as a value, which item 11 corrects', () => {
+  // As with maintain:commute, a value-taking flag consumes the next token
+  // unconditionally. Here it silently discards the public-review confirmation,
+  // so the command fails its confirmation check despite the flag being passed.
+  const options = parseOptions(['--input', 'handoff.txt', '--enrichment-dir', '--confirm-public']);
+
+  assert.equal(options.enrichmentDir, '--confirm-public');
+  assert.equal(options.confirmPublic, false);
+});

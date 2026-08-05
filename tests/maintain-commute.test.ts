@@ -10,6 +10,7 @@ import {
   parseAgentResult,
   reportedAgentPrUrl,
   resolveMaintainerCodexExecutable,
+  parseOptions,
 } from '../src/wiki/maintain-commute.js';
 
 test('uses the app-bundled Codex unless an explicit maintainer executable is configured', () => {
@@ -343,5 +344,120 @@ test('does not trust a reported PR URL from the wrong maintainer branch', () => 
       'commute-maintenance-20260720120000'
     ),
     undefined
+  );
+});
+
+// --- Characterization tests (issue #55 item 1) ---
+// Pin the current CLI argument contract before item 11 replaces this parser.
+// Item 11 is expected to change some of these; enumerating them here makes
+// each intentional change visible as a test diff rather than a silent shift.
+
+test('parses bundles, recovery queues, and an output directory in order', () => {
+  const options = parseOptions([
+    '--input',
+    'a.txt',
+    '--recover-with',
+    'queue-a.txt',
+    '--input',
+    'b.txt',
+    '--output-dir',
+    '.private/out',
+    '--prior-intake',
+    '.private/prior.json',
+  ]);
+
+  assert.equal(options.kind, 'maintain');
+  assert.deepEqual(options.kind === 'maintain' ? options.inputs : undefined, [
+    { bundle: 'a.txt', recoveryQueue: 'queue-a.txt' },
+    { bundle: 'b.txt' },
+  ]);
+  assert.equal(options.kind === 'maintain' ? options.outputDir : undefined, '.private/out');
+  assert.equal(
+    options.kind === 'maintain' ? options.priorIntake : undefined,
+    '.private/prior.json'
+  );
+});
+
+test('omits prior intake entirely when it is not supplied', () => {
+  const options = parseOptions(['--input', 'a.txt', '--output-dir', '.private/out']);
+
+  assert.equal(options.kind === 'maintain' && Object.hasOwn(options, 'priorIntake'), false);
+});
+
+test('treats the launcher diagnosis as a standalone mode', () => {
+  assert.deepEqual(parseOptions(['--diagnose-launcher']), { kind: 'diagnose_launcher' });
+  assert.throws(
+    () => parseOptions(['--diagnose-launcher', '--input', 'a.txt']),
+    /cannot be combined with maintenance inputs/
+  );
+  assert.throws(
+    () => parseOptions(['--diagnose-launcher', '--output-dir', '.private/out']),
+    /cannot be combined with maintenance inputs/
+  );
+});
+
+test('binds a recovery queue to the preceding bundle and only once', () => {
+  assert.throws(
+    () => parseOptions(['--recover-with', 'queue.txt', '--output-dir', '.private/out']),
+    /requires a preceding --input/
+  );
+  assert.throws(
+    () =>
+      parseOptions([
+        '--input',
+        'a.txt',
+        '--recover-with',
+        'one.txt',
+        '--recover-with',
+        'two.txt',
+        '--output-dir',
+        '.private/out',
+      ]),
+    /at most one --recover-with queue/
+  );
+});
+
+test('requires both a bundle and an output directory', () => {
+  assert.throws(() => parseOptions(['--output-dir', '.private/out']), /Usage: maintain:commute/);
+  assert.throws(() => parseOptions(['--input', 'a.txt']), /Usage: maintain:commute/);
+  assert.throws(() => parseOptions([]), /Usage: maintain:commute/);
+});
+
+test('rejects an unknown argument rather than ignoring it', () => {
+  assert.throws(
+    () => parseOptions(['--input', 'a.txt', '--output-dir', '.private/out', '--publish']),
+    /Unknown argument: --publish/
+  );
+});
+
+test('rejects a value-taking flag with no value', () => {
+  assert.throws(() => parseOptions(['--input']), /--input requires a bundle filename/);
+  assert.throws(
+    () => parseOptions(['--input', 'a.txt', '--output-dir']),
+    /--output-dir requires a directory/
+  );
+  assert.throws(
+    () => parseOptions(['--input', 'a.txt', '--output-dir', '.private/out', '--prior-intake']),
+    /--prior-intake requires a filename/
+  );
+});
+
+test('currently swallows a following flag as a value, which item 11 corrects', () => {
+  // Characterizing a defect, not endorsing it: a value-taking flag consumes the
+  // next token unconditionally, so a following flag becomes its value. Item 11
+  // replaces this with one missing-value rule; when it lands these expectations
+  // must change, and that diff is the point.
+
+  // Silent case: the flag is absorbed and the command runs with a nonsense
+  // output directory, with nothing reported.
+  const silent = parseOptions(['--input', 'a.txt', '--output-dir', '--diagnose-launcher']);
+  assert.equal(silent.kind, 'maintain');
+  assert.equal(silent.kind === 'maintain' ? silent.outputDir : undefined, '--diagnose-launcher');
+
+  // Misleading case: the absorbed flag leaves its own value stranded, which
+  // surfaces as an unknown-argument error naming the wrong token.
+  assert.throws(
+    () => parseOptions(['--input', 'a.txt', '--output-dir', '--prior-intake', 'p.json']),
+    /Unknown argument: p\.json/
   );
 });
