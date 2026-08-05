@@ -3,6 +3,8 @@ import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import { errorMessage } from '../shared/errors.js';
+
 import {
   bundleArtifactFilenameMatches,
   type CommuteSessionBundle,
@@ -573,10 +575,6 @@ function ensurePrivateOutput(output: string): void {
   if (!resolvedOutput.startsWith(`${privateRoot}${path.sep}`)) {
     throw new Error('--output must be inside the gitignored .private directory');
   }
-}
-
-function errorMessage(error: unknown): string {
-  return error instanceof Error ? error.message : String(error);
 }
 
 if (

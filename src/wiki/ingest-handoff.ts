@@ -5,6 +5,8 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { promisify } from 'node:util';
 
+import { errorCode, errorMessage } from '../shared/errors.js';
+
 import { parseCommuteHandoffText } from '../commute/handoff.js';
 import type { CommuteReviewNote } from '../commute/handoff.js';
 import { parseApprovedWikiSource, validateApprovedWikiSource } from './approved-source.js';
@@ -165,10 +167,6 @@ export function formatRollbackFailure(originalError: unknown, rollbackErrors: un
     .join('; ')}`;
 }
 
-function errorMessage(error: unknown): string {
-  return error instanceof Error ? error.message : String(error);
-}
-
 export function buildApprovedSource(
   note: CommuteReviewNote,
   enrichment: Enrichment,
@@ -242,10 +240,6 @@ export async function captureRollbackError(
   } catch (error) {
     rollbackErrors.push(error);
   }
-}
-
-function errorCode(error: unknown): unknown {
-  return typeof error === 'object' && error !== null && 'code' in error ? error.code : undefined;
 }
 
 export function parseOptions(args: string[]): {

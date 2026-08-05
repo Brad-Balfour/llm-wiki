@@ -3,6 +3,8 @@ import { lookup } from 'node:dns/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import { errorMessage } from '../shared/errors.js';
+
 import {
   parseMaintenanceCandidate as parseSharedMaintenanceCandidate,
   type MaintenanceCandidate,
@@ -319,10 +321,6 @@ function ensurePrivatePath(filePath: string, option: string): void {
   if (!resolved.startsWith(`${privateRoot}${path.sep}`)) {
     throw new Error(`${option} must be inside the gitignored .private directory`);
   }
-}
-
-function errorMessage(error: unknown): string {
-  return error instanceof Error ? error.message : String(error);
 }
 
 if (

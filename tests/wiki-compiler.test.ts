@@ -130,7 +130,10 @@ test('rejects unsafe URLs, raw HTML, and private-work context', async () => {
 
   const unsafeUrl = structuredClone(base);
   (unsafeUrl.source as Record<string, unknown>).url = 'javascript:alert(1)';
-  assert.throws(() => parseApprovedWikiSource(JSON.stringify(unsafeUrl)), /http\(s\) URL/);
+  assert.throws(
+    () => parseApprovedWikiSource(JSON.stringify(unsafeUrl)),
+    /source\.url must be a credential-free HTTP\(S\) URL/
+  );
 
   const credentialUrl = structuredClone(base);
   (credentialUrl.source as Record<string, unknown>).url =

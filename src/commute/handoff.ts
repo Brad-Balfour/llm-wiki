@@ -1,3 +1,16 @@
+import { errorMessage } from '../shared/errors.js';
+import { stripMarkdownFence } from '../shared/json.js';
+import {
+  optionalString,
+  rejectUnknownKeys,
+  requireArray,
+  requireEnum,
+  requireRecord,
+  requireString,
+  requireStringArray,
+  requireUniqueStrings,
+} from '../shared/validate.js';
+
 export const COMMUTE_HANDOFF_SCHEMA_VERSIONS = [
   'commute-handoff.v1',
   'commute-handoff.v2',
@@ -92,17 +105,21 @@ export function validateCommuteHandoff(candidate: unknown): CommuteHandoff {
     COMMUTE_HANDOFF_SCHEMA_VERSIONS,
     'schema_version'
   );
-  rejectUnknownKeys(record, [
-    'schema_version',
-    'session_id',
-    'session_date',
-    'voice_surface',
-    'queue_files',
-    ...(schemaVersion === 'commute-handoff.v2' ? ['queue_states'] : []),
-    'feedback',
-    'review_notes',
-    'issues',
-  ]);
+  rejectUnknownKeys(
+    record,
+    [
+      'schema_version',
+      'session_id',
+      'session_date',
+      'voice_surface',
+      'queue_files',
+      ...(schemaVersion === 'commute-handoff.v2' ? ['queue_states'] : []),
+      'feedback',
+      'review_notes',
+      'issues',
+    ],
+    'handoff'
+  );
 
   const sessionDate = requireString(record.session_date, 'session_date');
   if (!/^\d{4}-\d{2}-\d{2}$/.test(sessionDate)) {
@@ -251,81 +268,10 @@ function validateReviewNote(candidate: unknown, index: number): CommuteReviewNot
   };
 }
 
-function stripMarkdownFence(text: string): string {
-  const match = /^```(?:json)?\s*([\s\S]*?)\s*```$/i.exec(text);
-  return match?.[1] ?? text;
-}
-
-function requireRecord(candidate: unknown, field: string): Record<string, unknown> {
-  if (typeof candidate !== 'object' || candidate === null || Array.isArray(candidate)) {
-    throw new Error(`${field} must be an object`);
-  }
-  return candidate as Record<string, unknown>;
-}
-
-function requireArray(candidate: unknown, field: string): unknown[] {
-  if (!Array.isArray(candidate)) {
-    throw new Error(`${field} must be an array`);
-  }
-  return candidate;
-}
-
-function requireString(candidate: unknown, field: string): string {
-  if (typeof candidate !== 'string' || candidate.trim().length === 0) {
-    throw new Error(`${field} must be a non-empty string`);
-  }
-  return candidate;
-}
-
-function optionalString(candidate: unknown, field: string): string | undefined {
-  if (candidate === undefined) {
-    return undefined;
-  }
-  return requireString(candidate, field);
-}
-
 function optionalSourceItemId(candidate: unknown, field: string): string | undefined {
   const value = optionalString(candidate, field);
   if (value === 'unknown') {
     throw new Error(`${field} must use an exact source item id`);
   }
   return value;
-}
-
-function requireStringArray(candidate: unknown, field: string): string[] {
-  return requireArray(candidate, field).map((item, index) =>
-    requireString(item, `${field}[${index}]`)
-  );
-}
-
-function requireUniqueStrings(values: string[], field: string): void {
-  if (new Set(values).size !== values.length) {
-    throw new Error(`${field} must contain unique values`);
-  }
-}
-
-function requireEnum<const T extends readonly string[]>(
-  candidate: unknown,
-  values: T,
-  field: string
-): T[number] {
-  if (typeof candidate !== 'string' || !values.includes(candidate)) {
-    throw new Error(`${field} must be one of: ${values.join(', ')}`);
-  }
-  return candidate as T[number];
-}
-
-function rejectUnknownKeys(
-  record: Record<string, unknown>,
-  allowed: readonly string[],
-  field = 'handoff'
-): void {
-  const unknown = Object.keys(record).filter((key) => !allowed.includes(key));
-  if (unknown.length > 0) {
-    throw new Error(`${field} contains unsupported fields: ${unknown.join(', ')}`);
-  }
-}
-
-function errorMessage(error: unknown): string {
-  return error instanceof Error ? error.message : String(error);
 }

@@ -4,6 +4,16 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { queueSnapshotFingerprint, validateTldrCommuteQueueV2 } from '../commute/session-bundle.js';
+import { errorMessage, errorCode, isExistingFile, isMissingFile } from '../shared/errors.js';
+import { requireDate, requireDateTime } from '../shared/time.js';
+import { requireHttpUrl } from '../shared/url.js';
+import {
+  rejectUnknownKeys,
+  requireEnum,
+  requireRecord,
+  requireScore,
+  requireString,
+} from '../shared/validate.js';
 import {
   deriveRouteFromClassification,
   ROUTE_VERSION,
@@ -296,7 +306,7 @@ function parseLabelInput(candidate: unknown, stored: boolean): ClassifierFeedbac
   if (input.schema_version !== CLASSIFIER_FEEDBACK_LABEL_SCHEMA_VERSION) {
     throw new Error(`label.schema_version must be ${CLASSIFIER_FEEDBACK_LABEL_SCHEMA_VERSION}`);
   }
-  const queueFilename = requireNonEmptyString(input.queue_filename, 'label.queue_filename');
+  const queueFilename = requireString(input.queue_filename, 'label.queue_filename');
   if (queueFilename !== queueFilename.trim()) {
     throw new Error('label.queue_filename must not have leading or trailing whitespace');
   }
@@ -304,21 +314,10 @@ function parseLabelInput(candidate: unknown, stored: boolean): ClassifierFeedbac
     throw new Error('label.queue_filename must be a filename without directory components');
   }
 
-  const url = requireNonEmptyString(input.url, 'label.url');
-  let parsedUrl: URL;
-  try {
-    parsedUrl = new URL(url);
-  } catch {
-    throw new Error('label.url must be a credential-free HTTP(S) URL');
-  }
-  if (
-    !/^https?:\/\/\S+$/.test(url) ||
-    !['http:', 'https:'].includes(parsedUrl.protocol) ||
-    parsedUrl.username ||
-    parsedUrl.password
-  ) {
-    throw new Error('label.url must be a credential-free HTTP(S) URL');
-  }
+  const url = requireHttpUrl(input.url, 'label.url', {
+    rejectCredentials: true,
+    exactSpelling: true,
+  });
 
   const correctionType = requireEnum(
     input.correction_type,
@@ -340,23 +339,13 @@ function parseLabelInput(candidate: unknown, stored: boolean): ClassifierFeedbac
     validateRoute(corrected, 'label.corrected');
   }
 
-  const sessionDate = requireNonEmptyString(input.session_date, 'label.session_date');
-  validateCalendarDate(sessionDate, 'label.session_date');
-  const recordedAt = requireNonEmptyString(input.recorded_at, 'label.recorded_at');
-  if (
-    !/^\d{4}-\d{2}-\d{2}T(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z|[+-](?:[01]\d|2[0-3]):[0-5]\d)$/.test(
-      recordedAt
-    ) ||
-    Number.isNaN(Date.parse(recordedAt))
-  ) {
-    throw new Error('label.recorded_at must be an RFC 3339 timestamp with a timezone');
-  }
-  validateCalendarDate(recordedAt.slice(0, 10), 'label.recorded_at date');
+  const sessionDate = requireDate(input.session_date, 'label.session_date');
+  const recordedAt = requireDateTime(input.recorded_at, 'label.recorded_at');
   if (input.evidence_kind !== 'verbatim_user_feedback') {
     throw new Error('label.evidence_kind must be verbatim_user_feedback');
   }
 
-  const routeVersion = requireNonEmptyString(input.route_version, 'label.route_version');
+  const routeVersion = requireString(input.route_version, 'label.route_version');
   if (routeVersion !== ROUTE_VERSION) {
     throw new Error(
       `label.route_version must be ${ROUTE_VERSION}; historical route policies require an explicit migration`
@@ -366,19 +355,19 @@ function parseLabelInput(candidate: unknown, stored: boolean): ClassifierFeedbac
   return {
     schema_version: CLASSIFIER_FEEDBACK_LABEL_SCHEMA_VERSION,
     queue_filename: queueFilename,
-    source_item_id: requireNonEmptyString(input.source_item_id, 'label.source_item_id'),
-    title: requireNonEmptyString(input.title, 'label.title'),
+    source_item_id: requireString(input.source_item_id, 'label.source_item_id'),
+    title: requireString(input.title, 'label.title'),
     url,
     correction_type: correctionType,
     original,
     corrected,
-    reason: requireNonEmptyString(input.reason, 'label.reason'),
+    reason: requireString(input.reason, 'label.reason'),
     session_date: sessionDate,
     recorded_at: recordedAt,
-    profile_version: requireNonEmptyString(input.profile_version, 'label.profile_version'),
-    prompt_version: requireNonEmptyString(input.prompt_version, 'label.prompt_version'),
-    provider: requireNonEmptyString(input.provider, 'label.provider'),
-    model: requireNonEmptyString(input.model, 'label.model'),
+    profile_version: requireString(input.profile_version, 'label.profile_version'),
+    prompt_version: requireString(input.prompt_version, 'label.prompt_version'),
+    provider: requireString(input.provider, 'label.provider'),
+    model: requireString(input.model, 'label.model'),
     route_version: ROUTE_VERSION,
     evidence_kind: 'verbatim_user_feedback',
   };
@@ -526,22 +515,6 @@ function parseOptions(argv: string[]): CliOptions {
   return options;
 }
 
-function validateCalendarDate(value: string, field: string): void {
-  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
-  if (match === null) throw new Error(`${field} must use YYYY-MM-DD`);
-  const year = Number(match[1]);
-  const month = Number(match[2]);
-  const day = Number(match[3]);
-  const date = new Date(Date.UTC(year, month - 1, day));
-  if (
-    date.getUTCFullYear() !== year ||
-    date.getUTCMonth() !== month - 1 ||
-    date.getUTCDate() !== day
-  ) {
-    throw new Error(`${field} must be a real calendar date`);
-  }
-}
-
 function requireExactQueueValue(
   actual: unknown,
   expected: unknown,
@@ -653,65 +626,6 @@ function ensurePrivateOutput(output: string): void {
   if (!path.resolve(output).split(path.sep).includes('.private')) {
     throw new Error('--output must be under a .private directory');
   }
-}
-
-function requireRecord(value: unknown, field: string): Record<string, unknown> {
-  if (typeof value !== 'object' || value === null || Array.isArray(value)) {
-    throw new Error(`${field} must be an object`);
-  }
-  return value as Record<string, unknown>;
-}
-
-function rejectUnknownKeys(
-  record: Record<string, unknown>,
-  allowed: readonly string[],
-  field: string
-): void {
-  const unknown = Object.keys(record).filter((key) => !allowed.includes(key));
-  if (unknown.length > 0) throw new Error(`${field} has unknown field(s): ${unknown.join(', ')}`);
-}
-
-function requireNonEmptyString(value: unknown, field: string): string {
-  if (typeof value !== 'string' || value.trim().length === 0) {
-    throw new Error(`${field} must be a non-empty string`);
-  }
-  return value;
-}
-
-function requireScore(value: unknown, field: string): number {
-  if (typeof value !== 'number' || !Number.isFinite(value) || value < 0 || value > 1) {
-    throw new Error(`${field} must be a number from 0 through 1`);
-  }
-  return value;
-}
-
-function requireEnum<const T extends readonly string[]>(
-  value: unknown,
-  allowed: T,
-  field: string
-): T[number] {
-  if (typeof value !== 'string' || !allowed.includes(value)) {
-    throw new Error(`${field} must be one of: ${allowed.join(', ')}`);
-  }
-  return value as T[number];
-}
-
-function isMissingFile(error: unknown): boolean {
-  return errorCode(error) === 'ENOENT';
-}
-
-function isExistingFile(error: unknown): boolean {
-  return errorCode(error) === 'EEXIST';
-}
-
-function errorCode(error: unknown): unknown {
-  return typeof error === 'object' && error !== null && 'code' in error
-    ? (error as { code?: unknown }).code
-    : undefined;
-}
-
-function errorMessage(error: unknown): string {
-  return error instanceof Error ? error.message : String(error);
 }
 
 async function readStdin(): Promise<string> {
