@@ -1,4 +1,4 @@
-# LLM-Wiki-Car Instructions — Queue Contract v2 · Prompt Revision 3.0
+# LLM-Wiki-Car Instructions — Queue Contract v2 · Prompt Revision 3.1
 
 Play one active `tldr-commute-queue.v2` during one Voice session. Create a
 downloadable `commute-session-bundle.v1` only when Brad explicitly asks. Do not use legacy
@@ -27,8 +27,13 @@ Bind one valid result as the sole active queue and begin exactly:
 Reading: <M> items from <filename>.
 ```
 
-Enter Playback at `items[0]`. If unavailable or invalid, say you cannot find a
-valid queue with that name in this Project and stop. Never speak source IDs.
+Then give one ordered headline sweep directly from the queue. For every item,
+say literal `item.playback.spoken`, the literal `consumption_depth` mapping, and
+literal `item.title`; do not give summaries or article commentary during the
+sweep. After item `M`, make `items[0]` current and wait for Brad's command. Do
+not begin item 1's summary before completing the sweep. If unavailable or
+invalid, say you cannot find a valid queue with that name in this Project and
+stop. Never speak source IDs.
 
 Keep the filename, complete queue JSON, current item, and captured events until
 Brad ends or intentionally abandons this session. A different queue starts only
@@ -51,7 +56,9 @@ queue object: use `item.playback.spoken`; map only literal
 search-derived, or article-level text. Start exactly:
 `<N of M>. <Headline only or In depth>. <title>.` Before speaking, verify
 filename, position, ID, title, URL, mode, and summary. On failure, run queue
-recovery before stopping.
+recovery before stopping. Every valid queue item has a URL: never claim the
+current item has none. If its URL or literal reading mode cannot be read from
+the bound queue, treat queue context as lost and recover it before speaking.
 
 Advance only on `next`, `continue`, or `skip`, and only to immediate
 `items[playback.position - 1]`. Never bind a late command to another item.

@@ -324,6 +324,66 @@ test('converts a redundant depth promotion into a quality incident without rejec
   );
 });
 
+test('does not turn an already-wikied reference into a new maintenance candidate', () => {
+  const bundle = JSON.parse(validBundle) as { events: Array<Record<string, unknown>> };
+  const action = bundle.events[1];
+  assert.ok(action);
+  action.user_words = 'I already wikked this, so you can move on to the next.';
+
+  const result = reconcileSessionBundles(
+    [{ filename: artifactFilename, text: JSON.stringify(bundle) }],
+    '2026-08-05T12:00:00.000Z'
+  );
+
+  assert.equal(result.sessions[0]?.status, 'accepted');
+  assert.equal(result.maintenance_candidates.length, 0);
+  assert.equal(result.quality_incidents.length, 1);
+  assert.equal(result.event_conversions.length, 1);
+  assert.match(result.event_conversions[0]?.reason ?? '', /already completed wiki save/);
+});
+
+test('does not recover an already-wikied reference as a new maintenance candidate', () => {
+  const queue = (JSON.parse(validBundle) as { queue_snapshot: { queue: unknown } }).queue_snapshot
+    .queue;
+  const malformed = {
+    schema_version: 'commute-session-bundle.v1',
+    session: {
+      session_id: 'reconstructed-prior-save',
+      session_date: '2026-07-20',
+      artifact_filename: artifactFilename,
+      voice_surface: 'chatgpt_live',
+    },
+    queue_snapshot: { filename: 'fixture-queue.txt', queue: {} },
+    events: [
+      {
+        event_id: 'prior-save',
+        sequence: 1,
+        kind: 'item_action',
+        action: 'wiki_this',
+        item: { source_item_id: 'tldr-demo-001' },
+        user_words: 'I already wikied this last week.',
+      },
+    ],
+  };
+
+  const result = reconcileSessionBundles([
+    {
+      filename: artifactFilename,
+      text: JSON.stringify(malformed),
+      recoveryQueue: { filename: 'fixture-queue.txt', text: JSON.stringify(queue) },
+    },
+  ]);
+
+  assert.equal(result.sessions[0]?.status, 'accepted');
+  assert.equal(result.maintenance_candidates.length, 0);
+  assert.equal(result.quality_incidents.length, 1);
+  const incident = result.quality_incidents[0]?.event;
+  assert.equal(incident?.kind, 'quality_incident');
+  if (incident?.kind === 'quality_incident') {
+    assert.match(incident.observed_behavior, /prior wiki save/);
+  }
+});
+
 test('preserves source identity when another event uses the old synthesized incident suffix', () => {
   const bundle = JSON.parse(validBundle) as {
     queue_snapshot: { queue: { items: Array<Record<string, unknown>> } };

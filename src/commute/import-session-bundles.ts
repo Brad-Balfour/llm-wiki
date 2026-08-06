@@ -9,7 +9,10 @@ import {
   parseCommuteSessionBundleText,
   queueSnapshotFingerprint,
 } from './session-bundle.js';
-import { recoverSessionBundleWithSuppliedQueue } from './recover-session-bundle.js';
+import {
+  recoverSessionBundleWithSuppliedQueue,
+  refersToPriorWikiCapture,
+} from './recover-session-bundle.js';
 
 const IMPORT_SCHEMA_VERSION = 'commute-session-import.v1';
 
@@ -194,6 +197,28 @@ export function reconcileSessionBundles(
               status: 'pending',
             });
           }
+          for (const capture of recovered.contradictoryWikiCaptures) {
+            result.quality_incidents.push({
+              session_id: recovered.sessionId,
+              event_id: capture.eventId,
+              kind: 'quality_incident',
+              event: {
+                event_id: capture.eventId,
+                sequence: 1,
+                kind: 'quality_incident',
+                observed_behavior:
+                  `A wiki_this action was recorded for "${capture.title}", ` +
+                  'but the captured user words referred to a prior wiki save.',
+                boundary: 'bundle import semantic normalization',
+                evidence: [
+                  {
+                    source: 'explicit_user_capture',
+                    reference: `Recovered user words: ${capture.userWords}`,
+                  },
+                ],
+              },
+            });
+          }
           continue;
         } catch (recoveryError) {
           result.sessions.push({
@@ -231,22 +256,49 @@ export function reconcileSessionBundles(
 
       if (event.kind === 'item_action') {
         if (event.action === 'wiki_this') {
-          const maintenanceKey = maintenanceCandidateKey(
-            bundle.session.session_id,
-            event.event_id,
-            event.item.url
-          );
-          if (!maintenanceKeys.has(maintenanceKey)) {
-            maintenanceKeys.add(maintenanceKey);
-            result.maintenance_candidates.push({
-              maintenance_key: maintenanceKey,
+          if (refersToPriorWikiCapture(event.user_words)) {
+            const convertedEvent: CommuteSessionBundle['events'][number] = {
+              event_id: event.event_id,
+              sequence: event.sequence,
+              kind: 'quality_incident',
+              observed_behavior:
+                `A wiki_this action was recorded for "${event.item.title}", ` +
+                'but the captured user words referred to a prior wiki save.',
+              boundary: 'bundle import semantic normalization',
+              evidence: event.evidence,
+            };
+            result.event_conversions.push({
               session_id: bundle.session.session_id,
               event_id: event.event_id,
-              source_item_id: event.item.source_item_id,
-              title: event.item.title,
-              url: event.item.url,
-              status: 'pending',
+              reason:
+                'A reference to an already completed wiki save is product-state evidence, not a new maintenance request.',
+              original_event: event,
+              converted_event: convertedEvent,
             });
+            result.quality_incidents.push({
+              session_id: bundle.session.session_id,
+              event_id: convertedEvent.event_id,
+              kind: convertedEvent.kind,
+              event: convertedEvent,
+            });
+          } else {
+            const maintenanceKey = maintenanceCandidateKey(
+              bundle.session.session_id,
+              event.event_id,
+              event.item.url
+            );
+            if (!maintenanceKeys.has(maintenanceKey)) {
+              maintenanceKeys.add(maintenanceKey);
+              result.maintenance_candidates.push({
+                maintenance_key: maintenanceKey,
+                session_id: bundle.session.session_id,
+                event_id: event.event_id,
+                source_item_id: event.item.source_item_id,
+                title: event.item.title,
+                url: event.item.url,
+                status: 'pending',
+              });
+            }
           }
         } else if (
           event.action === 'promote_to_in_depth' &&

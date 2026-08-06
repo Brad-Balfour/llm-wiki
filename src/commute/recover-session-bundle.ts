@@ -20,12 +20,17 @@ export interface RecoveredWikiCapture {
   url: string;
 }
 
+export interface RecoveredContradictoryWikiCapture extends RecoveredWikiCapture {
+  userWords: string;
+}
+
 export interface RecoveredSessionBundle {
   sessionId: string;
   artifactFilename: string;
   queueFilename: string;
   queueFingerprint: string;
   wikiCaptures: RecoveredWikiCapture[];
+  contradictoryWikiCaptures: RecoveredContradictoryWikiCapture[];
 }
 
 /**
@@ -55,6 +60,7 @@ export function recoverSessionBundleWithSuppliedQueue(
   const artifactFilename = declaredArtifactFilename(bundle, input.bundleFilename);
   const sessionId = declaredSessionId(bundle, artifactFilename);
   const wikiCaptures: RecoveredWikiCapture[] = [];
+  const contradictoryWikiCaptures: RecoveredContradictoryWikiCapture[] = [];
 
   for (const [index, event] of events.entries()) {
     const record = requireObject(event, `Recovery bundle events[${index}]`);
@@ -64,8 +70,20 @@ export function recoverSessionBundleWithSuppliedQueue(
       exactItems,
       `Recovery bundle events[${index}].item`
     );
+    const eventId = optionalString(record.event_id) ?? `recovered-event-${index + 1}`;
+    const userWords = optionalString(record.user_words) ?? optionalString(record.feedback);
+    if (userWords && refersToPriorWikiCapture(userWords)) {
+      contradictoryWikiCaptures.push({
+        eventId,
+        sourceItemId: item.sourceItemId,
+        title: item.title,
+        url: item.url,
+        userWords,
+      });
+      continue;
+    }
     wikiCaptures.push({
-      eventId: optionalString(record.event_id) ?? `recovered-event-${index + 1}`,
+      eventId,
       sourceItemId: item.sourceItemId,
       title: item.title,
       url: item.url,
@@ -78,7 +96,14 @@ export function recoverSessionBundleWithSuppliedQueue(
     queueFilename: input.queueFilename,
     queueFingerprint: queueSnapshotFingerprint(queue),
     wikiCaptures,
+    contradictoryWikiCaptures,
   };
+}
+
+export function refersToPriorWikiCapture(userWords: string): boolean {
+  return /\b(?:already|previously)\s+(?:wiki(?:ed|d)|wikked|saved\s+(?:this|it)\s+(?:to|for|in)\s+(?:(?:my|the)\s+)?wiki)\b/i.test(
+    userWords
+  );
 }
 
 interface ExactQueueItem {

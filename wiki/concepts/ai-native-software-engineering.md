@@ -2,15 +2,15 @@
 type: concept
 title: 'AI-Native Software Engineering'
 # prettier-ignore
-aliases: ["Control the ideas, not the code","Engineer away the slop","How building software is changing at Anthropic","AI-native fintech architecture"]
+aliases: ["Control the ideas, not the code","Engineer away the slop","How building software is changing at Anthropic","AI-native fintech architecture","LLMs reward expertise"]
 # prettier-ignore
-tags: ["ai-engineering","software-design","correctness","code-review","formal-verification","quality-gates","multi-agent-systems","fintech","compliance","auditability"]
+tags: ["ai-engineering","software-design","correctness","code-review","formal-verification","quality-gates","multi-agent-systems","fintech","compliance","auditability","domain-expertise","prompting","human-judgment"]
 wiki_slug: ai-native-software-engineering
 created: 2026-07-16
-updated: 2026-07-31
+updated: 2026-08-05
 confidence: high
 # prettier-ignore
-provenance: [{"source_item_id":"19f6057544b9bae7-06","source_path":"sources/tldr/2026-07-14-ai-native-software-engineering.txt","url":"https://antirez.com/news/169"},{"source_item_id":"general-20260724-05","source_path":"sources/tldr/2026-07-24-engineer-away-the-slop.txt","url":"https://ghuntley.com/slop/"},{"source_item_id":"19fadaee19e22a31-18","source_path":"sources/tldr/2026-07-29-ai-native-software-engineering-anthropic.txt","url":"https://newsletter.pragmaticengineer.com/p/inside-anthropic"},{"source_item_id":"19fb33942bb1cc3e-04","source_path":"sources/tldr/2026-07-30-ai-native-fintech-architecture.txt","url":"https://hackernoon.com/what-fintech-founders-get-wrong-about-ai-native-development"}]
+provenance: [{"source_item_id":"19f6057544b9bae7-06","source_path":"sources/tldr/2026-07-14-ai-native-software-engineering.txt","url":"https://antirez.com/news/169"},{"source_item_id":"general-20260724-05","source_path":"sources/tldr/2026-07-24-engineer-away-the-slop.txt","url":"https://ghuntley.com/slop/"},{"source_item_id":"19fadaee19e22a31-18","source_path":"sources/tldr/2026-07-29-ai-native-software-engineering-anthropic.txt","url":"https://newsletter.pragmaticengineer.com/p/inside-anthropic"},{"source_item_id":"19fb33942bb1cc3e-04","source_path":"sources/tldr/2026-07-30-ai-native-fintech-architecture.txt","url":"https://hackernoon.com/what-fintech-founders-get-wrong-about-ai-native-development"},{"source_item_id":"19fcc720f38e999b-06","source_path":"sources/tldr/2026-08-04-llms-reward-expertise.txt","url":"https://www.seangoedecke.com/llms-reward-expertise/?utm_source=tldrnewsletter"}]
 ---
 
 # AI-Native Software Engineering
@@ -103,6 +103,26 @@ reviewable:
 When positioning gets ahead of this evidence, the gap becomes architectural
 debt rather than a messaging problem.
 
+## Expertise Is a Steering Capability
+
+LLMs let non-specialists produce acceptable first passes in unfamiliar domains,
+but that does not make expert use indistinguishable from novice use. Expertise
+changes the interaction itself: a knowledgeable operator can discard irrelevant
+detail, suggest a more promising formulation, recognize that a result feels
+wrong, and ask whether the system already contains a simpler path.
+
+This is not mainly a prompting-style advantage. Concision and firm direction
+can signal expertise, but imitating those surface habits cannot supply the
+missing domain model. In software work, a concrete theory of the codebase may
+be more valuable than generic design knowledge because the decisive constraints
+often live in existing interfaces, history, and local tradeoffs.
+
+The implication for AI-native engineering is that human work moves toward
+specification and evaluation rather than disappearing. Stronger models can
+raise the value of judgment when the limiting factor is communicating which
+solution fits the actual system and recognizing whether the result satisfies
+that intent.
+
 ## Source Notes
 
 ### [Control the ideas, not the code](https://antirez.com/news/169)
@@ -144,6 +164,17 @@ The source distinguishes AI-assisted development from AI-native product
 architecture and argues that compliance and auditability must be built
 alongside the intelligence layer in fintech systems.
 
+### [LLMs reward expertise](https://www.seangoedecke.com/llms-reward-expertise/?utm_source=tldrnewsletter)
+
+<!-- source-item-id: 19fcc720f38e999b-06 -->
+
+TLDR, 2026-08-04.
+
+Sean Goedecke uses Terence Tao's mathematical interaction and his own software
+work to argue that domain knowledge enables harder steering of the same model.
+The claim is a reasoned observation supported by examples, not a measured
+comparison across expertise levels or models.
+
 ## Related
 
 - {% include wiki-related-link.md slug="deterministic-agent-workflows" %}
@@ -153,3 +184,4 @@ alongside the intelligence layer in fintech systems.
 - {% include wiki-related-link.md slug="production-ai-agent-architecture" %}
 - {% include wiki-related-link.md slug="reality-driven-ai-product-development" %}
 - {% include wiki-related-link.md slug="state-ownership-before-state-management" %}
+- {% include wiki-related-link.md slug="code-structure-agent-context-economics" %}
