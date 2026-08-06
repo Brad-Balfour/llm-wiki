@@ -19,7 +19,7 @@ import {
 } from './retrieve-maintenance-sources.js';
 
 const execFileAsync = promisify(execFile);
-type Options =
+export type Options =
   | { kind: 'diagnose_launcher' }
   | {
       kind: 'maintain';
@@ -474,7 +474,7 @@ function optionalHttpUrl(candidate: unknown, field: string): string | undefined 
   return value;
 }
 
-function parseOptions(args: string[]): Options {
+export function parseOptions(args: string[]): Options {
   const inputs: Array<{ bundle: string; recoveryQueue?: string }> = [];
   let outputDir: string | undefined;
   let priorIntake: string | undefined;

@@ -297,7 +297,7 @@ function parseOptions(args: string[]): { input: string; output: string } {
   return { input, output };
 }
 
-function parseImportRecord(candidate: unknown): ImportRecord {
+export function parseImportRecord(candidate: unknown): ImportRecord {
   if (typeof candidate !== 'object' || candidate === null || Array.isArray(candidate)) {
     throw new Error('Commute import record must be an object');
   }
@@ -312,7 +312,7 @@ function parseImportRecord(candidate: unknown): ImportRecord {
   };
 }
 
-function parseMaintenanceCandidate(candidate: unknown, field: string): MaintenanceCandidate {
+export function parseMaintenanceCandidate(candidate: unknown, field: string): MaintenanceCandidate {
   if (typeof candidate !== 'object' || candidate === null || Array.isArray(candidate)) {
     throw new Error(`${field} must be an object`);
   }

@@ -248,7 +248,7 @@ function errorCode(error: unknown): unknown {
   return typeof error === 'object' && error !== null && 'code' in error ? error.code : undefined;
 }
 
-function parseOptions(args: string[]): {
+export function parseOptions(args: string[]): {
   input: string;
   enrichmentDir: string;
   sourceItemId?: string;
