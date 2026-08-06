@@ -11,7 +11,7 @@ import {
   parseClassifierFeedbackLabel,
   runClassifierFeedbackCommand,
   type ClassifierFeedbackLabelInput,
-} from '../src/classifier/feedback-label.js';
+} from '../src/feedback/label.js';
 
 const validFixturePath = 'tests/fixtures/expected/feedback/valid-corrections.json';
 const queueFilename = '20260701-sanitized-feedback.txt';

@@ -1,3 +1,14 @@
+/**
+ * Classifier feedback labels: the record of a correction the user made to a
+ * classification during a commute session.
+ *
+ * This lives outside `src/classifier/` deliberately. It spans three packages —
+ * it reads the commute queue contract, re-derives the route to check the
+ * correction against routing policy, and uses the classifier's label types.
+ * Inside `src/classifier/` it made that package depend on `src/routing/`, which
+ * both created a package cycle and put the classifier in the position of
+ * importing the routing policy it is supposed to stay neutral about.
+ */
 import { createHash } from 'node:crypto';
 import { appendFile, mkdir, open, readFile, unlink, type FileHandle } from 'node:fs/promises';
 import path from 'node:path';
@@ -24,7 +35,7 @@ import {
   INTEREST_LEVELS,
   type ConsumptionDepth,
   type InterestLevel,
-} from './types.js';
+} from '../classifier/types.js';
 
 export const CLASSIFIER_FEEDBACK_LABEL_SCHEMA_VERSION = 'classifier-feedback-label.v1';
 const CORRECTION_TYPES = ['interest', 'depth', 'route'] as const;
