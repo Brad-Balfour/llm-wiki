@@ -3,6 +3,8 @@ import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import { errorMessage } from '../shared/errors.js';
+
 import {
   bundleArtifactFilenameMatches,
   type CommuteSessionBundle,
@@ -13,6 +15,29 @@ import {
   recoverSessionBundleWithSuppliedQueue,
   refersToPriorWikiCapture,
 } from './recover-session-bundle.js';
+import {
+  parseMaintenanceCandidate,
+  requireMaintenanceAttemptSource,
+  requireMaintenanceAttemptStatus,
+  requireMaintenanceHttpUrl,
+} from './maintenance.js';
+import { requireIsoTimestamp } from '../shared/time.js';
+import { requireRecord, requireString } from '../shared/validate.js';
+
+export type {
+  MaintenanceAttempt,
+  MaintenanceAttemptInput,
+  MaintenanceAttemptStatus,
+  MaintenanceCandidate,
+  MaintenanceLatestResult,
+} from './maintenance.js';
+
+import type {
+  MaintenanceAttempt,
+  MaintenanceAttemptInput,
+  MaintenanceCandidate,
+  MaintenanceLatestResult,
+} from './maintenance.js';
 
 const IMPORT_SCHEMA_VERSION = 'commute-session-import.v1';
 
@@ -35,53 +60,6 @@ interface ImportedSession {
   queue_filename?: string;
   queue_fingerprint?: string;
   error?: string;
-}
-
-export interface MaintenanceCandidate {
-  maintenance_key: string;
-  session_id: string;
-  event_id: string;
-  source_item_id: string;
-  title: string;
-  url: string;
-  status: 'pending';
-}
-
-export type MaintenanceAttemptStatus =
-  | 'inaccessible_source'
-  | 'unsupported_source'
-  | 'no_change'
-  | 'insufficient_source'
-  | 'unresolved'
-  | 'pr_created'
-  | 'review_required'
-  | 'failed';
-
-export interface MaintenanceAttemptInput {
-  maintenance_key: string;
-  source: 'retrieval' | 'maintainer';
-  status: MaintenanceAttemptStatus;
-  detail: string;
-  attempted_at: string;
-}
-
-export interface MaintenanceAttempt extends MaintenanceAttemptInput {
-  attempt_id: string;
-  bundle_session_id: string;
-  event_id: string;
-  source_url: string;
-}
-
-export interface MaintenanceLatestResult {
-  maintenance_key: string;
-  bundle_session_id: string;
-  event_id: string;
-  source_url: string;
-  latest_status: MaintenanceAttemptStatus;
-  latest_detail: string;
-  latest_attempted_at: string;
-  attempt_count: number;
-  retryable: boolean;
 }
 
 interface ReconciledEvent {
@@ -198,25 +176,42 @@ export function reconcileSessionBundles(
             });
           }
           for (const capture of recovered.contradictoryWikiCaptures) {
+            const originalEvent: CommuteSessionBundle['events'][number] = {
+              event_id: capture.eventId,
+              sequence: capture.sequence,
+              kind: 'item_action',
+              action: 'wiki_this',
+              item: {
+                source_item_id: capture.sourceItemId,
+                title: capture.title,
+                url: capture.url,
+              },
+              user_words: capture.userWords,
+              evidence: [userWordsEvidence(capture.userWords, true)],
+            };
+            const convertedEvent: CommuteSessionBundle['events'][number] = {
+              event_id: capture.eventId,
+              sequence: capture.sequence,
+              kind: 'quality_incident',
+              observed_behavior:
+                `A wiki_this action was recorded for "${capture.title}", ` +
+                'but the captured user words referred to a prior wiki save.',
+              boundary: 'bundle import semantic normalization',
+              evidence: originalEvent.evidence,
+            };
+            result.event_conversions.push({
+              session_id: recovered.sessionId,
+              event_id: capture.eventId,
+              reason:
+                'A reference to an already completed wiki save is product-state evidence, not a new maintenance request.',
+              original_event: originalEvent,
+              converted_event: convertedEvent,
+            });
             result.quality_incidents.push({
               session_id: recovered.sessionId,
               event_id: capture.eventId,
               kind: 'quality_incident',
-              event: {
-                event_id: capture.eventId,
-                sequence: 1,
-                kind: 'quality_incident',
-                observed_behavior:
-                  `A wiki_this action was recorded for "${capture.title}", ` +
-                  'but the captured user words referred to a prior wiki save.',
-                boundary: 'bundle import semantic normalization',
-                evidence: [
-                  {
-                    source: 'explicit_user_capture',
-                    reference: `Recovered user words: ${capture.userWords}`,
-                  },
-                ],
-              },
+              event: convertedEvent,
             });
           }
           continue;
@@ -265,7 +260,7 @@ export function reconcileSessionBundles(
                 `A wiki_this action was recorded for "${event.item.title}", ` +
                 'but the captured user words referred to a prior wiki save.',
               boundary: 'bundle import semantic normalization',
-              evidence: event.evidence,
+              evidence: [...event.evidence, userWordsEvidence(event.user_words, false)],
             };
             result.event_conversions.push({
               session_id: bundle.session.session_id,
@@ -344,6 +339,16 @@ export function reconcileSessionBundles(
   return result;
 }
 
+function userWordsEvidence(
+  userWords: string,
+  recovered: boolean
+): CommuteSessionBundle['events'][number]['evidence'][number] {
+  return {
+    source: 'explicit_user_capture',
+    reference: `${recovered ? 'Recovered user words' : 'User words'}: ${userWords}`,
+  };
+}
+
 export function maintenanceCandidateKey(
   bundleSessionId: string,
   eventId: string,
@@ -383,7 +388,7 @@ export function recordMaintenanceAttempts(
     }
     requireMaintenanceAttemptStatus(input.status, 'Maintenance attempt status');
     requireMaintenanceAttemptSource(input.source, 'Maintenance attempt source');
-    requireNonEmpty(input.detail, 'Maintenance attempt detail');
+    requireString(input.detail, 'Maintenance attempt detail');
     requireIsoTimestamp(input.attempted_at, 'Maintenance attempt attempted_at');
 
     const attempt: MaintenanceAttempt = {
@@ -495,17 +500,7 @@ function maintenanceCandidatesByKey(
 }
 
 function parsePriorMaintenanceCandidate(candidate: unknown, index: number): MaintenanceCandidate {
-  const field = `Prior maintenance_candidates[${index}]`;
-  const record = requireRecord(candidate, field);
-  return {
-    maintenance_key: requireNonEmpty(record.maintenance_key, `${field}.maintenance_key`),
-    session_id: requireNonEmpty(record.session_id, `${field}.session_id`),
-    event_id: requireNonEmpty(record.event_id, `${field}.event_id`),
-    source_item_id: requireNonEmpty(record.source_item_id, `${field}.source_item_id`),
-    title: requireNonEmpty(record.title, `${field}.title`),
-    url: requireHttpUrl(record.url, `${field}.url`),
-    status: 'pending',
-  };
+  return parseMaintenanceCandidate(candidate, `Prior maintenance_candidates[${index}]`);
 }
 
 function parsePriorMaintenanceAttempt(
@@ -515,7 +510,7 @@ function parsePriorMaintenanceAttempt(
 ): MaintenanceAttempt {
   const field = `Prior maintenance_attempts[${index}]`;
   const record = requireRecord(attempt, field);
-  const maintenanceKey = requireNonEmpty(record.maintenance_key, `${field}.maintenance_key`);
+  const maintenanceKey = requireString(record.maintenance_key, `${field}.maintenance_key`);
   const candidate = candidates.get(maintenanceKey);
   if (!candidate) {
     throw new Error(`${field} names unknown candidate ${maintenanceKey}`);
@@ -526,15 +521,15 @@ function parsePriorMaintenanceAttempt(
     maintenance_key: maintenanceKey,
     source,
     status,
-    detail: requireNonEmpty(record.detail, `${field}.detail`),
+    detail: requireString(record.detail, `${field}.detail`),
     attempted_at: requireIsoTimestamp(record.attempted_at, `${field}.attempted_at`),
   };
   const parsed: MaintenanceAttempt = {
     ...input,
-    attempt_id: requireNonEmpty(record.attempt_id, `${field}.attempt_id`),
-    bundle_session_id: requireNonEmpty(record.bundle_session_id, `${field}.bundle_session_id`),
-    event_id: requireNonEmpty(record.event_id, `${field}.event_id`),
-    source_url: requireHttpUrl(record.source_url, `${field}.source_url`),
+    attempt_id: requireString(record.attempt_id, `${field}.attempt_id`),
+    bundle_session_id: requireString(record.bundle_session_id, `${field}.bundle_session_id`),
+    event_id: requireString(record.event_id, `${field}.event_id`),
+    source_url: requireMaintenanceHttpUrl(record.source_url, `${field}.source_url`),
   };
   if (
     parsed.bundle_session_id !== candidate.session_id ||
@@ -558,66 +553,6 @@ function maintenanceAttemptId(input: MaintenanceAttemptInput): string {
     input.attempted_at,
   ].join('\u0000');
   return `sha256:${createHash('sha256').update(identity, 'utf8').digest('hex')}`;
-}
-
-function requireRecord(candidate: unknown, field: string): Record<string, unknown> {
-  if (typeof candidate !== 'object' || candidate === null || Array.isArray(candidate)) {
-    throw new Error(`${field} must be an object`);
-  }
-  return candidate as Record<string, unknown>;
-}
-
-function requireNonEmpty(candidate: unknown, field: string): string {
-  if (typeof candidate !== 'string' || candidate.trim().length === 0) {
-    throw new Error(`${field} must be a non-empty string`);
-  }
-  return candidate;
-}
-
-function requireIsoTimestamp(candidate: unknown, field: string): string {
-  const value = requireNonEmpty(candidate, field);
-  if (!Number.isFinite(Date.parse(value))) {
-    throw new Error(`${field} must be an ISO timestamp`);
-  }
-  return value;
-}
-
-function requireHttpUrl(candidate: unknown, field: string): string {
-  const value = requireNonEmpty(candidate, field);
-  const parsed = new URL(value);
-  if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') {
-    throw new Error(`${field} must be an HTTP(S) URL`);
-  }
-  return value;
-}
-
-function requireMaintenanceAttemptSource(
-  candidate: unknown,
-  field: string
-): MaintenanceAttemptInput['source'] {
-  if (candidate !== 'retrieval' && candidate !== 'maintainer') {
-    throw new Error(`${field} must be retrieval or maintainer`);
-  }
-  return candidate;
-}
-
-function requireMaintenanceAttemptStatus(
-  candidate: unknown,
-  field: string
-): MaintenanceAttemptStatus {
-  if (
-    candidate !== 'inaccessible_source' &&
-    candidate !== 'unsupported_source' &&
-    candidate !== 'no_change' &&
-    candidate !== 'insufficient_source' &&
-    candidate !== 'unresolved' &&
-    candidate !== 'pr_created' &&
-    candidate !== 'review_required' &&
-    candidate !== 'failed'
-  ) {
-    throw new Error(`${field} is unsupported`);
-  }
-  return candidate;
 }
 
 function queueItemConsumptionDepth(
@@ -715,10 +650,6 @@ function ensurePrivateOutput(output: string): void {
   if (!resolvedOutput.startsWith(`${privateRoot}${path.sep}`)) {
     throw new Error('--output must be inside the gitignored .private directory');
   }
-}
-
-function errorMessage(error: unknown): string {
-  return error instanceof Error ? error.message : String(error);
 }
 
 if (

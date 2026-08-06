@@ -1,5 +1,7 @@
 import { createHash } from 'node:crypto';
 
+import { errorMessage } from '../shared/errors.js';
+import { optionalRecord, requireArray, requireRecord } from '../shared/validate.js';
 import {
   canonicalBundleArtifactFilename,
   queueSnapshotFingerprint,
@@ -15,6 +17,7 @@ export interface SuppliedQueueRecoveryInput {
 
 export interface RecoveredWikiCapture {
   eventId: string;
+  sequence: number;
   sourceItemId: string;
   title: string;
   url: string;
@@ -63,18 +66,21 @@ export function recoverSessionBundleWithSuppliedQueue(
   const contradictoryWikiCaptures: RecoveredContradictoryWikiCapture[] = [];
 
   for (const [index, event] of events.entries()) {
-    const record = requireObject(event, `Recovery bundle events[${index}]`);
+    const record = requireRecord(event, `Recovery bundle events[${index}]`);
     if (!isWikiCapture(record)) continue;
     const item = resolveLegacyItem(
       record.item,
       exactItems,
       `Recovery bundle events[${index}].item`
     );
-    const eventId = optionalString(record.event_id) ?? `recovered-event-${index + 1}`;
-    const userWords = optionalString(record.user_words) ?? optionalString(record.feedback);
+    const eventId = lenientOptionalString(record.event_id) ?? `recovered-event-${index + 1}`;
+    const sequence = lenientPositiveInteger(record.sequence) ?? index + 1;
+    const userWords =
+      lenientOptionalString(record.user_words) ?? lenientOptionalString(record.feedback);
     if (userWords && refersToPriorWikiCapture(userWords)) {
       contradictoryWikiCaptures.push({
         eventId,
+        sequence,
         sourceItemId: item.sourceItemId,
         title: item.title,
         url: item.url,
@@ -84,6 +90,7 @@ export function recoverSessionBundleWithSuppliedQueue(
     }
     wikiCaptures.push({
       eventId,
+      sequence,
       sourceItemId: item.sourceItemId,
       title: item.title,
       url: item.url,
@@ -101,8 +108,15 @@ export function recoverSessionBundleWithSuppliedQueue(
 }
 
 export function refersToPriorWikiCapture(userWords: string): boolean {
-  return /\b(?:already|previously)\s+(?:wiki(?:ed|d)|wikked|saved\s+(?:this|it)\s+(?:to|for|in)\s+(?:(?:my|the)\s+)?wiki)\b/i.test(
-    userWords
+  const priorCapture =
+    /\b(?:already|previously)\s+(?:wiki(?:ed|d)|wikked|saved\s+(?:this|it)\s+(?:to|for|in)\s+(?:(?:my|the)\s+)?wiki)\b/i.exec(
+      userWords
+    );
+  if (!priorCapture) return false;
+
+  const followingWords = userWords.slice(priorCapture.index + priorCapture[0].length);
+  return !/\b(?:but|then)\b[\s\S]*\b(?:please\s+)?(?:wiki|save)\s+(?:this|it)\b/i.test(
+    followingWords
   );
 }
 
@@ -114,10 +128,10 @@ interface ExactQueueItem {
 }
 
 function declaredQueueName(bundle: Record<string, unknown>): string {
-  const snapshot = optionalObject(bundle.queue_snapshot);
-  const snapshotFilename = snapshot && optionalString(snapshot.filename);
-  const session = optionalObject(bundle.session);
-  const sessionFilename = session && optionalString(session.queue_filename);
+  const snapshot = optionalRecord(bundle.queue_snapshot);
+  const snapshotFilename = snapshot && lenientOptionalString(snapshot.filename);
+  const session = optionalRecord(bundle.session);
+  const sessionFilename = session && lenientOptionalString(session.queue_filename);
   const filename = snapshotFilename ?? sessionFilename;
   if (!filename) {
     throw new Error('Malformed bundle does not name the selected queue file');
@@ -126,8 +140,8 @@ function declaredQueueName(bundle: Record<string, unknown>): string {
 }
 
 function declaredSessionId(bundle: Record<string, unknown>, bundleFilename: string): string {
-  const session = optionalObject(bundle.session);
-  const declared = session && optionalString(session.session_id);
+  const session = optionalRecord(bundle.session);
+  const declared = session && lenientOptionalString(session.session_id);
   if (declared) return declared;
   return `recovered-${createHash('sha256')
     .update(canonicalBundleArtifactFilename(bundleFilename))
@@ -136,14 +150,14 @@ function declaredSessionId(bundle: Record<string, unknown>, bundleFilename: stri
 }
 
 function declaredArtifactFilename(bundle: Record<string, unknown>, inputFilename: string): string {
-  const session = optionalObject(bundle.session);
+  const session = optionalRecord(bundle.session);
   return canonicalBundleArtifactFilename(
-    (session && optionalString(session.artifact_filename)) ?? inputFilename
+    (session && lenientOptionalString(session.artifact_filename)) ?? inputFilename
   );
 }
 
 function parseQueueItem(candidate: unknown, index: number): ExactQueueItem {
-  const item = requireObject(candidate, `Recovery queue items[${index}]`);
+  const item = requireRecord(candidate, `Recovery queue items[${index}]`);
   const sourceItemId = requiredString(
     item.source_item_id,
     `Recovery queue items[${index}].source_item_id`
@@ -165,8 +179,8 @@ function resolveLegacyItem(
   if (typeof candidate === 'number' && Number.isInteger(candidate)) {
     return byPosition(candidate, queueItems, field);
   }
-  const record = requireObject(candidate, field);
-  const sourceItemId = optionalString(record.source_item_id);
+  const record = requireRecord(candidate, field);
+  const sourceItemId = lenientOptionalString(record.source_item_id);
   if (sourceItemId) {
     const exact = queueItems.find((item) => item.sourceItemId === sourceItemId);
     if (exact) return exact;
@@ -185,40 +199,25 @@ function byPosition(position: number, queueItems: ExactQueueItem[], field: strin
 
 function parseJsonObject(text: string, field: string): Record<string, unknown> {
   try {
-    return requireObject(JSON.parse(text) as unknown, field);
+    return requireRecord(JSON.parse(text) as unknown, field);
   } catch (error) {
     throw new Error(`${field} is not valid JSON: ${errorMessage(error)}`);
   }
 }
 
-function requireArray(candidate: unknown, field: string): unknown[] {
-  if (!Array.isArray(candidate)) throw new Error(`${field} must be an array`);
-  return candidate;
-}
-
-function requireObject(candidate: unknown, field: string): Record<string, unknown> {
-  if (typeof candidate !== 'object' || candidate === null || Array.isArray(candidate)) {
-    throw new Error(`${field} must be an object`);
-  }
-  return candidate as Record<string, unknown>;
-}
-
-function optionalObject(candidate: unknown): Record<string, unknown> | undefined {
-  if (typeof candidate !== 'object' || candidate === null || Array.isArray(candidate))
-    return undefined;
-  return candidate as Record<string, unknown>;
-}
-
 function requiredString(candidate: unknown, field: string): string {
-  const value = optionalString(candidate);
+  const value = lenientOptionalString(candidate);
   if (!value) throw new Error(`${field} must be a non-empty string`);
   return value;
 }
 
-function optionalString(candidate: unknown): string | undefined {
+/** Legacy bundles are salvaged leniently: absent and blank are both "missing". */
+function lenientOptionalString(candidate: unknown): string | undefined {
   return typeof candidate === 'string' && candidate.trim().length > 0 ? candidate : undefined;
 }
 
-function errorMessage(error: unknown): string {
-  return error instanceof Error ? error.message : String(error);
+function lenientPositiveInteger(candidate: unknown): number | undefined {
+  return typeof candidate === 'number' && Number.isInteger(candidate) && candidate > 0
+    ? candidate
+    : undefined;
 }

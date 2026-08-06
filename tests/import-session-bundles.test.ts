@@ -340,6 +340,27 @@ test('does not turn an already-wikied reference into a new maintenance candidate
   assert.equal(result.quality_incidents.length, 1);
   assert.equal(result.event_conversions.length, 1);
   assert.match(result.event_conversions[0]?.reason ?? '', /already completed wiki save/);
+  const incident = result.quality_incidents[0]?.event;
+  assert.ok(incident);
+  assert.deepEqual(incident.evidence.at(-1), {
+    source: 'explicit_user_capture',
+    reference: 'User words: I already wikked this, so you can move on to the next.',
+  });
+});
+
+test('preserves a later explicit wiki command after reporting a prior save', () => {
+  const bundle = JSON.parse(validBundle) as { events: Array<Record<string, unknown>> };
+  const action = bundle.events[1];
+  assert.ok(action);
+  action.user_words = 'I already wikied this, but wiki it again.';
+
+  const result = reconcileSessionBundles([
+    { filename: artifactFilename, text: JSON.stringify(bundle) },
+  ]);
+
+  assert.equal(result.maintenance_candidates.length, 1);
+  assert.equal(result.quality_incidents.length, 0);
+  assert.equal(result.event_conversions.length, 0);
 });
 
 test('does not recover an already-wikied reference as a new maintenance candidate', () => {
@@ -381,7 +402,101 @@ test('does not recover an already-wikied reference as a new maintenance candidat
   assert.equal(incident?.kind, 'quality_incident');
   if (incident?.kind === 'quality_incident') {
     assert.match(incident.observed_behavior, /prior wiki save/);
+    assert.equal(incident.sequence, 1);
   }
+  assert.equal(result.event_conversions.length, 1);
+  const original = result.event_conversions[0]?.original_event;
+  assert.equal(original?.kind, 'item_action');
+  if (original?.kind === 'item_action') {
+    assert.equal(original.item.source_item_id, 'tldr-demo-001');
+    assert.equal(original.item.url, 'https://example.com/first');
+    assert.equal(original.user_words, 'I already wikied this last week.');
+  }
+});
+
+test('keeps recovered contradictory captures ordered and bound to exact queue items', () => {
+  const queue = (JSON.parse(validBundle) as { queue_snapshot: { queue: unknown } }).queue_snapshot
+    .queue;
+  const malformed = {
+    schema_version: 'commute-session-bundle.v1',
+    session: {
+      session_id: 'reconstructed-multiple-prior-saves',
+      artifact_filename: artifactFilename,
+    },
+    queue_snapshot: { filename: 'fixture-queue.txt', queue: {} },
+    events: [
+      {
+        event_id: 'prior-save-first',
+        sequence: 4,
+        kind: 'item_action',
+        action: 'wiki_this',
+        item: { source_item_id: 'tldr-demo-001' },
+        user_words: 'I already wikied this.',
+      },
+      {
+        event_id: 'prior-save-second',
+        sequence: 7,
+        kind: 'item_action',
+        action: 'wiki_this',
+        item: { source_item_id: 'tldr-demo-002' },
+        user_words: 'I previously wikked this.',
+      },
+    ],
+  };
+
+  const result = reconcileSessionBundles([
+    {
+      filename: artifactFilename,
+      text: JSON.stringify(malformed),
+      recoveryQueue: { filename: 'fixture-queue.txt', text: JSON.stringify(queue) },
+    },
+  ]);
+
+  assert.deepEqual(
+    result.quality_incidents.map((incident) => incident.event.sequence),
+    [4, 7]
+  );
+  assert.deepEqual(
+    result.event_conversions.map((conversion) => {
+      const original = conversion.original_event;
+      assert.equal(original.kind, 'item_action');
+      return [original.item.source_item_id, original.item.url];
+    }),
+    [
+      ['tldr-demo-001', 'https://example.com/first'],
+      ['tldr-demo-002', 'https://example.com/second'],
+    ]
+  );
+});
+
+test('recovers a later explicit wiki command after reporting a prior save', () => {
+  const queue = (JSON.parse(validBundle) as { queue_snapshot: { queue: unknown } }).queue_snapshot
+    .queue;
+  const malformed = {
+    schema_version: 'commute-session-bundle.v1',
+    session: { session_id: 'reconstructed-resave', artifact_filename: artifactFilename },
+    queue_snapshot: { filename: 'fixture-queue.txt', queue: {} },
+    events: [
+      {
+        event_id: 'resave',
+        kind: 'item_action',
+        action: 'wiki_this',
+        item: { source_item_id: 'tldr-demo-001' },
+        user_words: 'I already wikied this, but wiki it again.',
+      },
+    ],
+  };
+
+  const result = reconcileSessionBundles([
+    {
+      filename: artifactFilename,
+      text: JSON.stringify(malformed),
+      recoveryQueue: { filename: 'fixture-queue.txt', text: JSON.stringify(queue) },
+    },
+  ]);
+
+  assert.equal(result.maintenance_candidates.length, 1);
+  assert.equal(result.quality_incidents.length, 0);
 });
 
 test('preserves source identity when another event uses the old synthesized incident suffix', () => {

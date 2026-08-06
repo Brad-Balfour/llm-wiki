@@ -172,3 +172,64 @@ test('rejects duplicate attempts in prior history', () => {
 function importFixture(importedAt: string) {
   return reconcileSessionBundles([{ filename: artifactFilename, text: validBundle }], importedAt);
 }
+
+// --- Item 2: single maintenance-candidate contract (issue #55) ---
+
+test('reports a malformed prior-record URL as a named contract failure', () => {
+  // Before consolidation this path let the URL constructor throw, surfacing a
+  // raw `TypeError: Invalid URL` with no indication of which field was bad.
+  // Both producers now share one parser, so the field is always named.
+  const current = importFixture('2026-07-20T12:00:00.000Z');
+  const candidate = current.maintenance_candidates[0];
+  assert.ok(candidate);
+
+  assert.throws(
+    () =>
+      carryForwardMaintenanceHistory(current, {
+        schema_version: 'commute-session-import.v1',
+        maintenance_candidates: [{ ...candidate, url: 'not a url' }],
+      }),
+    (error: unknown) =>
+      error instanceof Error &&
+      !(error instanceof TypeError) &&
+      /Prior maintenance_candidates\[0\]\.url must be an HTTP\(S\) URL/.test(error.message)
+  );
+});
+
+test('rejects a non-HTTP prior-record URL through the same shared rule', () => {
+  const current = importFixture('2026-07-20T12:00:00.000Z');
+  const candidate = current.maintenance_candidates[0];
+  assert.ok(candidate);
+
+  assert.throws(
+    () =>
+      carryForwardMaintenanceHistory(current, {
+        schema_version: 'commute-session-import.v1',
+        maintenance_candidates: [{ ...candidate, url: 'file:///etc/passwd' }],
+      }),
+    /Prior maintenance_candidates\[0\]\.url must be an HTTP\(S\) URL/
+  );
+});
+
+test('both producers of a maintenance candidate share one parser', async () => {
+  const shared = await import('../src/commute/maintenance.js');
+  const retrieval = await import('../src/wiki/retrieve-maintenance-sources.js');
+  const malformed = {
+    maintenance_key: 'k',
+    session_id: 's',
+    event_id: 'e',
+    source_item_id: 'i',
+    title: 't',
+    url: 'not a url',
+  };
+
+  // Same input, same field-scoped message, whichever entry point is used.
+  assert.throws(
+    () => shared.parseMaintenanceCandidate(malformed, 'field'),
+    /field\.url must be an HTTP\(S\) URL/
+  );
+  assert.throws(
+    () => retrieval.parseMaintenanceCandidate(malformed, 'field'),
+    /field\.url must be an HTTP\(S\) URL/
+  );
+});

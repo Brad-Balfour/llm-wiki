@@ -5,6 +5,9 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { promisify } from 'node:util';
 
+import { errorMessage } from '../shared/errors.js';
+import { requireString } from '../shared/validate.js';
+
 import {
   carryForwardMaintenanceHistory,
   type CommuteSessionImport,
@@ -19,7 +22,7 @@ import {
 } from './retrieve-maintenance-sources.js';
 
 const execFileAsync = promisify(execFile);
-type Options =
+export type Options =
   | { kind: 'diagnose_launcher' }
   | {
       kind: 'maintain';
@@ -474,7 +477,7 @@ function optionalHttpUrl(candidate: unknown, field: string): string | undefined 
   return value;
 }
 
-function parseOptions(args: string[]): Options {
+export function parseOptions(args: string[]): Options {
   const inputs: Array<{ bundle: string; recoveryQueue?: string }> = [];
   let outputDir: string | undefined;
   let priorIntake: string | undefined;
@@ -577,17 +580,6 @@ function timestamp(): string {
     .toISOString()
     .replace(/[-:TZ.]/g, '')
     .slice(0, 14);
-}
-
-function errorMessage(error: unknown): string {
-  return error instanceof Error ? error.message : String(error);
-}
-
-function requireString(candidate: unknown, field: string): string {
-  if (typeof candidate !== 'string' || candidate.trim().length === 0) {
-    throw new Error(`${field} must be a non-empty string`);
-  }
-  return candidate;
 }
 
 if (fileURLToPath(import.meta.url) === path.resolve(process.argv[1] ?? '')) {
