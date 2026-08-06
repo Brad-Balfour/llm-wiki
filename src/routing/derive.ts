@@ -1,4 +1,4 @@
-import type { ClassificationRecord } from '../classifier/types.js';
+import type { ClassificationRecord, ConsumptionDepth, InterestLevel } from '../classifier/types.js';
 
 export const ROUTE_VERSION = 'routing-rules.v1';
 
@@ -26,58 +26,70 @@ export interface RouteDecision {
   discard: boolean;
 }
 
-export function deriveRouteFromClassification(record: ClassificationRecord): RouteDecision {
-  if (record.interest_level === 'uninterested') {
-    return {
-      route_version: ROUTE_VERSION,
-      commute_behavior: 'skip',
-      wiki_behavior: 'discard',
-      stream_log: 'none',
-      review: 'none',
-      discard: true,
-    };
-  }
+/** A route without its version stamp, which every decision shares. */
+type RouteBehavior = Omit<RouteDecision, 'route_version'>;
 
-  if (record.interest_level === 'interested' && record.consumption_depth === 'headline_only') {
-    return {
-      route_version: ROUTE_VERSION,
+/**
+ * An uninterested item is discarded whatever its depth score says: depth only
+ * describes how the item would be consumed, and it is not going to be.
+ */
+const DISCARD_UNINTERESTED: RouteBehavior = {
+  commute_behavior: 'skip',
+  wiki_behavior: 'discard',
+  stream_log: 'none',
+  review: 'none',
+  discard: true,
+};
+
+/**
+ * The whole routing policy, as one table keyed by the two classifier labels.
+ * This is the executable form of `schema/routing-rules.md`; the two should be
+ * readable side by side, and every cell is pinned by
+ * `tests/fixtures/expected/routing/default-routes.json`.
+ */
+const ROUTES: Record<InterestLevel, Record<ConsumptionDepth, RouteBehavior>> = {
+  interested: {
+    headline_only: {
       commute_behavior: 'quick_read',
       wiki_behavior: 'stream_log_only',
       stream_log: 'write',
       review: 'none',
       discard: false,
-    };
-  }
-
-  if (record.interest_level === 'interested' && record.consumption_depth === 'in_depth') {
-    return {
-      route_version: ROUTE_VERSION,
+    },
+    in_depth: {
       commute_behavior: 'discuss',
       wiki_behavior: 'full_source_candidate',
       stream_log: 'optional_summary',
       review: 'none',
       discard: false,
-    };
-  }
-
-  if (record.interest_level === 'maybe' && record.consumption_depth === 'headline_only') {
-    return {
-      route_version: ROUTE_VERSION,
+    },
+  },
+  maybe: {
+    headline_only: {
       commute_behavior: 'optional_quick_read',
       wiki_behavior: 'stream_log_or_review',
       stream_log: 'candidate_after_review',
       review: 'classification_boundary',
       discard: false,
-    };
-  }
+    },
+    in_depth: {
+      commute_behavior: 'optional_discuss_or_teaser',
+      wiki_behavior: 'review_required',
+      stream_log: 'none',
+      review: 'classification_boundary',
+      discard: false,
+    },
+  },
+  uninterested: {
+    headline_only: DISCARD_UNINTERESTED,
+    in_depth: DISCARD_UNINTERESTED,
+  },
+};
 
+export function deriveRouteFromClassification(record: ClassificationRecord): RouteDecision {
   return {
     route_version: ROUTE_VERSION,
-    commute_behavior: 'optional_discuss_or_teaser',
-    wiki_behavior: 'review_required',
-    stream_log: 'none',
-    review: 'classification_boundary',
-    discard: false,
+    ...ROUTES[record.interest_level][record.consumption_depth],
   };
 }
 
@@ -89,6 +101,7 @@ export function deriveClassifierValidationFailureRoute(): RouteDecision {
   return reviewRoute('validation_error');
 }
 
+/** A failure never reaches the commute or the wiki; it only reaches review. */
 function reviewRoute(review: Exclude<ReviewReason, 'none'>): RouteDecision {
   return {
     route_version: ROUTE_VERSION,
