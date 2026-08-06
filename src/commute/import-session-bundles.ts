@@ -11,7 +11,10 @@ import {
   parseCommuteSessionBundleText,
   queueSnapshotFingerprint,
 } from './session-bundle.js';
-import { recoverSessionBundleWithSuppliedQueue } from './recover-session-bundle.js';
+import {
+  recoverSessionBundleWithSuppliedQueue,
+  refersToPriorWikiCapture,
+} from './recover-session-bundle.js';
 import {
   parseMaintenanceCandidate,
   requireMaintenanceAttemptSource,
@@ -172,6 +175,45 @@ export function reconcileSessionBundles(
               status: 'pending',
             });
           }
+          for (const capture of recovered.contradictoryWikiCaptures) {
+            const originalEvent: CommuteSessionBundle['events'][number] = {
+              event_id: capture.eventId,
+              sequence: capture.sequence,
+              kind: 'item_action',
+              action: 'wiki_this',
+              item: {
+                source_item_id: capture.sourceItemId,
+                title: capture.title,
+                url: capture.url,
+              },
+              user_words: capture.userWords,
+              evidence: [userWordsEvidence(capture.userWords, true)],
+            };
+            const convertedEvent: CommuteSessionBundle['events'][number] = {
+              event_id: capture.eventId,
+              sequence: capture.sequence,
+              kind: 'quality_incident',
+              observed_behavior:
+                `A wiki_this action was recorded for "${capture.title}", ` +
+                'but the captured user words referred to a prior wiki save.',
+              boundary: 'bundle import semantic normalization',
+              evidence: originalEvent.evidence,
+            };
+            result.event_conversions.push({
+              session_id: recovered.sessionId,
+              event_id: capture.eventId,
+              reason:
+                'A reference to an already completed wiki save is product-state evidence, not a new maintenance request.',
+              original_event: originalEvent,
+              converted_event: convertedEvent,
+            });
+            result.quality_incidents.push({
+              session_id: recovered.sessionId,
+              event_id: capture.eventId,
+              kind: 'quality_incident',
+              event: convertedEvent,
+            });
+          }
           continue;
         } catch (recoveryError) {
           result.sessions.push({
@@ -209,22 +251,49 @@ export function reconcileSessionBundles(
 
       if (event.kind === 'item_action') {
         if (event.action === 'wiki_this') {
-          const maintenanceKey = maintenanceCandidateKey(
-            bundle.session.session_id,
-            event.event_id,
-            event.item.url
-          );
-          if (!maintenanceKeys.has(maintenanceKey)) {
-            maintenanceKeys.add(maintenanceKey);
-            result.maintenance_candidates.push({
-              maintenance_key: maintenanceKey,
+          if (refersToPriorWikiCapture(event.user_words)) {
+            const convertedEvent: CommuteSessionBundle['events'][number] = {
+              event_id: event.event_id,
+              sequence: event.sequence,
+              kind: 'quality_incident',
+              observed_behavior:
+                `A wiki_this action was recorded for "${event.item.title}", ` +
+                'but the captured user words referred to a prior wiki save.',
+              boundary: 'bundle import semantic normalization',
+              evidence: [...event.evidence, userWordsEvidence(event.user_words, false)],
+            };
+            result.event_conversions.push({
               session_id: bundle.session.session_id,
               event_id: event.event_id,
-              source_item_id: event.item.source_item_id,
-              title: event.item.title,
-              url: event.item.url,
-              status: 'pending',
+              reason:
+                'A reference to an already completed wiki save is product-state evidence, not a new maintenance request.',
+              original_event: event,
+              converted_event: convertedEvent,
             });
+            result.quality_incidents.push({
+              session_id: bundle.session.session_id,
+              event_id: convertedEvent.event_id,
+              kind: convertedEvent.kind,
+              event: convertedEvent,
+            });
+          } else {
+            const maintenanceKey = maintenanceCandidateKey(
+              bundle.session.session_id,
+              event.event_id,
+              event.item.url
+            );
+            if (!maintenanceKeys.has(maintenanceKey)) {
+              maintenanceKeys.add(maintenanceKey);
+              result.maintenance_candidates.push({
+                maintenance_key: maintenanceKey,
+                session_id: bundle.session.session_id,
+                event_id: event.event_id,
+                source_item_id: event.item.source_item_id,
+                title: event.item.title,
+                url: event.item.url,
+                status: 'pending',
+              });
+            }
           }
         } else if (
           event.action === 'promote_to_in_depth' &&
@@ -268,6 +337,16 @@ export function reconcileSessionBundles(
   }
 
   return result;
+}
+
+function userWordsEvidence(
+  userWords: string,
+  recovered: boolean
+): CommuteSessionBundle['events'][number]['evidence'][number] {
+  return {
+    source: 'explicit_user_capture',
+    reference: `${recovered ? 'Recovered user words' : 'User words'}: ${userWords}`,
+  };
 }
 
 export function maintenanceCandidateKey(

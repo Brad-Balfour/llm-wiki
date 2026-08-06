@@ -17,9 +17,14 @@ export interface SuppliedQueueRecoveryInput {
 
 export interface RecoveredWikiCapture {
   eventId: string;
+  sequence: number;
   sourceItemId: string;
   title: string;
   url: string;
+}
+
+export interface RecoveredContradictoryWikiCapture extends RecoveredWikiCapture {
+  userWords: string;
 }
 
 export interface RecoveredSessionBundle {
@@ -28,6 +33,7 @@ export interface RecoveredSessionBundle {
   queueFilename: string;
   queueFingerprint: string;
   wikiCaptures: RecoveredWikiCapture[];
+  contradictoryWikiCaptures: RecoveredContradictoryWikiCapture[];
 }
 
 /**
@@ -57,6 +63,7 @@ export function recoverSessionBundleWithSuppliedQueue(
   const artifactFilename = declaredArtifactFilename(bundle, input.bundleFilename);
   const sessionId = declaredSessionId(bundle, artifactFilename);
   const wikiCaptures: RecoveredWikiCapture[] = [];
+  const contradictoryWikiCaptures: RecoveredContradictoryWikiCapture[] = [];
 
   for (const [index, event] of events.entries()) {
     const record = requireRecord(event, `Recovery bundle events[${index}]`);
@@ -66,8 +73,24 @@ export function recoverSessionBundleWithSuppliedQueue(
       exactItems,
       `Recovery bundle events[${index}].item`
     );
+    const eventId = lenientOptionalString(record.event_id) ?? `recovered-event-${index + 1}`;
+    const sequence = lenientPositiveInteger(record.sequence) ?? index + 1;
+    const userWords =
+      lenientOptionalString(record.user_words) ?? lenientOptionalString(record.feedback);
+    if (userWords && refersToPriorWikiCapture(userWords)) {
+      contradictoryWikiCaptures.push({
+        eventId,
+        sequence,
+        sourceItemId: item.sourceItemId,
+        title: item.title,
+        url: item.url,
+        userWords,
+      });
+      continue;
+    }
     wikiCaptures.push({
-      eventId: lenientOptionalString(record.event_id) ?? `recovered-event-${index + 1}`,
+      eventId,
+      sequence,
       sourceItemId: item.sourceItemId,
       title: item.title,
       url: item.url,
@@ -80,7 +103,21 @@ export function recoverSessionBundleWithSuppliedQueue(
     queueFilename: input.queueFilename,
     queueFingerprint: queueSnapshotFingerprint(queue),
     wikiCaptures,
+    contradictoryWikiCaptures,
   };
+}
+
+export function refersToPriorWikiCapture(userWords: string): boolean {
+  const priorCapture =
+    /\b(?:already|previously)\s+(?:wiki(?:ed|d)|wikked|saved\s+(?:this|it)\s+(?:to|for|in)\s+(?:(?:my|the)\s+)?wiki)\b/i.exec(
+      userWords
+    );
+  if (!priorCapture) return false;
+
+  const followingWords = userWords.slice(priorCapture.index + priorCapture[0].length);
+  return !/\b(?:but|then)\b[\s\S]*\b(?:please\s+)?(?:wiki|save)\s+(?:this|it)\b/i.test(
+    followingWords
+  );
 }
 
 interface ExactQueueItem {
@@ -177,4 +214,10 @@ function requiredString(candidate: unknown, field: string): string {
 /** Legacy bundles are salvaged leniently: absent and blank are both "missing". */
 function lenientOptionalString(candidate: unknown): string | undefined {
   return typeof candidate === 'string' && candidate.trim().length > 0 ? candidate : undefined;
+}
+
+function lenientPositiveInteger(candidate: unknown): number | undefined {
+  return typeof candidate === 'number' && Number.isInteger(candidate) && candidate > 0
+    ? candidate
+    : undefined;
 }

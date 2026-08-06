@@ -15,8 +15,10 @@ Library.
   live Project Library
 - **THEN** it SHALL begin from that queue's first item
 - **AND** before any summary or article commentary it SHALL announce
-  `Reading: <M> items from <filename>.` and begin the per-item playback
-  workflow at item 1
+  `Reading: <M> items from <filename>.`, give one ordered sweep containing each
+  item's literal position, reading mode, and headline, and then keep item 1
+  current while it waits for Brad's command
+- **AND** it SHALL NOT begin item 1's summary before completing the sweep
 - **AND** it SHALL NOT insert items from another queue
 - **AND** the resulting canonical-filename lookup SHALL occur only for session
   start, not as a fallback after another queue has become active.
@@ -45,6 +47,9 @@ Library.
 - **WHEN** Voice is about to announce an item
 - **THEN** it SHALL silently verify the selected filename, literal `N of M`
   phrase, source ID, title, URL, and reading mode against the selected queue
+- **AND** because every valid v2 item contains a URL, it SHALL treat an
+  unavailable URL or reading mode as lost queue context rather than claim the
+  item has no URL or infer a mode from conversational memory
 - **AND** the current item SHALL be exactly `items[position - 1]`, with an
   automatic advance moving only to the immediately next position
 - **AND** if the selected queue is lost, a new/restarted chat lacks a fresh

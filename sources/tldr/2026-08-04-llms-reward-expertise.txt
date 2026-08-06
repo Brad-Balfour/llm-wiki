@@ -1,0 +1,49 @@
+{
+  "schema_version": "approved-wiki-source.v1",
+  "approval": {
+    "status": "approved",
+    "public": true,
+    "approved_at": "2026-08-04T17:54:00-04:00",
+    "reviewed_by": "brad",
+    "safety_review": {
+      "privacy": "cleared",
+      "publication_rights": "cleared",
+      "dual_use": "cleared"
+    }
+  },
+  "source": {
+    "source_item_id": "19fcc720f38e999b-06",
+    "source_path": "sources/tldr/2026-08-04-llms-reward-expertise.txt",
+    "source_type": "tldr",
+    "title": "LLMs reward expertise",
+    "url": "https://www.seangoedecke.com/llms-reward-expertise/?utm_source=tldrnewsletter",
+    "newsletter": "TLDR",
+    "edition_date": "2026-08-04"
+  },
+  "entry": {
+    "type": "concept",
+    "slug": "ai-native-software-engineering",
+    "title": "AI-Native Software Engineering",
+    "aliases": [
+      "LLMs reward expertise"
+    ],
+    "tags": [
+      "domain-expertise",
+      "prompting",
+      "human-judgment"
+    ],
+    "confidence": "high",
+    "summary": "Domain expertise is an AI steering capability: it lets a human identify promising directions, notice implausible output, and demand solutions that fit a concrete system.",
+    "key_ideas": [
+      "LLMs broaden access to acceptable first-pass work, but experts can extract more value because they know what good looks like.",
+      "Expert prompting is not mainly a collection of phrases; it is the ability to select relevant details, propose alternatives, and recognize when an answer is subtly wrong.",
+      "Familiarity with a specific codebase can matter more than generic system-design knowledge when concrete constraints dominate the decision.",
+      "Stronger models may shift the bottleneck toward human specification and evaluation rather than erase the value of expertise."
+    ],
+    "related": [
+      "adaptive-context-engineering",
+      "code-structure-agent-context-economics",
+      "review-driven-software-factories"
+    ]
+  }
+}

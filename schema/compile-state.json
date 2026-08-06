@@ -2,7 +2,7 @@
   "manifest_version": 1,
   "schema_version": "compile-state.v1",
   "created": "2026-07-05",
-  "updated": "2026-08-04T01:44:00.000Z",
+  "updated": "2026-08-06T01:37:33.008Z",
   "processed_sources": {
     "sources/tldr/2026-06-23-transformer-architecture-for-senior-engineers.txt": {
       "hash": "sha256:f9a592761c47b368e73c13dd97d27b02bc875433b632a582a40ec6419643e631",
@@ -123,6 +123,18 @@
       "output_path": "wiki/concepts/code-structure-agent-context-economics.md",
       "source_item_id": "19fb7fb144b8358d-01",
       "processed_at": "2026-08-04T01:44:00.000Z"
+    },
+    "sources/tldr/2026-08-04-llms-reward-expertise.txt": {
+      "hash": "sha256:14a54f70211c01ee9384cec9085df63b6d0a198cfe32bd5fc04358dee9b08489",
+      "output_path": "wiki/concepts/ai-native-software-engineering.md",
+      "source_item_id": "19fcc720f38e999b-06",
+      "processed_at": "2026-08-06T01:37:32.982Z"
+    },
+    "sources/tldr/2026-08-04-nextjs-16-3.txt": {
+      "hash": "sha256:89be1a844f0a8cf01c4e11ee850c13217c21e786bd94058969e39229ef2fe0fc",
+      "output_path": "wiki/tools/nextjs.md",
+      "source_item_id": "19fcc7bdf7e9fe90-08",
+      "processed_at": "2026-08-06T01:37:33.008Z"
     }
   },
   "wiki_outputs": {
@@ -137,9 +149,9 @@
       "provenance_count": 1
     },
     "wiki/concepts/ai-native-software-engineering.md": {
-      "hash": "sha256:2a52ffd2fe5d555e4ec4d365404fdcce8fce3414ffbda88a77a8aba82cfc9401",
-      "updated": "2026-07-31T02:41:43.206Z",
-      "provenance_count": 4
+      "hash": "sha256:cbbc2ea2992fa04706f27f943d88de3305cc406a20df44057e9f9498005beec2",
+      "updated": "2026-08-06T01:37:32.982Z",
+      "provenance_count": 5
     },
     "wiki/tools/clawk.md": {
       "hash": "sha256:f94e4b7517a3126563fae82604555a3b7baf8aa7bcfe16f2ec68f7b81baf1a8d",
@@ -209,6 +221,11 @@
     "wiki/concepts/code-structure-agent-context-economics.md": {
       "hash": "sha256:cc79368ba5ece22e2ea478a86b111df0c75a5ab46c2601e3d15f2aaef20bac9e",
       "updated": "2026-08-04T01:44:00.000Z",
+      "provenance_count": 1
+    },
+    "wiki/tools/nextjs.md": {
+      "hash": "sha256:76e21474b24d360a164b6076b751f3071adb1c90639470baa7fe31daabcc695b",
+      "updated": "2026-08-06T01:37:33.008Z",
       "provenance_count": 1
     }
   },
@@ -445,6 +462,18 @@
       "timestamp": "2026-08-04T01:44:00.000Z",
       "source_path": "sources/tldr/2026-07-31-code-structure-agent-context-economics.txt",
       "output_path": "wiki/concepts/code-structure-agent-context-economics.md",
+      "status": "created"
+    },
+    {
+      "timestamp": "2026-08-06T01:37:32.982Z",
+      "source_path": "sources/tldr/2026-08-04-llms-reward-expertise.txt",
+      "output_path": "wiki/concepts/ai-native-software-engineering.md",
+      "status": "updated"
+    },
+    {
+      "timestamp": "2026-08-06T01:37:33.008Z",
+      "source_path": "sources/tldr/2026-08-04-nextjs-16-3.txt",
+      "output_path": "wiki/tools/nextjs.md",
       "status": "created"
     }
   ]

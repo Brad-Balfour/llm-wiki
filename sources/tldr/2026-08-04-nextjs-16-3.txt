@@ -1,0 +1,52 @@
+{
+  "schema_version": "approved-wiki-source.v1",
+  "approval": {
+    "status": "approved",
+    "public": true,
+    "approved_at": "2026-08-04T18:22:00-04:00",
+    "reviewed_by": "brad",
+    "safety_review": {
+      "privacy": "cleared",
+      "publication_rights": "cleared",
+      "dual_use": "cleared"
+    }
+  },
+  "source": {
+    "source_item_id": "19fcc7bdf7e9fe90-08",
+    "source_path": "sources/tldr/2026-08-04-nextjs-16-3.txt",
+    "source_type": "tldr",
+    "title": "Next.js 16.3",
+    "url": "https://nextjs.org/blog/next-16-3?utm_source=tldrdev",
+    "newsletter": "TLDR Dev",
+    "edition_date": "2026-08-04"
+  },
+  "entry": {
+    "type": "tool",
+    "slug": "nextjs",
+    "title": "Next.js",
+    "aliases": [
+      "Next.js 16.3"
+    ],
+    "tags": [
+      "nextjs",
+      "react",
+      "web-framework",
+      "performance",
+      "ai-coding-agents"
+    ],
+    "confidence": "high",
+    "summary": "Next.js 16.3 combines broadly applicable performance improvements with opt-in navigation and caching changes that preview the framework's next programming model.",
+    "key_ideas": [
+      "The stable upgrade reduces long-session development memory, caches repeat builds, improves server-rendering throughput, and adds version-matched local documentation for coding agents.",
+      "Instant Navigations remains opt-in through Cache Components and Partial Prefetching, so an upgrade does not by itself adopt the new navigation and caching model.",
+      "Navigation performance becomes more observable through Instant Insights, a Navigation Inspector, and a Playwright helper that can make instant loading shells a regression-tested contract.",
+      "Custom error boundaries can retry failed server-rendered children without interfering with notFound or redirect behavior.",
+      "Published benchmark gains are workload-specific upper bounds, not guarantees for every application; upgrades still need application-level memory, build, rendering, and navigation measurements."
+    ],
+    "related": [
+      "adaptive-context-engineering",
+      "deterministic-agent-workflows",
+      "interface-design-rules"
+    ]
+  }
+}
