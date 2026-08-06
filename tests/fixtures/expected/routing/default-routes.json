@@ -17,6 +17,23 @@
     }
   },
   {
+    "case": "uninterested/in_depth",
+    "classification": {
+      "interest_level": "uninterested",
+      "interest_score": 0.18,
+      "consumption_depth": "in_depth",
+      "depth_score": 0.81
+    },
+    "route": {
+      "route_version": "routing-rules.v1",
+      "commute_behavior": "skip",
+      "wiki_behavior": "discard",
+      "stream_log": "none",
+      "review": "none",
+      "discard": true
+    }
+  },
+  {
     "case": "interested/headline_only",
     "classification": {
       "interest_level": "interested",
