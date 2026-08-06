@@ -2,7 +2,7 @@
 
 Status: proposal. Implementation is a follow-on if this plan is accepted.
 
-Scope: the TypeScript implementation under `src/` (6,723 lines, 24 modules) and
+Scope: the TypeScript implementation under `src/` (6,723 lines, 23 modules) and
 `scripts/`. Markdown is in scope only where a code change forces a documentation
 update. OpenSpec and other spec-driven-development files are not refactored;
 they are the contracts the code must keep satisfying.
@@ -13,7 +13,7 @@ Measured at the current `main` content, not estimated.
 
 | Measure              | Value                                                                                                  |
 | -------------------- | ------------------------------------------------------------------------------------------------------ |
-| Source               | 6,723 lines, 24 modules                                                                                |
+| Source               | 6,723 lines, 23 modules                                                                                |
 | Tests                | 139 passing, `npm run check` green                                                                     |
 | Coverage             | 80.71% line, 75.09% branch, 89.40% function                                                            |
 | TypeScript           | already strict, incl. `noUncheckedIndexedAccess`, `exactOptionalPropertyTypes`, `verbatimModuleSyntax` |
@@ -429,12 +429,33 @@ at the same length); and the TLDR text scanner (577), the Markdown compiler
 benefit not at all — the net saving attributable to zod is **~250-320 lines,
 under 5% of the codebase**.
 
-**The real argument is 2.8, not the line count.** `z.toJSONSchema()` (confirmed
-present in zod 4.4) generates the six `schema/*.schema.json` files from the
-validators, making them build output instead of a parallel hand-maintained
-artifact. That removes ~856 lines of unguarded duplication — more than the
-entire validation-logic saving — and eliminates a defect class no amount of
-hand-rolled refactoring addresses.
+**Schema generation is the main argument, but it is narrower than first
+claimed.** `z.toJSONSchema()` (confirmed present in zod 4.4) can generate the
+six `schema/*.schema.json` files from the validators, turning ~856 lines of
+unguarded duplication into build output.
+
+**Correction, from review of this plan (#56).** Generation covers _structural_
+rules only. Cross-field constraints expressed as `superRefine` are **silently
+dropped** — no error, no warning — so a generated schema is more permissive than
+both the validator and the hand-written schema it would replace. Verified:
+
+```
+runtime validator rejects {queue_file:'q', status:'partial'}   -> true
+generated schema "required"                                    -> ["queue_file","status"]
+=> the generated schema accepts what the validator rejects
+```
+
+This is not hypothetical. Three of the six schemas encode exactly these rules:
+
+| Schema                                  | `if`/`then` blocks | `oneOf` |
+| --------------------------------------- | ------------------ | ------- |
+| `commute-handoff-v2.schema.json`        | 4                  | 0       |
+| `commute-session-bundle-v1.schema.json` | 2                  | 1       |
+| `commute-handoff-v1.schema.json`        | 1                  | 0       |
+
+Naive generation would quietly weaken seven conditional rules and one `oneOf`,
+including `status: partial` requiring `resume_source_item_id`. That is a
+contract regression wearing a refactoring label.
 
 **Costs found in the spike:**
 
@@ -448,12 +469,33 @@ hand-rolled refactoring addresses.
    preserves today's API and type-checks clean.
 4. `recover-session-bundle.ts` deliberately accepts malformed historical bundles
    and coerces positional references. Leave it hand-written.
+5. Generated schemas lose every cross-field constraint, as above.
 
-**Recommendation:** adopt zod, justified by schema generation, with the
-validation saving as a secondary benefit. This does not remove item 4 —
-`src/shared/` is still needed for `errorMessage`, the `compact()` bridge, the
-issue-to-message translator, and the refinements encoding this project's actual
-rules (safe text, credential-free URL, real calendar date).
+**Revised recommendation.** The original problem was never "the schemas are
+hand-written" — it was that they are **unguarded** duplicates, with one partial
+check across six files. Generation is one way to close that; it is not the only
+way, and on its own it trades a duplication problem for a weaker-contract
+problem.
+
+Take them in this order, and stop as soon as the duplication is guarded:
+
+1. **First, and independent of zod: a conformance test.** Run the hand-written
+   JSON Schema and the TypeScript validator over a shared corpus of valid and
+   invalid fixtures, and assert they agree on every accept/reject. This closes
+   the actual defect — silent drift between the two — at a fraction of the cost,
+   preserves every conditional rule, and is worth doing whether or not zod is
+   ever adopted. It also gives any later migration a safety net.
+2. **Then, optionally, zod for the validators**, taken for the ~250-320 line
+   saving on its own merits rather than for schema generation.
+3. **Generation only where a schema has no cross-field rules.**
+   `classifier-feedback-label-v1` and `tldr-commute-queue-v2` have none and
+   could be generated safely. The other four keep their hand-authored
+   conditional sections, with the conformance test from step 1 as the guard.
+
+This does not remove item 4 — `src/shared/` is still needed for `errorMessage`,
+the `compact()` bridge, the issue-to-message translator, and the refinements
+encoding this project's actual rules (safe text, credential-free URL, real
+calendar date).
 
 ### 11. Unified CLI entrypoint layer
 
