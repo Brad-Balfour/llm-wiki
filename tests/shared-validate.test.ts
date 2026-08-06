@@ -154,14 +154,24 @@ test('no module outside src/shared redeclares a shared primitive', async () => {
     'requireIsoTimestamp',
   ]);
 
+  // Match every binding form, not just `function name(`. A guard that only
+  // catches one spelling invites the duplication back under another.
+  const declarations = [
+    /^(?:export\s+)?(?:async\s+)?function\s+(\w+)\s*[(<]/gm,
+    /^(?:export\s+)?(?:const|let|var)\s+(\w+)\s*[:=]/gm,
+    /\bas\s+(\w+)\s*[,}]/g, // `export { x as requireString }` re-export aliases
+  ];
+
   const offenders: string[] = [];
   for (const file of await sourceFiles('src')) {
     if (file.startsWith(`src${path.sep}shared${path.sep}`)) continue;
     const text = await readFile(file, 'utf8');
-    for (const match of text.matchAll(/^(?:export )?function (\w+)\s*\(/gm)) {
-      const name = match[1];
-      if (name !== undefined && shared.has(name)) {
-        offenders.push(`${file}: ${name}`);
+    for (const pattern of declarations) {
+      for (const match of text.matchAll(pattern)) {
+        const name = match[1];
+        if (name !== undefined && shared.has(name)) {
+          offenders.push(`${file}: ${name}`);
+        }
       }
     }
   }
