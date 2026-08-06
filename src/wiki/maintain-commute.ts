@@ -5,6 +5,9 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { promisify } from 'node:util';
 
+import { errorMessage } from '../shared/errors.js';
+import { requireString } from '../shared/validate.js';
+
 import {
   carryForwardMaintenanceHistory,
   type CommuteSessionImport,
@@ -577,17 +580,6 @@ function timestamp(): string {
     .toISOString()
     .replace(/[-:TZ.]/g, '')
     .slice(0, 14);
-}
-
-function errorMessage(error: unknown): string {
-  return error instanceof Error ? error.message : String(error);
-}
-
-function requireString(candidate: unknown, field: string): string {
-  if (typeof candidate !== 'string' || candidate.trim().length === 0) {
-    throw new Error(`${field} must be a non-empty string`);
-  }
-  return candidate;
 }
 
 if (fileURLToPath(import.meta.url) === path.resolve(process.argv[1] ?? '')) {

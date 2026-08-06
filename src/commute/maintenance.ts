@@ -7,6 +7,9 @@
  * typing let the two drift silently. Keep one declaration and one parser here.
  */
 
+import { requireHttpUrl } from '../shared/url.js';
+import { requireRecord, requireString } from '../shared/validate.js';
+
 export const MAINTENANCE_ATTEMPT_SOURCES = ['retrieval', 'maintainer'] as const;
 export type MaintenanceAttemptSource = (typeof MAINTENANCE_ATTEMPT_SOURCES)[number];
 
@@ -63,11 +66,11 @@ export interface MaintenanceLatestResult {
 export function parseMaintenanceCandidate(candidate: unknown, field: string): MaintenanceCandidate {
   const record = requireRecord(candidate, field);
   return {
-    maintenance_key: requireNonEmptyString(record.maintenance_key, `${field}.maintenance_key`),
-    session_id: requireNonEmptyString(record.session_id, `${field}.session_id`),
-    event_id: requireNonEmptyString(record.event_id, `${field}.event_id`),
-    source_item_id: requireNonEmptyString(record.source_item_id, `${field}.source_item_id`),
-    title: requireNonEmptyString(record.title, `${field}.title`),
+    maintenance_key: requireString(record.maintenance_key, `${field}.maintenance_key`),
+    session_id: requireString(record.session_id, `${field}.session_id`),
+    event_id: requireString(record.event_id, `${field}.event_id`),
+    source_item_id: requireString(record.source_item_id, `${field}.source_item_id`),
+    title: requireString(record.title, `${field}.title`),
     url: requireMaintenanceHttpUrl(record.url, `${field}.url`),
     status: 'pending',
   };
@@ -86,6 +89,14 @@ export function requireMaintenanceAttemptSource(
   return candidate as MaintenanceAttemptSource;
 }
 
+/**
+ * A maintenance URL is an exact captured source URL. Report a malformed one as
+ * a contract failure naming its field, never as a raw URL TypeError.
+ */
+export function requireMaintenanceHttpUrl(candidate: unknown, field: string): string {
+  return requireHttpUrl(candidate, field);
+}
+
 export function requireMaintenanceAttemptStatus(
   candidate: unknown,
   field: string
@@ -97,44 +108,4 @@ export function requireMaintenanceAttemptStatus(
     throw new Error(`${field} is unsupported`);
   }
   return candidate as MaintenanceAttemptStatus;
-}
-
-/**
- * A maintenance URL is always an exact captured source URL. Report a malformed
- * one as a contract failure naming its field, never as a raw URL TypeError.
- */
-export function requireMaintenanceHttpUrl(candidate: unknown, field: string): string {
-  const value = requireNonEmptyString(candidate, field);
-  let parsed: URL;
-  try {
-    parsed = new URL(value);
-  } catch {
-    throw new Error(`${field} must be an HTTP(S) URL`);
-  }
-  if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') {
-    throw new Error(`${field} must be an HTTP(S) URL`);
-  }
-  return value;
-}
-
-export function requireRecord(candidate: unknown, field: string): Record<string, unknown> {
-  if (typeof candidate !== 'object' || candidate === null || Array.isArray(candidate)) {
-    throw new Error(`${field} must be an object`);
-  }
-  return candidate as Record<string, unknown>;
-}
-
-export function requireNonEmptyString(candidate: unknown, field: string): string {
-  if (typeof candidate !== 'string' || candidate.trim().length === 0) {
-    throw new Error(`${field} must be a non-empty string`);
-  }
-  return candidate;
-}
-
-export function requireIsoTimestamp(candidate: unknown, field: string): string {
-  const value = requireNonEmptyString(candidate, field);
-  if (!Number.isFinite(Date.parse(value))) {
-    throw new Error(`${field} must be an ISO timestamp`);
-  }
-  return value;
 }

@@ -1,3 +1,14 @@
+import { errorMessage } from '../shared/errors.js';
+import { stripMarkdownFence } from '../shared/json.js';
+import { requireHttpUrl } from '../shared/url.js';
+import { requireDate } from '../shared/time.js';
+import {
+  rejectUnknownKeys,
+  requireEnum,
+  requireRecord,
+  requireString,
+  requireStringArray,
+} from '../shared/validate.js';
 import {
   APPROVED_WIKI_SOURCE_SCHEMA_VERSION,
   WIKI_CONFIDENCE_LEVELS,
@@ -6,7 +17,6 @@ import {
 } from './types.js';
 
 const SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
-const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
 const SOURCE_ITEM_ID_PATTERN = /^[A-Za-z0-9][A-Za-z0-9._:-]*$/;
 const SOURCE_PATH_PATTERN = /^sources\/tldr\/[A-Za-z0-9._/-]+$/;
 const RAW_HTML_PATTERN = /<\/?[A-Za-z!][^>]*>/;
@@ -81,10 +91,7 @@ export function validateApprovedWikiSource(candidate: unknown): ApprovedWikiSour
   if (!SOURCE_ITEM_ID_PATTERN.test(sourceItemId)) {
     throw new Error('source.source_item_id contains unsupported characters');
   }
-  const editionDate = requireString(source.edition_date, 'source.edition_date');
-  if (!DATE_PATTERN.test(editionDate)) {
-    throw new Error('source.edition_date must use YYYY-MM-DD');
-  }
+  const editionDate = requireDate(source.edition_date, 'source.edition_date');
 
   const entry = requireRecord(root.entry, 'entry');
   rejectUnknownKeys(
@@ -106,7 +113,11 @@ export function validateApprovedWikiSource(candidate: unknown): ApprovedWikiSour
   }
 
   const sourceTitle = requireSafeText(source.title, 'source.title', 300);
-  const sourceUrl = requireHttpUrl(source.url, 'source.url');
+  const sourceUrl = requireHttpUrl(source.url, 'source.url', {
+    rejectCredentials: true,
+    markdownSafe: true,
+    rejectCredentialParams: true,
+  });
   const newsletter = requireSafeText(source.newsletter, 'source.newsletter', 100);
   const entryTitle = requireSafeText(entry.title, 'entry.title', 300);
   const aliases = unique(requireStringArray(entry.aliases, 'entry.aliases')).map((value, index) =>
@@ -183,87 +194,6 @@ function hasDisallowedControlCharacter(value: string): boolean {
   });
 }
 
-function requireHttpUrl(candidate: unknown, field: string): string {
-  const value = requireString(candidate, field);
-  let parsed: URL;
-  try {
-    parsed = new URL(value);
-  } catch {
-    throw new Error(`${field} must be a valid URL`);
-  }
-  if (!['http:', 'https:'].includes(parsed.protocol) || parsed.username || parsed.password) {
-    throw new Error(`${field} must be an http(s) URL without embedded credentials`);
-  }
-  if (/[\s()[\]<>]/.test(value)) {
-    throw new Error(`${field} contains characters that are unsafe in a Markdown link`);
-  }
-  const fragmentParameters = new URLSearchParams(parsed.hash.slice(1));
-  for (const key of [...parsed.searchParams.keys(), ...fragmentParameters.keys()]) {
-    if (isCredentialParameter(key)) {
-      throw new Error(`${field} contains a credential-like URL parameter`);
-    }
-  }
-  return value;
-}
-
-function isCredentialParameter(key: string): boolean {
-  return /^(?:(?:x[-_])?api[-_]?key|access[-_]?(?:token|key)|auth[-_]?(?:token|key)|client[-_]?secret|x[-_]amz[-_]?(?:credential|signature|security[-_]token)|credential|signature|token|secret|password)$/i.test(
-    key
-  );
-}
-
-function stripMarkdownFence(text: string): string {
-  const match = /^```(?:json)?\s*([\s\S]*?)\s*```$/i.exec(text);
-  return match?.[1] ?? text;
-}
-
-function requireRecord(candidate: unknown, field: string): Record<string, unknown> {
-  if (typeof candidate !== 'object' || candidate === null || Array.isArray(candidate)) {
-    throw new Error(`${field} must be an object`);
-  }
-  return candidate as Record<string, unknown>;
-}
-
-function requireString(candidate: unknown, field: string): string {
-  if (typeof candidate !== 'string' || candidate.trim().length === 0) {
-    throw new Error(`${field} must be a non-empty string`);
-  }
-  return candidate;
-}
-
-function requireStringArray(candidate: unknown, field: string): string[] {
-  if (!Array.isArray(candidate)) {
-    throw new Error(`${field} must be an array`);
-  }
-  return candidate.map((value, index) => requireString(value, `${field}[${index}]`));
-}
-
-function requireEnum<const T extends readonly string[]>(
-  candidate: unknown,
-  values: T,
-  field: string
-): T[number] {
-  if (typeof candidate !== 'string' || !values.includes(candidate)) {
-    throw new Error(`${field} must be one of: ${values.join(', ')}`);
-  }
-  return candidate as T[number];
-}
-
-function rejectUnknownKeys(
-  record: Record<string, unknown>,
-  allowed: readonly string[],
-  field: string
-): void {
-  const unknown = Object.keys(record).filter((key) => !allowed.includes(key));
-  if (unknown.length > 0) {
-    throw new Error(`${field} contains unsupported fields: ${unknown.join(', ')}`);
-  }
-}
-
 function unique(values: string[]): string[] {
   return [...new Set(values)];
-}
-
-function errorMessage(error: unknown): string {
-  return error instanceof Error ? error.message : String(error);
 }

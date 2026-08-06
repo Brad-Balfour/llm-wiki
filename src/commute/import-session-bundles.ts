@@ -3,6 +3,8 @@ import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import { errorMessage } from '../shared/errors.js';
+
 import {
   bundleArtifactFilenameMatches,
   type CommuteSessionBundle,
@@ -12,13 +14,12 @@ import {
 import { recoverSessionBundleWithSuppliedQueue } from './recover-session-bundle.js';
 import {
   parseMaintenanceCandidate,
-  requireIsoTimestamp,
   requireMaintenanceAttemptSource,
   requireMaintenanceAttemptStatus,
   requireMaintenanceHttpUrl,
-  requireNonEmptyString,
-  requireRecord,
 } from './maintenance.js';
+import { requireIsoTimestamp } from '../shared/time.js';
+import { requireRecord, requireString } from '../shared/validate.js';
 
 export type {
   MaintenanceAttempt,
@@ -308,7 +309,7 @@ export function recordMaintenanceAttempts(
     }
     requireMaintenanceAttemptStatus(input.status, 'Maintenance attempt status');
     requireMaintenanceAttemptSource(input.source, 'Maintenance attempt source');
-    requireNonEmptyString(input.detail, 'Maintenance attempt detail');
+    requireString(input.detail, 'Maintenance attempt detail');
     requireIsoTimestamp(input.attempted_at, 'Maintenance attempt attempted_at');
 
     const attempt: MaintenanceAttempt = {
@@ -430,7 +431,7 @@ function parsePriorMaintenanceAttempt(
 ): MaintenanceAttempt {
   const field = `Prior maintenance_attempts[${index}]`;
   const record = requireRecord(attempt, field);
-  const maintenanceKey = requireNonEmptyString(record.maintenance_key, `${field}.maintenance_key`);
+  const maintenanceKey = requireString(record.maintenance_key, `${field}.maintenance_key`);
   const candidate = candidates.get(maintenanceKey);
   if (!candidate) {
     throw new Error(`${field} names unknown candidate ${maintenanceKey}`);
@@ -441,17 +442,14 @@ function parsePriorMaintenanceAttempt(
     maintenance_key: maintenanceKey,
     source,
     status,
-    detail: requireNonEmptyString(record.detail, `${field}.detail`),
+    detail: requireString(record.detail, `${field}.detail`),
     attempted_at: requireIsoTimestamp(record.attempted_at, `${field}.attempted_at`),
   };
   const parsed: MaintenanceAttempt = {
     ...input,
-    attempt_id: requireNonEmptyString(record.attempt_id, `${field}.attempt_id`),
-    bundle_session_id: requireNonEmptyString(
-      record.bundle_session_id,
-      `${field}.bundle_session_id`
-    ),
-    event_id: requireNonEmptyString(record.event_id, `${field}.event_id`),
+    attempt_id: requireString(record.attempt_id, `${field}.attempt_id`),
+    bundle_session_id: requireString(record.bundle_session_id, `${field}.bundle_session_id`),
+    event_id: requireString(record.event_id, `${field}.event_id`),
     source_url: requireMaintenanceHttpUrl(record.source_url, `${field}.source_url`),
   };
   if (
@@ -573,10 +571,6 @@ function ensurePrivateOutput(output: string): void {
   if (!resolvedOutput.startsWith(`${privateRoot}${path.sep}`)) {
     throw new Error('--output must be inside the gitignored .private directory');
   }
-}
-
-function errorMessage(error: unknown): string {
-  return error instanceof Error ? error.message : String(error);
 }
 
 if (

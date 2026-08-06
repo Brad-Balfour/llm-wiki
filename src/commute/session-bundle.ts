@@ -1,5 +1,21 @@
 import { createHash } from 'node:crypto';
 
+import { errorMessage } from '../shared/errors.js';
+import { stripMarkdownFence } from '../shared/json.js';
+import { requireDate, requireDateTime } from '../shared/time.js';
+import { requireHttpUrl } from '../shared/url.js';
+import {
+  optionalString,
+  rejectUnknownKeys,
+  requireArray,
+  requireEnum,
+  requirePositiveInteger,
+  requireRecord,
+  requireScore,
+  requireString,
+  requireStringArray,
+  requireUniqueStrings,
+} from '../shared/validate.js';
 import type { VoiceSurface } from './handoff.js';
 import { VOICE_SURFACES } from './handoff.js';
 
@@ -367,13 +383,13 @@ function validateQueueItem(candidate: unknown, itemPath: string): QueueItemIdent
     ['interested', 'maybe', 'uninterested'] as const,
     `${itemPath}.interest_level`
   );
-  requireNumberInRange(record.interest_score, `${itemPath}.interest_score`);
+  requireScore(record.interest_score, `${itemPath}.interest_score`);
   requireEnum(
     record.consumption_depth,
     ['headline_only', 'in_depth'] as const,
     `${itemPath}.consumption_depth`
   );
-  requireNumberInRange(record.depth_score, `${itemPath}.depth_score`);
+  requireScore(record.depth_score, `${itemPath}.depth_score`);
   requireString(record.commute_behavior, `${itemPath}.commute_behavior`);
   requireStringArray(record.signals, `${itemPath}.signals`);
   requireString(record.reason, `${itemPath}.reason`);
@@ -956,124 +972,4 @@ function rejectSensitiveQueueFields(candidate: unknown, path: string): void {
     }
     rejectSensitiveQueueFields(value, `${path}.${key}`);
   }
-}
-
-function requireRecord(candidate: unknown, field: string): Record<string, unknown> {
-  if (typeof candidate !== 'object' || candidate === null || Array.isArray(candidate)) {
-    throw new Error(`${field} must be an object`);
-  }
-  return candidate as Record<string, unknown>;
-}
-
-function requireArray(candidate: unknown, field: string): unknown[] {
-  if (!Array.isArray(candidate)) {
-    throw new Error(`${field} must be an array`);
-  }
-  return candidate;
-}
-
-function requireString(candidate: unknown, field: string): string {
-  if (typeof candidate !== 'string' || candidate.trim().length === 0) {
-    throw new Error(`${field} must be a non-empty string`);
-  }
-  return candidate;
-}
-
-function requireDate(candidate: unknown, field: string): string {
-  const value = requireString(candidate, field);
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(value) || Number.isNaN(Date.parse(`${value}T00:00:00Z`))) {
-    throw new Error(`${field} must use a real YYYY-MM-DD date`);
-  }
-  return value;
-}
-
-function requireDateTime(candidate: unknown, field: string): string {
-  const value = requireString(candidate, field);
-  if (
-    !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})$/.test(value) ||
-    Number.isNaN(Date.parse(value))
-  ) {
-    throw new Error(`${field} must use an RFC 3339 date-time with timezone`);
-  }
-  return value;
-}
-
-function requireHttpUrl(candidate: unknown, field: string): string {
-  const value = requireString(candidate, field);
-  let parsed: URL;
-  try {
-    parsed = new URL(value);
-  } catch {
-    throw new Error(`${field} must be an HTTP(S) URL`);
-  }
-  if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') {
-    throw new Error(`${field} must be an HTTP(S) URL`);
-  }
-  return value;
-}
-
-function optionalString(candidate: unknown, field: string): string | undefined {
-  return candidate === undefined ? undefined : requireString(candidate, field);
-}
-
-function requireStringArray(candidate: unknown, field: string): string[] {
-  return requireArray(candidate, field).map((item, index) =>
-    requireString(item, `${field}[${index}]`)
-  );
-}
-
-function requirePositiveInteger(candidate: unknown, field: string): number {
-  if (typeof candidate !== 'number' || !Number.isInteger(candidate) || candidate < 1) {
-    throw new Error(`${field} must be a positive integer`);
-  }
-  return candidate;
-}
-
-function requireNumberInRange(candidate: unknown, field: string): number {
-  if (
-    typeof candidate !== 'number' ||
-    !Number.isFinite(candidate) ||
-    candidate < 0 ||
-    candidate > 1
-  ) {
-    throw new Error(`${field} must be a number from 0 through 1`);
-  }
-  return candidate;
-}
-
-function requireEnum<T extends readonly string[]>(
-  candidate: unknown,
-  values: T,
-  field: string
-): T[number] {
-  if (typeof candidate !== 'string' || !values.includes(candidate)) {
-    throw new Error(`${field} must be one of: ${values.join(', ')}`);
-  }
-  return candidate as T[number];
-}
-
-function requireUniqueStrings(values: string[], field: string): void {
-  if (new Set(values).size !== values.length) {
-    throw new Error(`${field} must not contain duplicates`);
-  }
-}
-
-function rejectUnknownKeys(
-  record: Record<string, unknown>,
-  allowed: string[],
-  field: string
-): void {
-  const unsupported = Object.keys(record).filter((key) => !allowed.includes(key));
-  if (unsupported.length > 0) {
-    throw new Error(`${field} contains unsupported fields: ${unsupported.join(', ')}`);
-  }
-}
-
-function stripMarkdownFence(text: string): string {
-  const match = /^```(?:json)?\s*([\s\S]*?)\s*```$/i.exec(text);
-  return match?.[1] ?? text;
-}
-
-function errorMessage(error: unknown): string {
-  return error instanceof Error ? error.message : String(error);
 }
