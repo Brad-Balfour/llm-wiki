@@ -8,10 +8,7 @@
  */
 
 import { requireHttpUrl } from '../shared/url.js';
-import { requireIsoTimestamp } from '../shared/time.js';
 import { requireRecord, requireString } from '../shared/validate.js';
-
-export { requireIsoTimestamp, requireRecord };
 
 export const MAINTENANCE_ATTEMPT_SOURCES = ['retrieval', 'maintainer'] as const;
 export type MaintenanceAttemptSource = (typeof MAINTENANCE_ATTEMPT_SOURCES)[number];
@@ -92,8 +89,6 @@ export function requireMaintenanceAttemptSource(
   return candidate as MaintenanceAttemptSource;
 }
 
-export { requireString as requireNonEmptyString };
-
 /**
  * A maintenance URL is an exact captured source URL. Report a malformed one as
  * a contract failure naming its field, never as a raw URL TypeError.
@@ -114,8 +109,3 @@ export function requireMaintenanceAttemptStatus(
   }
   return candidate as MaintenanceAttemptStatus;
 }
-
-/**
- * A maintenance URL is always an exact captured source URL. Report a malformed
- * one as a contract failure naming its field, never as a raw URL TypeError.
- */
