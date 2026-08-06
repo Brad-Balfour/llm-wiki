@@ -1,6 +1,8 @@
-import { createHash } from 'node:crypto';
-import { mkdir, readFile, rename, writeFile } from 'node:fs/promises';
+import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
+
+import { formatJsonRecord, readOptionalFile, writeFileAtomic } from '../shared/fs.js';
+import { sha256Fingerprint } from '../shared/hash.js';
 
 import { parseApprovedWikiSource } from './approved-source.js';
 import { compileApprovedWikiSource, normalizeGeneratedWikiMarkdown } from './compiler.js';
@@ -48,7 +50,7 @@ async function main(): Promise<void> {
   }
 
   const state = await readCompileState(path.resolve(options.repoRoot, options.statePath));
-  const inputHash = sha256(inputText);
+  const inputHash = sha256Fingerprint(inputText);
   const prior = state.processed_sources[source.source.source_path];
   const now = new Date().toISOString();
   const conflictingSourceId = Object.entries(state.processed_sources).find(
@@ -72,7 +74,7 @@ async function main(): Promise<void> {
     const priorOutput = await readOptionalFile(path.resolve(options.repoRoot, prior.output_path));
     if (priorOutput !== undefined) {
       const recordedOutput = state.wiki_outputs[prior.output_path];
-      if (recordedOutput?.hash !== sha256(priorOutput)) {
+      if (recordedOutput?.hash !== sha256Fingerprint(priorOutput)) {
         throw new Error(
           `Wiki output drift detected for ${prior.output_path}. Review the file before compiling again.`
         );
@@ -91,7 +93,7 @@ async function main(): Promise<void> {
   const existingMarkdown = await readOptionalFile(absoluteOutputPath);
   if (existingMarkdown !== undefined) {
     const recordedOutput = state.wiki_outputs[outputPath];
-    if (!recordedOutput || recordedOutput.hash !== sha256(existingMarkdown)) {
+    if (!recordedOutput || recordedOutput.hash !== sha256Fingerprint(existingMarkdown)) {
       throw new Error(
         `Wiki output drift detected for ${outputPath}. Review the file before compiling again.`
       );
@@ -121,7 +123,7 @@ async function main(): Promise<void> {
     processed_at: normalizedPriorOutput === undefined ? now : (prior?.processed_at ?? now),
   };
   state.wiki_outputs[result.output_path] = {
-    hash: sha256(result.markdown),
+    hash: sha256Fingerprint(result.markdown),
     updated: now,
     provenance_count: result.provenance_count,
   };
@@ -174,20 +176,7 @@ async function readCompileState(statePath: string): Promise<CompileState> {
 }
 
 async function writeCompileState(statePath: string, state: CompileState): Promise<void> {
-  const temporaryPath = `${statePath}.tmp-${process.pid}`;
-  await writeFile(temporaryPath, `${JSON.stringify(state, null, 2)}\n`, 'utf8');
-  await rename(temporaryPath, statePath);
-}
-
-async function readOptionalFile(filePath: string): Promise<string | undefined> {
-  try {
-    return await readFile(filePath, 'utf8');
-  } catch (error) {
-    if (isNodeError(error) && error.code === 'ENOENT') {
-      return undefined;
-    }
-    throw error;
-  }
+  await writeFileAtomic(statePath, formatJsonRecord(state));
 }
 
 function wikiOutputPath(type: string, slug: string): string {
@@ -195,16 +184,8 @@ function wikiOutputPath(type: string, slug: string): string {
   return `wiki/${directory}/${slug}.md`;
 }
 
-function sha256(value: string): string {
-  return `sha256:${createHash('sha256').update(value).digest('hex')}`;
-}
-
 function toPosixPath(value: string): string {
   return value.split(path.sep).join('/');
-}
-
-function isNodeError(error: unknown): error is Error & { code: string } {
-  return error instanceof Error && 'code' in error && typeof error.code === 'string';
 }
 
 await main();

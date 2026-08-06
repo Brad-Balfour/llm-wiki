@@ -1,9 +1,10 @@
-import { createHash } from 'node:crypto';
-import { mkdir, readFile, writeFile } from 'node:fs/promises';
+import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { errorMessage } from '../shared/errors.js';
+import { writeNewJsonFile } from '../shared/fs.js';
+import { sha256Fingerprint } from '../shared/hash.js';
 
 import {
   bundleArtifactFilenameMatches,
@@ -355,7 +356,7 @@ export function maintenanceCandidateKey(
   sourceUrl: string
 ): string {
   const identity = JSON.stringify([bundleSessionId, eventId, sourceUrl]);
-  return `sha256:${createHash('sha256').update(identity, 'utf8').digest('hex')}`;
+  return sha256Fingerprint(identity);
 }
 
 function claimArtifactFilename(
@@ -552,7 +553,7 @@ function maintenanceAttemptId(input: MaintenanceAttemptInput): string {
     input.detail,
     input.attempted_at,
   ].join('\u0000');
-  return `sha256:${createHash('sha256').update(identity, 'utf8').digest('hex')}`;
+  return sha256Fingerprint(identity);
 }
 
 function queueItemConsumptionDepth(
@@ -589,8 +590,7 @@ async function main(): Promise<void> {
   );
   const result = reconcileSessionBundles(inputs);
   ensurePrivateOutput(options.output);
-  await mkdir(path.dirname(options.output), { recursive: true });
-  await writeFile(options.output, `${JSON.stringify(result, null, 2)}\n`, { flag: 'wx' });
+  await writeNewJsonFile(options.output, result);
 
   const accepted = result.sessions.filter((session) => session.status === 'accepted').length;
   const rejected = result.sessions.length - accepted;

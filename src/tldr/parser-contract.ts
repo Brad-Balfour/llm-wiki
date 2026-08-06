@@ -1,4 +1,4 @@
-import { createHash } from 'node:crypto';
+import { shortDigest } from '../shared/hash.js';
 
 export const PARSER_VERSION = 'tldr-parser.v1';
 
@@ -21,5 +21,5 @@ export function buildSourceItemId(
     .map((value) => value.trim().toLowerCase())
     .join('\n');
 
-  return `tldr_${createHash('sha256').update(stableInput).digest('hex').slice(0, 16)}`;
+  return `tldr_${shortDigest(stableInput)}`;
 }

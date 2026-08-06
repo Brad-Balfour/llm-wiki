@@ -9,13 +9,14 @@
  * both created a package cycle and put the classifier in the position of
  * importing the routing policy it is supposed to stay neutral about.
  */
-import { createHash } from 'node:crypto';
 import { appendFile, mkdir, open, readFile, unlink, type FileHandle } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { queueSnapshotFingerprint, validateTldrCommuteQueueV2 } from '../commute/session-bundle.js';
 import { errorMessage, errorCode, isExistingFile, isMissingFile } from '../shared/errors.js';
+import { readStdin } from '../shared/fs.js';
+import { shortDigest } from '../shared/hash.js';
 import { requireDate, requireDateTime } from '../shared/time.js';
 import { requireHttpUrl } from '../shared/url.js';
 import {
@@ -478,11 +479,7 @@ function deriveLabelId(input: ClassifierFeedbackLabelInput, queueSha256: string)
   const semanticInput = Object.fromEntries(
     Object.entries(input).filter(([key]) => key !== 'recorded_at')
   );
-  const digest = createHash('sha256')
-    .update(JSON.stringify({ ...semanticInput, queue_sha256: queueSha256 }))
-    .digest('hex')
-    .slice(0, 20);
-  return `feedback_${digest}`;
+  return `feedback_${shortDigest(JSON.stringify({ ...semanticInput, queue_sha256: queueSha256 }), 20)}`;
 }
 
 function parseStoredJsonl(text: string): ClassifierFeedbackLabel[] {
@@ -637,14 +634,6 @@ function ensurePrivateOutput(output: string): void {
   if (!path.resolve(output).split(path.sep).includes('.private')) {
     throw new Error('--output must be under a .private directory');
   }
-}
-
-async function readStdin(): Promise<string> {
-  const chunks: Buffer[] = [];
-  for await (const chunk of process.stdin) {
-    chunks.push(typeof chunk === 'string' ? Buffer.from(chunk) : chunk);
-  }
-  return Buffer.concat(chunks).toString('utf8');
 }
 
 if (fileURLToPath(import.meta.url) === path.resolve(process.argv[1] ?? '')) {

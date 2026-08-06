@@ -1,11 +1,12 @@
 import { execFile } from 'node:child_process';
-import { mkdtemp, mkdir, readFile, writeFile } from 'node:fs/promises';
+import { mkdtemp, mkdir, readFile } from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { promisify } from 'node:util';
 
 import { errorMessage } from '../shared/errors.js';
+import { writeJsonFile, writeNewJsonFile } from '../shared/fs.js';
 import { requireString } from '../shared/validate.js';
 
 import {
@@ -139,13 +140,13 @@ async function main(): Promise<void> {
     );
   }
   const intakePath = path.join(outputDir, 'intake.json');
-  await writeJsonExclusive(intakePath, intake);
+  await writeNewJsonFile(intakePath, intake);
   const candidatesToAttempt = maintenanceCandidatesForAttempt(intake);
   const retrieval = await retrieveMaintenanceSources(candidatesToAttempt);
   const retrievalPath = path.join(outputDir, 'sources.json');
-  await writeJsonExclusive(retrievalPath, retrieval);
+  await writeNewJsonFile(retrievalPath, retrieval);
   intake = recordMaintenanceAttempts(intake, maintenanceAttemptsFromRetrieval(retrieval));
-  await writeJson(intakePath, intake);
+  await writeJsonFile(intakePath, intake);
 
   const viableSources = retrieval.sources.filter((source) => source.status === 'retrieved');
   if (viableSources.length === 0) {
@@ -159,7 +160,7 @@ async function main(): Promise<void> {
         ? 'Every maintenance candidate already has a non-retryable successful result.'
         : 'No exact wiki_this capture had a retrievable text source.',
     };
-    await writeJsonExclusive(path.join(outputDir, 'outcome.json'), outcome);
+    await writeNewJsonFile(path.join(outputDir, 'outcome.json'), outcome);
     process.stdout.write(
       noRetryableCandidates
         ? `${outputDir}\nNo retryable maintenance candidates; no PR created.\n`
@@ -191,7 +192,7 @@ async function main(): Promise<void> {
     branch,
     worktree,
   };
-  await writeJsonExclusive(path.join(outputDir, 'outcome.json'), outcome);
+  await writeNewJsonFile(path.join(outputDir, 'outcome.json'), outcome);
 
   let agentResult: AgentResult | undefined;
   let reportedPrUrl: string | undefined;
@@ -224,7 +225,7 @@ async function main(): Promise<void> {
         new Date().toISOString()
       )
     );
-    await writeJson(intakePath, intake);
+    await writeJsonFile(intakePath, intake);
     agentAttemptsRecorded = true;
     if (agentResult.status === 'failed') {
       throw new Error('Maintainer agent reported failed outcome');
@@ -234,10 +235,7 @@ async function main(): Promise<void> {
       status: agentResult.status,
       ...(agentResult.pr_url === undefined ? {} : { pr_url: agentResult.pr_url }),
     };
-    await writeFile(
-      path.join(outputDir, 'outcome.json'),
-      `${JSON.stringify(completed, null, 2)}\n`
-    );
+    await writeJsonFile(path.join(outputDir, 'outcome.json'), completed);
     process.stdout.write(
       `${outputDir}\nMaintainer ${agentResult.status}${agentResult.pr_url ? `: ${agentResult.pr_url}` : ''}\n`
     );
@@ -255,7 +253,7 @@ async function main(): Promise<void> {
           prUrl
         )
       );
-      await writeJson(intakePath, intake);
+      await writeJsonFile(intakePath, intake);
     }
     const knownPrUrl = agentResult?.pr_url ?? reportedPrUrl;
     const failed: MaintainerOutcome = {
@@ -264,7 +262,7 @@ async function main(): Promise<void> {
       detail: errorMessage(error),
       ...(knownPrUrl === undefined ? {} : { pr_url: knownPrUrl }),
     };
-    await writeFile(path.join(outputDir, 'outcome.json'), `${JSON.stringify(failed, null, 2)}\n`);
+    await writeJsonFile(path.join(outputDir, 'outcome.json'), failed);
     throw error;
   }
 }
@@ -565,14 +563,6 @@ function ensurePrivatePath(filePath: string, option: string): void {
 async function gitOutput(args: string[]): Promise<string> {
   const { stdout } = await execFileAsync('git', args);
   return stdout.trim();
-}
-
-async function writeJsonExclusive(filePath: string, value: unknown): Promise<void> {
-  await writeFile(filePath, `${JSON.stringify(value, null, 2)}\n`, { flag: 'wx' });
-}
-
-async function writeJson(filePath: string, value: unknown): Promise<void> {
-  await writeFile(filePath, `${JSON.stringify(value, null, 2)}\n`);
 }
 
 function timestamp(): string {

@@ -1,7 +1,8 @@
-import { mkdir, readFile, writeFile } from 'node:fs/promises';
+import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 
 import { parseCommuteHandoffText } from './handoff.js';
+import { writeNewJsonFile } from '../shared/fs.js';
 
 interface Options {
   input: string;
@@ -15,8 +16,7 @@ async function main(): Promise<void> {
   const safeSessionId = handoff.session_id.replace(/[^a-zA-Z0-9._-]+/g, '-');
   const outputPath = path.join(options.outputDir, `${safeSessionId}.json`);
 
-  await mkdir(options.outputDir, { recursive: true });
-  await writeFile(outputPath, `${JSON.stringify(handoff, null, 2)}\n`, { flag: 'wx' });
+  await writeNewJsonFile(outputPath, handoff);
 
   process.stdout.write(
     `${outputPath}\n${handoff.feedback.length} feedback item(s), ${handoff.review_notes.length} review note(s)\n`

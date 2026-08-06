@@ -1,4 +1,4 @@
-import { createHash } from 'node:crypto';
+import { shortDigest } from '../shared/hash.js';
 
 import { buildSourceItemId, PARSER_VERSION } from './parser-contract.js';
 import type { ParsedTldrItem } from './parser-contract.js';
@@ -563,7 +563,7 @@ function buildReview(input: {
   ].join('\n');
 
   return {
-    review_id: `tldr_review_${createHash('sha256').update(stableInput).digest('hex').slice(0, 16)}`,
+    review_id: `tldr_review_${shortDigest(stableInput)}`,
     reason: input.reason,
     message: input.message,
     newsletter: input.newsletter,

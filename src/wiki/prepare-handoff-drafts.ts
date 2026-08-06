@@ -1,8 +1,9 @@
-import { mkdir, readFile, writeFile } from 'node:fs/promises';
+import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { parseCommuteHandoffText } from '../commute/handoff.js';
+import { writeNewJsonFile } from '../shared/fs.js';
 import type { CommuteHandoff, CommuteReviewNote } from '../commute/handoff.js';
 
 export const WIKI_REVIEW_DRAFT_SCHEMA_VERSION = 'wiki-review-drafts.v1';
@@ -79,8 +80,7 @@ async function main(): Promise<void> {
     drafts,
   };
 
-  await mkdir(outputDir, { recursive: true });
-  await writeFile(outputPath, `${JSON.stringify(output, null, 2)}\n`, { flag: 'wx' });
+  await writeNewJsonFile(outputPath, output);
   process.stdout.write(`${outputPath}\n${drafts.length} wiki review draft(s)\n`);
 }
 

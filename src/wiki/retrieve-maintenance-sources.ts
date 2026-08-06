@@ -1,9 +1,10 @@
-import { mkdir, readFile, writeFile } from 'node:fs/promises';
+import { readFile } from 'node:fs/promises';
 import { lookup } from 'node:dns/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { errorMessage } from '../shared/errors.js';
+import { writeNewJsonFile } from '../shared/fs.js';
 
 import {
   parseMaintenanceCandidate as parseSharedMaintenanceCandidate,
@@ -264,8 +265,7 @@ async function main(): Promise<void> {
   ensurePrivatePath(options.output, '--output');
   const record = parseImportRecord(JSON.parse(await readFile(options.input, 'utf8')) as unknown);
   const result = await retrieveMaintenanceSources(record.maintenance_candidates);
-  await mkdir(path.dirname(options.output), { recursive: true });
-  await writeFile(options.output, `${JSON.stringify(result, null, 2)}\n`, { flag: 'wx' });
+  await writeNewJsonFile(options.output, result);
 
   const retrieved = result.sources.filter((source) => source.status === 'retrieved').length;
   process.stdout.write(

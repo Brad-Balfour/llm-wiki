@@ -1,11 +1,12 @@
 import { execFile } from 'node:child_process';
 import { realpathSync } from 'node:fs';
-import { mkdir, readFile, unlink, writeFile } from 'node:fs/promises';
+import { readFile, unlink, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { promisify } from 'node:util';
 
 import { errorCode, errorMessage } from '../shared/errors.js';
+import { readOptionalFile, writeNewJsonFile } from '../shared/fs.js';
 
 import { parseCommuteHandoffText } from '../commute/handoff.js';
 import type { CommuteReviewNote } from '../commute/handoff.js';
@@ -112,8 +113,7 @@ async function ingestCandidate(
   let sourceCreated = false;
   try {
     if (sourceBefore === undefined) {
-      await mkdir(path.dirname(sourcePath), { recursive: true });
-      await writeFile(sourcePath, `${JSON.stringify(approved, null, 2)}\n`, { flag: 'wx' });
+      await writeNewJsonFile(sourcePath, approved);
       sourceCreated = true;
       process.stdout.write(`created ${sourcePath}\n`);
     } else {
@@ -212,15 +212,6 @@ export function resolveEnrichmentPath(enrichmentDir: string, sourceItemId: strin
     throw new Error('Enrichment path escapes the configured directory.');
   }
   return enrichmentPath;
-}
-
-async function readOptionalFile(filePath: string): Promise<string | undefined> {
-  try {
-    return await readFile(filePath, 'utf8');
-  } catch (error) {
-    if (errorCode(error) === 'ENOENT') return undefined;
-    throw error;
-  }
 }
 
 async function unlinkIfPresent(filePath: string): Promise<void> {
