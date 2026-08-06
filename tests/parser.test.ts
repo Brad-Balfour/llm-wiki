@@ -7,7 +7,11 @@ import test from 'node:test';
 import { promisify } from 'node:util';
 
 import { ingestTldrText } from '../src/tldr/ingestion.js';
-import { parseTldrEditionBody } from '../src/tldr/parser.js';
+import {
+  isKnownWrapperOrAdLine,
+  linkedBlockSkipReason,
+  parseTldrEditionBody,
+} from '../src/tldr/parser.js';
 import { buildSourceItemId, PARSER_VERSION } from '../src/tldr/parser-contract.js';
 import type { ParsedTldrItem } from '../src/tldr/parser-contract.js';
 
@@ -156,4 +160,65 @@ test('file ingestion command writes sanitized item and review outputs', async ()
   assert.deepEqual(output.items, records);
   assert.deepEqual(output.review, []);
   assert.deepEqual(review, []);
+});
+
+// --- Item 15: parser data/logic separation (issue #55) ---
+
+test('names why a linked block is not an editorial item', () => {
+  const cases: Array<[string, string, string, string | null, string | null]> = [
+    ['A Real Article', 'A Real Article', 'https://example.com/a', 'https://example.com/a', null],
+    ['Great Tool (sponsor)', 'Great Tool', 'https://example.com/x', null, 'sponsor'],
+    ['Anything', 'Anything', 'https://ads.example.com/sponsorship', null, 'sponsor'],
+    ['Contact', 'Contact', 'mailto:hi@example.com', null, 'mailto'],
+    [
+      'TLDR is hiring engineers',
+      'TLDR is hiring engineers',
+      'https://x.test/j',
+      null,
+      'tldr_hiring',
+    ],
+    ['Refer', 'Refer', 'https://refer.tldr.tech/abc', null, 'referral_or_unsubscribe'],
+    ['Stop', 'Stop', 'https://x.test/unsubscribe', null, 'referral_or_unsubscribe'],
+    ['Advertise', 'Advertise', 'https://tldr.tech/advertise', null, 'tldr_house_page'],
+    ['Jobs', 'Jobs', 'https://tldr.tech/jobs', null, 'tldr_house_page'],
+  ];
+
+  for (const [rawTitle, normalizedTitle, rawUrl, normalizedUrl, expected] of cases) {
+    assert.equal(
+      linkedBlockSkipReason(rawTitle, normalizedTitle, rawUrl, normalizedUrl),
+      expected,
+      `${rawTitle} / ${rawUrl}`
+    );
+  }
+});
+
+test('sponsor and wrapper line lists are data, not logic', () => {
+  // These strings change whenever TLDR changes advertisers, so they live in
+  // named constants. Pinning them here states that editing the constant is the
+  // supported way to update, and catches an accidental deletion.
+  for (const line of [
+    '---------- Forwarded message ---------',
+    'Begin forwarded message:',
+    'From: TLDR <noreply@tldr.tech>',
+    'Sent: Monday',
+    'To: brad@example.com',
+    'Subject: TLDR AI',
+    '> Built for scale',
+    '> Frontier models, one API',
+    '> Reliable at scale',
+    'Why teams run their agents here',
+    'Coding agents only move as fast as their context',
+    'Powered by Friendli',
+    'Advertise with us',
+    'Track your referrals',
+  ]) {
+    assert.equal(isKnownWrapperOrAdLine(line), true, `not recognized: ${line}`);
+  }
+
+  for (const line of [
+    'Context engineering treats the prompt as an interface.',
+    'Researchers published a new benchmark this week.',
+  ]) {
+    assert.equal(isKnownWrapperOrAdLine(line), false, `editorial text dropped: ${line}`);
+  }
 });

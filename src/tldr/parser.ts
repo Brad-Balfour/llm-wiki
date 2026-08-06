@@ -70,6 +70,33 @@ const KNOWN_SECTION_HEADINGS = new Set([
   'Research & Innovation',
 ]);
 
+/**
+ * Email-client wrapper lines. These are structural and stable.
+ */
+const WRAPPER_LINE_PREFIXES = [
+  '---------- forwarded message',
+  'begin forwarded message',
+  'from:',
+  'sent:',
+  'to:',
+  'subject:',
+] as const;
+
+/**
+ * Sponsor copy that reads like editorial text. Unlike the wrapper prefixes,
+ * these change whenever TLDR changes advertisers, so they are data to be
+ * edited rather than logic to be rewritten. Add new sponsors here.
+ */
+const SPONSOR_LINE_PREFIXES = [
+  '> built for',
+  '> frontier models',
+  '> reliable at scale',
+  'why teams run',
+  'coding agents only move',
+] as const;
+
+const SPONSOR_LINE_FRAGMENTS = ['friendli', 'advertise with us', 'track your referrals'] as const;
+
 const BODY_CONFIRMATION_MARKERS = [
   { label: 'standalone TLDR masthead', pattern: /^TLDR$/m },
   { label: 'sponsor preheader marker', pattern: /^Together With$/m },
@@ -485,57 +512,71 @@ function unwrapTldrTrackingUrl(rawUrl: string): string {
   }
 }
 
+interface LinkedBlock {
+  rawTitleLower: string;
+  normalizedTitleLower: string;
+  rawUrlLower: string;
+  urlLower: string;
+}
+
+/**
+ * Reasons a linked block is not an editorial item. Each carries a label so a
+ * caller can report why a block was skipped rather than only that it was.
+ */
+const SKIP_REASONS: ReadonlyArray<{ reason: string; matches: (block: LinkedBlock) => boolean }> = [
+  {
+    reason: 'sponsor',
+    matches: (block) =>
+      block.rawTitleLower.includes('(sponsor)') || block.urlLower.includes('sponsorship'),
+  },
+  { reason: 'mailto', matches: (block) => block.rawUrlLower.startsWith('mailto:') },
+  {
+    reason: 'tldr_hiring',
+    matches: (block) => block.normalizedTitleLower.includes('tldr is hiring'),
+  },
+  {
+    reason: 'referral_or_unsubscribe',
+    matches: (block) =>
+      block.urlLower.includes('refer.tldr.tech') || block.urlLower.includes('/unsubscribe'),
+  },
+  {
+    reason: 'tldr_house_page',
+    matches: (block) =>
+      block.urlLower.includes('tldr.tech') && /advertis|jobs|manage/.test(block.urlLower),
+  },
+];
+
+export function linkedBlockSkipReason(
+  rawTitle: string,
+  normalizedTitle: string,
+  rawUrl: string,
+  normalizedUrl: string | null
+): string | null {
+  const block: LinkedBlock = {
+    rawTitleLower: rawTitle.toLowerCase(),
+    normalizedTitleLower: normalizedTitle.toLowerCase(),
+    rawUrlLower: rawUrl.toLowerCase(),
+    urlLower: (normalizedUrl ?? rawUrl).toLowerCase(),
+  };
+  return SKIP_REASONS.find((candidate) => candidate.matches(block))?.reason ?? null;
+}
+
 function shouldSkipLinkedBlock(
   rawTitle: string,
   normalizedTitle: string,
   rawUrl: string,
   normalizedUrl: string | null
 ): boolean {
-  const normalizedTitleLower = normalizedTitle.toLowerCase();
-  const rawTitleLower = rawTitle.toLowerCase();
-  const urlLower = (normalizedUrl ?? rawUrl).toLowerCase();
-
-  if (rawTitleLower.includes('(sponsor)') || urlLower.includes('sponsorship')) {
-    return true;
-  }
-
-  if (rawUrl.toLowerCase().startsWith('mailto:')) {
-    return true;
-  }
-
-  if (normalizedTitleLower.includes('tldr is hiring')) {
-    return true;
-  }
-
-  if (urlLower.includes('refer.tldr.tech') || urlLower.includes('/unsubscribe')) {
-    return true;
-  }
-
-  if (urlLower.includes('tldr.tech') && /advertis|jobs|manage/.test(urlLower)) {
-    return true;
-  }
-
-  return false;
+  return linkedBlockSkipReason(rawTitle, normalizedTitle, rawUrl, normalizedUrl) !== null;
 }
 
-function isKnownWrapperOrAdLine(line: string): boolean {
+export function isKnownWrapperOrAdLine(line: string): boolean {
   const lower = line.toLowerCase();
 
   return (
-    lower.startsWith('---------- forwarded message') ||
-    lower.startsWith('begin forwarded message') ||
-    lower.startsWith('from:') ||
-    lower.startsWith('sent:') ||
-    lower.startsWith('to:') ||
-    lower.startsWith('subject:') ||
-    lower.startsWith('> built for') ||
-    lower.startsWith('> frontier models') ||
-    lower.startsWith('> reliable at scale') ||
-    lower.startsWith('why teams run') ||
-    lower.startsWith('coding agents only move') ||
-    lower.includes('friendli') ||
-    lower.includes('advertise with us') ||
-    lower.includes('track your referrals')
+    WRAPPER_LINE_PREFIXES.some((prefix) => lower.startsWith(prefix)) ||
+    SPONSOR_LINE_PREFIXES.some((prefix) => lower.startsWith(prefix)) ||
+    SPONSOR_LINE_FRAGMENTS.some((fragment) => lower.includes(fragment))
   );
 }
 
