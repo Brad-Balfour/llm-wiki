@@ -2,7 +2,7 @@
   "manifest_version": 1,
   "schema_version": "compile-state.v1",
   "created": "2026-07-05",
-  "updated": "2026-08-06T01:37:33.008Z",
+  "updated": "2026-08-07T02:11:43.000Z",
   "processed_sources": {
     "sources/tldr/2026-06-23-transformer-architecture-for-senior-engineers.txt": {
       "hash": "sha256:f9a592761c47b368e73c13dd97d27b02bc875433b632a582a40ec6419643e631",
@@ -63,6 +63,12 @@
       "output_path": "wiki/concepts/review-driven-software-factories.md",
       "source_item_id": "dev-20260724-01",
       "processed_at": "2026-07-25T16:07:22.059Z"
+    },
+    "sources/tldr/2026-08-06-agentic-documentation-workflows.txt": {
+      "hash": "sha256:000f6dfeac3dbe2c6f2c997e5c04e66d6e370f0ba08bfc4d323c2215662229f8",
+      "output_path": "wiki/concepts/review-driven-software-factories.md",
+      "source_item_id": "19fd6c96b2d39a67-11",
+      "processed_at": "2026-08-07T02:11:43.000Z"
     },
     "sources/tldr/2026-07-24-state-ownership.txt": {
       "hash": "sha256:cec272f569b3fd8353b20eb303bf46520777fa2c79acd54329735812f6f56638",
@@ -179,9 +185,9 @@
       "provenance_count": 1
     },
     "wiki/concepts/review-driven-software-factories.md": {
-      "hash": "sha256:4b0335ee429044357a20e45e45025878ac8601af4b79b3c8d3d430bdbcdde7a7",
-      "updated": "2026-07-25T16:07:22.059Z",
-      "provenance_count": 1
+      "hash": "sha256:8133dc30a60ef2f86387bb0b956d7f949fdcda68f965d8c09e4b17d4b1d7267b",
+      "updated": "2026-08-07T02:11:43.000Z",
+      "provenance_count": 2
     },
     "wiki/concepts/state-ownership-before-state-management.md": {
       "hash": "sha256:d4d75ec2a2cb4c1c97a45329a8361f77d3d42664e27b23eaf259ee092d0a9537",
@@ -475,6 +481,12 @@
       "source_path": "sources/tldr/2026-08-04-nextjs-16-3.txt",
       "output_path": "wiki/tools/nextjs.md",
       "status": "created"
+    },
+    {
+      "timestamp": "2026-08-07T02:11:43.000Z",
+      "source_path": "sources/tldr/2026-08-06-agentic-documentation-workflows.txt",
+      "output_path": "wiki/concepts/review-driven-software-factories.md",
+      "status": "updated"
     }
   ]
 }
