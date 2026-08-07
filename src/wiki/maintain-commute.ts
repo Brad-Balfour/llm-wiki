@@ -60,9 +60,11 @@ interface MaintainerOutcome {
   pr_url?: string;
 }
 
+const AGENT_RESULT_STATUSES = ['pr_created', 'no_change', 'insufficient_source', 'failed'] as const;
+
 export interface AgentResult {
   schema_version: 'commute-maintenance-result.v1';
-  status: 'pr_created' | 'no_change' | 'insufficient_source' | 'failed';
+  status: (typeof AGENT_RESULT_STATUSES)[number];
   branch: string;
   pr_url?: string;
   results: Array<{
@@ -72,8 +74,15 @@ export interface AgentResult {
   }>;
 }
 
-type MaintainerCandidateStatus =
-  'pr_created' | 'no_change' | 'insufficient_source' | 'unresolved' | 'failed';
+const MAINTAINER_CANDIDATE_STATUSES = [
+  'pr_created',
+  'no_change',
+  'insufficient_source',
+  'unresolved',
+  'failed',
+] as const;
+
+type MaintainerCandidateStatus = (typeof MAINTAINER_CANDIDATE_STATUSES)[number];
 
 export function buildMaintainerPrompt(options: {
   intakePath: string;
@@ -407,9 +416,7 @@ export function parseAgentResult(candidate: unknown, branch: string): AgentResul
   if (result.schema_version !== 'commute-maintenance-result.v1') {
     throw new Error('Maintainer agent result has an unsupported schema_version');
   }
-  if (
-    !['pr_created', 'no_change', 'insufficient_source', 'failed'].includes(result.status as string)
-  ) {
+  if (!(AGENT_RESULT_STATUSES as readonly string[]).includes(result.status as string)) {
     throw new Error('Maintainer agent result has an unsupported status');
   }
   if (result.branch !== branch) {
@@ -454,15 +461,14 @@ function requireMaintainerCandidateStatus(
   field: string
 ): MaintainerCandidateStatus {
   if (
-    candidate !== 'pr_created' &&
-    candidate !== 'no_change' &&
-    candidate !== 'insufficient_source' &&
-    candidate !== 'unresolved' &&
-    candidate !== 'failed'
+    typeof candidate !== 'string' ||
+    !(MAINTAINER_CANDIDATE_STATUSES as readonly string[]).includes(candidate)
   ) {
+    // Deliberately not the shared requireEnum: this wording is asserted by the
+    // maintainer-result contract tests and echoed to the operator.
     throw new Error(`${field} has an unsupported status`);
   }
-  return candidate;
+  return candidate as MaintainerCandidateStatus;
 }
 
 function optionalHttpUrl(candidate: unknown, field: string): string | undefined {

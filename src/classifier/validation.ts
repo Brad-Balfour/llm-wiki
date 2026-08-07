@@ -215,22 +215,68 @@ function validateRecordKeys(
   return stringValue(record.classifier_item_id);
 }
 
+/**
+ * One field rule: how to recognize a valid value and what to report when it is
+ * not. Collecting these in a table keeps the check and its error message
+ * together, and lets validity be derived from the errors actually collected
+ * rather than restated as a second condition.
+ */
+interface FieldRule {
+  code: ClassifierValidationError['code'];
+  isValid: (value: unknown) => boolean;
+  message: string;
+}
+
+/** Every classifier-supplied field except the id, which is checked separately. */
+type ValidatedField = keyof Omit<ClassificationRecord, 'classifier_item_id'>;
+
+/**
+ * Keying the table by `ValidatedField` makes exhaustiveness a compile error:
+ * adding a field to `ClassificationRecord` without adding its rule here will
+ * not build. That is what makes the assertions in the success path safe.
+ */
+const FIELD_RULES: Record<ValidatedField, FieldRule> = {
+  interest_level: {
+    code: 'invalid_enum',
+    isValid: isInterestLevel,
+    message: 'interest_level must be interested, maybe, or uninterested.',
+  },
+  interest_score: {
+    code: 'invalid_score',
+    isValid: isValidScore,
+    message: 'interest_score must be a finite number from 0.0 through 1.0.',
+  },
+  consumption_depth: {
+    code: 'invalid_enum',
+    isValid: isConsumptionDepth,
+    message: 'consumption_depth must be headline_only or in_depth.',
+  },
+  depth_score: {
+    code: 'invalid_score',
+    isValid: isValidScore,
+    message: 'depth_score must be a finite number from 0.0 through 1.0.',
+  },
+  signals: {
+    code: 'invalid_signals',
+    isValid: isValidSignals,
+    message: 'signals must be a non-empty array of non-empty strings.',
+  },
+  reason: {
+    code: 'invalid_reason',
+    isValid: (value) => typeof value === 'string' && value.trim().length > 0,
+    message: 'reason must be a non-empty string.',
+  },
+};
+
 function validateRecordFields(
   record: Record<string, unknown>,
   id: string | undefined,
   thresholds: ClassifierThresholds,
   errors: ClassifierValidationError[]
 ): ClassificationRecord | null {
-  const interestLevel = record.interest_level;
-  const interestScore = record.interest_score;
-  const consumptionDepth = record.consumption_depth;
-  const depthScore = record.depth_score;
-  const signals = record.signals;
-  const reason = record.reason;
-  let valid = true;
+  const before = errors.length;
 
   if (!id || id.trim().length === 0) {
-    valid = false;
     errors.push({
       code: 'invalid_classifier_item_id',
       field: 'classifier_item_id',
@@ -238,50 +284,56 @@ function validateRecordFields(
     });
   }
 
-  if (!isInterestLevel(interestLevel)) {
-    valid = false;
-    errors.push({
-      code: 'invalid_enum',
-      field: 'interest_level',
-      classifier_item_id: id ?? undefined,
-      message: 'interest_level must be interested, maybe, or uninterested.',
-    });
+  for (const field of Object.keys(FIELD_RULES) as ValidatedField[]) {
+    const rule = FIELD_RULES[field];
+    if (!rule.isValid(record[field])) {
+      errors.push({
+        code: rule.code,
+        field,
+        classifier_item_id: id ?? undefined,
+        message: rule.message,
+      });
+    }
   }
 
-  if (!isValidScore(interestScore)) {
-    valid = false;
-    errors.push({
-      code: 'invalid_score',
-      field: 'interest_score',
-      classifier_item_id: id ?? undefined,
-      message: 'interest_score must be a finite number from 0.0 through 1.0.',
-    });
-  }
+  validateScoreLabelAgreement(record, id, thresholds, errors);
 
-  if (!isConsumptionDepth(consumptionDepth)) {
-    valid = false;
-    errors.push({
-      code: 'invalid_enum',
-      field: 'consumption_depth',
-      classifier_item_id: id ?? undefined,
-      message: 'consumption_depth must be headline_only or in_depth.',
-    });
-  }
+  // A record is valid exactly when this call collected no errors. Deriving it
+  // avoids restating every predicate a second time purely to satisfy narrowing.
+  // The assertions below are sound because FIELD_RULES is exhaustive over
+  // ValidatedField and every rule passed.
+  if (errors.length !== before) return null;
 
-  if (!isValidScore(depthScore)) {
-    valid = false;
-    errors.push({
-      code: 'invalid_score',
-      field: 'depth_score',
-      classifier_item_id: id ?? undefined,
-      message: 'depth_score must be a finite number from 0.0 through 1.0.',
-    });
-  }
+  return {
+    classifier_item_id: id as string,
+    interest_level: record.interest_level as ClassificationRecord['interest_level'],
+    interest_score: record.interest_score as number,
+    consumption_depth: record.consumption_depth as ClassificationRecord['consumption_depth'],
+    depth_score: record.depth_score as number,
+    signals: record.signals as string[],
+    reason: record.reason as string,
+  };
+}
+
+/**
+ * A label and its score must agree. Checked separately because it is the one
+ * rule that reads two fields at once, and it only applies when both are
+ * individually well-formed.
+ */
+function validateScoreLabelAgreement(
+  record: Record<string, unknown>,
+  id: string | undefined,
+  thresholds: ClassifierThresholds,
+  errors: ClassifierValidationError[]
+): void {
+  const interestLevel = record.interest_level;
+  const interestScore = record.interest_score;
+  const consumptionDepth = record.consumption_depth;
+  const depthScore = record.depth_score;
 
   if (isInterestLevel(interestLevel) && isValidScore(interestScore)) {
     const expected = deriveInterestLevel(interestScore, thresholds);
     if (interestLevel !== expected) {
-      valid = false;
       errors.push({
         code: 'score_label_mismatch',
         field: 'interest_level',
@@ -294,7 +346,6 @@ function validateRecordFields(
   if (isConsumptionDepth(consumptionDepth) && isValidScore(depthScore)) {
     const expected = deriveConsumptionDepth(depthScore, thresholds);
     if (consumptionDepth !== expected) {
-      valid = false;
       errors.push({
         code: 'score_label_mismatch',
         field: 'consumption_depth',
@@ -303,49 +354,6 @@ function validateRecordFields(
       });
     }
   }
-
-  if (!isValidSignals(signals)) {
-    valid = false;
-    errors.push({
-      code: 'invalid_signals',
-      field: 'signals',
-      classifier_item_id: id ?? undefined,
-      message: 'signals must be a non-empty array of non-empty strings.',
-    });
-  }
-
-  if (typeof reason !== 'string' || reason.trim().length === 0) {
-    valid = false;
-    errors.push({
-      code: 'invalid_reason',
-      field: 'reason',
-      classifier_item_id: id ?? undefined,
-      message: 'reason must be a non-empty string.',
-    });
-  }
-
-  if (
-    !valid ||
-    !id ||
-    !isInterestLevel(interestLevel) ||
-    !isValidScore(interestScore) ||
-    !isConsumptionDepth(consumptionDepth) ||
-    !isValidScore(depthScore) ||
-    !isValidSignals(signals) ||
-    typeof reason !== 'string'
-  ) {
-    return null;
-  }
-
-  return {
-    classifier_item_id: id,
-    interest_level: interestLevel,
-    interest_score: interestScore,
-    consumption_depth: consumptionDepth,
-    depth_score: depthScore,
-    signals,
-    reason,
-  };
 }
 
 function isPlainObject(value: unknown): value is Record<string, unknown> {

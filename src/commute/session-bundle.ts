@@ -532,6 +532,96 @@ function validateEvents(candidate: unknown, queueItems: QueueItemIndex): Session
   return events;
 }
 
+/** Keys every event carries, regardless of kind. */
+const BASE_EVENT_KEYS = ['event_id', 'sequence', 'kind', 'evidence'] as const;
+
+/**
+ * One row per event kind: the fields it adds beyond the base, whether it must
+ * carry direct evidence of a user action, and how to read its fields.
+ *
+ * Keying by `SessionEvent['kind']` makes the table exhaustive at compile time,
+ * so adding a kind to the union without adding its row will not build. Adding a
+ * kind is then one row rather than a new switch arm plus a key list to keep in
+ * sync with six others.
+ */
+type EventKindSpecs = {
+  [K in SessionEvent['kind']]: {
+    extraKeys: readonly string[];
+    requiresUserActionEvidence?: true;
+    parse: (
+      record: Record<string, unknown>,
+      field: string,
+      queueItems: QueueItemIndex
+    ) => Omit<Extract<SessionEvent, { kind: K }>, keyof BaseSessionEvent | 'kind'>;
+  };
+};
+
+const EVENT_KIND_SPECS: EventKindSpecs = {
+  item_announced: {
+    extraKeys: ['item'],
+    parse: (record, field, queueItems) => ({
+      item: validateExactItem(record.item, `${field}.item`, queueItems),
+    }),
+  },
+  item_action: {
+    extraKeys: ['action', 'item', 'user_words'],
+    requiresUserActionEvidence: true,
+    parse: (record, field, queueItems) => ({
+      action: requireEnum(record.action, ITEM_ACTIONS, `${field}.action`),
+      item: validateExactItem(record.item, `${field}.item`, queueItems),
+      user_words: requireString(record.user_words, `${field}.user_words`),
+    }),
+  },
+  unresolved_capture: {
+    extraKeys: ['capture_type', 'user_words', 'recovery_clues'],
+    parse: (record, field) => ({
+      capture_type: requireEnum(
+        record.capture_type,
+        ['wiki_this', 'feedback', 'general_save', 'unknown'] as const,
+        `${field}.capture_type`
+      ),
+      user_words: requireString(record.user_words, `${field}.user_words`),
+      recovery_clues: requireStringArray(record.recovery_clues, `${field}.recovery_clues`),
+    }),
+  },
+  quality_incident: {
+    extraKeys: ['observed_behavior', 'boundary'],
+    parse: (record, field) => ({
+      observed_behavior: requireString(record.observed_behavior, `${field}.observed_behavior`),
+      boundary: requireString(record.boundary, `${field}.boundary`),
+    }),
+  },
+  playback_transition: {
+    extraKeys: ['transition', 'item'],
+    parse: (record, field, queueItems) => ({
+      transition: requireEnum(record.transition, PLAYBACK_TRANSITIONS, `${field}.transition`),
+      item: validateExactItem(record.item, `${field}.item`, queueItems),
+    }),
+  },
+  general_capture: {
+    extraKeys: ['user_words'],
+    requiresUserActionEvidence: true,
+    parse: (record, field) => ({
+      user_words: requireString(record.user_words, `${field}.user_words`),
+    }),
+  },
+  session_boundary: {
+    extraKeys: ['boundary'],
+    parse: (record, field) => ({
+      boundary: requireEnum(record.boundary, ['start', 'end'] as const, `${field}.boundary`),
+    }),
+  },
+};
+
+/**
+ * The accepted kinds, derived from the spec table rather than listed again.
+ * A hand-written second list would compile even when it fell out of step with
+ * the table, and the mismatch would only appear at runtime as a rejected kind.
+ */
+export const SESSION_EVENT_KINDS = Object.keys(EVENT_KIND_SPECS) as ReadonlyArray<
+  SessionEvent['kind']
+>;
+
 function validateEvent(
   candidate: unknown,
   index: number,
@@ -539,115 +629,20 @@ function validateEvent(
 ): SessionEvent {
   const field = `events[${index}]`;
   const record = requireRecord(candidate, field);
-  const kind = requireEnum(
-    record.kind,
-    [
-      'item_announced',
-      'item_action',
-      'unresolved_capture',
-      'quality_incident',
-      'playback_transition',
-      'general_capture',
-      'session_boundary',
-    ] as const,
-    `${field}.kind`
-  );
-  const base = {
+  const kind = requireEnum(record.kind, SESSION_EVENT_KINDS, `${field}.kind`);
+  const base: BaseSessionEvent = {
     event_id: requireString(record.event_id, `${field}.event_id`),
     sequence: requirePositiveInteger(record.sequence, `${field}.sequence`),
     evidence: validateEvidence(record.evidence, `${field}.evidence`),
   };
 
-  switch (kind) {
-    case 'item_announced':
-      rejectUnknownKeys(record, ['event_id', 'sequence', 'kind', 'item', 'evidence'], field);
-      return {
-        ...base,
-        kind,
-        item: validateExactItem(record.item, `${field}.item`, queueItems),
-      };
-    case 'item_action': {
-      rejectUnknownKeys(
-        record,
-        ['event_id', 'sequence', 'kind', 'action', 'item', 'user_words', 'evidence'],
-        field
-      );
-      const action = requireEnum(record.action, ITEM_ACTIONS, `${field}.action`);
-      const userWords = requireString(record.user_words, `${field}.user_words`);
-      requireUserActionEvidence(base.evidence, `${field}.evidence`);
-      return {
-        ...base,
-        kind,
-        action,
-        item: validateExactItem(record.item, `${field}.item`, queueItems),
-        user_words: userWords,
-      };
-    }
-    case 'unresolved_capture':
-      rejectUnknownKeys(
-        record,
-        [
-          'event_id',
-          'sequence',
-          'kind',
-          'capture_type',
-          'user_words',
-          'recovery_clues',
-          'evidence',
-        ],
-        field
-      );
-      return {
-        ...base,
-        kind,
-        capture_type: requireEnum(
-          record.capture_type,
-          ['wiki_this', 'feedback', 'general_save', 'unknown'] as const,
-          `${field}.capture_type`
-        ),
-        user_words: requireString(record.user_words, `${field}.user_words`),
-        recovery_clues: requireStringArray(record.recovery_clues, `${field}.recovery_clues`),
-      };
-    case 'quality_incident':
-      rejectUnknownKeys(
-        record,
-        ['event_id', 'sequence', 'kind', 'observed_behavior', 'boundary', 'evidence'],
-        field
-      );
-      return {
-        ...base,
-        kind,
-        observed_behavior: requireString(record.observed_behavior, `${field}.observed_behavior`),
-        boundary: requireString(record.boundary, `${field}.boundary`),
-      };
-    case 'playback_transition':
-      rejectUnknownKeys(
-        record,
-        ['event_id', 'sequence', 'kind', 'transition', 'item', 'evidence'],
-        field
-      );
-      return {
-        ...base,
-        kind,
-        transition: requireEnum(record.transition, PLAYBACK_TRANSITIONS, `${field}.transition`),
-        item: validateExactItem(record.item, `${field}.item`, queueItems),
-      };
-    case 'general_capture':
-      rejectUnknownKeys(record, ['event_id', 'sequence', 'kind', 'user_words', 'evidence'], field);
-      requireUserActionEvidence(base.evidence, `${field}.evidence`);
-      return {
-        ...base,
-        kind,
-        user_words: requireString(record.user_words, `${field}.user_words`),
-      };
-    case 'session_boundary':
-      rejectUnknownKeys(record, ['event_id', 'sequence', 'kind', 'boundary', 'evidence'], field);
-      return {
-        ...base,
-        kind,
-        boundary: requireEnum(record.boundary, ['start', 'end'] as const, `${field}.boundary`),
-      };
+  const spec = EVENT_KIND_SPECS[kind];
+  rejectUnknownKeys(record, [...BASE_EVENT_KEYS, ...spec.extraKeys], field);
+  if (spec.requiresUserActionEvidence) {
+    requireUserActionEvidence(base.evidence, `${field}.evidence`);
   }
+
+  return { ...base, kind, ...spec.parse(record, field, queueItems) } as SessionEvent;
 }
 
 function validateEvidence(candidate: unknown, field: string): EventEvidence[] {
