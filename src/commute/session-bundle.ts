@@ -1,6 +1,5 @@
-import { createHash } from 'node:crypto';
-
 import { errorMessage } from '../shared/errors.js';
+import { sha256Fingerprint } from '../shared/hash.js';
 import { stripMarkdownFence } from '../shared/json.js';
 import { requireDate, requireDateTime } from '../shared/time.js';
 import { requireHttpUrl } from '../shared/url.js';
@@ -209,7 +208,7 @@ export function validateCommuteSessionBundle(candidate: unknown): CommuteSession
 }
 
 export function queueSnapshotFingerprint(queue: unknown): string {
-  return `sha256:${createHash('sha256').update(canonicalJson(queue), 'utf8').digest('hex')}`;
+  return sha256Fingerprint(canonicalJson(queue));
 }
 
 /** Validate the single queue contract without requiring a session bundle. */
@@ -223,7 +222,7 @@ export function validateTldrCommuteQueueV2(candidate: unknown): Record<string, u
 /** Hash an externally stored record byte-for-byte. Unlike a queue snapshot, a
  * durable record is not JSON-normalized before hashing. */
 export function fileSha256(text: string): string {
-  return `sha256:${createHash('sha256').update(text, 'utf8').digest('hex')}`;
+  return sha256Fingerprint(text);
 }
 
 export function bundleArtifactFilenameMatches(

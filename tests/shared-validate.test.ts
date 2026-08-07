@@ -152,6 +152,14 @@ test('no module outside src/shared redeclares a shared primitive', async () => {
     'requireDate',
     'requireDateTime',
     'requireIsoTimestamp',
+    'readOptionalFile',
+    'readStdin',
+    'writeJsonFile',
+    'writeNewJsonFile',
+    'writeFileAtomic',
+    'formatJsonRecord',
+    'sha256Fingerprint',
+    'shortDigest',
   ]);
 
   // Match every binding form, not just `function name(`. A guard that only

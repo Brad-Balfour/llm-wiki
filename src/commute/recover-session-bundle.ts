@@ -1,6 +1,5 @@
-import { createHash } from 'node:crypto';
-
 import { errorMessage } from '../shared/errors.js';
+import { shortDigest } from '../shared/hash.js';
 import { optionalRecord, requireArray, requireRecord } from '../shared/validate.js';
 import {
   canonicalBundleArtifactFilename,
@@ -143,10 +142,7 @@ function declaredSessionId(bundle: Record<string, unknown>, bundleFilename: stri
   const session = optionalRecord(bundle.session);
   const declared = session && lenientOptionalString(session.session_id);
   if (declared) return declared;
-  return `recovered-${createHash('sha256')
-    .update(canonicalBundleArtifactFilename(bundleFilename))
-    .digest('hex')
-    .slice(0, 16)}`;
+  return `recovered-${shortDigest(canonicalBundleArtifactFilename(bundleFilename))}`;
 }
 
 function declaredArtifactFilename(bundle: Record<string, unknown>, inputFilename: string): string {

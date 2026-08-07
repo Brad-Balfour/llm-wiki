@@ -1,9 +1,10 @@
-import { mkdir, readFile, writeFile } from 'node:fs/promises';
-import { dirname, resolve } from 'node:path';
+import { readFile } from 'node:fs/promises';
+import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import { readStdin, writeJsonFile } from '../shared/fs.js';
 import { ingestTldrText } from './ingestion.js';
-import type { TldrIngestionResult, TldrInputSource } from './ingestion.js';
+import type { TldrInputSource } from './ingestion.js';
 
 interface CliOptions {
   input?: string;
@@ -59,10 +60,10 @@ export async function runTldrIngestFileCommand(argv: string[]): Promise<number> 
 
   const result = ingestTldrText(body, ingestOptions);
 
-  await writeJsonFile(resolve(options.output), result, options.pretty);
+  await writeJsonFile(resolve(options.output), result, options.pretty ? 2 : 0);
 
   if (options.reviewOutput !== undefined) {
-    await writeJsonFile(resolve(options.reviewOutput), result.review, options.pretty);
+    await writeJsonFile(resolve(options.reviewOutput), result.review, options.pretty ? 2 : 0);
   }
 
   if (result.review.length > 0) {
@@ -140,25 +141,6 @@ function readValue(argv: string[], index: number, arg: string): string {
   }
 
   return value;
-}
-
-async function writeJsonFile(
-  path: string,
-  value: TldrIngestionResult | TldrIngestionResult['review'],
-  pretty: boolean
-) {
-  await mkdir(dirname(path), { recursive: true });
-  await writeFile(path, `${JSON.stringify(value, null, pretty ? 2 : 0)}\n`, 'utf8');
-}
-
-async function readStdin(): Promise<string> {
-  const chunks: Buffer[] = [];
-
-  for await (const chunk of process.stdin) {
-    chunks.push(typeof chunk === 'string' ? Buffer.from(chunk) : chunk);
-  }
-
-  return Buffer.concat(chunks).toString('utf8');
 }
 
 const executedPath = process.argv[1] === undefined ? null : resolve(process.argv[1]);
