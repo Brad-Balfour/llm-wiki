@@ -535,16 +535,6 @@ function validateEvents(candidate: unknown, queueItems: QueueItemIndex): Session
 /** Keys every event carries, regardless of kind. */
 const BASE_EVENT_KEYS = ['event_id', 'sequence', 'kind', 'evidence'] as const;
 
-export const SESSION_EVENT_KINDS = [
-  'item_announced',
-  'item_action',
-  'unresolved_capture',
-  'quality_incident',
-  'playback_transition',
-  'general_capture',
-  'session_boundary',
-] as const;
-
 /**
  * One row per event kind: the fields it adds beyond the base, whether it must
  * carry direct evidence of a user action, and how to read its fields.
@@ -622,6 +612,15 @@ const EVENT_KIND_SPECS: EventKindSpecs = {
     }),
   },
 };
+
+/**
+ * The accepted kinds, derived from the spec table rather than listed again.
+ * A hand-written second list would compile even when it fell out of step with
+ * the table, and the mismatch would only appear at runtime as a rejected kind.
+ */
+export const SESSION_EVENT_KINDS = Object.keys(EVENT_KIND_SPECS) as ReadonlyArray<
+  SessionEvent['kind']
+>;
 
 function validateEvent(
   candidate: unknown,
