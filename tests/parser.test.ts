@@ -12,6 +12,7 @@ import {
   linkedBlockSkipReason,
   parseTldrEditionBody,
 } from '../src/tldr/parser.js';
+import type { LinkedBlockSkipReason } from '../src/tldr/parser.js';
 import { buildSourceItemId, PARSER_VERSION } from '../src/tldr/parser-contract.js';
 import type { ParsedTldrItem } from '../src/tldr/parser-contract.js';
 
@@ -165,7 +166,7 @@ test('file ingestion command writes sanitized item and review outputs', async ()
 // --- Item 15: parser data/logic separation (issue #55) ---
 
 test('names why a linked block is not an editorial item', () => {
-  const cases: Array<[string, string, string, string | null, string | null]> = [
+  const cases: Array<[string, string, string, string | null, LinkedBlockSkipReason | null]> = [
     ['A Real Article', 'A Real Article', 'https://example.com/a', 'https://example.com/a', null],
     ['Great Tool (sponsor)', 'Great Tool', 'https://example.com/x', null, 'sponsor'],
     ['Anything', 'Anything', 'https://ads.example.com/sponsorship', null, 'sponsor'],

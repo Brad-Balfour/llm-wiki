@@ -512,51 +512,63 @@ function unwrapTldrTrackingUrl(rawUrl: string): string {
   }
 }
 
-interface LinkedBlock {
-  rawTitleLower: string;
-  normalizedTitleLower: string;
-  rawUrlLower: string;
-  urlLower: string;
+/**
+ * A candidate linked block with every field already lowercased, so the skip
+ * rules below can compare without each repeating `.toLowerCase()`.
+ *
+ * Distinct from `LinkBlock` above, which is the parsed Markdown link itself.
+ */
+interface LowercasedLinkedBlock {
+  rawTitle: string;
+  normalizedTitle: string;
+  rawUrl: string;
+  url: string;
 }
 
 /**
  * Reasons a linked block is not an editorial item. Each carries a label so a
  * caller can report why a block was skipped rather than only that it was.
  */
-const SKIP_REASONS: ReadonlyArray<{ reason: string; matches: (block: LinkedBlock) => boolean }> = [
+const SKIP_REASONS = [
   {
     reason: 'sponsor',
-    matches: (block) =>
-      block.rawTitleLower.includes('(sponsor)') || block.urlLower.includes('sponsorship'),
+    matches: (block: LowercasedLinkedBlock) =>
+      block.rawTitle.includes('(sponsor)') || block.url.includes('sponsorship'),
   },
-  { reason: 'mailto', matches: (block) => block.rawUrlLower.startsWith('mailto:') },
+  {
+    reason: 'mailto',
+    matches: (block: LowercasedLinkedBlock) => block.rawUrl.startsWith('mailto:'),
+  },
   {
     reason: 'tldr_hiring',
-    matches: (block) => block.normalizedTitleLower.includes('tldr is hiring'),
+    matches: (block: LowercasedLinkedBlock) => block.normalizedTitle.includes('tldr is hiring'),
   },
   {
     reason: 'referral_or_unsubscribe',
-    matches: (block) =>
-      block.urlLower.includes('refer.tldr.tech') || block.urlLower.includes('/unsubscribe'),
+    matches: (block: LowercasedLinkedBlock) =>
+      block.url.includes('refer.tldr.tech') || block.url.includes('/unsubscribe'),
   },
   {
     reason: 'tldr_house_page',
-    matches: (block) =>
-      block.urlLower.includes('tldr.tech') && /advertis|jobs|manage/.test(block.urlLower),
+    matches: (block: LowercasedLinkedBlock) =>
+      block.url.includes('tldr.tech') && /advertis|jobs|manage/.test(block.url),
   },
-];
+] as const;
+
+/** The reason labels, derived from the table so the two cannot drift. */
+export type LinkedBlockSkipReason = (typeof SKIP_REASONS)[number]['reason'];
 
 export function linkedBlockSkipReason(
   rawTitle: string,
   normalizedTitle: string,
   rawUrl: string,
   normalizedUrl: string | null
-): string | null {
-  const block: LinkedBlock = {
-    rawTitleLower: rawTitle.toLowerCase(),
-    normalizedTitleLower: normalizedTitle.toLowerCase(),
-    rawUrlLower: rawUrl.toLowerCase(),
-    urlLower: (normalizedUrl ?? rawUrl).toLowerCase(),
+): LinkedBlockSkipReason | null {
+  const block: LowercasedLinkedBlock = {
+    rawTitle: rawTitle.toLowerCase(),
+    normalizedTitle: normalizedTitle.toLowerCase(),
+    rawUrl: rawUrl.toLowerCase(),
+    url: (normalizedUrl ?? rawUrl).toLowerCase(),
   };
   return SKIP_REASONS.find((candidate) => candidate.matches(block))?.reason ?? null;
 }
