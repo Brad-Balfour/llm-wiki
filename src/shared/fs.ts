@@ -32,7 +32,13 @@ export async function writeNewJsonFile(filePath: string, value: unknown): Promis
   await writeFile(filePath, formatJsonRecord(value), { flag: 'wx' });
 }
 
-/** Write a record that is expected to already exist and be replaced. */
+/**
+ * Write a record, replacing it if present and creating it if not.
+ *
+ * The counterpart to `writeNewJsonFile`: use this where re-running a command is
+ * meant to update its output, and that one where an existing file means the
+ * command has already run and its record must not be clobbered.
+ */
 export async function writeJsonFile(filePath: string, value: unknown, indent = 2): Promise<void> {
   await mkdir(path.dirname(filePath), { recursive: true });
   await writeFile(filePath, formatJsonRecord(value, indent), 'utf8');
