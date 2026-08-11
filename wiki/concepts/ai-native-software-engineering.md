@@ -2,15 +2,15 @@
 type: concept
 title: 'AI-Native Software Engineering'
 # prettier-ignore
-aliases: ["Control the ideas, not the code","Engineer away the slop","How building software is changing at Anthropic","AI-native fintech architecture","LLMs reward expertise"]
+aliases: ["Control the ideas, not the code","Engineer away the slop","How building software is changing at Anthropic","AI-native fintech architecture","LLMs reward expertise","Agentic Code Quality"]
 # prettier-ignore
-tags: ["ai-engineering","software-design","correctness","code-review","formal-verification","quality-gates","multi-agent-systems","fintech","compliance","auditability","domain-expertise","prompting","human-judgment"]
+tags: ["ai-engineering","software-design","correctness","code-review","formal-verification","quality-gates","multi-agent-systems","fintech","compliance","auditability","domain-expertise","prompting","human-judgment","agentic-code","back-pressure"]
 wiki_slug: ai-native-software-engineering
 created: 2026-07-16
-updated: 2026-08-05
+updated: 2026-08-11
 confidence: high
 # prettier-ignore
-provenance: [{"source_item_id":"19f6057544b9bae7-06","source_path":"sources/tldr/2026-07-14-ai-native-software-engineering.txt","url":"https://antirez.com/news/169"},{"source_item_id":"general-20260724-05","source_path":"sources/tldr/2026-07-24-engineer-away-the-slop.txt","url":"https://ghuntley.com/slop/"},{"source_item_id":"19fadaee19e22a31-18","source_path":"sources/tldr/2026-07-29-ai-native-software-engineering-anthropic.txt","url":"https://newsletter.pragmaticengineer.com/p/inside-anthropic"},{"source_item_id":"19fb33942bb1cc3e-04","source_path":"sources/tldr/2026-07-30-ai-native-fintech-architecture.txt","url":"https://hackernoon.com/what-fintech-founders-get-wrong-about-ai-native-development"},{"source_item_id":"19fcc720f38e999b-06","source_path":"sources/tldr/2026-08-04-llms-reward-expertise.txt","url":"https://www.seangoedecke.com/llms-reward-expertise/?utm_source=tldrnewsletter"}]
+provenance: [{"source_item_id":"19f6057544b9bae7-06","source_path":"sources/tldr/2026-07-14-ai-native-software-engineering.txt","url":"https://antirez.com/news/169"},{"source_item_id":"general-20260724-05","source_path":"sources/tldr/2026-07-24-engineer-away-the-slop.txt","url":"https://ghuntley.com/slop/"},{"source_item_id":"19fadaee19e22a31-18","source_path":"sources/tldr/2026-07-29-ai-native-software-engineering-anthropic.txt","url":"https://newsletter.pragmaticengineer.com/p/inside-anthropic"},{"source_item_id":"19fb33942bb1cc3e-04","source_path":"sources/tldr/2026-07-30-ai-native-fintech-architecture.txt","url":"https://hackernoon.com/what-fintech-founders-get-wrong-about-ai-native-development"},{"source_item_id":"19fcc720f38e999b-06","source_path":"sources/tldr/2026-08-04-llms-reward-expertise.txt","url":"https://www.seangoedecke.com/llms-reward-expertise/?utm_source=tldrnewsletter"},{"source_item_id":"19feb593f3d9a2d9-05","source_path":"sources/tldr/2026-08-10-agentic-code-quality.txt","url":"https://addyo.substack.com/p/agentic-code-quality?utm_source=tldrnewsletter"}]
 ---
 
 # AI-Native Software Engineering
@@ -40,6 +40,22 @@ organization-specific AST check, or a pre-commit gate.
 - Formal methods and deterministic system testing may become easier to apply as
   tooling improves, but availability of tools does not eliminate the need for
   engineering judgment or evidence.
+
+## Quality Gates as Distributed Back-Pressure
+
+At agent-scale code volume, quality cannot depend on one final review step.
+Constraints need to apply back-pressure throughout the work: architecture and
+type rules shape acceptable proposals before implementation, tests and analysis
+provide feedback while the agent works, and security or deployment policies
+decide whether an output may cross the production boundary.
+
+This requires multiple signals rather than one quality score. Correctness,
+maintainability, performance, security, efficiency, and comprehensibility each
+need checks suited to their failure modes. The surrounding environment should
+also provide trustworthy feedback and low-damage failure when builds,
+permissions, requirements, or tests are incomplete. Human attention can then
+focus on ambiguous failures and on auditing whether the automated gates have
+meaningful blind spots.
 
 ## From Coding Assistant to Managed Work
 
@@ -175,6 +191,17 @@ work to argue that domain knowledge enables harder steering of the same model.
 The claim is a reasoned observation supported by examples, not a measured
 comparison across expertise levels or models.
 
+### [Agentic Code Quality](https://addyo.substack.com/p/agentic-code-quality?utm_source=tldrnewsletter)
+
+<!-- source-item-id: 19feb593f3d9a2d9-05 -->
+
+TLDR, 2026-08-10.
+
+Addy Osmani frames agentic code quality as distributed back-pressure rather
+than a final code-review gate. The source adds the staged constraint model,
+multi-signal definition of quality, and low-damage failure requirement used in
+this page's verification guidance.
+
 ## Related
 
 - {% include wiki-related-link.md slug="deterministic-agent-workflows" %}
@@ -185,3 +212,4 @@ comparison across expertise levels or models.
 - {% include wiki-related-link.md slug="reality-driven-ai-product-development" %}
 - {% include wiki-related-link.md slug="state-ownership-before-state-management" %}
 - {% include wiki-related-link.md slug="code-structure-agent-context-economics" %}
+- {% include wiki-related-link.md slug="agent-autonomy-boundaries" %}
