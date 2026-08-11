@@ -2,7 +2,7 @@
   "manifest_version": 1,
   "schema_version": "compile-state.v1",
   "created": "2026-07-05",
-  "updated": "2026-08-07T02:11:43.000Z",
+  "updated": "2026-08-11T01:53:08.177Z",
   "processed_sources": {
     "sources/tldr/2026-06-23-transformer-architecture-for-senior-engineers.txt": {
       "hash": "sha256:f9a592761c47b368e73c13dd97d27b02bc875433b632a582a40ec6419643e631",
@@ -141,6 +141,12 @@
       "output_path": "wiki/tools/nextjs.md",
       "source_item_id": "19fcc7bdf7e9fe90-08",
       "processed_at": "2026-08-06T01:37:33.008Z"
+    },
+    "sources/tldr/2026-08-10-agentic-code-quality.txt": {
+      "hash": "sha256:a1b2b0e277541a3dbb8ca74479f21f31a2fbcfe9471f75dbde628f56e8a8672a",
+      "output_path": "wiki/concepts/ai-native-software-engineering.md",
+      "source_item_id": "19feb593f3d9a2d9-05",
+      "processed_at": "2026-08-11T01:53:08.177Z"
     }
   },
   "wiki_outputs": {
@@ -155,9 +161,9 @@
       "provenance_count": 1
     },
     "wiki/concepts/ai-native-software-engineering.md": {
-      "hash": "sha256:cbbc2ea2992fa04706f27f943d88de3305cc406a20df44057e9f9498005beec2",
-      "updated": "2026-08-06T01:37:32.982Z",
-      "provenance_count": 5
+      "hash": "sha256:124ca04a851731efcaaa50fb938b6254a43475c64328bd667747e8d882c562aa",
+      "updated": "2026-08-11T01:53:08.177Z",
+      "provenance_count": 6
     },
     "wiki/tools/clawk.md": {
       "hash": "sha256:f94e4b7517a3126563fae82604555a3b7baf8aa7bcfe16f2ec68f7b81baf1a8d",
@@ -486,6 +492,12 @@
       "timestamp": "2026-08-07T02:11:43.000Z",
       "source_path": "sources/tldr/2026-08-06-agentic-documentation-workflows.txt",
       "output_path": "wiki/concepts/review-driven-software-factories.md",
+      "status": "updated"
+    },
+    {
+      "timestamp": "2026-08-11T01:53:08.177Z",
+      "source_path": "sources/tldr/2026-08-10-agentic-code-quality.txt",
+      "output_path": "wiki/concepts/ai-native-software-engineering.md",
       "status": "updated"
     }
   ]

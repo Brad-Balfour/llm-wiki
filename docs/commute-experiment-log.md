@@ -429,6 +429,12 @@ incident rather than classifier feedback. This reinforces the existing rule:
 every presentation must project literal current-queue fields before adding
 article-level research.
 
+The source-grounded maintenance pass retrieved _Agentic Code Quality_ with host
+network access and compiled it into the existing _AI-Native Software
+Engineering_ concept instead of creating a duplicate page. The approved source,
+page provenance, related concepts, and compiler state are now registered
+together.
+
 ## What Worked
 
 - The weekday Task has produced real dated, parseable queues, including four

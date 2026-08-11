@@ -1,0 +1,50 @@
+{
+  "schema_version": "approved-wiki-source.v1",
+  "approval": {
+    "status": "approved",
+    "public": true,
+    "approved_at": "2026-08-10T21:50:00-04:00",
+    "reviewed_by": "brad",
+    "safety_review": {
+      "privacy": "cleared",
+      "publication_rights": "cleared",
+      "dual_use": "cleared"
+    }
+  },
+  "source": {
+    "source_item_id": "19feb593f3d9a2d9-05",
+    "source_path": "sources/tldr/2026-08-10-agentic-code-quality.txt",
+    "source_type": "tldr",
+    "title": "Agentic Code Quality",
+    "url": "https://addyo.substack.com/p/agentic-code-quality?utm_source=tldrnewsletter",
+    "newsletter": "TLDR",
+    "edition_date": "2026-08-10"
+  },
+  "entry": {
+    "type": "concept",
+    "slug": "ai-native-software-engineering",
+    "title": "AI-Native Software Engineering",
+    "aliases": [
+      "Agentic Code Quality"
+    ],
+    "tags": [
+      "agentic-code",
+      "quality-gates",
+      "back-pressure"
+    ],
+    "confidence": "high",
+    "summary": "At agent-scale code volume, quality depends on distributed, deterministic constraints that shape work before it begins, provide trustworthy feedback while it runs, and block unsafe output at the production boundary.",
+    "key_ideas": [
+      "Treat quality gates as distributed back-pressure across the agent loop rather than one review step at the end.",
+      "Use distinct checks for distinct risks, including types, tests, mutation testing, complexity limits, performance, and security policies.",
+      "Design agent environments for trustworthy feedback and low-damage failure when tasks, permissions, builds, or tests are ambiguous or brittle.",
+      "Reserve scarce human attention for nuanced failures that automated constraints cannot resolve, and review the gates themselves for blind spots.",
+      "Evaluate quality as a collection of correctness, maintainability, performance, security, efficiency, and comprehensibility signals rather than one metric."
+    ],
+    "related": [
+      "deterministic-agent-workflows",
+      "review-driven-software-factories",
+      "agent-autonomy-boundaries"
+    ]
+  }
+}
