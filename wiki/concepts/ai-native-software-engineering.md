@@ -41,6 +41,22 @@ organization-specific AST check, or a pre-commit gate.
   tooling improves, but availability of tools does not eliminate the need for
   engineering judgment or evidence.
 
+## Quality Gates as Distributed Back-Pressure
+
+At agent-scale code volume, quality cannot depend on one final review step.
+Constraints need to apply back-pressure throughout the work: architecture and
+type rules shape acceptable proposals before implementation, tests and analysis
+provide feedback while the agent works, and security or deployment policies
+decide whether an output may cross the production boundary.
+
+This requires multiple signals rather than one quality score. Correctness,
+maintainability, performance, security, efficiency, and comprehensibility each
+need checks suited to their failure modes. The surrounding environment should
+also provide trustworthy feedback and low-damage failure when builds,
+permissions, requirements, or tests are incomplete. Human attention can then
+focus on ambiguous failures and on auditing whether the automated gates have
+meaningful blind spots.
+
 ## From Coding Assistant to Managed Work
 
 The saved report from inside Anthropic describes engineers routinely running
@@ -180,6 +196,11 @@ comparison across expertise levels or models.
 <!-- source-item-id: 19feb593f3d9a2d9-05 -->
 
 TLDR, 2026-08-10.
+
+Addy Osmani frames agentic code quality as distributed back-pressure rather
+than a final code-review gate. The source adds the staged constraint model,
+multi-signal definition of quality, and low-damage failure requirement used in
+this page's verification guidance.
 
 ## Related
 

@@ -2,7 +2,7 @@
   "manifest_version": 1,
   "schema_version": "compile-state.v1",
   "created": "2026-07-05",
-  "updated": "2026-08-11T01:53:08.177Z",
+  "updated": "2026-08-11T02:05:28.000Z",
   "processed_sources": {
     "sources/tldr/2026-06-23-transformer-architecture-for-senior-engineers.txt": {
       "hash": "sha256:f9a592761c47b368e73c13dd97d27b02bc875433b632a582a40ec6419643e631",
@@ -161,8 +161,8 @@
       "provenance_count": 1
     },
     "wiki/concepts/ai-native-software-engineering.md": {
-      "hash": "sha256:124ca04a851731efcaaa50fb938b6254a43475c64328bd667747e8d882c562aa",
-      "updated": "2026-08-11T01:53:08.177Z",
+      "hash": "sha256:2f46d2c89c9ed4d6ae22b0eb4ecd5631e3133a64042c5da22353ef43e07a045b",
+      "updated": "2026-08-11T02:05:28.000Z",
       "provenance_count": 6
     },
     "wiki/tools/clawk.md": {
