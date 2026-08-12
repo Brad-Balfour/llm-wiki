@@ -109,6 +109,46 @@ the task introduces that surface.
 - LLM enrichment may be optional, but deterministic URL and source ingestion
   must not require an API key or a paid model.
 
+## Recurring daily commute processing
+
+When Brad supplies dated commute queues, session bundles, and shared-chat URLs
+with shorthand such as "today's commute," treat that as a request to complete
+the full daily evidence loop. This is a recurring operating workflow, not a
+one-off file inspection. The request authorizes the normal repository and
+GitHub writes needed to finish that loop.
+
+For every daily commute intake:
+
+1. Validate each queue and bundle, compare every embedded snapshot with the
+   separately supplied canonical queue, and use shared chats only as bounded
+   recovery evidence. Never invent missing item identity or user intent.
+2. Reconcile the day into the correct evidence channels: wiki-maintenance
+   candidates, exact classifier feedback, product/quality incidents, general
+   captures, duplicate/prior-awareness signals, and unresolved evidence.
+3. Preserve the private normalized intake under `.private/`, then add the
+   sanitized durable findings to the experiment log or other appropriate
+   tracked memory. Do not silently turn an interesting discussion into a wiki
+   save or classifier label.
+4. Route every material recurring finding to its existing open GitHub issue
+   when one fits. Add an evidence-backed comment with the exact date, artifact
+   identity, observed behavior, boundary, and resulting PR. Avoid duplicating
+   an equivalent comment already on the issue. If no issue fits, keep the
+   finding visible in the PR and call out the missing issue explicitly.
+5. Treat friction in the processing run itself as workflow evidence. When the
+   same omission or mistake could recur, add the smallest durable instruction,
+   test, or automation guard that makes the next daily pass simpler and safer.
+6. Run the relevant local validation, commit the tracked daily evidence, push
+   the branch, and open a draft PR against the intended base. A local-only
+   commit is not a completed daily commute handoff. Wait for the initial PR
+   checks and report their state.
+7. Cross-link the PR and issue comments, then finish with the remote branch,
+   commit, PR URL, validation result, issue updates, and any genuinely
+   unresolved evidence or next action.
+
+If the day produces no justified tracked change, report an explicit no-change
+result with the validation and issue-routing evidence; do not manufacture a PR
+or public wiki content merely to make the loop look active.
+
 ## Git and handoff
 
 - Keep each worktree to one focused task. Stage only its intended files; do not
