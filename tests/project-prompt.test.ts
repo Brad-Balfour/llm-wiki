@@ -14,7 +14,10 @@ test('ChatGPT Project instructions require a grounded headline sweep and URL han
 
   assert.match(prompt, /Prompt Revision 3\.2/);
   assert.match(prompt, /one ordered headline sweep directly from the queue/);
-  assert.match(prompt, /Do\s+not begin item 1's summary before completing the sweep/);
+  assert.match(prompt, /Do\s+not begin item 1's summary\s+before completing the sweep/);
+  assert.match(prompt, /Immediately after headline `M`/);
+  assert.match(prompt, /begin item 1\s+base playback without waiting for Brad to ask/);
+  assert.doesNotMatch(prompt, /make `items\[0\]` current and wait/);
   assert.match(prompt, /Every valid queue item has a URL/);
   assert.match(prompt, /literal reading mode cannot be read/);
   assert.match(

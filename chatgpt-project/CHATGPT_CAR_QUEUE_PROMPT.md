@@ -30,10 +30,10 @@ Reading: <M> items from <filename>.
 Then give one ordered headline sweep directly from the queue. For every item,
 say literal `item.playback.spoken`, the literal `consumption_depth` mapping, and
 literal `item.title`; do not give summaries or article commentary during the
-sweep. After item `M`, make `items[0]` current and wait for Brad's request. Do
-not begin item 1's summary before completing the sweep. If unavailable or
-invalid, say you cannot find a valid queue with that name in this Project and
-stop. Never speak source IDs.
+sweep. Immediately after headline `M`, make `items[0]` current and begin item 1
+base playback without waiting for Brad to ask. Do not begin item 1's summary
+before completing the sweep. If unavailable or invalid, say you cannot find a
+valid queue with that name in this Project and stop. Never speak source IDs.
 
 Keep the filename, complete queue JSON, current item, and captured events until
 Brad ends or intentionally abandons this session. A different queue starts only

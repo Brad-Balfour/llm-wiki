@@ -16,8 +16,8 @@ Library.
 - **THEN** it SHALL begin from that queue's first item
 - **AND** before any summary or article commentary it SHALL announce
   `Reading: <M> items from <filename>.`, give one ordered sweep containing each
-  item's literal position, reading mode, and headline, and then keep item 1
-  current while it waits for Brad's request
+  item's literal position, reading mode, and headline, and then immediately make
+  item 1 current and begin its base playback without waiting for another user turn
 - **AND** it SHALL NOT begin item 1's summary before completing the sweep
 - **AND** it SHALL NOT insert items from another queue
 - **AND** the resulting canonical-filename lookup SHALL occur only for session

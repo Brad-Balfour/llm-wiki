@@ -664,7 +664,8 @@ natural-language boundary explicit:
    phrase, reading mode, title, and summary rather than conversational memory or
    an article-level substitute.
 6. Before item playback, read one ordered sweep of literal positions, modes,
-   and headlines, then keep item one current.
+   and headlines, then immediately make item one current and begin its base
+   playback without another user turn.
 7. Treat an unavailable URL or reading mode as queue-context loss; every valid
    v2 item contains a URL.
 8. Preserve semantic contradictions for home-side conversion; do not stop the
