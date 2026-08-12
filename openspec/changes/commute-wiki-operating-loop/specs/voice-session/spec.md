@@ -69,8 +69,10 @@ Brad expresses another intent.
 - **WHEN** Voice presents the verified current item
 - **THEN** Voice SHALL announce the item's literal `N of M` phrase, reading
   mode, and exact queue headline before its summary or article commentary
-- **AND** it SHALL read the complete TLDR summary exactly as written regardless
-  of `consumption_depth`
+- **AND** for `headline_only` it SHALL stop after the exact queue headline and
+  SHALL NOT read `item.summary`
+- **AND** for `in_depth` it SHALL then read the complete TLDR summary exactly as
+  written
 - **AND** it SHALL retrieve or discuss the linked article only after Brad
   requests more detail
 - **AND** it SHALL make an approximately five-second interruption-friendly gap
@@ -85,12 +87,13 @@ can provide a measured timer or capture every overlapping interruption.
 
 - **WHEN** Voice presents any verified queue item
 - **THEN** it SHALL read the queue headline from `item.title`
-- **AND** it SHALL read the complete TLDR summary from `item.summary` exactly as
+- **AND** for `headline_only` it SHALL omit `item.summary`
+- **AND** for `in_depth` it SHALL read the complete `item.summary` exactly as
   written
 - **AND** it SHALL NOT paraphrase, truncate, expand, combine, or select only
-  part of either field because of `consumption_depth`
-- **AND** `consumption_depth` SHALL remain metadata and an announced label, not
-  permission to rewrite the queue text.
+  part of a field it reads
+- **AND** `consumption_depth` SHALL remain the literal switch between those two
+  base-reading shapes, not permission to rewrite queue text.
 
 #### Scenario: Brad navigates in ordinary English
 

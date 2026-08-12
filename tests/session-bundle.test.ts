@@ -294,6 +294,77 @@ test('rejects a jump that re-announces the departing item', () => {
   );
 });
 
+test('rejects a complete bundle whose jump never announces its destination', () => {
+  const malformed = clone(validBundle);
+  const durableEvidence = [
+    {
+      source: 'durable_contemporaneous_record',
+      reference: 'durable-session-events.jsonl',
+    },
+  ];
+  const events = malformed.events as Array<Record<string, unknown>>;
+  events.splice(
+    0,
+    events.length,
+    {
+      event_id: 'event-start',
+      sequence: 1,
+      kind: 'session_boundary',
+      boundary: 'start',
+      evidence: durableEvidence,
+    },
+    {
+      event_id: 'event-announced',
+      sequence: 2,
+      kind: 'item_announced',
+      item: {
+        source_item_id: 'tldr-demo-001',
+        title: 'First exact headline',
+        url: 'https://example.com/first',
+      },
+      evidence: durableEvidence,
+    },
+    {
+      event_id: 'event-jump-without-destination',
+      sequence: 3,
+      kind: 'playback_transition',
+      transition: 'jump',
+      item: {
+        source_item_id: 'tldr-demo-001',
+        title: 'First exact headline',
+        url: 'https://example.com/first',
+      },
+      evidence: durableEvidence,
+    },
+    {
+      event_id: 'event-end',
+      sequence: 4,
+      kind: 'session_boundary',
+      boundary: 'end',
+      evidence: durableEvidence,
+    }
+  );
+  malformed.integrity = {
+    state: 'complete',
+    unresolved_event_ids: [],
+    durable_event_record: {
+      filename: 'durable-session-events.jsonl',
+      sha256: `sha256:${'0'.repeat(64)}`,
+      covered_event_ids: events.map((event) => event.event_id),
+    },
+  };
+  malformed.playback = {
+    status: 'partial',
+    last_announced_source_item_id: 'tldr-demo-001',
+    resume_source_item_id: 'tldr-demo-001',
+  };
+
+  assert.throws(
+    () => parseCommuteSessionBundleText(JSON.stringify(malformed)),
+    /complete integrity cannot end with a jump transition awaiting its destination announcement/
+  );
+});
+
 test('rejects an out-of-order queue announcement after a next transition', () => {
   const malformed = clone(validBundle);
   const events = malformed.events as Array<Record<string, unknown>>;

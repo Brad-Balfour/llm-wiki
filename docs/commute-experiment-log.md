@@ -673,9 +673,9 @@ natural-language boundary explicit:
 9. Interpret Brad's ordinary English by intent, never as a closed command
    grammar; normalize adjacent and direct named/numbered navigation into
    internal events without asking him to speak schema vocabulary.
-10. In base playback, read the queue headline and complete TLDR summary exactly
-    as written. `consumption_depth` is metadata and an announced label, not
-    permission to paraphrase, truncate, or select sentences.
+10. In base playback, `headline_only` reads the exact queue headline and omits
+    the summary; `in_depth` reads the exact queue headline and complete TLDR
+    summary. Neither mode permits paraphrasing, truncation, or sentence selection.
 
 This is a bounded recovery strategy, not an explanation of root cause. It
 addresses the observed difference between exact search and recent-file listing

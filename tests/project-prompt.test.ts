@@ -20,11 +20,12 @@ test('ChatGPT Project instructions require a grounded headline sweep and URL han
   assert.doesNotMatch(prompt, /make `items\[0\]` current and wait/);
   assert.match(prompt, /Every valid queue item has a URL/);
   assert.match(prompt, /literal reading mode cannot be read/);
+  assert.match(prompt, /`headline_only`: read exact\s+`item\.title`; omit `item\.summary`/);
   assert.match(
     prompt,
-    /read the queue\s+headline from `item\.title` and then the complete TLDR summary from `item\.summary`\s+exactly as written/
+    /`in_depth`: read exact `item\.title`, then the\s+complete `item\.summary` exactly as written/
   );
-  assert.match(prompt, /Never paraphrase, shorten, expand, combine, select sentences/);
+  assert.match(prompt, /Never rewrite, shorten, expand,\s+combine, or select sentences/);
   assert.doesNotMatch(prompt, /one brisk queue-summary sentence/);
   assert.doesNotMatch(prompt, /one or two short queue-summary sentences/);
 });

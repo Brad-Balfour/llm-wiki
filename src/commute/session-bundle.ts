@@ -956,6 +956,12 @@ function validateLifecycle(
       }
     }
   }
+
+  if (integrityState === 'complete' && jumpDepartingItemIndex !== undefined) {
+    throw new Error(
+      'complete integrity cannot end with a jump transition awaiting its destination announcement'
+    );
+  }
 }
 
 function validatePlaybackMatchesEvents(playback: PlaybackState, events: SessionEvent[]): void {
