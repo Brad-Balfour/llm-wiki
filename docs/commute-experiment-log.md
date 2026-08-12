@@ -38,6 +38,10 @@ found a queue as proof.
   nine shared conversations covering General, Dev, Fintech, and AI. General
   spanned three chats and AI spanned four after mobile interruptions started
   new Voice conversations.
+- The three downloaded August 11 queues, three recovered session bundles, and
+  three shared conversations covering General, Dev, and AI, plus Brad's direct
+  clarification that AI playback returned from item seven to item six for
+  deeper discussion.
 - The live `Weekday TLDR Queues` Task conversation/configuration, the July
   21-24 Task Update emails, the July 24 manual queue-generation control, and
   the live Project settings/sources inspected on July 26.
@@ -86,6 +90,7 @@ retrieve sources, and preserve history after the drive.
 | Aug. 5     | Per-advance grounding workaround with GPT-Live                                                 | Re-read the bound Project queue before each requested next position during General, Dev, and AI playback, then export after returning to text.                                                              | Playback was smoother and the August 5 AI sequence stayed aligned with its six-item queue; Dev still mislabeled an in-depth item as headline-only. All three downloads existed, but none passed strict bundle validation. The workaround needs a longer-session test.                                                                                                      |
 | Aug. 7     | Three-queue playback and recovered-bundle control                                              | Validate General, Dev, and AI queues and bundles, compare their retained events with the shared chats, and separate exact classifier feedback from presentation and duplicate signals.                      | All six artifacts passed local validation and all snapshots matched their canonical queues. Playback nevertheless omitted or paraphrased summaries for six in-depth item presentations. One depth promotion is exact evidence but cannot enter the label store while the queue's route-version stamp disagrees with the committed recorder contract.                       |
 | Aug. 10    | Four-queue commute, fragmented-Voice recovery, and source-access audit                         | Validate all four daily queues, reconcile four recovered exports with nine shared chats, retain the explicit wiki save and preference signal, and distinguish website failures from product safety denials. | All queues were valid, but every downloaded bundle violated the lifecycle contract. Evidence-backed local repair accepted all four sessions with no unresolved captures. Switching to Siri, dictation, or calls repeatedly started new chats; ordinary public text pages were denied at the browsing safety layer even though host-side deterministic retrieval succeeded. |
+| Aug. 11    | Three-queue playback, literal-summary feedback, and back-navigation audit                      | Validate General, Dev, and AI queues and bundles, compare three shared chats, retain presentation and duplicate signals, and test a deliberate item-seven-to-item-six return.                               | All queues matched their embedded snapshots. Dev was strict-valid; General retained an illegal completed-session resume cursor; and AI exposed that the contract cannot represent deliberate previous-item navigation. Recovered intake accepted all three sessions with no wiki save, classifier label, or unresolved capture.                                            |
 
 ### July 24 Bundle Acceptance Result
 
@@ -435,6 +440,56 @@ Engineering_ concept instead of creating a duplicate page. The approved source,
 page provenance, related concepts, and compiler state are now registered
 together.
 
+### August 11 Acceptance, Presentation, And Navigation Result
+
+The three downloaded queues passed the v2 validator: eight General items,
+seven Dev items, and seven AI items. Their embedded snapshots matched the
+separately downloaded queues exactly. Dev's downloaded bundle passed strict
+validation. General failed because completed playback retained a resume cursor.
+AI failed because the commute deliberately advanced to item seven and then
+returned to item six, while the then-current event contract offered `next`,
+`repeat`, `interrupted`, `voice_restart`, and `duplicate_recognition` but no
+previous/back transition. The 7-to-6 sequence was normal driver behavior, not a
+playback defect. Prompt Revision 3.2 and the additive `previous` and `jump`
+events now make internal navigation normalization explicit without constraining
+Brad's wording or inventing playback of intervening items.
+
+Home-side normalization removed General's impossible resume cursor and retained
+that export contradiction as a quality incident. For AI, it preserved Brad's
+direct clarification and the shared-chat evidence by normalizing the clear
+return as `previous`, while keeping both the item-seven announcement and the
+true final item-six cursor. All three repaired bundles then passed strict
+validation and canonical queue comparison. Combined intake recorded three
+accepted recovered sessions, seven quality incidents, four general captures,
+and no maintenance candidates, classifier-feedback events, unresolved
+captures, or semantic conversions.
+
+The commute reinforced a presentation rule already visible on August 7:
+single-word or product-name headlines such as _OpenChamber_ and
+_GPT-5.6-Cyber_ are practically useless without the literal queue summary.
+Dev also caught Voice compressing the OpenChamber summary and adding unsupported
+wording, and later announcing an in-depth item without its required summary.
+These are queue-projection and presentation failures, not evidence that the
+article-interest classifier is wrong.
+
+The shared chats add two further operational signals. Dev lost Voice during an
+item-six source discussion and repeatedly stalled before confirming retained
+context after reconnection. General initially claimed that a plain public
+article could not be loaded, then retrieved it after Brad insisted on using the
+queue URL; its first Google-homepage explanation also blurred removal of a
+button with removal of the search field until Brad asked for a precise answer.
+Source access and summary precision therefore still need explicit verification
+even when queue identity remains stable.
+
+Cross-newsletter duplication also persisted. General and Dev both queued the
+same Dan Luu programming-language article, while Dev and AI queued the same
+Meta Muse Glimmer source; General separately covered the Muse release through
+Simon Willison. Brad explicitly identified the overlaps as another instance of
+the missing day-level prior-awareness feature. No conversation contained an
+explicit wiki save, so the substantive UI discussion and favorable finance-
+article remark remain general captures rather than silently created public
+wiki work.
+
 ## What Worked
 
 - The weekday Task has produced real dated, parseable queues, including four
@@ -593,10 +648,11 @@ prove queue identity across interruptions.
 | Reconstruct an item from topic memory or position alone | Rejected     | The Jul. 22 Kiro and Dev mismatches show that this creates false captures.                                      |
 | Stronger wording alone                                  | Insufficient | Prompt revisions improved expectations and validation language but cannot guarantee Library tool availability.  |
 
-## Repository Queue-Discovery Rule: Prompt 3.1 Candidate
+## Repository Queue-Discovery Rule: Prompt 3.2 Candidate
 
-Prompt 3.1 keeps Prompt 3.0's discovery ordering and direct per-item field
-projection, and adds the August 4-5 playback guards:
+Prompt 3.2 keeps Prompt 3.1's discovery ordering and direct per-item field
+projection, adds the August 4-5 playback guards, and makes the August 11
+natural-language boundary explicit:
 
 1. Search for the canonical filename first.
 2. If that fails, list recent Project Library files and inspect plausible queue
@@ -608,11 +664,18 @@ projection, and adds the August 4-5 playback guards:
    phrase, reading mode, title, and summary rather than conversational memory or
    an article-level substitute.
 6. Before item playback, read one ordered sweep of literal positions, modes,
-   and headlines, then keep item one current.
+   and headlines, then immediately make item one current and begin its base
+   playback without another user turn.
 7. Treat an unavailable URL or reading mode as queue-context loss; every valid
    v2 item contains a URL.
 8. Preserve semantic contradictions for home-side conversion; do not stop the
    commute or discard the rest of the bundle.
+9. Interpret Brad's ordinary English by intent, never as a closed command
+   grammar; normalize adjacent and direct named/numbered navigation into
+   internal events without asking him to speak schema vocabulary.
+10. In base playback, `headline_only` reads the exact queue headline and omits
+    the summary; `in_depth` reads the exact queue headline and complete TLDR
+    summary. Neither mode permits paraphrasing, truncation, or sentence selection.
 
 This is a bounded recovery strategy, not an explanation of root cause. It
 addresses the observed difference between exact search and recent-file listing

@@ -47,6 +47,8 @@ export type PlaybackStatus = (typeof PLAYBACK_STATUSES)[number];
 
 export const PLAYBACK_TRANSITIONS = [
   'next',
+  'previous',
+  'jump',
   'repeat',
   'interrupted',
   'voice_restart',
@@ -621,18 +623,27 @@ function validateEvent(
         observed_behavior: requireString(record.observed_behavior, `${field}.observed_behavior`),
         boundary: requireString(record.boundary, `${field}.boundary`),
       };
-    case 'playback_transition':
+    case 'playback_transition': {
       rejectUnknownKeys(
         record,
         ['event_id', 'sequence', 'kind', 'transition', 'item', 'evidence'],
         field
       );
+      const transition = requireEnum(
+        record.transition,
+        PLAYBACK_TRANSITIONS,
+        `${field}.transition`
+      );
+      if (transition === 'previous' || transition === 'jump' || transition === 'repeat') {
+        requireUserActionEvidence(base.evidence, `${field}.evidence`);
+      }
       return {
         ...base,
         kind,
-        transition: requireEnum(record.transition, PLAYBACK_TRANSITIONS, `${field}.transition`),
+        transition,
         item: validateExactItem(record.item, `${field}.item`, queueItems),
       };
+    }
     case 'general_capture':
       rejectUnknownKeys(record, ['event_id', 'sequence', 'kind', 'user_words', 'evidence'], field);
       requireUserActionEvidence(base.evidence, `${field}.evidence`);
@@ -668,17 +679,19 @@ function validateEvidence(candidate: unknown, field: string): EventEvidence[] {
 }
 
 function requireUserActionEvidence(evidence: EventEvidence[], field: string): void {
-  if (
-    !evidence.some((item) =>
-      [
-        'durable_contemporaneous_record',
-        'explicit_user_capture',
-        'user_provided_chat_or_ui_observation',
-      ].includes(item.source)
-    )
-  ) {
+  if (!hasUserActionEvidence(evidence)) {
     throw new Error(`${field} must include direct evidence of the user's action`);
   }
+}
+
+function hasUserActionEvidence(evidence: EventEvidence[]): boolean {
+  return evidence.some((item) =>
+    [
+      'durable_contemporaneous_record',
+      'explicit_user_capture',
+      'user_provided_chat_or_ui_observation',
+    ].includes(item.source)
+  );
 }
 
 function validateExactItem(
@@ -831,6 +844,7 @@ function validateLifecycle(
 ): void {
   let currentItemIndex: number | undefined;
   let expectedItemIndex: number | undefined = 0;
+  let jumpDepartingItemIndex: number | undefined;
   let skipAwaitingNavigation = false;
 
   for (const event of events) {
@@ -842,22 +856,30 @@ function validateLifecycle(
         skipAwaitingNavigation &&
         currentItemIndex !== undefined &&
         announcedIndex === currentItemIndex + 1;
+      const isJumpDestination =
+        jumpDepartingItemIndex !== undefined && currentItemIndex === undefined;
       if (
         (currentItemIndex !== undefined && !isImplicitNavigationAfterSkip) ||
-        expectedItemIndex === undefined
+        (expectedItemIndex === undefined && !isJumpDestination)
       ) {
         throw new Error(
-          `events[${event.sequence - 1}] item_announced must follow a valid next or repeat transition`
+          `events[${event.sequence - 1}] item_announced must follow a valid next, previous, jump, or repeat transition`
+        );
+      }
+      if (isJumpDestination && announcedIndex === jumpDepartingItemIndex) {
+        throw new Error(
+          `events[${event.sequence - 1}] jump transition must announce a different queue item`
         );
       }
       const expectedAnnouncementIndex =
         currentItemIndex === undefined ? expectedItemIndex : currentItemIndex + 1;
-      if (announcedIndex !== expectedAnnouncementIndex) {
+      if (!isJumpDestination && announcedIndex !== expectedAnnouncementIndex) {
         throw new Error(
           `events[${event.sequence - 1}] item_announced does not match the expected queue position`
         );
       }
       currentItemIndex = announcedIndex;
+      jumpDepartingItemIndex = undefined;
       skipAwaitingNavigation = false;
       continue;
     }
@@ -909,9 +931,34 @@ function validateLifecycle(
           `events[${event.sequence - 1}] playback_transition does not match the currently announced item`
         );
       }
+      if (
+        event.transition === 'next' &&
+        !skipAwaitingNavigation &&
+        !hasUserActionEvidence(event.evidence)
+      ) {
+        throw new Error(
+          `events[${event.sequence - 1}] next transition must include direct user evidence or follow an evidenced skip action`
+        );
+      }
       if (event.transition === 'next') {
         expectedItemIndex = announcedItemIndex + 1;
         currentItemIndex = undefined;
+        jumpDepartingItemIndex = undefined;
+        skipAwaitingNavigation = false;
+      } else if (event.transition === 'previous') {
+        if (announcedItemIndex === 0) {
+          throw new Error(
+            `events[${event.sequence - 1}] previous transition cannot move before the first queue item`
+          );
+        }
+        expectedItemIndex = announcedItemIndex - 1;
+        currentItemIndex = undefined;
+        jumpDepartingItemIndex = undefined;
+        skipAwaitingNavigation = false;
+      } else if (event.transition === 'jump') {
+        expectedItemIndex = undefined;
+        currentItemIndex = undefined;
+        jumpDepartingItemIndex = announcedItemIndex;
         skipAwaitingNavigation = false;
       } else if (event.transition === 'repeat') {
         // A repeat must be followed by a fresh announcement before any later
@@ -919,13 +966,25 @@ function validateLifecycle(
         // from being silently attributed to a stale announcement.
         expectedItemIndex = announcedItemIndex;
         currentItemIndex = undefined;
+        jumpDepartingItemIndex = undefined;
         skipAwaitingNavigation = false;
       } else {
         currentItemIndex = undefined;
         expectedItemIndex = undefined;
+        jumpDepartingItemIndex = undefined;
         skipAwaitingNavigation = false;
       }
     }
+  }
+
+  if (
+    integrityState === 'complete' &&
+    currentItemIndex === undefined &&
+    (expectedItemIndex !== undefined || jumpDepartingItemIndex !== undefined)
+  ) {
+    throw new Error(
+      'complete integrity cannot end with navigation awaiting its destination announcement'
+    );
   }
 }
 

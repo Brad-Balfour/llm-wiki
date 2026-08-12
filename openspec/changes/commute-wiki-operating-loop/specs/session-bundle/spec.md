@@ -191,7 +191,7 @@ The bundle SHALL declare event-level evidence sources and an integrity state of
 
 ### Requirement: Ordered Current-Item Lifecycle
 
-The bundle SHALL record monotonic queue-state and action transitions so that an
+The bundle SHALL record ordered queue-state and action transitions so that an
 item-specific action can be validated against the announced current item.
 
 #### Scenario: Feedback follows an announced item
@@ -212,6 +212,27 @@ item-specific action can be validated against the announced current item.
 - **AND** the following `item_announced` record SHALL identify the successor
 - **AND** the transition SHALL NOT duplicate the successor or add a separate
   destination-item field.
+
+#### Scenario: Return to the previous item
+
+- **WHEN** Brad uses any clear ordinary-English wording to return from one
+  announced item to its immediate predecessor
+- **THEN** the bundle SHALL normalize that intent as a `previous` transition
+- **AND** the transition SHALL identify the current, departing item
+- **AND** the following `item_announced` record SHALL identify the predecessor
+- **AND** Brad SHALL NOT be required to speak the word `previous` or any other
+  schema vocabulary.
+
+#### Scenario: Jump directly to another queue item
+
+- **WHEN** Brad clearly requests item N of M, names an unambiguous item, or uses
+  equivalent ordinary English to select another verified queue item
+- **THEN** the bundle SHALL normalize that intent as a `jump` transition
+- **AND** the transition SHALL identify the current, departing item
+- **AND** the following `item_announced` record SHALL identify the requested
+  destination item
+- **AND** the bundle SHALL NOT invent announcements or playback for intervening
+  queue items.
 
 ### Requirement: Quality Incidents Do Not Require Model Diagnosis
 

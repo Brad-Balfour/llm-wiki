@@ -11,9 +11,9 @@ Paste `chatgpt-project/CHATGPT_CAR_QUEUE_PROMPT.md` into the **Instructions**
 field of `LLM-Wiki-Car`. It supersedes the former commute prompt and the
 earlier separate-Project v2 Pilot.
 
-The repository file is Prompt Revision 3.1, prepared from the August 4-5
-commute evidence. The last independently verified live Project text was Prompt
-Revision 3.0 on July 26; do not describe 3.1 as live until the Instructions
+The repository file is Prompt Revision 3.2, prepared from the August 4-5 and
+August 11 commute evidence. The last independently verified live Project text
+was Prompt Revision 3.0 on July 26; do not describe 3.2 as live until the Instructions
 field has been updated and checked.
 
 The prompt heading carries two distinct versions. `Queue Contract v2` changes

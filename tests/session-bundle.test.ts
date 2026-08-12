@@ -123,7 +123,7 @@ test('requires a fresh announcement after repeat before accepting feedback', () 
       title: 'First exact headline',
       url: 'https://example.com/first',
     },
-    evidence: [{ source: 'selected_queue_snapshot', reference: 'Brad said repeat' }],
+    evidence: [{ source: 'explicit_user_capture', reference: 'Brad said repeat' }],
   });
   events[3]!.sequence = 4;
   events[4]!.sequence = 5;
@@ -146,6 +146,317 @@ test('requires a fresh announcement after repeat before accepting feedback', () 
   assert.throws(
     () => parseCommuteSessionBundleText(JSON.stringify(malformed)),
     /item_action has no prior announced current item/
+  );
+});
+
+test('accepts previous-item navigation while keeping the transition bound to the departing item', () => {
+  const bundle = clone(validBundle);
+  const events = bundle.events as Array<Record<string, unknown>>;
+  events.push(
+    {
+      event_id: 'event-previous',
+      sequence: 5,
+      kind: 'playback_transition',
+      transition: 'previous',
+      item: {
+        source_item_id: 'tldr-demo-002',
+        title: 'Second exact headline',
+        url: 'https://example.com/second',
+      },
+      evidence: [
+        {
+          source: 'explicit_user_capture',
+          reference: 'Brad said: go back from seven to six so we can discuss it more.',
+        },
+      ],
+    },
+    {
+      event_id: 'event-reannounced-previous',
+      sequence: 6,
+      kind: 'item_announced',
+      item: {
+        source_item_id: 'tldr-demo-001',
+        title: 'First exact headline',
+        url: 'https://example.com/first',
+      },
+      evidence: [{ source: 'selected_queue_snapshot', reference: 'Returned to item one.' }],
+    }
+  );
+  const playback = bundle.playback as Record<string, unknown>;
+  playback.last_announced_source_item_id = 'tldr-demo-001';
+  playback.resume_source_item_id = 'tldr-demo-001';
+
+  const parsed = parseCommuteSessionBundleText(JSON.stringify(bundle));
+
+  assert.equal(parsed.events[4]?.kind, 'playback_transition');
+  assert.equal(parsed.events[4]?.transition, 'previous');
+  assert.equal(parsed.playback.resume_source_item_id, 'tldr-demo-001');
+});
+
+test('rejects previous-item navigation before the first queue item', () => {
+  const malformed = clone(validBundle);
+  const events = malformed.events as Array<Record<string, unknown>>;
+  events.splice(1, events.length - 1, {
+    event_id: 'event-previous-before-first',
+    sequence: 2,
+    kind: 'playback_transition',
+    transition: 'previous',
+    item: {
+      source_item_id: 'tldr-demo-001',
+      title: 'First exact headline',
+      url: 'https://example.com/first',
+    },
+    evidence: [{ source: 'explicit_user_capture', reference: 'Brad asked to go back.' }],
+  });
+
+  assert.throws(
+    () => parseCommuteSessionBundleText(JSON.stringify(malformed)),
+    /previous transition cannot move before the first queue item/
+  );
+});
+
+test('accepts a direct jump without inventing intervening announcements', () => {
+  const bundle = clone(validBundle);
+  const queueSnapshot = bundle.queue_snapshot as Record<string, unknown>;
+  const queue = queueSnapshot.queue as Record<string, unknown>;
+  const items = queue.items as Array<Record<string, unknown>>;
+  const third = clone(items[1]!) as Record<string, unknown>;
+  third.playback = { position: 3, total: 3, spoken: '3 of 3' };
+  third.source_item_id = 'tldr-demo-003';
+  third.title = 'Third exact headline';
+  third.summary = 'Third summary';
+  third.url = 'https://example.com/third';
+  items.push(third);
+  queue.total_items = 3;
+  (items[0]!.playback as Record<string, unknown>).total = 3;
+  (items[0]!.playback as Record<string, unknown>).spoken = '1 of 3';
+  (items[1]!.playback as Record<string, unknown>).total = 3;
+  (items[1]!.playback as Record<string, unknown>).spoken = '2 of 3';
+
+  const events = bundle.events as Array<Record<string, unknown>>;
+  events.splice(
+    2,
+    2,
+    {
+      event_id: 'event-jump',
+      sequence: 3,
+      kind: 'playback_transition',
+      transition: 'jump',
+      item: {
+        source_item_id: 'tldr-demo-001',
+        title: 'First exact headline',
+        url: 'https://example.com/first',
+      },
+      evidence: [
+        {
+          source: 'explicit_user_capture',
+          reference: 'Brad said: take me directly to item 3 of 3.',
+        },
+      ],
+    },
+    {
+      event_id: 'event-announced-jump-destination',
+      sequence: 4,
+      kind: 'item_announced',
+      item: {
+        source_item_id: 'tldr-demo-003',
+        title: 'Third exact headline',
+        url: 'https://example.com/third',
+      },
+      evidence: [{ source: 'selected_queue_snapshot', reference: 'Jumped to item 3 of 3.' }],
+    }
+  );
+  const playback = bundle.playback as Record<string, unknown>;
+  playback.last_announced_source_item_id = 'tldr-demo-003';
+  playback.resume_source_item_id = 'tldr-demo-003';
+
+  const parsed = parseCommuteSessionBundleText(JSON.stringify(bundle));
+
+  assert.equal(parsed.events[2]?.kind, 'playback_transition');
+  assert.equal(parsed.events[2]?.transition, 'jump');
+  assert.equal(parsed.events[3]?.kind, 'item_announced');
+  assert.equal(parsed.events[3]?.item.source_item_id, 'tldr-demo-003');
+  assert.equal(parsed.playback.resume_source_item_id, 'tldr-demo-003');
+});
+
+test('rejects a jump that re-announces the departing item', () => {
+  const malformed = clone(validBundle);
+  const events = malformed.events as Array<Record<string, unknown>>;
+  events[2]!.transition = 'jump';
+  events[2]!.evidence = [
+    { source: 'explicit_user_capture', reference: 'Brad requested a direct jump.' },
+  ];
+  const destination = events[3]!.item as Record<string, unknown>;
+  destination.source_item_id = 'tldr-demo-001';
+  destination.title = 'First exact headline';
+  destination.url = 'https://example.com/first';
+
+  assert.throws(
+    () => parseCommuteSessionBundleText(JSON.stringify(malformed)),
+    /jump transition must announce a different queue item/
+  );
+});
+
+test('requires direct user evidence for previous, jump, and repeat navigation', () => {
+  for (const transition of ['previous', 'jump', 'repeat']) {
+    const malformed = clone(validBundle);
+    const events = malformed.events as Array<Record<string, unknown>>;
+    events.push({
+      event_id: `event-${transition}-without-user-evidence`,
+      sequence: 5,
+      kind: 'playback_transition',
+      transition,
+      item: {
+        source_item_id: 'tldr-demo-002',
+        title: 'Second exact headline',
+        url: 'https://example.com/second',
+      },
+      evidence: [{ source: 'selected_queue_snapshot', reference: 'Queue identity only.' }],
+    });
+
+    assert.throws(
+      () => parseCommuteSessionBundleText(JSON.stringify(malformed)),
+      /must include direct evidence of the user's action/
+    );
+  }
+});
+
+test('requires direct user evidence for next without an evidenced skip', () => {
+  const malformed = clone(validBundle);
+  const events = malformed.events as Array<Record<string, unknown>>;
+  events[2]!.evidence = [{ source: 'selected_queue_snapshot', reference: 'Queue identity only.' }];
+
+  assert.throws(
+    () => parseCommuteSessionBundleText(JSON.stringify(malformed)),
+    /next transition must include direct user evidence or follow an evidenced skip action/
+  );
+});
+
+test('rejects a complete bundle whose jump never announces its destination', () => {
+  const malformed = clone(validBundle);
+  const durableEvidence = [
+    {
+      source: 'durable_contemporaneous_record',
+      reference: 'durable-session-events.jsonl',
+    },
+  ];
+  const events = malformed.events as Array<Record<string, unknown>>;
+  events.splice(
+    0,
+    events.length,
+    {
+      event_id: 'event-start',
+      sequence: 1,
+      kind: 'session_boundary',
+      boundary: 'start',
+      evidence: durableEvidence,
+    },
+    {
+      event_id: 'event-announced',
+      sequence: 2,
+      kind: 'item_announced',
+      item: {
+        source_item_id: 'tldr-demo-001',
+        title: 'First exact headline',
+        url: 'https://example.com/first',
+      },
+      evidence: durableEvidence,
+    },
+    {
+      event_id: 'event-jump-without-destination',
+      sequence: 3,
+      kind: 'playback_transition',
+      transition: 'jump',
+      item: {
+        source_item_id: 'tldr-demo-001',
+        title: 'First exact headline',
+        url: 'https://example.com/first',
+      },
+      evidence: durableEvidence,
+    },
+    {
+      event_id: 'event-end',
+      sequence: 4,
+      kind: 'session_boundary',
+      boundary: 'end',
+      evidence: durableEvidence,
+    }
+  );
+  malformed.integrity = {
+    state: 'complete',
+    unresolved_event_ids: [],
+    durable_event_record: {
+      filename: 'durable-session-events.jsonl',
+      sha256: `sha256:${'0'.repeat(64)}`,
+      covered_event_ids: events.map((event) => event.event_id),
+    },
+  };
+  malformed.playback = {
+    status: 'partial',
+    last_announced_source_item_id: 'tldr-demo-001',
+    resume_source_item_id: 'tldr-demo-001',
+  };
+
+  assert.throws(
+    () => parseCommuteSessionBundleText(JSON.stringify(malformed)),
+    /complete integrity cannot end with navigation awaiting its destination announcement/
+  );
+});
+
+test('rejects a complete bundle whose previous transition never announces its destination', () => {
+  const malformed = clone(validBundle);
+  const durableEvidence = [
+    {
+      source: 'durable_contemporaneous_record',
+      reference: 'durable-session-events.jsonl',
+    },
+  ];
+  const events = malformed.events as Array<Record<string, unknown>>;
+  events.unshift({
+    event_id: 'event-start',
+    sequence: 1,
+    kind: 'session_boundary',
+    boundary: 'start',
+    evidence: durableEvidence,
+  });
+  events.push(
+    {
+      event_id: 'event-previous-without-destination',
+      sequence: events.length + 1,
+      kind: 'playback_transition',
+      transition: 'previous',
+      item: {
+        source_item_id: 'tldr-demo-002',
+        title: 'Second exact headline',
+        url: 'https://example.com/second',
+      },
+      evidence: durableEvidence,
+    },
+    {
+      event_id: 'event-end',
+      sequence: events.length + 2,
+      kind: 'session_boundary',
+      boundary: 'end',
+      evidence: durableEvidence,
+    }
+  );
+  events.forEach((event, index) => {
+    event.sequence = index + 1;
+    event.evidence = durableEvidence;
+  });
+  malformed.integrity = {
+    state: 'complete',
+    unresolved_event_ids: [],
+    durable_event_record: {
+      filename: 'durable-session-events.jsonl',
+      sha256: `sha256:${'0'.repeat(64)}`,
+      covered_event_ids: events.map((event) => event.event_id),
+    },
+  };
+
+  assert.throws(
+    () => parseCommuteSessionBundleText(JSON.stringify(malformed)),
+    /complete integrity cannot end with navigation awaiting its destination announcement/
   );
 });
 
@@ -198,6 +509,9 @@ test('accepts a redundant next transition after a skip action', () => {
     evidence: [{ source: 'explicit_user_capture', reference: 'Brad said: skip' }],
   });
   (events[3] as Record<string, unknown>).sequence = 4;
+  (events[3] as Record<string, unknown>).evidence = [
+    { source: 'selected_queue_snapshot', reference: 'Queue identity after skip.' },
+  ];
   (events[4] as Record<string, unknown>).sequence = 5;
 
   const parsed = parseCommuteSessionBundleText(JSON.stringify(bundle));
@@ -227,7 +541,7 @@ test('accepts a recovered next transition whose exact departing item follows a m
       title: 'Second exact headline',
       url: 'https://example.com/second',
     },
-    evidence: [{ source: 'selected_queue_snapshot', reference: 'Recovered exact queue item.' }],
+    evidence: [{ source: 'explicit_user_capture', reference: 'Brad asked for the next item.' }],
   });
   const integrity = bundle.integrity as Record<string, unknown>;
   integrity.state = 'recovered';
