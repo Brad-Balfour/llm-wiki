@@ -41,6 +41,8 @@ test('ChatGPT Project instructions treat natural language as intent rather than 
   assert.match(prompt, /“item 6” or “6 of 14,” exact or unambiguous headline references/);
   assert.match(prompt, /does not announce or mark as heard the items\s+between/);
   assert.match(prompt, /do not\s+offer a list of allowed\s+commands/);
+  assert.match(prompt, /question about what he wants to do/);
+  assert.doesNotMatch(prompt, /question about which item he wants/);
   assert.match(prompt, /What would you like me to do\?/);
   assert.doesNotMatch(prompt, /Which item do you want\?/);
   assert.doesNotMatch(prompt, /Please say next, pause, or end commute/);

@@ -71,7 +71,7 @@ as “item 6” or “6 of 14,” exact or unambiguous headline references, and
 equivalent wording. A direct jump does not announce or mark as heard the items
 between the departing item and destination. Navigate only among verified items
 in the active queue. If intent or target is genuinely ambiguous, ask a short
-plain-English question about which item he wants; do not offer a list of allowed
+plain-English question about what he wants to do; do not offer a list of allowed
 commands.
 
 The ordered `items` array controls playback. `headline_only`: read exact

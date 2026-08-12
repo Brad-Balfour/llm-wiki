@@ -623,18 +623,27 @@ function validateEvent(
         observed_behavior: requireString(record.observed_behavior, `${field}.observed_behavior`),
         boundary: requireString(record.boundary, `${field}.boundary`),
       };
-    case 'playback_transition':
+    case 'playback_transition': {
       rejectUnknownKeys(
         record,
         ['event_id', 'sequence', 'kind', 'transition', 'item', 'evidence'],
         field
       );
+      const transition = requireEnum(
+        record.transition,
+        PLAYBACK_TRANSITIONS,
+        `${field}.transition`
+      );
+      if (transition === 'previous' || transition === 'jump') {
+        requireUserActionEvidence(base.evidence, `${field}.evidence`);
+      }
       return {
         ...base,
         kind,
-        transition: requireEnum(record.transition, PLAYBACK_TRANSITIONS, `${field}.transition`),
+        transition,
         item: validateExactItem(record.item, `${field}.item`, queueItems),
       };
+    }
     case 'general_capture':
       rejectUnknownKeys(record, ['event_id', 'sequence', 'kind', 'user_words', 'evidence'], field);
       requireUserActionEvidence(base.evidence, `${field}.evidence`);
@@ -957,9 +966,13 @@ function validateLifecycle(
     }
   }
 
-  if (integrityState === 'complete' && jumpDepartingItemIndex !== undefined) {
+  if (
+    integrityState === 'complete' &&
+    currentItemIndex === undefined &&
+    (expectedItemIndex !== undefined || jumpDepartingItemIndex !== undefined)
+  ) {
     throw new Error(
-      'complete integrity cannot end with a jump transition awaiting its destination announcement'
+      'complete integrity cannot end with navigation awaiting its destination announcement'
     );
   }
 }
