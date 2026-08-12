@@ -17,7 +17,7 @@ Library.
 - **AND** before any summary or article commentary it SHALL announce
   `Reading: <M> items from <filename>.`, give one ordered sweep containing each
   item's literal position, reading mode, and headline, and then keep item 1
-  current while it waits for Brad's command
+  current while it waits for Brad's request
 - **AND** it SHALL NOT begin item 1's summary before completing the sweep
 - **AND** it SHALL NOT insert items from another queue
 - **AND** the resulting canonical-filename lookup SHALL occur only for session
@@ -28,13 +28,13 @@ Library.
 - **WHEN** Voice completes item `M of M` in the selected queue
 - **THEN** it SHALL keep that final item current through the same approximately
   five-second interruption-friendly gap used after every other item
-- **AND** a `wiki this`, `tell me more`, `repeat`, or `pause` command during
-  that gap, or after the finished announcement, SHALL apply to the final item
+- **AND** any clear ordinary-English intent to save, explore, repeat, or pause
+  during that gap, or after the finished announcement, SHALL apply to the final item
   rather than begin export
 - **AND** after the gap it SHALL announce that canonical filename is finished
   and wait for Brad's instruction
-- **AND** it SHALL create the downloadable session bundle only after an
-  explicit `end commute` or `create bundle` command
+- **AND** it SHALL create the downloadable session bundle only after a clear
+  ordinary-English request to end the commute or create the bundle
 - **AND** it SHALL NOT ask which queue Brad would like next or automatically
   start another queue
 - **AND** after a visible bundle download, a later queue request SHALL start a
@@ -59,27 +59,38 @@ a new queue.` and stop playback
 - **AND** after reading starts it SHALL NOT search Library, switch
   queues, or repair the cursor from conversational recollection.
 
-### Requirement: Automatic, Terse Playback Is the Default
+### Requirement: Literal, Interruption-Friendly Playback Is the Default
 
-Voice SHALL automatically continue through the one selected queue unless Brad
-interrupts, says pause, or ends the session.
+Voice SHALL present only the verified current item and keep it current until
+Brad expresses another intent.
 
 #### Scenario: Normal playback
 
-- **WHEN** Brad has not interrupted or requested a pause
+- **WHEN** Voice presents the verified current item
 - **THEN** Voice SHALL announce the item's literal `N of M` phrase, reading
-  mode, and headline before any summary or article commentary
-- **AND** `headline_only` SHALL use one brisk queue-summary sentence
-- **AND** `in_depth` SHALL use one or two short queue-summary sentences and
-  SHALL retrieve or discuss the linked article only after Brad requests more
-  detail
+  mode, and exact queue headline before its summary or article commentary
+- **AND** it SHALL read the complete TLDR summary exactly as written regardless
+  of `consumption_depth`
+- **AND** it SHALL retrieve or discuss the linked article only after Brad
+  requests more detail
 - **AND** it SHALL make an approximately five-second interruption-friendly gap
-  before continuing to the next item
-- **AND** it SHALL NOT ask whether Brad wants to continue or narrate a routine
-  transition.
+  and keep the item current
+- **AND** it SHALL NOT auto-advance, ask whether Brad wants to continue, or
+  narrate a routine transition.
 
 The five-second gap is a prompt-level target, not a claim that Standard Voice
 can provide a measured timer or capture every overlapping interruption.
+
+#### Scenario: Base playback projects queue text literally
+
+- **WHEN** Voice presents any verified queue item
+- **THEN** it SHALL read the queue headline from `item.title`
+- **AND** it SHALL read the complete TLDR summary from `item.summary` exactly as
+  written
+- **AND** it SHALL NOT paraphrase, truncate, expand, combine, or select only
+  part of either field because of `consumption_depth`
+- **AND** `consumption_depth` SHALL remain metadata and an announced label, not
+  permission to rewrite the queue text.
 
 #### Scenario: Brad navigates in ordinary English
 
@@ -91,12 +102,15 @@ can provide a measured timer or capture every overlapping interruption.
 - **AND** examples in Project instructions SHALL be illustrative rather than an
   exhaustive command grammar
 - **AND** a clear request to return from the current item to its immediate
-  predecessor SHALL make that predecessor current.
+  predecessor SHALL make that predecessor current
+- **AND** a clear request for item N of M, a named item, or another unambiguous
+  queue reference SHALL make that verified item current without announcing or
+  marking intervening items as heard.
 
-#### Scenario: Voice combines spoken commands
+#### Scenario: Voice combines spoken intents
 
 - **WHEN** Voice combines multiple spoken fragments into one transcript
-- **THEN** it SHALL follow the final clear commute command in that transcript
+- **THEN** it SHALL follow the final clear commute intent in that transcript
 - **AND** it SHALL NOT reload or replace the active queue because an earlier
   fragment names a file
 - **AND** if no final intent is clear, it SHALL ask a short plain-English

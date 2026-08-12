@@ -48,6 +48,7 @@ export type PlaybackStatus = (typeof PLAYBACK_STATUSES)[number];
 export const PLAYBACK_TRANSITIONS = [
   'next',
   'previous',
+  'jump',
   'repeat',
   'interrupted',
   'voice_restart',
@@ -832,6 +833,7 @@ function validateLifecycle(
 ): void {
   let currentItemIndex: number | undefined;
   let expectedItemIndex: number | undefined = 0;
+  let jumpDepartingItemIndex: number | undefined;
   let skipAwaitingNavigation = false;
 
   for (const event of events) {
@@ -843,22 +845,30 @@ function validateLifecycle(
         skipAwaitingNavigation &&
         currentItemIndex !== undefined &&
         announcedIndex === currentItemIndex + 1;
+      const isJumpDestination =
+        jumpDepartingItemIndex !== undefined && currentItemIndex === undefined;
       if (
         (currentItemIndex !== undefined && !isImplicitNavigationAfterSkip) ||
-        expectedItemIndex === undefined
+        (expectedItemIndex === undefined && !isJumpDestination)
       ) {
         throw new Error(
-          `events[${event.sequence - 1}] item_announced must follow a valid next, previous, or repeat transition`
+          `events[${event.sequence - 1}] item_announced must follow a valid next, previous, jump, or repeat transition`
+        );
+      }
+      if (isJumpDestination && announcedIndex === jumpDepartingItemIndex) {
+        throw new Error(
+          `events[${event.sequence - 1}] jump transition must announce a different queue item`
         );
       }
       const expectedAnnouncementIndex =
         currentItemIndex === undefined ? expectedItemIndex : currentItemIndex + 1;
-      if (announcedIndex !== expectedAnnouncementIndex) {
+      if (!isJumpDestination && announcedIndex !== expectedAnnouncementIndex) {
         throw new Error(
           `events[${event.sequence - 1}] item_announced does not match the expected queue position`
         );
       }
       currentItemIndex = announcedIndex;
+      jumpDepartingItemIndex = undefined;
       skipAwaitingNavigation = false;
       continue;
     }
@@ -913,6 +923,7 @@ function validateLifecycle(
       if (event.transition === 'next') {
         expectedItemIndex = announcedItemIndex + 1;
         currentItemIndex = undefined;
+        jumpDepartingItemIndex = undefined;
         skipAwaitingNavigation = false;
       } else if (event.transition === 'previous') {
         if (announcedItemIndex === 0) {
@@ -922,6 +933,12 @@ function validateLifecycle(
         }
         expectedItemIndex = announcedItemIndex - 1;
         currentItemIndex = undefined;
+        jumpDepartingItemIndex = undefined;
+        skipAwaitingNavigation = false;
+      } else if (event.transition === 'jump') {
+        expectedItemIndex = undefined;
+        currentItemIndex = undefined;
+        jumpDepartingItemIndex = announcedItemIndex;
         skipAwaitingNavigation = false;
       } else if (event.transition === 'repeat') {
         // A repeat must be followed by a fresh announcement before any later
@@ -929,10 +946,12 @@ function validateLifecycle(
         // from being silently attributed to a stale announcement.
         expectedItemIndex = announcedItemIndex;
         currentItemIndex = undefined;
+        jumpDepartingItemIndex = undefined;
         skipAwaitingNavigation = false;
       } else {
         currentItemIndex = undefined;
         expectedItemIndex = undefined;
+        jumpDepartingItemIndex = undefined;
         skipAwaitingNavigation = false;
       }
     }

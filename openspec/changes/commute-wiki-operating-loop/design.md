@@ -217,8 +217,10 @@ item-specific action is valid only when it identifies an exact current queue
 item and has direct user evidence; it does not require Brad to use a memorized
 spoken phrase. Ordinary English is interpreted by intent and normalized into
 internal events; the event enum is not user-facing vocabulary. Next, previous,
-skip, repeat, interrupted discussion, and duplicate speech recognition all
-produce explicit transitions or an unresolved capture.
+direct jump, skip, repeat, interrupted discussion, and duplicate speech
+recognition all produce explicit transitions or an unresolved capture. A direct
+jump records only the departing and destination items, never invented playback
+of intervening items.
 For partial/recovered sessions, an exact next transition may repair a missing
 announcement cursor, but never retroactively binds an ambiguous wiki request.
 This is a structural guard against attaching feedback to any real-but-wrong item
@@ -273,9 +275,9 @@ input queues have been checked.
 
 Bundle event order has one intentionally minimal transition rule: an
 `item_announced` event identifies the item that became current, while a
-`playback_transition` identifies the item being left. For `next` or `previous`,
-the following `item_announced` identifies the destination. Recording both items
-on the transition would duplicate identity and add a second mismatch
+`playback_transition` identifies the item being left. For `next`, `previous`, or
+`jump`, the following `item_announced` identifies the destination. Recording
+both items on the transition would duplicate identity and add a second mismatch
 opportunity.
 
 ## Journey Contract

@@ -223,6 +223,17 @@ item-specific action can be validated against the announced current item.
 - **AND** Brad SHALL NOT be required to speak the word `previous` or any other
   schema vocabulary.
 
+#### Scenario: Jump directly to another queue item
+
+- **WHEN** Brad clearly requests item N of M, names an unambiguous item, or uses
+  equivalent ordinary English to select another verified queue item
+- **THEN** the bundle SHALL normalize that intent as a `jump` transition
+- **AND** the transition SHALL identify the current, departing item
+- **AND** the following `item_announced` record SHALL identify the requested
+  destination item
+- **AND** the bundle SHALL NOT invent announcements or playback for intervening
+  queue items.
+
 ### Requirement: Quality Incidents Do Not Require Model Diagnosis
 
 A session bundle SHALL retain user-observed or structurally detected product

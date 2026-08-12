@@ -450,8 +450,9 @@ AI failed because the commute deliberately advanced to item seven and then
 returned to item six, while the then-current event contract offered `next`,
 `repeat`, `interrupted`, `voice_restart`, and `duplicate_recognition` but no
 previous/back transition. The 7-to-6 sequence was normal driver behavior, not a
-playback defect. Prompt Revision 3.2 and the additive `previous` event now make
-that internal normalization explicit without constraining Brad's wording.
+playback defect. Prompt Revision 3.2 and the additive `previous` and `jump`
+events now make internal navigation normalization explicit without constraining
+Brad's wording or inventing playback of intervening items.
 
 Home-side normalization removed General's impossible resume cursor and retained
 that export contradiction as a quality incident. For AI, it preserved Brad's
@@ -669,8 +670,11 @@ natural-language boundary explicit:
 8. Preserve semantic contradictions for home-side conversion; do not stop the
    commute or discard the rest of the bundle.
 9. Interpret Brad's ordinary English by intent, never as a closed command
-   grammar; normalize clear navigation into internal events without asking him
-   to speak schema vocabulary.
+   grammar; normalize adjacent and direct named/numbered navigation into
+   internal events without asking him to speak schema vocabulary.
+10. In base playback, read the queue headline and complete TLDR summary exactly
+    as written. `consumption_depth` is metadata and an announced label, not
+    permission to paraphrase, truncate, or select sentences.
 
 This is a bounded recovery strategy, not an explanation of root cause. It
 addresses the observed difference between exact search and recent-file listing

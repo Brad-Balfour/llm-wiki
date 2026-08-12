@@ -215,6 +215,85 @@ test('rejects previous-item navigation before the first queue item', () => {
   );
 });
 
+test('accepts a direct jump without inventing intervening announcements', () => {
+  const bundle = clone(validBundle);
+  const queueSnapshot = bundle.queue_snapshot as Record<string, unknown>;
+  const queue = queueSnapshot.queue as Record<string, unknown>;
+  const items = queue.items as Array<Record<string, unknown>>;
+  const third = clone(items[1]!) as Record<string, unknown>;
+  third.playback = { position: 3, total: 3, spoken: '3 of 3' };
+  third.source_item_id = 'tldr-demo-003';
+  third.title = 'Third exact headline';
+  third.summary = 'Third summary';
+  third.url = 'https://example.com/third';
+  items.push(third);
+  queue.total_items = 3;
+  (items[0]!.playback as Record<string, unknown>).total = 3;
+  (items[0]!.playback as Record<string, unknown>).spoken = '1 of 3';
+  (items[1]!.playback as Record<string, unknown>).total = 3;
+  (items[1]!.playback as Record<string, unknown>).spoken = '2 of 3';
+
+  const events = bundle.events as Array<Record<string, unknown>>;
+  events.splice(
+    2,
+    2,
+    {
+      event_id: 'event-jump',
+      sequence: 3,
+      kind: 'playback_transition',
+      transition: 'jump',
+      item: {
+        source_item_id: 'tldr-demo-001',
+        title: 'First exact headline',
+        url: 'https://example.com/first',
+      },
+      evidence: [
+        {
+          source: 'explicit_user_capture',
+          reference: 'Brad said: take me directly to item 3 of 3.',
+        },
+      ],
+    },
+    {
+      event_id: 'event-announced-jump-destination',
+      sequence: 4,
+      kind: 'item_announced',
+      item: {
+        source_item_id: 'tldr-demo-003',
+        title: 'Third exact headline',
+        url: 'https://example.com/third',
+      },
+      evidence: [{ source: 'selected_queue_snapshot', reference: 'Jumped to item 3 of 3.' }],
+    }
+  );
+  const playback = bundle.playback as Record<string, unknown>;
+  playback.last_announced_source_item_id = 'tldr-demo-003';
+  playback.resume_source_item_id = 'tldr-demo-003';
+
+  const parsed = parseCommuteSessionBundleText(JSON.stringify(bundle));
+
+  assert.equal(parsed.events[2]?.kind, 'playback_transition');
+  assert.equal(parsed.events[2]?.transition, 'jump');
+  assert.equal(parsed.events[3]?.kind, 'item_announced');
+  assert.equal(parsed.events[3]?.item.source_item_id, 'tldr-demo-003');
+  assert.equal(parsed.playback.resume_source_item_id, 'tldr-demo-003');
+});
+
+test('rejects a jump that re-announces the departing item', () => {
+  const malformed = clone(validBundle);
+  const events = malformed.events as Array<Record<string, unknown>>;
+  events[2]!.transition = 'jump';
+  const destination = events[3]!.item as Record<string, unknown>;
+  destination.source_item_id = 'tldr-demo-001';
+  destination.title = 'First exact headline';
+  destination.url = 'https://example.com/first';
+
+  assert.throws(
+    () => parseCommuteSessionBundleText(JSON.stringify(malformed)),
+    /jump transition must announce a different queue item/
+  );
+});
+
 test('rejects an out-of-order queue announcement after a next transition', () => {
   const malformed = clone(validBundle);
   const events = malformed.events as Array<Record<string, unknown>>;

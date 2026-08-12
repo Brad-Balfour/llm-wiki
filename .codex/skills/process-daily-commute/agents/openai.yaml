@@ -1,0 +1,4 @@
+interface:
+  display_name: 'Process Daily Commute'
+  short_description: 'Complete the daily commute evidence loop'
+  default_prompt: "Use $process-daily-commute to process today's commute queues, bundles, and shared chats through reviewed GitHub handoff."
