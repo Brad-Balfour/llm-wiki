@@ -123,7 +123,7 @@ test('requires a fresh announcement after repeat before accepting feedback', () 
       title: 'First exact headline',
       url: 'https://example.com/first',
     },
-    evidence: [{ source: 'selected_queue_snapshot', reference: 'Brad said repeat' }],
+    evidence: [{ source: 'explicit_user_capture', reference: 'Brad said repeat' }],
   });
   events[3]!.sequence = 4;
   events[4]!.sequence = 5;
@@ -297,8 +297,8 @@ test('rejects a jump that re-announces the departing item', () => {
   );
 });
 
-test('requires direct user evidence for previous and jump navigation', () => {
-  for (const transition of ['previous', 'jump']) {
+test('requires direct user evidence for previous, jump, and repeat navigation', () => {
+  for (const transition of ['previous', 'jump', 'repeat']) {
     const malformed = clone(validBundle);
     const events = malformed.events as Array<Record<string, unknown>>;
     events.push({
@@ -319,6 +319,17 @@ test('requires direct user evidence for previous and jump navigation', () => {
       /must include direct evidence of the user's action/
     );
   }
+});
+
+test('requires direct user evidence for next without an evidenced skip', () => {
+  const malformed = clone(validBundle);
+  const events = malformed.events as Array<Record<string, unknown>>;
+  events[2]!.evidence = [{ source: 'selected_queue_snapshot', reference: 'Queue identity only.' }];
+
+  assert.throws(
+    () => parseCommuteSessionBundleText(JSON.stringify(malformed)),
+    /next transition must include direct user evidence or follow an evidenced skip action/
+  );
 });
 
 test('rejects a complete bundle whose jump never announces its destination', () => {
@@ -498,6 +509,9 @@ test('accepts a redundant next transition after a skip action', () => {
     evidence: [{ source: 'explicit_user_capture', reference: 'Brad said: skip' }],
   });
   (events[3] as Record<string, unknown>).sequence = 4;
+  (events[3] as Record<string, unknown>).evidence = [
+    { source: 'selected_queue_snapshot', reference: 'Queue identity after skip.' },
+  ];
   (events[4] as Record<string, unknown>).sequence = 5;
 
   const parsed = parseCommuteSessionBundleText(JSON.stringify(bundle));
@@ -527,7 +541,7 @@ test('accepts a recovered next transition whose exact departing item follows a m
       title: 'Second exact headline',
       url: 'https://example.com/second',
     },
-    evidence: [{ source: 'selected_queue_snapshot', reference: 'Recovered exact queue item.' }],
+    evidence: [{ source: 'explicit_user_capture', reference: 'Brad asked for the next item.' }],
   });
   const integrity = bundle.integrity as Record<string, unknown>;
   integrity.state = 'recovered';

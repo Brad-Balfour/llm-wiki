@@ -124,8 +124,8 @@
       },
       "evidence": [
         {
-          "source": "selected_queue_snapshot",
-          "reference": "automatic queue advance"
+          "source": "explicit_user_capture",
+          "reference": "Brad asked to move to the next item."
         }
       ]
     },

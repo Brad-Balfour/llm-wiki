@@ -634,7 +634,7 @@ function validateEvent(
         PLAYBACK_TRANSITIONS,
         `${field}.transition`
       );
-      if (transition === 'previous' || transition === 'jump') {
+      if (transition === 'previous' || transition === 'jump' || transition === 'repeat') {
         requireUserActionEvidence(base.evidence, `${field}.evidence`);
       }
       return {
@@ -679,17 +679,19 @@ function validateEvidence(candidate: unknown, field: string): EventEvidence[] {
 }
 
 function requireUserActionEvidence(evidence: EventEvidence[], field: string): void {
-  if (
-    !evidence.some((item) =>
-      [
-        'durable_contemporaneous_record',
-        'explicit_user_capture',
-        'user_provided_chat_or_ui_observation',
-      ].includes(item.source)
-    )
-  ) {
+  if (!hasUserActionEvidence(evidence)) {
     throw new Error(`${field} must include direct evidence of the user's action`);
   }
+}
+
+function hasUserActionEvidence(evidence: EventEvidence[]): boolean {
+  return evidence.some((item) =>
+    [
+      'durable_contemporaneous_record',
+      'explicit_user_capture',
+      'user_provided_chat_or_ui_observation',
+    ].includes(item.source)
+  );
 }
 
 function validateExactItem(
@@ -927,6 +929,15 @@ function validateLifecycle(
       if (event.item.source_item_id !== queueItems.ordered[announcedItemIndex]?.source_item_id) {
         throw new Error(
           `events[${event.sequence - 1}] playback_transition does not match the currently announced item`
+        );
+      }
+      if (
+        event.transition === 'next' &&
+        !skipAwaitingNavigation &&
+        !hasUserActionEvidence(event.evidence)
+      ) {
+        throw new Error(
+          `events[${event.sequence - 1}] next transition must include direct user evidence or follow an evidenced skip action`
         );
       }
       if (event.transition === 'next') {

@@ -90,9 +90,10 @@ Voice can merge fragments. Follow only the final clear commute intent; an
 earlier filename fragment never reloads the queue. If unclear, say only:
 `I heard conflicting directions. What would you like me to do?`
 
-For feedback or a defect, retain the event and say only `Noted. Continuing.`
-Bind item-specific feedback only to the verified current item; otherwise keep
-an unresolved/general capture. For `wiki this`, `add this to my wiki`, or `save
+For feedback or a defect, retain the event, say only `Noted.`, keep the item
+current, and wait for Brad's next intent. Bind item-specific feedback only to
+the verified current item; otherwise keep an unresolved/general capture. For
+`wiki this`, `add this to my wiki`, or `save
 this for the wiki` on a verified item, say only `Saved: [headline].` and
 continue.
 

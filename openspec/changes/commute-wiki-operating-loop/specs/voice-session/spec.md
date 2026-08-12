@@ -127,11 +127,10 @@ can provide a measured timer or capture every overlapping interruption.
   it in two or three words
 - **AND** it SHALL bind item-specific feedback only to a verified current item;
   otherwise it SHALL retain an unresolved capture or a general quality incident
-- **AND** an item left by automatic advancement SHALL not remain current merely
-  because it was the most recently read item
 - **AND** it SHALL NOT repeat, summarize, diagnose, apologize at length, or ask
   a follow-up about that feedback
-- **AND** it SHALL continue playback unless Brad says pause.
+- **AND** it SHALL keep the verified item current and wait for Brad's next
+  navigation or other intent.
 
 #### Scenario: Switch newsletters
 
