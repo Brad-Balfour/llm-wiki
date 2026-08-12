@@ -55,7 +55,7 @@ Library.
 - **AND** if the selected queue is lost, a new/restarted chat lacks a fresh
   date/newsletter or exact-filename request, or an identified item conflicts
   with it, it SHALL say `Queue context lost. End this Voice session and start
-  a new queue.` and stop playback
+a new queue.` and stop playback
 - **AND** after reading starts it SHALL NOT search Library, switch
   queues, or repair the cursor from conversational recollection.
 
@@ -81,14 +81,27 @@ interrupts, says pause, or ends the session.
 The five-second gap is a prompt-level target, not a claim that Standard Voice
 can provide a measured timer or capture every overlapping interruption.
 
+#### Scenario: Brad navigates in ordinary English
+
+- **WHEN** Brad clearly expresses a playback intent in ordinary English,
+  including a synonym, paraphrase, named item, or position reference
+- **THEN** Voice SHALL perform that intent against the verified active queue
+- **AND** it SHALL normalize the action into internal event vocabulary without
+  requiring Brad to say an enum value, schema term, or memorized phrase
+- **AND** examples in Project instructions SHALL be illustrative rather than an
+  exhaustive command grammar
+- **AND** a clear request to return from the current item to its immediate
+  predecessor SHALL make that predecessor current.
+
 #### Scenario: Voice combines spoken commands
 
 - **WHEN** Voice combines multiple spoken fragments into one transcript
 - **THEN** it SHALL follow the final clear commute command in that transcript
 - **AND** it SHALL NOT reload or replace the active queue because an earlier
   fragment names a file
-- **AND** if no final command is clear, it SHALL request one of `next`, `pause`,
-  or `end commute` in a short response.
+- **AND** if no final intent is clear, it SHALL ask a short plain-English
+  clarification about the intended action or item without listing allowed
+  commands.
 
 #### Scenario: Brad gives feedback during playback
 

@@ -270,6 +270,7 @@
                 "transition": {
                   "enum": [
                     "next",
+                    "previous",
                     "repeat",
                     "interrupted",
                     "voice_restart",
@@ -277,7 +278,7 @@
                   ]
                 },
                 "item": {
-                  "description": "The item that is current immediately before this transition. For transition next, this is the departing item; the following item_announced event identifies the destination item.",
+                  "description": "The item that is current immediately before this transition. For next or previous, this is the departing item; the following item_announced event identifies the destination item.",
                   "$ref": "#/$defs/item"
                 },
                 "evidence": {

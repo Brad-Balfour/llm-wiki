@@ -212,11 +212,13 @@ rejects a `complete` declaration that lacks the required evidence coverage.
 
 ### 12. Event ordering is required for exact action binding
 
-The bundle records a monotonic sequence of queue states and actions. An
+The bundle records an ordered sequence of queue states and actions. An
 item-specific action is valid only when it identifies an exact current queue
 item and has direct user evidence; it does not require Brad to use a memorized
-spoken phrase. `next`, skip, repeat, interrupted discussion, and duplicate
-speech recognition all produce explicit transitions or an unresolved capture.
+spoken phrase. Ordinary English is interpreted by intent and normalized into
+internal events; the event enum is not user-facing vocabulary. Next, previous,
+skip, repeat, interrupted discussion, and duplicate speech recognition all
+produce explicit transitions or an unresolved capture.
 For partial/recovered sessions, an exact next transition may repair a missing
 announcement cursor, but never retroactively binds an ambiguous wiki request.
 This is a structural guard against attaching feedback to any real-but-wrong item
@@ -271,9 +273,10 @@ input queues have been checked.
 
 Bundle event order has one intentionally minimal transition rule: an
 `item_announced` event identifies the item that became current, while a
-`playback_transition` identifies the item being left. For `next`, the next
-`item_announced` identifies the destination. Recording both items on the
-transition would duplicate identity and add a second mismatch opportunity.
+`playback_transition` identifies the item being left. For `next` or `previous`,
+the following `item_announced` identifies the destination. Recording both items
+on the transition would duplicate identity and add a second mismatch
+opportunity.
 
 ## Journey Contract
 

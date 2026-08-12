@@ -149,6 +149,72 @@ test('requires a fresh announcement after repeat before accepting feedback', () 
   );
 });
 
+test('accepts previous-item navigation while keeping the transition bound to the departing item', () => {
+  const bundle = clone(validBundle);
+  const events = bundle.events as Array<Record<string, unknown>>;
+  events.push(
+    {
+      event_id: 'event-previous',
+      sequence: 5,
+      kind: 'playback_transition',
+      transition: 'previous',
+      item: {
+        source_item_id: 'tldr-demo-002',
+        title: 'Second exact headline',
+        url: 'https://example.com/second',
+      },
+      evidence: [
+        {
+          source: 'explicit_user_capture',
+          reference: 'Brad said: go back from seven to six so we can discuss it more.',
+        },
+      ],
+    },
+    {
+      event_id: 'event-reannounced-previous',
+      sequence: 6,
+      kind: 'item_announced',
+      item: {
+        source_item_id: 'tldr-demo-001',
+        title: 'First exact headline',
+        url: 'https://example.com/first',
+      },
+      evidence: [{ source: 'selected_queue_snapshot', reference: 'Returned to item one.' }],
+    }
+  );
+  const playback = bundle.playback as Record<string, unknown>;
+  playback.last_announced_source_item_id = 'tldr-demo-001';
+  playback.resume_source_item_id = 'tldr-demo-001';
+
+  const parsed = parseCommuteSessionBundleText(JSON.stringify(bundle));
+
+  assert.equal(parsed.events[4]?.kind, 'playback_transition');
+  assert.equal(parsed.events[4]?.transition, 'previous');
+  assert.equal(parsed.playback.resume_source_item_id, 'tldr-demo-001');
+});
+
+test('rejects previous-item navigation before the first queue item', () => {
+  const malformed = clone(validBundle);
+  const events = malformed.events as Array<Record<string, unknown>>;
+  events.splice(1, events.length - 1, {
+    event_id: 'event-previous-before-first',
+    sequence: 2,
+    kind: 'playback_transition',
+    transition: 'previous',
+    item: {
+      source_item_id: 'tldr-demo-001',
+      title: 'First exact headline',
+      url: 'https://example.com/first',
+    },
+    evidence: [{ source: 'explicit_user_capture', reference: 'Brad asked to go back.' }],
+  });
+
+  assert.throws(
+    () => parseCommuteSessionBundleText(JSON.stringify(malformed)),
+    /previous transition cannot move before the first queue item/
+  );
+});
+
 test('rejects an out-of-order queue announcement after a next transition', () => {
   const malformed = clone(validBundle);
   const events = malformed.events as Array<Record<string, unknown>>;

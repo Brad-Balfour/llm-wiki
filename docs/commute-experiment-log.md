@@ -447,17 +447,19 @@ seven Dev items, and seven AI items. Their embedded snapshots matched the
 separately downloaded queues exactly. Dev's downloaded bundle passed strict
 validation. General failed because completed playback retained a resume cursor.
 AI failed because the commute deliberately advanced to item seven and then
-returned to item six, while the current event contract offers `next`, `repeat`,
-`pause`, and `end` but no previous/back transition. The 7-to-6 sequence was
-normal driver behavior, not a playback defect.
+returned to item six, while the then-current event contract offered `next`,
+`repeat`, `interrupted`, `voice_restart`, and `duplicate_recognition` but no
+previous/back transition. The 7-to-6 sequence was normal driver behavior, not a
+playback defect. Prompt Revision 3.2 and the additive `previous` event now make
+that internal normalization explicit without constraining Brad's wording.
 
 Home-side normalization removed General's impossible resume cursor and retained
 that export contradiction as a quality incident. For AI, it preserved Brad's
-direct clarification and the shared-chat evidence as a contract-coverage
-incident while keeping the true final item-six cursor; it did not claim that
-item seven was never announced. All three repaired bundles then passed strict
+direct clarification and the shared-chat evidence by normalizing the clear
+return as `previous`, while keeping both the item-seven announcement and the
+true final item-six cursor. All three repaired bundles then passed strict
 validation and canonical queue comparison. Combined intake recorded three
-accepted recovered sessions, eight quality incidents, four general captures,
+accepted recovered sessions, seven quality incidents, four general captures,
 and no maintenance candidates, classifier-feedback events, unresolved
 captures, or semantic conversions.
 
@@ -645,10 +647,11 @@ prove queue identity across interruptions.
 | Reconstruct an item from topic memory or position alone | Rejected     | The Jul. 22 Kiro and Dev mismatches show that this creates false captures.                                      |
 | Stronger wording alone                                  | Insufficient | Prompt revisions improved expectations and validation language but cannot guarantee Library tool availability.  |
 
-## Repository Queue-Discovery Rule: Prompt 3.1 Candidate
+## Repository Queue-Discovery Rule: Prompt 3.2 Candidate
 
-Prompt 3.1 keeps Prompt 3.0's discovery ordering and direct per-item field
-projection, and adds the August 4-5 playback guards:
+Prompt 3.2 keeps Prompt 3.1's discovery ordering and direct per-item field
+projection, adds the August 4-5 playback guards, and makes the August 11
+natural-language boundary explicit:
 
 1. Search for the canonical filename first.
 2. If that fails, list recent Project Library files and inspect plausible queue
@@ -665,6 +668,9 @@ projection, and adds the August 4-5 playback guards:
    v2 item contains a URL.
 8. Preserve semantic contradictions for home-side conversion; do not stop the
    commute or discard the rest of the bundle.
+9. Interpret Brad's ordinary English by intent, never as a closed command
+   grammar; normalize clear navigation into internal events without asking him
+   to speak schema vocabulary.
 
 This is a bounded recovery strategy, not an explanation of root cause. It
 addresses the observed difference between exact search and recent-file listing

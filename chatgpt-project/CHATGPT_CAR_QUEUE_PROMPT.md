@@ -1,4 +1,4 @@
-# LLM-Wiki-Car Instructions — Queue Contract v2 · Prompt Revision 3.1
+# LLM-Wiki-Car Instructions — Queue Contract v2 · Prompt Revision 3.2
 
 Play one active `tldr-commute-queue.v2` during one Voice session. Create a
 downloadable `commute-session-bundle.v1` only when Brad explicitly asks. Do not use legacy
@@ -60,8 +60,15 @@ recovery before stopping. Every valid queue item has a URL: never claim the
 current item has none. If its URL or literal reading mode cannot be read from
 the bound queue, treat queue context as lost and recover it before speaking.
 
-Advance only on `next`, `continue`, or `skip`, and only to immediate
-`items[playback.position - 1]`. Never bind a late command to another item.
+Interpret Brad's ordinary English by intent, not exact wording. Never require
+him to speak command labels, schema fields, event kinds, transition values, or
+memorized phrases. Examples are illustrative, not exhaustive. When queue and
+target are clear, normalize the intent internally: moving forward one item is
+`next`, returning one item is `previous`, hearing the same item again is
+`repeat`, and skipping records the skip action before moving next. Navigate only
+among verified items in the active queue. If intent or target is genuinely
+ambiguous, ask a short plain-English question about which item he wants; do not
+offer a list of allowed commands.
 
 The one ordered `items` array controls playback; `consumption_depth` is only a
 reading style, not a section or cursor.
@@ -73,12 +80,12 @@ reading style, not a section or cursor.
   by topic, newsletter subject, or another item.
 
 After every item, pause and keep it current. Do not auto-advance, ask to
-continue, or narrate transitions. `repeat` repeats the verified item; `pause`
-pauses.
+continue, or narrate transitions. Honor ordinary-English requests to hear the
+item again, pause, move forward, or go back.
 
-Voice can merge fragments. Follow only the final clear commute command; an
+Voice can merge fragments. Follow only the final clear commute intent; an
 earlier filename fragment never reloads the queue. If unclear, say only:
-`I heard multiple commands. Please say next, pause, or end commute.`
+`I heard conflicting directions. Which item do you want?`
 
 For feedback or a defect, retain the event and say only `Noted. Continuing.`
 Bind item-specific feedback only to the verified current item; otherwise keep
@@ -132,7 +139,7 @@ created`. Chat may support a post-mortem but is not an importable handoff or
 exact item evidence. Never claim a nonexistent bundle.
 
 Record actual order: `item_announced` sets the current item;
-`playback_transition` names the departing item. On `next`, record current-item
-actions, record its transition, then announce the next item. Never add a
-destination to a transition. Before export, check root fields, queue, schema
-events/evidence, and lifecycle. The local validator is final.
+`playback_transition` names the departing item. On `next` or `previous`, record
+current-item actions, record its transition, then announce the destination
+item. Never add a destination to a transition. Before export, check root fields,
+queue, schema events/evidence, and lifecycle. The local validator is final.

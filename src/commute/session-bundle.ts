@@ -47,6 +47,7 @@ export type PlaybackStatus = (typeof PLAYBACK_STATUSES)[number];
 
 export const PLAYBACK_TRANSITIONS = [
   'next',
+  'previous',
   'repeat',
   'interrupted',
   'voice_restart',
@@ -847,7 +848,7 @@ function validateLifecycle(
         expectedItemIndex === undefined
       ) {
         throw new Error(
-          `events[${event.sequence - 1}] item_announced must follow a valid next or repeat transition`
+          `events[${event.sequence - 1}] item_announced must follow a valid next, previous, or repeat transition`
         );
       }
       const expectedAnnouncementIndex =
@@ -911,6 +912,15 @@ function validateLifecycle(
       }
       if (event.transition === 'next') {
         expectedItemIndex = announcedItemIndex + 1;
+        currentItemIndex = undefined;
+        skipAwaitingNavigation = false;
+      } else if (event.transition === 'previous') {
+        if (announcedItemIndex === 0) {
+          throw new Error(
+            `events[${event.sequence - 1}] previous transition cannot move before the first queue item`
+          );
+        }
+        expectedItemIndex = announcedItemIndex - 1;
         currentItemIndex = undefined;
         skipAwaitingNavigation = false;
       } else if (event.transition === 'repeat') {
