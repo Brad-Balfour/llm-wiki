@@ -67,11 +67,9 @@ Voice may start a queue by an exact filename or an unambiguous date plus
 newsletter name, such as `July 16 TLDR Dev`. The Project normalizes that request
 to the dated v2 filename in its Library; it must not guess a nearby queue.
 
-Do not upload the legacy `commute-session-handoff.md`,
-`commute-session-ledger.md`, `wiki-ingestion.md`, any `commute-handoff` schema,
-or `approved-wiki-source-v1.schema.json` as live Project sources. They conflict
-with the v2 single-queue/session-bundle path. Their Git history remains the
-rollback record.
+Do not restore retired handoff, ledger, wiki-approval, or compiler artifacts
+from Git history as live Project sources. They conflict with the supported v2
+single-queue/session-bundle path.
 
 The synonymous commute commands are "End commute" and "End the commute
 session." An exact `wiki this` capture is sufficient to nominate maintenance;

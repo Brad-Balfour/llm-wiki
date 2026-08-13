@@ -30,23 +30,22 @@ direction.
 
 `llm-wiki` is a personal, Karpathy-style OKR and memory wiki with a TLDR
 ingestion pipeline. It saves useful knowledge and publishes the GitHub Pages
-wiki. A named `ingest:*` or `compile:wiki` command is authorization to make its
-intended wiki updates; do not invent review queues, permissions, attestations,
-or confirmation flags.
+wiki. Exact commute `wiki_this` captures authorize the maintainer to propose
+wiki changes directly in a PR; do not invent review queues, permissions,
+attestations, or confirmation flags.
 
 The active planning contracts are:
 
 - `openspec/changes/bootstrap-llm-wiki-mvp/` for retained TLDR parsing,
-  classifier/routing, queue, compiler, and runtime behavior; and
+  classifier/routing, queue, and runtime behavior; and
 - `openspec/changes/commute-wiki-operating-loop/` for journey boundaries J1-J6
   (scheduled queue output through wiki-maintainer PR).
 
-For J1-J6 planning and opt-in successor implementation work, read both changes
-and follow the compatibility map in `commute-wiki-operating-loop/design.md`;
-when they conflict, the successor change governs the new path. Bootstrap v1/v2
-handoffs and the current compiler remain the deployed/runtime default and
-legacy-compatible until the successor's stated migration criteria pass.
-Treat archived changes as history, not current direction.
+For commute planning, read both changes and follow the compatibility map in
+`commute-wiki-operating-loop/design.md`; when they conflict, the operating-loop
+change governs. The session-bundle importer and direct maintainer PR are the
+only supported post-commute path. Treat removed handoff/compiler behavior and
+archived changes as history, not current direction.
 
 ## Repository map
 
@@ -55,10 +54,9 @@ Treat archived changes as history, not current direction.
 | `src/tldr/`                              | Parse and sanitize TLDR email text.                               |
 | `src/classifier/`                        | Validate source-neutral model classification.                     |
 | `src/routing/`                           | Derive commute, wiki, stream-log, discard, and review behavior.   |
-| `src/commute/`                           | Import and validate commute handoffs.                             |
-| `src/wiki/`                              | Validate sources and compile provenance-preserving wiki pages.    |
-| `schema/`                                | Versioned contracts, routing rules, profiles, and compiler state. |
-| `sources/`                               | Sanitized source records.                                         |
+| `src/commute/`                           | Validate and reconcile session bundles.                           |
+| `src/wiki/`                              | Retrieve sources and run direct PR maintenance.                   |
+| `schema/`                                | Versioned contracts, routing rules, and profiles.                 |
 | `wiki/`                                  | GitHub Pages content and entry template.                          |
 | `tests/fixtures/` and `tests/`           | Node test fixtures and focused contract coverage.                 |
 | `docs/` and `chatgpt-project/`           | Operator runbooks and project prompts; keep commands accurate.    |
@@ -93,18 +91,16 @@ the task introduces that surface.
 
 - Keep raw credentials, API keys, `.env` contents, raw Gmail bodies, and private
   work material out of Git.
-- Preserve source provenance and stable identifiers. In normal operation, avoid
-  rewriting an existing source record; make a deliberate schema migration
-  explicit in its OpenSpec change and tests.
+- Preserve stable source identifiers and article URLs in wiki provenance.
 - Keep classifier output source-neutral. It must not emit routes,
   `voice_behavior`, wiki destinations, review choices, or discard behavior.
   Derive those in `src/routing/` according to `schema/routing-rules.md`.
 - Validate structured model output and handle malformed output explicitly. Do
   not silently drop records or invent values.
-- Parser, classifier, routing, queue, feedback, and compiler changes need
+- Parser, classifier, routing, queue, feedback, and maintainer changes need
   focused fixtures and tests. Update the schema and operator documentation when
   a contract or CLI changes.
-- Preserve idempotence and provenance in ingestion and compilation paths.
+- Preserve idempotence and provenance in ingestion and maintenance paths.
 - Keep public Markdown compatible with GitHub Pages/Jekyll.
 - LLM enrichment may be optional, but deterministic URL and source ingestion
   must not require an API key or a paid model.

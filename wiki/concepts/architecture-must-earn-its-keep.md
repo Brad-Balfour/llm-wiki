@@ -10,7 +10,7 @@ created: 2026-07-29
 updated: 2026-07-29
 confidence: high
 # prettier-ignore
-provenance: [{"source_item_id":"19fa86ef4f3e7e84-07","source_path":"sources/tldr/2026-07-28-architecture-must-earn-its-keep.txt","url":"https://tanstack.com/blog/we-stopped-using-rsc-on-tanstack-com"}]
+provenance: [{"source_item_id":"19fa86ef4f3e7e84-07","url":"https://tanstack.com/blog/we-stopped-using-rsc-on-tanstack-com"}]
 ---
 
 # Architecture Must Earn Its Keep

@@ -10,7 +10,7 @@ created: 2026-07-31
 updated: 2026-07-31
 confidence: high
 # prettier-ignore
-provenance: [{"source_item_id":"19fb2b55e8becbaa-06","source_path":"sources/tldr/2026-07-30-prompt-deployment-gates.txt","url":"https://luke.geek.nz/azure/eval-gates-for-prompts/"}]
+provenance: [{"source_item_id":"19fb2b55e8becbaa-06","url":"https://luke.geek.nz/azure/eval-gates-for-prompts/"}]
 ---
 
 # Prompt Deployment Gates

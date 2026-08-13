@@ -16,10 +16,15 @@ import {
   requireStringArray,
   requireUniqueStrings,
 } from '../shared/validate.js';
-import type { VoiceSurface } from './handoff.js';
-import { VOICE_SURFACES } from './handoff.js';
-
 export const COMMUTE_SESSION_BUNDLE_SCHEMA_VERSION = 'commute-session-bundle.v1';
+
+export const VOICE_SURFACES = [
+  'chatgpt_live',
+  'chatgpt_advanced',
+  'chatgpt_standard',
+  'other',
+] as const;
+export type VoiceSurface = (typeof VOICE_SURFACES)[number];
 
 export const INTEGRITY_STATES = ['complete', 'partial', 'recovered'] as const;
 export type IntegrityState = (typeof INTEGRITY_STATES)[number];

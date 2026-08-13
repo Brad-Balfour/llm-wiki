@@ -10,7 +10,7 @@ created: 2026-07-16
 updated: 2026-07-16
 confidence: medium
 # prettier-ignore
-provenance: [{"source_item_id":"19f60cf507a74afc-06","source_path":"sources/tldr/2026-07-14-mantis-skills.txt","url":"https://github.com/google/mantis"}]
+provenance: [{"source_item_id":"19f60cf507a74afc-06","url":"https://github.com/google/mantis"}]
 ---
 
 # Mantis Skills

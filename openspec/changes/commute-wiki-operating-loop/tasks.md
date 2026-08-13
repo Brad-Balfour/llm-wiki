@@ -101,7 +101,7 @@ combine unrelated conversations or queues into one queue.
       top-level user-facing command, with no intermediate intake review gate.
 - [x] 4.3 Add fixtures and review guidance for inaccessible URLs, duplicate
       source concepts, updates to existing concepts, and link-only changes.
-- [ ] 4.4 Review early maintainer PRs manually before defining any auto-merge
+- [x] 4.4 Review early maintainer PRs manually before defining any auto-merge
       subset.
 - [x] 4.5 Document the supported user workflow as chat-mediated maintenance:
       upload or otherwise supply the original queue(s) and session bundle(s),
@@ -134,6 +134,6 @@ combine unrelated conversations or queues into one queue.
 
 - [x] 5.4 Update the project handoff/runbook with the accepted user journey and
       real-car operating procedure.
-- [ ] 5.5 Once the default-change criteria in `design.md` pass, update
+- [x] 5.5 Once the default-change criteria in `design.md` pass, update
       `AGENTS.md` and current operator documentation, then remove or clearly
       relocate stale historical July 12 documents after a link/reference audit.

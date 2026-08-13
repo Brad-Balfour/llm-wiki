@@ -10,7 +10,7 @@ created: 2026-07-16
 updated: 2026-07-16
 confidence: low
 # prettier-ignore
-provenance: [{"source_item_id":"19f60cf507a74afc-14","source_path":"sources/tldr/2026-07-14-agentic-economy.txt","url":"https://agenticeconomytreatise.com/"}]
+provenance: [{"source_item_id":"19f60cf507a74afc-14","url":"https://agenticeconomytreatise.com/"}]
 ---
 
 # Agentic Economy

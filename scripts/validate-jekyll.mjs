@@ -29,7 +29,7 @@ const templateFrontmatter = extractFrontmatter(template, 'wiki/ENTRY_TEMPLATE.md
 const provenanceLine = templateFrontmatter
   .split('\n')
   .find((line) => line.startsWith('provenance: '));
-assert.ok(provenanceLine, 'entry template must keep compiler-compatible provenance on one line');
+assert.ok(provenanceLine, 'entry template must keep durable provenance on one line');
 const provenance = JSON.parse(provenanceLine.slice('provenance: '.length));
 assert.ok(
   Array.isArray(provenance) && provenance.length > 0,
@@ -37,7 +37,7 @@ assert.ok(
 );
 for (const [index, item] of provenance.entries()) {
   assert.ok(isMapping(item), `template provenance[${index}] must be an object`);
-  for (const field of ['source_item_id', 'source_path', 'url']) {
+  for (const field of ['source_item_id', 'url']) {
     assert.equal(
       typeof item[field],
       'string',

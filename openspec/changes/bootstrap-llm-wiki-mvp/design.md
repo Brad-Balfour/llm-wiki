@@ -180,20 +180,13 @@ the classifier output.
      as blockers for the next commute test. Rejected because it would delay use
      of a working manual product slice without reducing implementation risk.
 
-12. **Use JSON content in TXT as the post-commute handoff.**
-   - Decision: At session end, the same project chat creates a
-     `commute-handoff.v2` object containing only explicit feedback, saved review
-     notes, queue/session identity, structured per-queue completion or resume
-     state, and material recognition issues. The Library transport file uses
-     `.txt`; its content is JSON. The local importer remains compatible with v1.
-   - Decision: Explicit actions and material queue-state changes append to a
-     structured internal ledger during the commute. Handoff generation reloads
-     authoritative queues, ledger, instructions, and schema; validates during
-     the current generation pass; and writes a new revision rather than relying
-     on conversational reconstruction or replacing an earlier artifact.
-   - Decision: A local importer validates the object, rejects unknown top-level
-     fields such as `transcript`, and writes create-only normalized data under a
-     gitignored private directory.
+12. **Use JSON content in TXT as the post-commute session bundle.**
+   - Decision: At session end, the same project chat creates a self-contained
+     session bundle containing the selected queue snapshot, explicit actions,
+     playback state, evidence, and integrity declaration. The Library transport
+     file uses `.txt`; its content is JSON.
+   - Decision: Local reconciliation validates each bundle independently and
+     writes normalized evidence under a gitignored private directory.
    - Rationale: TXT is explicitly supported by ChatGPT file workflows, while
      JSON upload behavior is less clear in the observed product surface. The
      structured object is more useful and safer than relying on a non-verbatim
@@ -202,30 +195,23 @@ the classifier output.
      repository. Rejected because transcripts may be imperfect and can contain
      private, incidental, or unnecessary content.
 
-13. **Pull OKF scaffold and handoff ahead of classifier automation.**
-   - Decision: The current implementation priority is (1) initial reviewed OKF
-     wiki/read-path scaffold, (2) Monday-ready commute handoff and dry run, (3)
-     finish and merge the existing TLDR ingestion branch, (4) compile one
-     approved source, and then (5) resume provider-neutral classification and
-     deterministic queue automation.
-   - Rationale: This sequence closes the durable product loop around the proven
-     manual workflow while preserving the automated architecture as the intended
-     replacement.
+13. **Maintain wiki pages directly through PRs.**
+   - Decision: An exact `wiki_this` capture nominates maintenance. The maintainer
+     retrieves the article, inspects the existing wiki, and proposes useful
+     source-grounded Markdown changes in a PR without an approval-record step.
+   - Rationale: Repeated daily use has proven this path and Git review is the
+     durable human decision point.
 
-14. **Require local safety confirmation and safe public rendering.**
-   - Decision: A ChatGPT-authored `public: true` value is necessary but not
-     sufficient for compilation. The source contract also records cleared
-     privacy, publication-rights, and dual-use review, and the local compiler
-     requires an explicit `--confirm-public` flag.
+14. **Require source-grounded maintenance and safe public rendering.**
+   - Decision: The maintainer omits raw email, credentials, private work, and
+     unsafe rendered content before proposing a PR.
    - Decision: Public source URLs must be credential-free HTTP(S), public text
      fields must reject raw HTML, Markdown links, private-work markers, control
      characters, and credential-like material, and rendered plain text is
      Markdown-escaped.
-   - Decision: Reuse of a stable source item id is idempotent only when the full
-     provenance identity—item id, immutable source path, and URL—matches. A
-     collision with different provenance fails closed.
+   - Decision: Wiki provenance retains the stable source item id and public URL.
    - Rationale: The repository must enforce its public-promotion boundary
-     independently of model output and must never silently lose provenance.
+   independently of model output and must never silently lose provenance.
 
 15. **Validate the static-site source before Pages deployment.**
    - Decision: Keep Prettier and ESLint in the Node project checks, add a direct
@@ -259,7 +245,7 @@ the classifier output.
   Mitigation: treat July 3, 2026 and later direct TLDR emails as validation data
   unless Brad explicitly changes the plan.
 - [Risk] GitHub Pages publication can expose material too early. -> Mitigation:
-  require approved source records and public-promotion review before compilation.
+  require source-grounded maintainer PRs and ordinary Git review before merge.
 - [Risk] GitHub PR review can catch avoidable issues late. -> Mitigation: require
   local checks plus an independent Codex subagent or local Claude review before
   opening the PR or requesting GitHub Codex review.
@@ -268,32 +254,31 @@ the classifier output.
   files, preserve source ids and metadata, validate the handoff independently,
   and treat the manual adapter as temporary rather than classifier truth.
 - [Risk] Voice transcripts can be incomplete or contain private incidental
-  speech. -> Mitigation: ingest only an explicit structured end-of-session
-  handoff and keep it private until reviewed.
+  speech. -> Mitigation: ingest only an explicit session bundle and keep its
+  normalized evidence private until reviewed.
 
 ## Migration Plan
 
-1. Create the schema files, compile state, model config example, and fixture
-   directories.
-2. Establish the reviewed OKF wiki scaffold and private commute-handoff contract
-   so the proven manual ChatGPT workflow can be exercised on the next commute.
+1. Create the schema files, model config example, and fixture directories.
+2. Establish the reviewed OKF wiki scaffold so the proven manual ChatGPT
+   workflow can be exercised on the next commute.
 3. Implement parser, batch-capable classifier validation, routing, queue,
-   feedback, and wiki compile behavior against fixtures. The manual ChatGPT
+   feedback behavior against fixtures. The manual ChatGPT
    adapter may be used before classifier/queue automation is complete.
 4. Reuse applicable local repo conventions from `../bradbalfour-dot-com` and
    `../bradbalfour-photography` when adding or changing project tooling.
 5. Run one real TLDR email end to end locally.
 6. Use one prepared queue in a real car session or equivalent manual voice test,
-   then import the structured post-session handoff.
+   then import the structured session bundle.
 7. Record at least one correction label.
-8. Compile at least one approved source into the wiki.
+8. Produce and review at least one source-grounded maintainer wiki PR.
 9. Run local checks and an independent pre-PR review before opening or updating
    each implementation PR for GitHub review.
 10. Configure GitHub Pages and manual CI only after local tests pass.
 
-Rollback is file-based: keep source records immutable, keep generated queues and
-wiki output reviewable, and revert generated output or route questionable items
-to review without deleting raw correction history.
+Rollback is file-based: keep generated queues and wiki output reviewable, and
+revert generated output or route questionable items to review without deleting
+raw correction history.
 
 ## Open Questions
 

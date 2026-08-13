@@ -10,7 +10,7 @@ created: 2026-08-13
 updated: 2026-08-13
 confidence: high
 # prettier-ignore
-provenance: [{"source_item_id":"19ff5a5491f0195a-13","source_path":"docs/commute-experiment-log.md","url":"https://lethain.com/decisions-not-dates/?utm_source=tldrnewsletter"}]
+provenance: [{"source_item_id":"19ff5a5491f0195a-13","url":"https://lethain.com/decisions-not-dates/?utm_source=tldrnewsletter"}]
 ---
 
 # Decision-Driven Roadmaps

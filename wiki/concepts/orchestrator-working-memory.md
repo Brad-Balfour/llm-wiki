@@ -10,7 +10,7 @@ created: 2026-07-29
 updated: 2026-07-29
 confidence: medium
 # prettier-ignore
-provenance: [{"source_item_id":"19fad8d9ff2bc642-08","source_path":"sources/tldr/2026-07-29-orchestrator-working-memory.txt","url":"https://martinfowler.com/articles/orchestrator-tax.html"}]
+provenance: [{"source_item_id":"19fad8d9ff2bc642-08","url":"https://martinfowler.com/articles/orchestrator-tax.html"}]
 ---
 
 # Orchestrator Working Memory

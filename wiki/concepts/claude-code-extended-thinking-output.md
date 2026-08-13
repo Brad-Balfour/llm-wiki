@@ -10,7 +10,7 @@ created: 2026-07-13
 updated: 2026-07-13
 confidence: medium
 # prettier-ignore
-provenance: [{"source_item_id":"tldr_f6b2ae0fb7b44ced","source_path":"sources/tldr/2026-06-23-claude-code-extended-thinking-output.txt","url":"https://patrickmccanna.net/the-text-in-claude-codes-extended-thinking-output-is-not-authentic/"}]
+provenance: [{"source_item_id":"tldr_f6b2ae0fb7b44ced","url":"https://patrickmccanna.net/the-text-in-claude-codes-extended-thinking-output-is-not-authentic/"}]
 ---
 
 # Claude Code Extended Thinking Output

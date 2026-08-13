@@ -10,7 +10,7 @@ created: 2026-08-03
 updated: 2026-08-03
 confidence: medium
 # prettier-ignore
-provenance: [{"source_item_id":"19fb7fb144b8358d-01","source_path":"sources/tldr/2026-07-31-code-structure-agent-context-economics.txt","url":"https://martinfowler.com/articles/exploring-gen-ai/refactoring-economic-benefit.html?utm_source=tldrdev"}]
+provenance: [{"source_item_id":"19fb7fb144b8358d-01","url":"https://martinfowler.com/articles/exploring-gen-ai/refactoring-economic-benefit.html?utm_source=tldrdev"}]
 ---
 
 # Code Structure as Agent Context Economics

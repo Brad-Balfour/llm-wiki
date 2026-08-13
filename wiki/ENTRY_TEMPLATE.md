@@ -8,7 +8,7 @@ created: YYYY-MM-DD
 updated: YYYY-MM-DD
 confidence: low
 # prettier-ignore
-provenance: [{"source_item_id":"stable-id","source_path":"sources/tldr/date-source.txt","url":"https://example.com/source"}]
+provenance: [{"source_item_id":"stable-id","url":"https://example.com/source"}]
 ---
 
 # Entry title

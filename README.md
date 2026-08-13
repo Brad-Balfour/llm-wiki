@@ -7,20 +7,18 @@ inside this repo under OpenSpec.
 
 ## Current Status
 
-Phase 0 is in progress:
+The daily TLDR commute-to-wiki loop is operational:
 
 - OpenSpec has been initialized for Codex, GitHub Copilot, and Claude Code.
-- The first OpenSpec change is `bootstrap-llm-wiki-mvp`.
-- The TypeScript/Node runtime skeleton is initialized with focused parser,
-  classifier-validation, and routing tests.
+- The TypeScript/Node runtime has focused parser, classifier, routing, commute,
+  maintenance, and publishing tests.
 - TLDR text-file ingestion is implemented for pasted/exported email bodies,
   including manual Gmail connector handoff via confirmed body text.
-- A manual ChatGPT Project + Gmail connector + Library + Voice workflow has
-  produced and played a real commute queue as a proof of concept.
-- The review-safe OKF wiki scaffold, private commute-handoff importer, and
-  approved-source wiki compiler now exist. Live repo-backed classification,
-  deterministic queue generation, feedback-label promotion, the first real
-  wiki compilation, and public Pages enablement are not complete yet.
+- The live ChatGPT Project produces and plays queue-v2 files, exports
+  self-contained session bundles, and uses the repository maintainer to propose
+  source-grounded wiki changes in GitHub PRs.
+- GitHub Pages is the public read path. The retired handoff, approved-source,
+  and compiler workflows are available only in Git history.
 
 ## Development
 
@@ -55,15 +53,8 @@ when pasting or streaming a manually confirmed Gmail connector body. The command
 writes sanitized item-level JSON and review records; it does not persist raw
 email bodies.
 
-Import a structured post-commute handoff downloaded from ChatGPT Library:
-
-```bash
-npm run import:commute-handoff -- --input path/to/YYYYMMDD-tldr-commute-handoff.txt
-```
-
-The normalized record is written under gitignored
-`.private/commute-handoffs/`. See `docs/commute-voice-handoff.md` for the Monday
-workflow and `docs/replan-2026-07-12.md` for the current implementation order.
+Validate and reconcile self-contained post-commute session bundles with the
+current commands documented in `chatgpt-project/README.md`.
 
 Record one or more exact classifier corrections without changing the live
 profile or classifier:
@@ -92,17 +83,6 @@ and start time. If it reports a stale or unreadable lock after a crash, first
 confirm that no recorder is running, then remove only that named `.lock` file
 and retry; the JSONL store itself remains append-only.
 
-Compile one explicitly approved TLDR source into the OKF wiki:
-
-```bash
-npm run compile:wiki -- \
-  --input sources/tldr/YYYY-MM-DD-<entry-slug>.txt \
-  --confirm-public
-```
-
-See `docs/wiki-ingestion-test.md` for the ChatGPT Project preparation and review
-flow.
-
 ## MVP Direction
 
 The MVP is TLDR-only:
@@ -114,7 +94,7 @@ The MVP is TLDR-only:
 4. Derive commute, wiki, stream-log, and review behavior in application code.
 5. Generate a prepared commute queue.
 6. Capture Brad's corrections as feedback labels.
-7. Compile approved source material into OKF-style markdown wiki entries.
+7. Turn exact wiki captures into source-grounded wiki changes reviewed in PRs.
 8. Publish the readable wiki through GitHub Pages first.
 
 Cloudflare Workers, RSS, YouTube, custom realtime voice, and a review/admin UI
@@ -126,6 +106,7 @@ Primary planning artifacts live under:
 
 ```text
 openspec/changes/bootstrap-llm-wiki-mvp/
+openspec/changes/commute-wiki-operating-loop/
 ```
 
 Use OpenSpec artifacts as the implementation contract. The parent exploration

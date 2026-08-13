@@ -797,12 +797,12 @@ and spoken prompt constant, with no manual attachment before the lookup:
 4. Repeat the same pair during a real commute only if the parked A/B result is
    clear; do not change network, queue, and restart state in one experiment.
 
-## Deferred Cleanup Question
+## Retired Pilot Cleanup
 
-Assess whether the retired `v2-pilot` ChatGPT Project can now be deleted and
-what related files or instructions can be cleaned up. Do this only after the
-current Library-discovery probe establishes whether `LLM-Wiki-Car` is the sole
-active commute surface; preserve any unique historical evidence before deletion.
+The repository no longer contains the retired pilot prompt, legacy handoff and
+ledger instructions, or approved-source compiler path. Git history preserves
+their diagnostic evidence. The unused `v2-pilot` ChatGPT Project has no
+remaining repository dependency and can be deleted from the ChatGPT UI.
 
 ## Conversation-Informed Wiki Enrichment
 
