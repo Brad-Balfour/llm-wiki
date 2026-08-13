@@ -95,6 +95,15 @@ can provide a measured timer or capture every overlapping interruption.
 - **AND** `consumption_depth` SHALL remain the literal switch between those two
   base-reading shapes, not permission to rewrite queue text.
 
+#### Scenario: Brad requests the queue summary for a headline-only item
+
+- **WHEN** a verified `headline_only` item is current
+- **AND** Brad asks for the TLDR summary, queue summary, or summary directly
+  from the queue
+- **THEN** Voice SHALL read that item's complete literal `item.summary`
+- **AND** it SHALL NOT paraphrase the summary, retrieve the article, or
+  substitute article text unless Brad separately requests article retrieval.
+
 #### Scenario: Brad navigates in ordinary English
 
 - **WHEN** Brad clearly expresses a playback intent in ordinary English,

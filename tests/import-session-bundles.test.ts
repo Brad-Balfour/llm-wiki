@@ -324,6 +324,23 @@ test('converts a redundant depth promotion into a quality incident without rejec
   );
 });
 
+test('does not treat a playback skip as classifier feedback', () => {
+  const bundle = JSON.parse(validBundle) as { events: Array<Record<string, unknown>> };
+  const action = bundle.events[1];
+  assert.ok(action);
+  action.action = 'skip';
+  action.user_words = 'Skip to next.';
+
+  const result = reconcileSessionBundles(
+    [{ filename: artifactFilename, text: JSON.stringify(bundle) }],
+    '2026-08-12T22:00:00.000Z'
+  );
+
+  assert.equal(result.sessions[0]?.status, 'accepted');
+  assert.equal(result.feedback_events.length, 0);
+  assert.equal(result.maintenance_candidates.length, 0);
+});
+
 test('does not turn an already-wikied reference into a new maintenance candidate', () => {
   const bundle = JSON.parse(validBundle) as { events: Array<Record<string, unknown>> };
   const action = bundle.events[1];

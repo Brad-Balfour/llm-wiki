@@ -323,7 +323,7 @@ export function reconcileSessionBundles(
             kind: convertedEvent.kind,
             event: convertedEvent,
           });
-        } else {
+        } else if (event.action !== 'skip') {
           result.feedback_events.push(reconciled);
         }
       } else if (event.kind === 'unresolved_capture') {

@@ -12,7 +12,7 @@ test('ChatGPT Project instructions fit the 8,000-character limit', async () => {
 test('ChatGPT Project instructions require a grounded headline sweep and URL handling', async () => {
   const prompt = await readFile('chatgpt-project/CHATGPT_CAR_QUEUE_PROMPT.md', 'utf8');
 
-  assert.match(prompt, /Prompt Revision 3\.2/);
+  assert.match(prompt, /Prompt Revision 3\.3/);
   assert.match(prompt, /one ordered headline sweep directly from the queue/);
   assert.match(prompt, /Do\s+not begin item 1's summary\s+before completing the sweep/);
   assert.match(prompt, /Immediately after headline `M`/);
@@ -28,6 +28,9 @@ test('ChatGPT Project instructions require a grounded headline sweep and URL han
   assert.match(prompt, /Never rewrite, shorten, expand,\s+combine, or select sentences/);
   assert.doesNotMatch(prompt, /one brisk queue-summary sentence/);
   assert.doesNotMatch(prompt, /one or two short queue-summary sentences/);
+  assert.match(prompt, /Queue summary/);
+  assert.match(prompt, /read literal `item\.summary` for any mode/);
+  assert.match(prompt, /no search or\s+paraphrase/);
 });
 
 test('ChatGPT Project instructions treat natural language as intent rather than a CLI', async () => {
