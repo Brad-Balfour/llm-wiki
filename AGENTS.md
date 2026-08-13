@@ -146,8 +146,10 @@ For every daily commute intake:
    checks and report their state.
 8. Cross-link the PR and issue comments, then finish with the remote branch,
    commit, PR URL, validation result, issue updates, and any genuinely
-   unresolved evidence or next action. Never call the loop complete or
-   merge-ready while a required live-sync action is unconfirmed.
+   unresolved evidence or next action. Never call the loop complete while a
+   required live-sync action is unconfirmed. Keep that action visible before
+   merge, but do not change the PR's draft/ready state because of it; ready for
+   review is compatible with pending live synchronization.
 
 If the day produces no justified tracked change, report an explicit no-change
 result with the validation and issue-routing evidence; do not manufacture a PR

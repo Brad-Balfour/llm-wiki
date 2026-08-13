@@ -55,7 +55,7 @@ only when the intended action or target genuinely cannot be determined.
    `chatgpt-project/README.md`. Any changed live prompt or Project source creates
    a required live-sync action; never leave Brad to infer it from the diff.
 2. When a live-sync action exists, immediately provide the exact merged or
-   merge-ready prompt in one copyable block, or list the exact source files and
+   review-ready prompt in one copyable block, or list the exact source files and
    destination. Do this without waiting for Brad to request it. Repository and
    GitHub writes do not authorize changing the live Project UI, so keep the
    action explicitly unresolved until Brad confirms it was applied. Then update
@@ -77,6 +77,8 @@ only when the intended action or target genuinely cannot be determined.
 
 Report the remote branch, commit, PR, CI/review state, issue updates, evidence
 counts, and any genuinely unresolved item. Do not call the daily loop complete
-or merge-ready while a required live-sync action is unconfirmed. For every
+while a required live-sync action is unconfirmed. Keep the action visible as a
+pre-merge checklist item, but do not change the PR's draft/ready state because of
+it; ready for review is compatible with pending live synchronization. For every
 changed live prompt, return the exact file contents in one copyable block before
 handoff; never reconstruct them from memory and never make Brad remember to ask.

@@ -72,6 +72,8 @@ test('daily commute completion cannot omit live Project synchronization', async 
     assert.match(normalized, /exact .*prompt in one copyable block/i);
     assert.match(normalized, /until Brad confirms/i);
     assert.match(normalized, /never call the .*complete|do not call the .*complete/i);
+    assert.match(normalized, /do not change the PR's draft\/ready state/i);
+    assert.match(normalized, /ready for review is compatible/i);
   }
 
   assert.doesNotMatch(skill, /If Brad requests the live Project prompt/);
