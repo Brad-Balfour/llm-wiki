@@ -42,7 +42,7 @@ test('wiki provenance uses stable source identity and URL without source records
 
   for (const markdownPath of markdownFiles) {
     const markdown = await readFile(markdownPath, 'utf8');
-    assert.doesNotMatch(markdown, /"source_path":/, `${markdownPath} uses retired source_path`);
+    assert.doesNotMatch(markdown, /"source_path"\s*:/, `${markdownPath} uses retired source_path`);
   }
 
   try {

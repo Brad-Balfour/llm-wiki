@@ -4,6 +4,8 @@ import { extname, join } from 'node:path';
 
 import { JSON_SCHEMA, load } from 'js-yaml';
 
+import { validatePublishedWikiDocuments } from '../dist/src/wiki/publication-safety.js';
+
 const markdownFiles = ['index.md', ...(await findMarkdownFiles('wiki'))];
 const yamlFiles = [
   '_config.yml',
@@ -17,12 +19,17 @@ for (const path of yamlFiles) {
   assert.ok(isMapping(parsed), `${path} must contain a YAML mapping`);
 }
 
+const publishedWikiDocuments = [];
 for (const path of markdownFiles) {
   const markdown = await readFile(path, 'utf8');
   const frontmatter = extractFrontmatter(markdown, path);
   const parsed = parseYaml(frontmatter, `${path} frontmatter`);
   assert.ok(isMapping(parsed), `${path} frontmatter must contain a YAML mapping`);
+  if (path.startsWith('wiki/')) {
+    publishedWikiDocuments.push({ path, markdown, frontmatter: parsed });
+  }
 }
+validatePublishedWikiDocuments(publishedWikiDocuments);
 
 const template = await readFile('wiki/ENTRY_TEMPLATE.md', 'utf8');
 const templateFrontmatter = extractFrontmatter(template, 'wiki/ENTRY_TEMPLATE.md');

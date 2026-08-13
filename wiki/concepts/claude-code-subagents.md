@@ -9,6 +9,8 @@ wiki_slug: claude-code-subagents
 created: 2026-07-22
 updated: 2026-07-29
 confidence: high
+# prettier-ignore
+provenance: [{"source_item_id":"url_7dc93e85c023d968","url":"https://code.claude.com/docs/en/sub-agents"}]
 ---
 
 # Claude Code Subagents
@@ -58,10 +60,13 @@ building blocks rather than competing ways to package a team workflow.
 
 ### [Create custom subagents](https://code.claude.com/docs/en/sub-agents)
 
+<!-- source-item-id: url_7dc93e85c023d968 -->
+
 Saved during the July 22 TLDR Dev commute as a high-priority item for later
 team sharing. The recovered session transcript preserves the explicit save;
 the downloaded queue snapshot does not retain the original item title and URL
-consistently enough to use as page provenance.
+consistently enough to use as queue-item provenance. The page instead uses a
+deterministic identity for the cited public documentation URL.
 
 The official documentation describes built-in and custom subagents, their
 isolated contexts, file-based scopes, tool restrictions, and permission

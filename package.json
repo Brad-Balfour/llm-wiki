@@ -14,7 +14,7 @@
     "build": "tsc -p tsconfig.json",
     "ci:build": "npm run build",
     "compile": "npm run build",
-    "validate:site": "node scripts/validate-jekyll.mjs",
+    "validate:site": "npm run build --silent && node scripts/validate-jekyll.mjs",
     "ingest:tldr": "npm run build --silent && node dist/src/tldr/ingest-file.js",
     "import:commute-session-bundles": "npm run build --silent && node dist/src/commute/import-session-bundles.js",
     "maintain:commute": "npm run build --silent && node dist/src/wiki/maintain-commute.js",

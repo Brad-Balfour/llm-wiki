@@ -9,6 +9,8 @@ wiki_slug: interface-design-rules
 created: 2026-07-21
 updated: 2026-07-21
 confidence: medium
+# prettier-ignore
+provenance: [{"source_item_id":"url_6a9411cbc658c2c3","url":"https://anthonyhobday.com/sideprojects/saferules/"}]
 ---
 
 # Interface Design Rules
@@ -30,5 +32,7 @@ interaction mistakes early in implementation.
 ## Source Notes
 
 ### [Visual design rules you can safely follow every time](https://anthonyhobday.com/sideprojects/saferules/)
+
+<!-- source-item-id: url_6a9411cbc658c2c3 -->
 
 Saved from TLDR Dev, 2026-07-21.
