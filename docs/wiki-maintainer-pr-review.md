@@ -47,6 +47,11 @@ behavioral evidence for those judgments.
 
 ## Every Early Maintainer PR
 
+- Reject legacy `approved-wiki-source.v1` or compiler-state changes created for
+  a successor maintenance candidate. In particular, do not accept invented
+  `approved`, `public`, `reviewed_by`, safety-review, or confirmation metadata;
+  the exact `wiki_this` capture authorizes maintenance and the PR is the review
+  point.
 - Confirm the diff contains only source-grounded public wiki changes and omits
   raw email text, credentials, private work details, and unsafe rendered
   content.

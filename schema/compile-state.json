@@ -2,7 +2,7 @@
   "manifest_version": 1,
   "schema_version": "compile-state.v1",
   "created": "2026-07-05",
-  "updated": "2026-08-13T00:50:39.682Z",
+  "updated": "2026-08-11T02:05:28.000Z",
   "processed_sources": {
     "sources/tldr/2026-06-23-transformer-architecture-for-senior-engineers.txt": {
       "hash": "sha256:f9a592761c47b368e73c13dd97d27b02bc875433b632a582a40ec6419643e631",
@@ -147,12 +147,6 @@
       "output_path": "wiki/concepts/ai-native-software-engineering.md",
       "source_item_id": "19feb593f3d9a2d9-05",
       "processed_at": "2026-08-11T01:53:08.177Z"
-    },
-    "sources/tldr/2026-08-12-decision-driven-roadmaps.txt": {
-      "hash": "sha256:415bf83bd6e8f12d956c61e3e957276a6d873149228673bd46a6aeb0df2be1de",
-      "output_path": "wiki/concepts/decision-driven-roadmaps.md",
-      "source_item_id": "19ff5a5491f0195a-13",
-      "processed_at": "2026-08-13T00:50:39.682Z"
     }
   },
   "wiki_outputs": {
@@ -244,11 +238,6 @@
     "wiki/tools/nextjs.md": {
       "hash": "sha256:76e21474b24d360a164b6076b751f3071adb1c90639470baa7fe31daabcc695b",
       "updated": "2026-08-06T01:37:33.008Z",
-      "provenance_count": 1
-    },
-    "wiki/concepts/decision-driven-roadmaps.md": {
-      "hash": "sha256:6532f8708a4730a07e41310b4b37b218b2aa6eb5debc83d014018943d11f6e59",
-      "updated": "2026-08-13T00:50:39.682Z",
       "provenance_count": 1
     }
   },
@@ -510,12 +499,6 @@
       "source_path": "sources/tldr/2026-08-10-agentic-code-quality.txt",
       "output_path": "wiki/concepts/ai-native-software-engineering.md",
       "status": "updated"
-    },
-    {
-      "timestamp": "2026-08-13T00:50:39.682Z",
-      "source_path": "sources/tldr/2026-08-12-decision-driven-roadmaps.txt",
-      "output_path": "wiki/concepts/decision-driven-roadmaps.md",
-      "status": "created"
     }
   ]
 }
