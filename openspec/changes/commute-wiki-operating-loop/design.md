@@ -216,9 +216,9 @@ The bundle records an ordered sequence of queue states and actions. An
 item-specific action is valid only when it identifies an exact current queue
 item and has direct user evidence; it does not require Brad to use a memorized
 spoken phrase. Ordinary English is interpreted by intent and normalized into
-internal events; the event enum is not user-facing vocabulary. Next, previous,
-direct jump, skip, repeat, interrupted discussion, and duplicate speech
-recognition all produce explicit transitions or an unresolved capture. A direct
+internal events; the event enum is not user-facing vocabulary. Skip is a synonym
+for next, while previous, direct jump, repeat, interrupted discussion, and
+duplicate speech recognition produce explicit transitions or an unresolved capture. A direct
 jump records only the departing and destination items, never invented playback
 of intervening items.
 For partial/recovered sessions, an exact next transition may repair a missing
@@ -295,7 +295,7 @@ not a claim that every action is implemented in repository code.
 | J6  | Reconciled inputs -> wiki-maintainer PR     | Saved URLs, captures, feedback context, and existing wiki                             | Maintainer retrieves feasible sources, reads relevant wiki pages, and opens one PR containing useful page/link changes. The PR diff is the proof.                                                                                                                                                                                                                                   | Report inaccessible or insufficient sources and leave a traceable maintenance item for later recovery.                                                                                                                                                                                                                                                                                         | That a queue summary is the full source, or that every source deserves a new page.                    | Source retrieval + wiki maintainer           |
 
 Only an exact `wiki this` capture nominates a source for J6. General saves,
-classifier corrections, skips, and quality incidents do not silently become
+classifier corrections, navigation events, and quality incidents do not silently become
 wiki maintenance input. The maintainer may conclude that a nominated source
 does not justify a change; that outcome is recorded as a no-change or
 insufficient-source maintenance result rather than a fabricated PR.

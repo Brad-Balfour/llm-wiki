@@ -84,6 +84,7 @@ export interface CommuteSessionImport {
   maintenance_candidates: MaintenanceCandidate[];
   maintenance_attempts: MaintenanceAttempt[];
   maintenance_results: MaintenanceLatestResult[];
+  navigation_events: ReconciledEvent[];
   feedback_events: ReconciledEvent[];
   unresolved_captures: ReconciledEvent[];
   quality_incidents: ReconciledEvent[];
@@ -102,6 +103,7 @@ export function reconcileSessionBundles(
     maintenance_candidates: [],
     maintenance_attempts: [],
     maintenance_results: [],
+    navigation_events: [],
     feedback_events: [],
     unresolved_captures: [],
     quality_incidents: [],
@@ -323,9 +325,15 @@ export function reconcileSessionBundles(
             kind: convertedEvent.kind,
             event: convertedEvent,
           });
+        } else if (event.action === 'skip') {
+          // Older prompts emitted skip as an item action. Keep that evidence intact
+          // in navigation while newer prompts normalize the same intent to next.
+          result.navigation_events.push(reconciled);
         } else {
           result.feedback_events.push(reconciled);
         }
+      } else if (event.kind === 'playback_transition') {
+        result.navigation_events.push(reconciled);
       } else if (event.kind === 'unresolved_capture') {
         result.unresolved_captures.push(reconciled);
       } else if (event.kind === 'quality_incident') {
@@ -599,7 +607,7 @@ async function main(): Promise<void> {
       options.output,
       `${accepted} accepted session(s), ${rejected} rejected session(s)`,
       `${result.maintenance_candidates.length} wiki maintenance candidate(s)`,
-      `${result.feedback_events.length} feedback event(s), ${result.unresolved_captures.length} unresolved capture(s)`,
+      `${result.navigation_events.length} navigation event(s), ${result.feedback_events.length} feedback event(s), ${result.unresolved_captures.length} unresolved capture(s)`,
     ].join('\n') + '\n'
   );
 }

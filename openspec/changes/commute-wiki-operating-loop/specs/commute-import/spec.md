@@ -71,11 +71,20 @@ second user approval or promotion step.
 
 #### Scenario: Import an unresolved or non-wiki capture
 
-- **WHEN** a bundle contains an unresolved capture, general save, skip, or
+- **WHEN** a bundle contains an unresolved capture, general save, or explicit
   classifier correction
 - **THEN** the importer SHALL retain it in its applicable recovery, incident,
   or feedback result
 - **AND** it SHALL NOT nominate it for wiki maintenance.
+
+#### Scenario: Import a legacy skip action
+
+- **WHEN** a bundle created before skip normalization contains an `item_action`
+  with action `skip`
+- **THEN** the importer SHALL retain the exact event in its navigation result
+- **AND** it SHALL preserve the item binding, user words, and evidence
+- **AND** it SHALL NOT treat the action as classifier feedback or nominate it
+  for wiki maintenance.
 
 ### Requirement: Durable Maintenance Results
 

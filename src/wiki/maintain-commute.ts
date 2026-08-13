@@ -94,6 +94,8 @@ For each "pr_created" result, its "detail" must name every affected wiki path an
 
 There is no approval or intake-review gate. If useful changes result, run the relevant repository checks, commit the changes, push this branch to origin, and create one GitHub PR with gh. If no useful change is justified, do not create a filler page or PR.
 
+Write direct maintainer wiki output. Do not create or modify an approved-wiki-source.v1 record or legacy compiler state, and do not assert approved, public, reviewed_by, safety-review, or public-confirmation metadata. The exact wiki_this capture authorizes maintenance; the PR diff is the review point. Preserve source identity and URL in wiki provenance, using an existing durable evidence path when local source_path provenance is required.
+
 Before finishing, write JSON to ${options.resultPath} with this shape:
 {
   "schema_version": "commute-maintenance-result.v1",

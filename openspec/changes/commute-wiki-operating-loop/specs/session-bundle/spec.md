@@ -114,11 +114,19 @@ item at the time of the user action.
 
 #### Scenario: User corrects the current item
 
-- **WHEN** Brad marks the current item uninterested, asks for more depth, skips
-  it, or saves it for the wiki
+- **WHEN** Brad marks the current item uninterested, asks for more depth, or
+  saves it for the wiki
 - **THEN** the resulting event SHALL contain the current queue filename, stable
   item identifier, title, and URL copied from the queue snapshot
 - **AND** it SHALL NOT be stored as a general ChatGPT Memory.
+
+#### Scenario: Skip is normalized as next
+
+- **WHEN** Brad asks to skip the verified current item
+- **THEN** the bundle SHALL record the same `next` playback transition used for
+  any other request to move forward one item
+- **AND** it SHALL NOT record an `item_action` or classifier-feedback event for
+  the skip request.
 
 #### Scenario: Natural-language wiki capture
 
@@ -199,7 +207,7 @@ item-specific action can be validated against the announced current item.
 - **WHEN** an item-specific action is recorded
 - **THEN** the bundle SHALL show that the same item was current and announced
   before the action
-- **AND** no later `next`, skip, repeat, interruption, or replacement transition
+- **AND** no later `next`, repeat, interruption, or replacement transition
   may already have changed the current item
 - **AND** an ambiguous or duplicate recognition SHALL become an unresolved
   capture rather than a valid-looking action on another item.
