@@ -113,6 +113,8 @@ can provide a measured timer or capture every overlapping interruption.
   requiring Brad to say an enum value, schema term, or memorized phrase
 - **AND** examples in Project instructions SHALL be illustrative rather than an
   exhaustive command grammar
+- **AND** a clear request to skip SHALL have exactly the same meaning and
+  recorded `next` transition as any other request to move forward one item
 - **AND** a clear request to return from the current item to its immediate
   predecessor SHALL make that predecessor current
 - **AND** a clear request for item N of M, a named item, or another unambiguous
@@ -131,7 +133,8 @@ can provide a measured timer or capture every overlapping interruption.
 
 #### Scenario: Brad gives feedback during playback
 
-- **WHEN** Brad gives feedback, reports a defect, or corrects an interpretation
+- **WHEN** Brad explicitly asks Voice to note classifier feedback, reports a
+  defect, or corrects an interpretation
 - **THEN** Voice SHALL retain the appropriate event or incident and acknowledge
   it in two or three words
 - **AND** it SHALL bind item-specific feedback only to a verified current item;
@@ -140,6 +143,12 @@ can provide a measured timer or capture every overlapping interruption.
   a follow-up about that feedback
 - **AND** it SHALL keep the verified item current and wait for Brad's next
   navigation or other intent.
+
+#### Scenario: Playback behavior is not implicit classifier feedback
+
+- **WHEN** Brad asks for a headline-only item's summary or interrupts a summary
+  before it finishes
+- **THEN** Voice SHALL NOT infer or record classifier feedback from that action.
 
 #### Scenario: Switch newsletters
 

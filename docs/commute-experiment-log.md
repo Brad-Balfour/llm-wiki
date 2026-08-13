@@ -370,8 +370,9 @@ depth score was 0.45. The evidence is exact, but the queue stamps
 `routing-rules.v1`; silently replacing that provenance would make the label
 look more trustworthy than its source. Retain it as a verified correction
 candidate until the version-binding work in #66 provides an explicit migration.
-The AI item-one `skip` is a playback action, not an unambiguous interest or
-depth correction, so it should not be converted into a classifier label.
+The AI item-one `skip` is a synonym for moving to the next item, not an
+unambiguous interest or depth correction, so it belongs with navigation rather
+than classifier feedback.
 
 The broader feedback separates presentation policy from article-topic
 classification. Brad said short, clickbait, or unfamiliar product-name titles
@@ -510,11 +511,12 @@ return to still-current item seven as an evidenced repeat. All three normalized
 bundles then passed strict validation.
 
 The normalized intake accepted three recovered sessions with one maintenance
-candidate, one exact depth correction, seven quality incidents, seven general
-captures, no unresolved capture, and no semantic conversion. The initial
+candidate, 27 retained navigation events, one exact depth correction, seven
+quality incidents, seven general captures, no unresolved capture, and no
+semantic conversion. The initial
 import incorrectly counted two ordinary `skip` actions as classifier feedback;
-the importer now excludes playback skips from that channel and a focused test
-guards the boundary. The genuine correction promoted _Roadmap decisions rather
+the importer now preserves them in the navigation channel and a focused test
+guards their item binding, user words, and evidence. The genuine correction promoted _Roadmap decisions rather
 than dates_ from `headline_only` / `quick_read` to `in_depth` / `discuss`.
 Recording remains blocked because the queue stamps `commute-route-v2` while
 the append-only label contract accepts only `routing-rules.v1`; the private
@@ -727,12 +729,15 @@ on-demand summary boundary:
    commute or discard the rest of the bundle.
 9. Interpret Brad's ordinary English by intent, never as a closed command
    grammar; normalize adjacent and direct named/numbered navigation into
-   internal events without asking him to speak schema vocabulary.
+   internal events without asking him to speak schema vocabulary. Treat `skip`
+   as an exact synonym for `next`.
 10. In base playback, `headline_only` reads the exact queue headline and omits
     the summary; `in_depth` reads the exact queue headline and complete TLDR
     summary. Neither mode permits paraphrasing, truncation, or sentence selection.
 11. When Brad asks for the TLDR or queue summary, read the verified current
     item's literal summary in either mode without searching or paraphrasing.
+12. Record classifier feedback only when Brad explicitly asks for it; do not
+    infer it from a summary request or an interrupted summary.
 
 This is a bounded recovery strategy, not an explanation of root cause. It
 addresses the observed difference between exact search and recent-file listing

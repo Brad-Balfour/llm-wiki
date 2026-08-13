@@ -339,6 +339,13 @@ test('does not treat a playback skip as classifier feedback', () => {
   assert.equal(result.sessions[0]?.status, 'accepted');
   assert.equal(result.feedback_events.length, 0);
   assert.equal(result.maintenance_candidates.length, 0);
+  const retainedSkip = result.navigation_events.find(
+    ({ event }) => event.kind === 'item_action' && event.action === 'skip'
+  );
+  assert.ok(retainedSkip);
+  assert.deepEqual(retainedSkip.event, action);
+  assert.equal(retainedSkip.event.user_words, 'Skip to next.');
+  assert.ok(result.navigation_events.some(({ event }) => event.kind === 'playback_transition'));
 });
 
 test('does not turn an already-wikied reference into a new maintenance candidate', () => {

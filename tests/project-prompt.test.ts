@@ -38,9 +38,10 @@ test('ChatGPT Project instructions treat natural language as intent rather than 
 
   assert.match(prompt, /Interpret Brad's ordinary English by intent, not exact wording/);
   assert.match(prompt, /Examples are illustrative, not exhaustive/);
-  assert.match(prompt, /Never require\s+him to speak command labels, schema fields/);
+  assert.match(prompt, /Never require\s+command labels, schema terms/);
+  assert.match(prompt, /moving forward one item or skipping is `next`/);
   assert.match(prompt, /returning one item is\s+`previous`/);
-  assert.match(prompt, /going directly to any other named or numbered queue item is `jump`/);
+  assert.match(prompt, /going directly to any other named or\s+numbered queue item is `jump`/);
   assert.match(prompt, /“item 6” or “6 of 14,” exact or unambiguous headline references/);
   assert.match(prompt, /does not announce or mark as heard the items\s+between/);
   assert.match(prompt, /do not\s+offer a list of allowed\s+commands/);
@@ -49,4 +50,11 @@ test('ChatGPT Project instructions treat natural language as intent rather than 
   assert.match(prompt, /What would you like me to do\?/);
   assert.doesNotMatch(prompt, /Which item do you want\?/);
   assert.doesNotMatch(prompt, /Please say next, pause, or end commute/);
+});
+
+test('ChatGPT Project instructions require explicit classifier feedback', async () => {
+  const prompt = await readFile('chatgpt-project/CHATGPT_CAR_QUEUE_PROMPT.md', 'utf8');
+
+  assert.match(prompt, /Only record classifier feedback when Brad explicitly asks/);
+  assert.match(prompt, /A summary request or\s+interrupted playback is not feedback/);
 });
