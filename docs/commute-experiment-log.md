@@ -537,8 +537,8 @@ exact TLDR summary received paraphrases rather than `item.summary`. Dev's
 Corsair substitution crossed item identity and made the subsequent preference
 statement unusable. Prompt Revision 3.3 therefore adds the smallest observed
 guard: an on-demand queue-summary request reads the literal current summary in
-either mode without web search or paraphrase. It remains a repository candidate
-until the live Project Instructions are updated and verified.
+either mode without web search or paraphrase. Brad confirmed that the live
+Project Instructions were updated to Prompt Revision 3.3 on August 12, 2026.
 
 Day-level prior awareness also remains absent. Dev and AI both presented the
 same `stolen-thoughts.com` source under different titles and newsletter tracking
@@ -705,7 +705,7 @@ prove queue identity across interruptions.
 | Reconstruct an item from topic memory or position alone | Rejected     | The Jul. 22 Kiro and Dev mismatches show that this creates false captures.                                      |
 | Stronger wording alone                                  | Insufficient | Prompt revisions improved expectations and validation language but cannot guarantee Library tool availability.  |
 
-## Repository Queue-Discovery Rule: Prompt 3.3 Candidate
+## Queue-Discovery Rule: Prompt 3.3
 
 Prompt 3.3 keeps Prompt 3.2's discovery ordering, literal field projection,
 playback guards, and natural-language navigation, and adds the August 12
