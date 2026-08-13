@@ -23,15 +23,15 @@ classifier-provided downstream fields.
 
 ## Default Derivations
 
-| Classification | Commute | Wiki | Stream log | Review | Discard |
-| --- | --- | --- | --- | --- | --- |
-| `uninterested` | `skip` | `discard` | `none` | `none` | `true` |
-| `interested` + `headline_only` | `quick_read` | `stream_log_only` | `write` | `none` | `false` |
-| `interested` + `in_depth` | `discuss` | `full_source_candidate` | `optional_summary` | `none` | `false` |
-| `maybe` + `headline_only` | `optional_quick_read` | `stream_log_or_review` | `candidate_after_review` | `classification_boundary` | `false` |
-| `maybe` + `in_depth` | `optional_discuss_or_teaser` | `review_required` | `none` | `classification_boundary` | `false` |
-| parser failure | `none` | `none` | `none` | `parse_error` | `false` |
-| classifier validation failure | `none` | `none` | `none` | `validation_error` | `false` |
+| Classification                 | Commute                      | Wiki                    | Stream log               | Review                    | Discard |
+| ------------------------------ | ---------------------------- | ----------------------- | ------------------------ | ------------------------- | ------- |
+| `uninterested`                 | `skip`                       | `discard`               | `none`                   | `none`                    | `true`  |
+| `interested` + `headline_only` | `quick_read`                 | `stream_log_only`       | `write`                  | `none`                    | `false` |
+| `interested` + `in_depth`      | `discuss`                    | `full_source_candidate` | `optional_summary`       | `none`                    | `false` |
+| `maybe` + `headline_only`      | `optional_quick_read`        | `stream_log_or_review`  | `candidate_after_review` | `classification_boundary` | `false` |
+| `maybe` + `in_depth`           | `optional_discuss_or_teaser` | `review_required`       | `none`                   | `classification_boundary` | `false` |
+| parser failure                 | `none`                       | `none`                  | `none`                   | `parse_error`             | `false` |
+| classifier validation failure  | `none`                       | `none`                  | `none`                   | `validation_error`        | `false` |
 
 When a route is unclear, choose review over discard, stream log, commute queue, or
 wiki promotion.
@@ -73,9 +73,11 @@ provider, model, and route version.
 
 ## Wiki And Source Routing
 
-`interested/in_depth` creates a full-source candidate, not automatic public
-publication. Wiki compilation still requires approved source records and public
-promotion review.
+`interested/in_depth` creates a full-source candidate for commute discussion. It
+does not fetch or publish the source automatically. A later exact, item-bound
+`wiki this` capture authorizes source retrieval and a direct maintainer PR; the
+PR review and merge are the human publication decision. This path does not use
+approved-source records or a separate promotion review.
 
 `interested/headline_only` writes stream-log-only awareness by default. It should
 not trigger full fetch or wiki entry creation unless Brad later promotes it.
@@ -84,11 +86,13 @@ not trigger full fetch or wiki entry creation unless Brad later promotes it.
 clearly non-sensitive and daily budget allows. Default to review if the boundary,
 sensitivity, or public value is unclear.
 
-`maybe/in_depth` defaults to review before full fetch or wiki source creation.
+`maybe/in_depth` defaults to review before full fetch or wiki maintenance.
 
-Never compile private Range.com context, raw Gmail body text, credentials,
-sensitive personal content, dual-use operational detail, or unclear publication
-status into public wiki output automatically.
+Deterministic publication validation must reject missing or conflicting
+provenance, unsafe or credential-bearing URLs, raw HTML, credentials, and
+private Range.com context before a maintainer PR can pass repository checks.
+Never include raw Gmail body text, sensitive personal content, dual-use
+operational detail, or unclear publication status in public wiki output.
 
 ## Review Queue
 
@@ -102,8 +106,9 @@ Send items to review when:
 - Public promotion status is unclear.
 - The item contains private Range.com context, sensitive notes, credentials, raw
   email text, or dual-use operational detail.
-- Commute voice notes request wiki publication, external sending, reminders, or
-  work-related routing.
+- Commute voice notes request external sending, reminders, work-related routing,
+  or ambiguous or unbound wiki publication. An exact item-bound `wiki this`
+  capture becomes a maintenance candidate instead of a review record.
 
 Review records should preserve enough sanitized context for manual inspection and
 include parser, classifier, and routing metadata.
@@ -118,7 +123,7 @@ model output, or ambiguous sponsor/editorial boundaries. Send those to review.
 ## Stream Log
 
 The stream log is for lightweight awareness items that are worth retaining but do
-not deserve full-source fetch or wiki compilation.
+not deserve full-source fetch or wiki maintenance.
 
 Default stream-log candidates:
 

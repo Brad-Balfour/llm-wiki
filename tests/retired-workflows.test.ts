@@ -35,6 +35,12 @@ test('legacy handoff and approved-source workflows stay retired', async () => {
       await assert.rejects(access(retiredPath), `${retiredPath} must remain absent`);
     })
   );
+
+  const routingRules = await readFile('schema/routing-rules.md', 'utf8');
+  assert.doesNotMatch(routingRules, /requires approved source records/);
+  assert.doesNotMatch(routingRules, /public promotion review/);
+  assert.match(routingRules, /exact, item-bound\s+`wiki this` capture authorizes/);
+  assert.match(routingRules, /direct maintainer PR/);
 });
 
 test('wiki provenance uses stable source identity and URL without source records', async () => {
