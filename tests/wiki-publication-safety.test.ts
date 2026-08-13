@@ -30,6 +30,21 @@ test('accepts safe published wiki content and provenance', () => {
   assert.doesNotThrow(() => validatePublishedWikiDocuments([safeDocument]));
 });
 
+test('rejects missing or unsupported entry types without applying that rule to known indexes', () => {
+  for (const frontmatter of [{}, { type: 'conecpt' }]) {
+    assert.throws(
+      () => validatePublishedWikiDocuments([{ ...safeDocument, frontmatter }]),
+      /frontmatter\.type must be one of/
+    );
+  }
+
+  assert.doesNotThrow(() =>
+    validatePublishedWikiDocuments([
+      { path: 'wiki/concepts/index.md', frontmatter: { layout: 'default' }, markdown: '# Index' },
+    ])
+  );
+});
+
 test('rejects missing, retired, unsafe, and conflicting provenance', () => {
   assert.throws(
     () => validatePublishedWikiDocuments([{ ...safeDocument, frontmatter: { type: 'concept' } }]),
@@ -103,6 +118,31 @@ test('rejects unsafe public text, HTML, and Markdown links', () => {
     assert.throws(() =>
       validatePublishedWikiDocuments([
         { ...safeDocument, markdown: `${safeDocument.markdown}\n${unsafeText}\n` },
+      ])
+    );
+  }
+});
+
+test('validates reference-style Markdown link destinations', () => {
+  const referenceMarkdown = safeDocument.markdown.replace(
+    '[Source](https://example.com/article)',
+    '[Source][article]\n\n[article]: https://example.com/article'
+  );
+  assert.doesNotThrow(() =>
+    validatePublishedWikiDocuments([{ ...safeDocument, markdown: referenceMarkdown }])
+  );
+
+  for (const destination of [
+    'https://user:password@example.com/article',
+    'https://example.com/article?access_token=secret',
+    'javascript:alert(1)',
+  ]) {
+    assert.throws(() =>
+      validatePublishedWikiDocuments([
+        {
+          ...safeDocument,
+          markdown: `${safeDocument.markdown}\n[unsafe]: ${destination}\n`,
+        },
       ])
     );
   }

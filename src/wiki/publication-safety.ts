@@ -7,10 +7,19 @@ import {
 } from '../shared/validate.js';
 
 const WIKI_ENTRY_TYPES = ['concept', 'tool', 'person', 'event'] as const;
+const NON_ENTRY_PATHS = new Set([
+  'wiki/ENTRY_TEMPLATE.md',
+  'wiki/index.md',
+  'wiki/concepts/index.md',
+  'wiki/tools/index.md',
+  'wiki/people/index.md',
+  'wiki/events/index.md',
+]);
 const SOURCE_ITEM_ID_PATTERN = /^[A-Za-z0-9][A-Za-z0-9._:-]*$/;
 const SOURCE_MARKER_PATTERN = /<!-- source-item-id: ([A-Za-z0-9][A-Za-z0-9._:-]*) -->/g;
 const RAW_HTML_PATTERN = /<\/?[A-Za-z!][^>]*>/;
 const MARKDOWN_LINK_PATTERN = /!?\[[^\]\n]*\]\(([^()\n]*)\)/g;
+const MARKDOWN_REFERENCE_PATTERN = /^ {0,3}\[[^\]\n]+\]:\s*(?:<([^>\n]+)>|(\S+))(?:\s+.*)?$/gm;
 const CREDENTIAL_PATTERN =
   /(?:-----BEGIN [A-Z ]*PRIVATE KEY-----|\b(?:api[_ -]?key|access[_ -]?token|client[_ -]?secret|password)\s*[:=]\s*\S+)/i;
 
@@ -25,8 +34,13 @@ export function validatePublishedWikiDocuments(documents: PublishedWikiDocument[
 
   for (const document of documents) {
     const frontmatter = requireRecord(document.frontmatter, `${document.path} frontmatter`);
-    if (!WIKI_ENTRY_TYPES.includes(frontmatter.type as (typeof WIKI_ENTRY_TYPES)[number])) {
+    if (NON_ENTRY_PATHS.has(document.path)) {
       continue;
+    }
+    if (!WIKI_ENTRY_TYPES.includes(frontmatter.type as (typeof WIKI_ENTRY_TYPES)[number])) {
+      throw new Error(
+        `${document.path} frontmatter.type must be one of: ${WIKI_ENTRY_TYPES.join(', ')}`
+      );
     }
 
     const evidence = validatePublishedMarkdown(document);
@@ -91,18 +105,15 @@ function validatePublishedMarkdown(document: PublishedWikiDocument): {
   for (const match of document.markdown.matchAll(MARKDOWN_LINK_PATTERN)) {
     const destination = requireString(match[1], `${document.path} Markdown link destination`);
     linkDestinations.add(destination);
-    if (destination !== destination.trim() || /[\s<>]/.test(destination)) {
-      throw new Error(`${document.path} contains an unsafe Markdown link destination`);
-    }
-    if (/^https?:\/\//i.test(destination)) {
-      requireHttpUrl(destination, `${document.path} Markdown link`, {
-        rejectCredentials: true,
-        markdownSafe: true,
-        rejectCredentialParams: true,
-      });
-    } else if (/^(?:[A-Za-z][A-Za-z0-9+.-]*:|\/\/)/.test(destination)) {
-      throw new Error(`${document.path} contains a non-HTTP(S) Markdown link`);
-    }
+    validateLinkDestination(destination, document.path);
+  }
+  for (const match of document.markdown.matchAll(MARKDOWN_REFERENCE_PATTERN)) {
+    const destination = requireString(
+      match[1] ?? match[2],
+      `${document.path} Markdown reference destination`
+    );
+    linkDestinations.add(destination);
+    validateLinkDestination(destination, document.path);
   }
 
   const withoutLinks = document.markdown.replace(MARKDOWN_LINK_PATTERN, '');
@@ -127,6 +138,21 @@ function validatePublishedMarkdown(document: PublishedWikiDocument): {
     throw new Error(`${document.path} contains disallowed control characters`);
   }
   return { linkDestinations, sourceMarkers };
+}
+
+function validateLinkDestination(destination: string, path: string): void {
+  if (destination !== destination.trim() || /[\s<>]/.test(destination)) {
+    throw new Error(`${path} contains an unsafe Markdown link destination`);
+  }
+  if (/^https?:\/\//i.test(destination)) {
+    requireHttpUrl(destination, `${path} Markdown link`, {
+      rejectCredentials: true,
+      markdownSafe: true,
+      rejectCredentialParams: true,
+    });
+  } else if (/^(?:[A-Za-z][A-Za-z0-9+.-]*:|\/\/)/.test(destination)) {
+    throw new Error(`${path} contains a non-HTTP(S) Markdown link`);
+  }
 }
 
 function hasDisallowedControlCharacter(character: string): boolean {
