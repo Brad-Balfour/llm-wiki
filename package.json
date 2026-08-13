@@ -25,7 +25,7 @@
     "validate:commute-session-bundle": "npm run build --silent && node dist/src/commute/validate-session-bundle.js",
     "prepare:wiki-drafts": "npm run build --silent && node dist/src/wiki/prepare-handoff-drafts.js",
     "retrieve:commute-sources": "npm run build --silent && node dist/src/wiki/retrieve-maintenance-sources.js",
-    "record:classifier-feedback": "npm run build --silent && node dist/src/classifier/feedback-label.js",
+    "record:classifier-feedback": "npm run build --silent && node dist/src/feedback/label.js",
     "ingest:wiki": "sh -c 'npm run build --silent && node dist/src/wiki/ingest-handoff.js \"$@\" && npm run verify:publish' --",
     "test": "npm run build && node --test dist/tests/*.test.js",
     "ci:test": "npm run test",
