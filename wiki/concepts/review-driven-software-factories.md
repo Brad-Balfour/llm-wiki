@@ -10,7 +10,7 @@ created: 2026-07-25
 updated: 2026-08-06
 confidence: medium
 # prettier-ignore
-provenance: [{"source_item_id":"dev-20260724-01","source_path":"sources/tldr/2026-07-24-why-software-factories-fail.txt","url":"https://github.com/humanlayer/advanced-context-engineering-for-coding-agents/blob/main/wsff.md"},{"source_item_id":"19fd6c96b2d39a67-11","source_path":"sources/tldr/2026-08-06-agentic-documentation-workflows.txt","url":"https://github.blog/ai-and-ml/github-copilot/automating-cross-repo-documentation-with-github-agentic-workflows/?utm_source=tldrdev"}]
+provenance: [{"source_item_id":"dev-20260724-01","url":"https://github.com/humanlayer/advanced-context-engineering-for-coding-agents/blob/main/wsff.md"},{"source_item_id":"19fd6c96b2d39a67-11","url":"https://github.blog/ai-and-ml/github-copilot/automating-cross-repo-documentation-with-github-agentic-workflows/?utm_source=tldrdev"}]
 ---
 
 # Review-Driven Software Factories

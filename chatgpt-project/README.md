@@ -12,9 +12,8 @@ field of `LLM-Wiki-Car`. It supersedes the former commute prompt and the
 earlier separate-Project v2 Pilot.
 
 The repository file is Prompt Revision 3.3, prepared from the August 4-5 and
-August 11-12 commute evidence. The last independently verified live Project text
-was Prompt Revision 3.0 on July 26; do not describe 3.3 as live until the Instructions
-field has been updated and checked.
+August 11-12 commute evidence. Brad confirmed that the live Project Instructions
+were updated to Prompt Revision 3.3 on August 12, 2026.
 
 The prompt heading carries two distinct versions. `Queue Contract v2` changes
 only when the queue/schema contract changes. `Prompt Revision` increments for
@@ -67,11 +66,9 @@ Voice may start a queue by an exact filename or an unambiguous date plus
 newsletter name, such as `July 16 TLDR Dev`. The Project normalizes that request
 to the dated v2 filename in its Library; it must not guess a nearby queue.
 
-Do not upload the legacy `commute-session-handoff.md`,
-`commute-session-ledger.md`, `wiki-ingestion.md`, any `commute-handoff` schema,
-or `approved-wiki-source-v1.schema.json` as live Project sources. They conflict
-with the v2 single-queue/session-bundle path. Their Git history remains the
-rollback record.
+Do not restore retired handoff, ledger, wiki-approval, or compiler artifacts
+from Git history as live Project sources. They conflict with the supported v2
+single-queue/session-bundle path.
 
 The synonymous commute commands are "End commute" and "End the commute
 session." An exact `wiki this` capture is sufficient to nominate maintenance;

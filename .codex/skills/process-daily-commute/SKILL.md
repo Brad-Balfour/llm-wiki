@@ -50,22 +50,35 @@ only when the intended action or target genuinely cannot be determined.
 
 ## Verify and publish
 
-1. Run focused tests while iterating, then run `npm run check`, strict validation
+1. Before treating repository edits as the whole deliverable, compare the diff
+   with the live Project instructions and source list in
+   `chatgpt-project/README.md`. Any changed live prompt or Project source creates
+   a required live-sync action; never leave Brad to infer it from the diff.
+2. When a live-sync action exists, immediately provide the exact merged or
+   review-ready prompt in one copyable block, or list the exact source files and
+   destination. Do this without waiting for Brad to request it. Repository and
+   GitHub writes do not authorize changing the live Project UI, so keep the
+   action explicitly unresolved until Brad confirms it was applied. Then update
+   the repository's live-version record in the active PR or a focused follow-up.
+3. Run focused tests while iterating, then run `npm run check`, strict validation
    for every touched OpenSpec change, and `git diff --check`.
-2. Commit only the intended tracked files, push the branch to `origin`, and open
+4. Commit only the intended tracked files, push the branch to `origin`, and open
    or update a draft PR. Never stop at a local commit.
-3. Keep the PR body current with user impact, root cause, evidence counts,
+5. Keep the PR body current with user impact, root cause, evidence counts,
    validation, and the latest head commit. Cross-link relevant issues.
-4. Inspect all review threads. Fix actionable comments, reply with the commit and
+6. Inspect all review threads. Fix actionable comments, reply with the commit and
    validation evidence, resolve the thread, and request a fresh Codex review of
    the new head when the fix materially changes behavior.
-5. Wait for the latest-head CI checks and required review workflows. Merge only
+7. Wait for the latest-head CI checks and required review workflows. Merge only
    with explicit user authorization and only when checks and actionable review
    threads are clean.
 
 ## Completion
 
 Report the remote branch, commit, PR, CI/review state, issue updates, evidence
-counts, and any genuinely unresolved item. If Brad requests the live Project
-prompt after merge, read the exact merged prompt file and return its full text in
-one copyable block; do not reconstruct it from memory.
+counts, and any genuinely unresolved item. Do not call the daily loop complete
+while a required live-sync action is unconfirmed. Keep the action visible as a
+pre-merge checklist item, but do not change the PR's draft/ready state because of
+it; ready for review is compatible with pending live synchronization. For every
+changed live prompt, return the exact file contents in one copyable block before
+handoff; never reconstruct them from memory and never make Brad remember to ask.

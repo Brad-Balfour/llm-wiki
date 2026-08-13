@@ -4,6 +4,8 @@ import { extname, join } from 'node:path';
 
 import { JSON_SCHEMA, load } from 'js-yaml';
 
+import { validatePublishedWikiDocuments } from '../dist/src/wiki/publication-safety.js';
+
 const markdownFiles = ['index.md', ...(await findMarkdownFiles('wiki'))];
 const yamlFiles = [
   '_config.yml',
@@ -17,19 +19,24 @@ for (const path of yamlFiles) {
   assert.ok(isMapping(parsed), `${path} must contain a YAML mapping`);
 }
 
+const publishedWikiDocuments = [];
 for (const path of markdownFiles) {
   const markdown = await readFile(path, 'utf8');
   const frontmatter = extractFrontmatter(markdown, path);
   const parsed = parseYaml(frontmatter, `${path} frontmatter`);
   assert.ok(isMapping(parsed), `${path} frontmatter must contain a YAML mapping`);
+  if (path.startsWith('wiki/')) {
+    publishedWikiDocuments.push({ path, markdown, frontmatter: parsed });
+  }
 }
+validatePublishedWikiDocuments(publishedWikiDocuments);
 
 const template = await readFile('wiki/ENTRY_TEMPLATE.md', 'utf8');
 const templateFrontmatter = extractFrontmatter(template, 'wiki/ENTRY_TEMPLATE.md');
 const provenanceLine = templateFrontmatter
   .split('\n')
   .find((line) => line.startsWith('provenance: '));
-assert.ok(provenanceLine, 'entry template must keep compiler-compatible provenance on one line');
+assert.ok(provenanceLine, 'entry template must keep durable provenance on one line');
 const provenance = JSON.parse(provenanceLine.slice('provenance: '.length));
 assert.ok(
   Array.isArray(provenance) && provenance.length > 0,
@@ -37,7 +44,7 @@ assert.ok(
 );
 for (const [index, item] of provenance.entries()) {
   assert.ok(isMapping(item), `template provenance[${index}] must be an object`);
-  for (const field of ['source_item_id', 'source_path', 'url']) {
+  for (const field of ['source_item_id', 'url']) {
     assert.equal(
       typeof item[field],
       'string',

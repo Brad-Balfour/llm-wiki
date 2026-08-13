@@ -10,7 +10,7 @@ created: 2026-07-28
 updated: 2026-07-29
 confidence: medium
 # prettier-ignore
-provenance: [{"source_item_id":"19fa340bcb6a5879-13","source_path":"sources/tldr/2026-07-27-adaptive-context-engineering.txt","url":"https://claude.com/blog/the-new-rules-of-context-engineering-for-claude-5-generation-models"}]
+provenance: [{"source_item_id":"19fa340bcb6a5879-13","url":"https://claude.com/blog/the-new-rules-of-context-engineering-for-claude-5-generation-models"}]
 ---
 
 # Adaptive Context Engineering

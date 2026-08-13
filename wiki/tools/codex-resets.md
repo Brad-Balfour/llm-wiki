@@ -9,6 +9,8 @@ wiki_slug: codex-resets
 created: 2026-07-21
 updated: 2026-07-21
 confidence: medium
+# prettier-ignore
+provenance: [{"source_item_id":"url_e4b958abbc0833ee","url":"https://codex-resets.com/"}]
 ---
 
 # Codex Resets
@@ -29,5 +31,7 @@ historical signal when a change in Codex availability or limits needs context.
 ## Source Notes
 
 ### [Codex Resets](https://codex-resets.com/)
+
+<!-- source-item-id: url_e4b958abbc0833ee -->
 
 Saved from TLDR Dev, 2026-07-20.

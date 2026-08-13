@@ -10,7 +10,7 @@ created: 2026-07-16
 updated: 2026-07-16
 confidence: medium
 # prettier-ignore
-provenance: [{"source_item_id":"19f6057544b9bae7-07","source_path":"sources/tldr/2026-07-14-clawk.txt","url":"https://github.com/clawkwork/clawk"}]
+provenance: [{"source_item_id":"19f6057544b9bae7-07","url":"https://github.com/clawkwork/clawk"}]
 ---
 
 # Clawk

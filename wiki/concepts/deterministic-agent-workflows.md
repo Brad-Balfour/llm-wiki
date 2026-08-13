@@ -9,6 +9,8 @@ wiki_slug: deterministic-agent-workflows
 created: 2026-07-21
 updated: 2026-07-29
 confidence: medium
+# prettier-ignore
+provenance: [{"source_item_id":"url_a3f46c0ffd32ff76","url":"https://www.adamhjk.com/blog/a-practical-guide-to-reducing-token-spend/"}]
 ---
 
 # Deterministic Agent Workflows
@@ -30,6 +32,8 @@ more inspectable.
 ## Source Notes
 
 ### [A Practical Guide to Reducing Token Spend](https://www.adamhjk.com/blog/a-practical-guide-to-reducing-token-spend/)
+
+<!-- source-item-id: url_a3f46c0ffd32ff76 -->
 
 Saved from TLDR Dev, 2026-07-20.
 

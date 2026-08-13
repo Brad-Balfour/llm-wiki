@@ -10,7 +10,7 @@ created: 2026-07-29
 updated: 2026-07-29
 confidence: high
 # prettier-ignore
-provenance: [{"source_item_id":"19fad8d9ff2bc642-15","source_path":"sources/tldr/2026-07-29-llm-search-integration-depth.txt","url":"https://blog.bytebytego.com/p/why-doordash-instacart-and-uber-eats"}]
+provenance: [{"source_item_id":"19fad8d9ff2bc642-15","url":"https://blog.bytebytego.com/p/why-doordash-instacart-and-uber-eats"}]
 ---
 
 # LLM Integration Depth in Search

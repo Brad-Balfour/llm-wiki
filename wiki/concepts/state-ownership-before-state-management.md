@@ -10,7 +10,7 @@ created: 2026-07-25
 updated: 2026-07-25
 confidence: medium
 # prettier-ignore
-provenance: [{"source_item_id":"dev-20260724-02","source_path":"sources/tldr/2026-07-24-state-ownership.txt","url":"https://tldr.tech/dev/2026-07-24"}]
+provenance: [{"source_item_id":"dev-20260724-02","url":"https://tldr.tech/dev/2026-07-24"}]
 ---
 
 # State Ownership Before State Management

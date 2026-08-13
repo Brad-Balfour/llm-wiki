@@ -9,6 +9,8 @@ wiki_slug: agent-context-handoff
 created: 2026-07-21
 updated: 2026-07-28
 confidence: medium
+# prettier-ignore
+provenance: [{"source_item_id":"url_4942c519be3d86ed","url":"https://stencil.so/blog/prewalk"}]
 ---
 
 # Agent Context Handoff
@@ -30,6 +32,8 @@ exploration.
 ## Source Notes
 
 ### [You only need the frontier model for one single edit](https://stencil.so/blog/prewalk)
+
+<!-- source-item-id: url_4942c519be3d86ed -->
 
 Saved from TLDR Dev, 2026-07-21.
 

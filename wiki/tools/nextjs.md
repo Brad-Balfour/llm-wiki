@@ -10,7 +10,7 @@ created: 2026-08-05
 updated: 2026-08-05
 confidence: high
 # prettier-ignore
-provenance: [{"source_item_id":"19fcc7bdf7e9fe90-08","source_path":"sources/tldr/2026-08-04-nextjs-16-3.txt","url":"https://nextjs.org/blog/next-16-3?utm_source=tldrdev"}]
+provenance: [{"source_item_id":"19fcc7bdf7e9fe90-08","url":"https://nextjs.org/blog/next-16-3?utm_source=tldrdev"}]
 ---
 
 # Next.js

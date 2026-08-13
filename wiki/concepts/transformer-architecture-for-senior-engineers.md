@@ -10,7 +10,7 @@ created: 2026-07-13
 updated: 2026-07-13
 confidence: high
 # prettier-ignore
-provenance: [{"source_item_id":"tldr_79edd44693b74006","source_path":"sources/tldr/2026-06-23-transformer-architecture-for-senior-engineers.txt","url":"https://www.pathtostaff.com/p/everything-a-senior-engineer-needs"}]
+provenance: [{"source_item_id":"tldr_79edd44693b74006","url":"https://www.pathtostaff.com/p/everything-a-senior-engineer-needs"}]
 ---
 
 # Transformer Architecture for Senior Engineers

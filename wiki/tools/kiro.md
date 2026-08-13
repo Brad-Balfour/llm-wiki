@@ -9,6 +9,8 @@ wiki_slug: kiro
 created: 2026-07-22
 updated: 2026-07-22
 confidence: high
+# prettier-ignore
+provenance: [{"source_item_id":"url_cd92690ee9623569","url":"https://kiro.dev/blog/introducing-kiro/"},{"source_item_id":"url_b73bef412d686a71","url":"https://kiro.dev/docs/specs/"},{"source_item_id":"url_0a1848e295690577","url":"https://kiro.dev/docs/models/"}]
 ---
 
 # Kiro
@@ -54,16 +56,23 @@ specification workflows such as OpenSpec or Spec Kit.
 
 ### [Introducing Kiro](https://kiro.dev/blog/introducing-kiro/)
 
+<!-- source-item-id: url_cd92690ee9623569 -->
+
 Saved during the July 22 TLDR commute for later team sharing. The commute
 transcript identifies Kiro as the item discussed in depth; the original queue
 artifact available after the session did not preserve the matching item record.
+The page uses a deterministic identity for each cited public URL instead.
 
 ### [Kiro Specs documentation](https://kiro.dev/docs/specs/)
+
+<!-- source-item-id: url_b73bef412d686a71 -->
 
 Kiro documents its structured requirements, design, and tasks workflow,
 including the three generated Markdown artifacts.
 
 ### [Kiro Models documentation](https://kiro.dev/docs/models/)
+
+<!-- source-item-id: url_0a1848e295690577 -->
 
 Kiro documents model selection and its own routing layer. Model availability,
 pricing, and usage policy are product details that should be checked at the

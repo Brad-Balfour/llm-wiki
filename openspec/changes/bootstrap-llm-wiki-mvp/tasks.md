@@ -18,7 +18,8 @@ runtime is needed as a fallback, a validation control, or the future default.
 - [x] 1.1 Create `schema/interest-profile.md` v1.4 from Claude v1.3 plus the agreed v1.4 fixes and Codex depth heuristics.
 - [x] 1.2 Create `schema/classifier-instructions.md` with the two-axis output schema, thresholds, fail-closed validation rules, and validation methodology.
 - [x] 1.3 Create `schema/routing-rules.md` with commute, wiki, stream-log, review, and discard derivations.
-- [x] 1.4 Initialize `schema/compile-state.json` and `schema/model-config.example.yaml`.
+- [x] 1.4 Initialize the model configuration and fixture directories. The
+      superseded compiler state was removed after maintainer PR cutover.
 - [x] 1.5 Add fixture directories for TLDR source text and expected parser, classifier, routing, queue, feedback, and wiki outputs.
 
 ## 2. Project Runtime Setup
@@ -120,7 +121,8 @@ other dedicated records, not classifier labels.
 - [x] 7.1 Compile approved full-source candidates into OKF-style markdown under `wiki/`.
 - [x] 7.2 Require frontmatter with type, title, aliases or tags where applicable, created date, updated date, confidence, and provenance.
 - [x] 7.3 Preserve prior sources when updating an existing wiki entry.
-- [x] 7.4 Track processed source hashes and output state in the compile-state manifest.
+- [x] 7.4 Preserve stable source identity and URLs in wiki provenance. The
+      superseded compile-state manifest was removed after maintainer PR cutover.
 - [x] 7.5 Add fixture tests for create, update, provenance, and idempotent compile behavior.
 - [x] 7.6 Require explicit local public confirmation, structured safety review, safe HTTP(S) URLs, unsafe-content rejection, and escaped Markdown rendering.
 - [x] 7.7 Reject stable source-item-id collisions when immutable source path or URL differs.

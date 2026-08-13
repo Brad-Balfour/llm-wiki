@@ -320,24 +320,21 @@ This change is a proposed successor to parts of
 - **Retained unchanged**: the requirement remains the intended contract.
 - **Retained, revised here**: keep the goal, but this change replaces its
   behavior or sequencing.
-- **Legacy compatibility only**: existing code/artifacts remain usable during
-  migration, but new work does not extend that path.
+- **Retired**: removed from the working tree; Git history is the rollback and
+  debugging record.
 - **Historical record**: useful evidence, not an active operating instruction.
 
-| Existing material                                                                                                              | Status                              | Governing direction after this change is accepted                                                                                                                    | Migration point                                                                                                                                             |
-| ------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| TLDR parsing, sanitized source records, stable source identity, classifier source-neutrality, queue ordering and item metadata | Retained unchanged                  | Bootstrap requirements remain applicable.                                                                                                                            | No migration beyond normal maintenance.                                                                                                                     |
-| Manual ChatGPT Voice before a custom voice agent; phone/Tesla-compatible car validation                                        | Retained, revised here              | J2 and J3 add explicit selected-queue and one-queue-per-session rules.                                                                                               | Project instructions change in tasks 2.1-2.2.                                                                                                               |
-| Voice notes/corrections and queue usage evidence                                                                               | Retained, revised here              | J4 requires exact item binding or `unresolved_capture`; quality incidents become first-class data.                                                                   | Session-bundle schema and fixtures in tasks 1.1-1.4.                                                                                                        |
-| `commute-handoff.v2`, a live append-only Library ledger, current-pass reconstruction, and one handoff for every loaded queue   | Superseded for new sessions         | J4 uses a self-contained session bundle with an explicit integrity/recovery declaration.                                                                             | The existing handoff importer stays available while J4/J5 are completed; the retired queue-v1 format has no runtime support.                                |
-| Bootstrap task 5.7a and the single-handoff portion of task 5.8                                                                 | Superseded for new work             | J4/J5 replace the ledger and single-file assumptions; task 5.8 evidence is not claimed from a reconstructed artifact.                                                | Mark superseded when tasks 1-3 of this change pass.                                                                                                         |
-| Feedback labels as durable data, cadence-based classifier updates, and private-data handling                                   | Retained, revised here              | Exact in-session binding is a prerequisite; only repeated, measurable corrections affect classifier/profile work.                                                    | Tasks 3.3 and 5.1-5.3.                                                                                                                                      |
-| Existing compiler implementation, safe rendering, source-link preservation, and Pages read path                                | Legacy compatibility only           | Existing code remains usable while J6 is built; its safety checks remain valuable.                                                                                   | Do not remove until direct maintainer PRs work for fixtures and real sources.                                                                               |
-| Bootstrap `approved source`, `public: true`, and local `--confirm-public` gates                                                | Superseded for new maintenance work | `wiki this` creates a maintenance capture; safeguards validate content and the maintainer writes a PR directly. Git review/merge is the normal human decision point. | Replace as the default only after tasks 3-4 complete and early PRs are reviewed.                                                                            |
-| `docs/commute-voice-handoff.md` and `chatgpt-project/commute-session-*.md`                                                     | Historical fallback material        | Their live-ledger and reconstructed-handoff paths do not govern v2. The files stay in Git, but are not live Project sources.                                         | The July 19 two-Project test showed that preserving them in a separate live Project makes the commute queue inaccessible.                                   |
-| `chatgpt-project/CHATGPT_CAR_QUEUE_PROMPT.md`                                                                                  | Current v2 operating instructions   | It governs queue selection, Voice playback, and session-bundle export in the one live `LLM-Wiki-Car` Project.                                                        | Replace its legacy contents during the single-Project v2 cutover; retain the earlier text in Git history.                                                   |
-| `chatgpt-project/wiki-ingestion.md` and `schema/approved-wiki-source-v1.schema.json`                                           | Historical fallback material        | Their “Approve this” path does not govern v2. Exact `wiki this` is sufficient to create a maintenance capture for the local maintainer.                              | Do not upload them as live Project sources; retain their files and history while the legacy compiler remains available.                                     |
-| `docs/replan-2026-07-12.md` and `docs/next-session-handoff.md`                                                                 | Historical record                   | They are not current plans. Evidence needed from them is summarized in `docs/commute-wiki-replan-2026-07-16.md` and this change.                                     | Remove from the working documentation set or move to a clearly marked history location after link/reference audit. Git history remains the durable archive. |
+| Existing material                                                                                                              | Status                            | Governing direction after this change is accepted                                                                                                             | Migration point                                                                                           |
+| ------------------------------------------------------------------------------------------------------------------------------ | --------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
+| TLDR parsing, sanitized source records, stable source identity, classifier source-neutrality, queue ordering and item metadata | Retained unchanged                | Bootstrap requirements remain applicable.                                                                                                                     | No migration beyond normal maintenance.                                                                   |
+| Manual ChatGPT Voice before a custom voice agent; phone/Tesla-compatible car validation                                        | Retained, revised here            | J2 and J3 add explicit selected-queue and one-queue-per-session rules.                                                                                        | Project instructions change in tasks 2.1-2.2.                                                             |
+| Voice notes/corrections and queue usage evidence                                                                               | Retained, revised here            | J4 requires exact item binding or `unresolved_capture`; quality incidents become first-class data.                                                            | Session-bundle schema and fixtures in tasks 1.1-1.4.                                                      |
+| `commute-handoff.v2`, its importer, and the live Library ledger                                                                | Retired                           | Session bundles provide the supported self-contained integrity and recovery contract.                                                                         | Removed after repeated daily use proved the replacement path.                                             |
+| Bootstrap task 5.7a and the single-handoff portion of task 5.8                                                                 | Superseded for new work           | J4/J5 replace the ledger and single-file assumptions; task 5.8 evidence is not claimed from a reconstructed artifact.                                         | Mark superseded when tasks 1-3 of this change pass.                                                       |
+| Feedback labels as durable data, cadence-based classifier updates, and private-data handling                                   | Retained, revised here            | Exact in-session binding is a prerequisite; only repeated, measurable corrections affect classifier/profile work.                                             | Tasks 3.3 and 5.1-5.3.                                                                                    |
+| Approved-source compiler, compile state, and public-confirmation gates                                                         | Retired                           | `wiki this` creates a maintenance capture; safeguards validate content and the maintainer writes a PR directly. Git review/merge is the human decision point. | Removed after real maintainer PRs and review proved the replacement path.                                 |
+| Legacy handoff, ledger, wiki-ingestion, and July 12 operator documents                                                         | Retired                           | Git history retains them for debugging without exposing obsolete commands in the working tree.                                                                | Removed after the session-bundle and maintainer instructions became the sole supported path.              |
+| `chatgpt-project/CHATGPT_CAR_QUEUE_PROMPT.md`                                                                                  | Current v2 operating instructions | It governs queue selection, Voice playback, and session-bundle export in the one live `LLM-Wiki-Car` Project.                                                 | Replace its legacy contents during the single-Project v2 cutover; retain the earlier text in Git history. |
 
 ### Requirement Disposition Detail
 
@@ -348,9 +345,9 @@ This change is a proposed successor to parts of
 | `commute-queue`: Voice Notes Route To Review, Queue Usage Evidence                                                                | Retained with narrowing             | Sensitive freeform content stays protected; a verified wiki request now becomes J6 input without promotion/approval. `wiki this`, `add this to my wiki`, and `save this for the wiki` are equivalent capture phrases. |
 | `commute-queue`: Structured Post-Commute Handoff, including live ledger append, reload, all-loaded-queues state, and v2 creation  | Superseded for new Project behavior | `session-bundle` and `commute-import`; the retired queue-v1 format is not supported by the successor path.                                                                                                            |
 | `feedback-labels`: label storage, cadence, product-harm review                                                                    | Retained with narrowing             | Exact verified binding is required before a correction is a label; unbound captures are not classifier data.                                                                                                          |
-| `wiki-compilation`: safe rendering, HTTP(S)/credential checks, source-link traceability, idempotence                              | Retained as mechanical safeguards   | Applied by the maintainer path without an approval ritual.                                                                                                                                                            |
+| `wiki-compilation`: safe rendering, HTTP(S)/credential checks, source-link traceability, idempotence                              | Retained as mechanical safeguards   | Enforced on every typed wiki entry by deterministic publication validation after maintainer synthesis, without an approval ritual.                                                                                    |
 | `wiki-compilation`: Approved Sources Compile, Review Before Public Promotion, local `--confirm-public`; `approved-wiki-source-v1` | Superseded for new maintenance work | Exact `wiki this` -> importer maintenance input -> direct maintainer branch/PR. No `approved`, `public`, `reviewed_by`, or confirmation field is required before the PR.                                              |
-| Existing compiler and handoff importer                                                                                            | Legacy compatibility only           | Retain until J4-J6 acceptance criteria pass; no new Project instructions extend these paths.                                                                                                                          |
+| Existing compiler and handoff importer                                                                                            | Retired                             | Removed after the session-bundle and direct-maintainer workflow passed fixtures, repeated real commutes, and PR review.                                                                                               |
 
 ### Public-Content Boundary
 
@@ -376,17 +373,14 @@ following are true:
 5. replacement operator instructions are published in the Project source
    bundle.
 
-These are **default/retirement criteria**, not a prohibition on creating and
-using a versioned successor prompt for a controlled commute test. The July 19
+These criteria have passed through repeated daily use and reviewed maintainer
+PRs. The session-bundle/direct-maintainer flow is the default and the old
+compiler/handoff executables are retired. The July 19
 two-Project experiment established one additional constraint: queue generation
 and Voice playback must use the same live `LLM-Wiki-Car` Project. A separate
 Pilot makes Project-scoped Library queues unavailable to the Voice session and
-therefore defeats J2/J3 recovery. Before the criteria pass, the v2 instructions
-may replace the legacy instructions in that one Project for a controlled test;
-the earlier instructions stay recoverable in Git but are not competing live
-Project sources. A test produces evidence for these criteria; it must not
-silently be described as the new default or cause the historical material to be
-lost.
+therefore defeats J2/J3 recovery. Earlier instructions stay recoverable in Git
+but are not competing live Project sources.
 
 At that point, update `AGENTS.md` and the active operator documentation to name
 this change as the governing commute/wiki contract. Keep legacy importer support
@@ -416,15 +410,14 @@ example, or a documented platform limitation.
 
 1. Reconcile and agree this journey contract against the observed workflow;
    preserve the working manual controls while changing any boundary.
-2. Define `commute-session-bundle` schema and local import behavior while
-   retaining the existing handoff importer separately from the v2-only queue path.
+2. Define `commute-session-bundle` schema and local import behavior.
 3. Add fixtures from observed defects before revising Project instructions.
 4. Update the Project instruction/reference files to implement J2-J4.
 5. Implement local reconciliation, source retrieval, and maintainer PR flow.
 6. Add feedback aggregation and quality-incident triage after the event
    contract is proven in real sessions.
-7. After the default-change criteria pass, update active repository guidance and
-   replace or remove stale historical operating documents.
+7. Retire replaced executables and stale operating documents after the
+   default-change criteria pass.
 
 ## Open Questions
 

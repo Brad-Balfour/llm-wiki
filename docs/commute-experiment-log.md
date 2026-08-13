@@ -537,8 +537,8 @@ exact TLDR summary received paraphrases rather than `item.summary`. Dev's
 Corsair substitution crossed item identity and made the subsequent preference
 statement unusable. Prompt Revision 3.3 therefore adds the smallest observed
 guard: an on-demand queue-summary request reads the literal current summary in
-either mode without web search or paraphrase. It remains a repository candidate
-until the live Project Instructions are updated and verified.
+either mode without web search or paraphrase. Brad confirmed that the live
+Project Instructions were updated to Prompt Revision 3.3 on August 12, 2026.
 
 Day-level prior awareness also remains absent. Dev and AI both presented the
 same `stolen-thoughts.com` source under different titles and newsletter tracking
@@ -705,7 +705,7 @@ prove queue identity across interruptions.
 | Reconstruct an item from topic memory or position alone | Rejected     | The Jul. 22 Kiro and Dev mismatches show that this creates false captures.                                      |
 | Stronger wording alone                                  | Insufficient | Prompt revisions improved expectations and validation language but cannot guarantee Library tool availability.  |
 
-## Repository Queue-Discovery Rule: Prompt 3.3 Candidate
+## Queue-Discovery Rule: Prompt 3.3
 
 Prompt 3.3 keeps Prompt 3.2's discovery ordering, literal field projection,
 playback guards, and natural-language navigation, and adds the August 12
@@ -797,12 +797,12 @@ and spoken prompt constant, with no manual attachment before the lookup:
 4. Repeat the same pair during a real commute only if the parked A/B result is
    clear; do not change network, queue, and restart state in one experiment.
 
-## Deferred Cleanup Question
+## Retired Pilot Cleanup
 
-Assess whether the retired `v2-pilot` ChatGPT Project can now be deleted and
-what related files or instructions can be cleaned up. Do this only after the
-current Library-discovery probe establishes whether `LLM-Wiki-Car` is the sole
-active commute surface; preserve any unique historical evidence before deletion.
+The repository no longer contains the retired pilot prompt, legacy handoff and
+ledger instructions, or approved-source compiler path. Git history preserves
+their diagnostic evidence. The unused `v2-pilot` ChatGPT Project has no
+remaining repository dependency and can be deleted from the ChatGPT UI.
 
 ## Conversation-Informed Wiki Enrichment
 

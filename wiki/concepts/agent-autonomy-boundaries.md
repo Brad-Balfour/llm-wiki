@@ -10,7 +10,7 @@ created: 2026-08-03
 updated: 2026-08-03
 confidence: high
 # prettier-ignore
-provenance: [{"source_item_id":"19fb2cd8ae0bed24-09","source_path":"sources/tldr/2026-07-31-agent-autonomy-boundaries.txt","url":"https://newsletter.posthog.com/p/agent-autonomy?utm_source=tldrdev"}]
+provenance: [{"source_item_id":"19fb2cd8ae0bed24-09","url":"https://newsletter.posthog.com/p/agent-autonomy?utm_source=tldrdev"}]
 ---
 
 # Agent Autonomy Boundaries

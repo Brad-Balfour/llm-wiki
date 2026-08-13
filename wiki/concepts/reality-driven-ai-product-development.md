@@ -10,7 +10,7 @@ created: 2026-07-17
 updated: 2026-07-17
 confidence: medium
 # prettier-ignore
-provenance: [{"source_item_id":"19f657fda97edc45-01","source_path":"sources/tldr/2026-07-15-reality-driven-ai-product-development.txt","url":"https://adi.bio/reality"}]
+provenance: [{"source_item_id":"19f657fda97edc45-01","url":"https://adi.bio/reality"}]
 ---
 
 # Reality-Driven AI Product Development

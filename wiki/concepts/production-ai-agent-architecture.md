@@ -10,7 +10,7 @@ created: 2026-07-16
 updated: 2026-07-16
 confidence: medium
 # prettier-ignore
-provenance: [{"source_item_id":"19f60cf507a74afc-05","source_path":"sources/tldr/2026-07-14-production-ai-agent-architecture.txt","url":"https://blog.bytebytego.com/p/how-microsoft-ships-ai-agents-at"}]
+provenance: [{"source_item_id":"19f60cf507a74afc-05","url":"https://blog.bytebytego.com/p/how-microsoft-ships-ai-agents-at"}]
 ---
 
 # Production AI Agent Architecture
