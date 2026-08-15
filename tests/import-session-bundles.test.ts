@@ -146,6 +146,41 @@ test('recovers an exact wiki capture when the period label contradicts the artif
   );
 });
 
+test('preserves full validated events when the declared artifact filename is missing or blank', () => {
+  for (const artifactFilenameValue of [undefined, '   ']) {
+    const malformed = JSON.parse(validBundle) as {
+      session: Record<string, unknown>;
+      queue_snapshot: { queue: unknown };
+    };
+    if (artifactFilenameValue === undefined) {
+      delete malformed.session.artifact_filename;
+    } else {
+      malformed.session.artifact_filename = artifactFilenameValue;
+    }
+
+    const result = reconcileSessionBundles([
+      {
+        filename: artifactFilename,
+        text: JSON.stringify(malformed),
+        recoveryQueue: {
+          filename: '20260720-tldr-dev.txt',
+          text: JSON.stringify(malformed.queue_snapshot.queue),
+        },
+      },
+    ]);
+
+    assert.equal(result.sessions[0]?.status, 'accepted');
+    assert.equal(result.sessions[0]?.integrity_state, 'partial');
+    assert.equal(result.maintenance_candidates.length, 1);
+    assert.equal(result.navigation_events.length, 1);
+    assert.ok(
+      result.sessions[0]?.recovery_warnings?.some((warning) =>
+        warning.includes('does not declare a non-empty session.artifact_filename')
+      )
+    );
+  }
+});
+
 test('warns but recovers when a distinct session reuses an artifact filename', () => {
   const queue = (JSON.parse(validBundle) as { queue_snapshot: { queue: unknown } }).queue_snapshot
     .queue;

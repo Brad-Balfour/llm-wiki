@@ -153,9 +153,15 @@ export function reconcileSessionBundles(
         continue;
       }
       let relaxedBundle: CommuteSessionBundle | undefined;
+      let relaxedDeclaredArtifactFilename: string | undefined;
       if (input.recoveryQueue) {
         try {
-          relaxedBundle = parseCommuteSessionBundleTextWithRelaxedArtifactFilename(input.text);
+          const relaxed = parseCommuteSessionBundleTextWithRelaxedArtifactFilename(
+            input.text,
+            input.filename
+          );
+          relaxedBundle = relaxed.bundle;
+          relaxedDeclaredArtifactFilename = relaxed.declaredArtifactFilename;
         } catch {
           // Continue to bounded wiki-only recovery for other malformed bundles.
         }
@@ -164,21 +170,30 @@ export function reconcileSessionBundles(
         try {
           validateFullRecoveryQueue(relaxedBundle, input.recoveryQueue);
           bundle = relaxedBundle;
-          strictRecoveryWarnings.push(
-            ...recoveryArtifactFilenameWarnings(
-              bundle.session.artifact_filename,
-              'Declared artifact filename',
-              bundle.session.session_date
-            )
-          );
-          if (!bundleArtifactFilenameMatches(input.filename, bundle.session.artifact_filename)) {
+          if (relaxedDeclaredArtifactFilename === undefined) {
+            strictRecoveryWarnings.push(
+              'Malformed bundle does not declare a non-empty session.artifact_filename.'
+            );
+          } else {
+            strictRecoveryWarnings.push(
+              ...recoveryArtifactFilenameWarnings(
+                relaxedDeclaredArtifactFilename,
+                'Declared artifact filename',
+                bundle.session.session_date
+              )
+            );
+          }
+          if (
+            relaxedDeclaredArtifactFilename !== undefined &&
+            !bundleArtifactFilenameMatches(input.filename, relaxedDeclaredArtifactFilename)
+          ) {
             strictRecoveryWarnings.push(
               ...recoveryArtifactFilenameWarnings(
                 input.filename,
                 'Downloaded bundle filename',
                 bundle.session.session_date
               ),
-              `Downloaded bundle filename ${input.filename} does not match declared artifact filename ${bundle.session.artifact_filename}.`
+              `Downloaded bundle filename ${input.filename} does not match declared artifact filename ${relaxedDeclaredArtifactFilename}.`
             );
           }
           if (sessionIds.has(bundle.session.session_id)) {
@@ -444,7 +459,10 @@ function collectStrictArtifactClaims(inputs: SessionBundleInput[]): Map<string, 
     } catch {
       if (!input.recoveryQueue) continue;
       try {
-        bundle = parseCommuteSessionBundleTextWithRelaxedArtifactFilename(input.text);
+        bundle = parseCommuteSessionBundleTextWithRelaxedArtifactFilename(
+          input.text,
+          input.filename
+        ).bundle;
         validateFullRecoveryQueue(bundle, input.recoveryQueue);
       } catch {
         continue;

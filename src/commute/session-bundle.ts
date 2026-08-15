@@ -173,10 +173,40 @@ export function parseCommuteSessionBundleText(text: string): CommuteSessionBundl
   return validateCommuteSessionBundle(parseCommuteSessionBundleJson(text));
 }
 
+export interface RelaxedArtifactFilenameParse {
+  bundle: CommuteSessionBundle;
+  declaredArtifactFilename?: string;
+}
+
 export function parseCommuteSessionBundleTextWithRelaxedArtifactFilename(
-  text: string
-): CommuteSessionBundle {
-  return validateCommuteSessionBundleCandidate(parseCommuteSessionBundleJson(text), false);
+  text: string,
+  fallbackArtifactFilename: string
+): RelaxedArtifactFilenameParse {
+  const candidate = requireRecord(parseCommuteSessionBundleJson(text), 'bundle');
+  const session = requireRecord(candidate.session, 'session');
+  const rawArtifactFilename = session.artifact_filename;
+  const declaredArtifactFilename =
+    typeof rawArtifactFilename === 'string' && rawArtifactFilename.trim().length > 0
+      ? rawArtifactFilename
+      : undefined;
+  if (
+    rawArtifactFilename !== undefined &&
+    !(typeof rawArtifactFilename === 'string' && rawArtifactFilename.trim().length === 0)
+  ) {
+    requireString(rawArtifactFilename, 'session.artifact_filename');
+  }
+  const normalizedCandidate =
+    declaredArtifactFilename === undefined
+      ? {
+          ...candidate,
+          session: { ...session, artifact_filename: fallbackArtifactFilename },
+        }
+      : candidate;
+
+  return {
+    bundle: validateCommuteSessionBundleCandidate(normalizedCandidate, false),
+    ...(declaredArtifactFilename === undefined ? {} : { declaredArtifactFilename }),
+  };
 }
 
 function parseCommuteSessionBundleJson(text: string): unknown {
