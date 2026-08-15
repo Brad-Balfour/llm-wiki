@@ -547,6 +547,63 @@ picker articles argued toward the same automatic-routing future. Duplicate
 handling therefore needs canonical URL identity plus an explicit related-story
 path; exact string equality alone is insufficient.
 
+### August 13-14 Acceptance, Grounding, And Maintenance Result
+
+The three August 13 queues passed the v2 validator with seven General items,
+ten Dev items, and four Fintech items. Every embedded snapshot matched its
+separately supplied canonical queue. The August 13 General bundle passed strict
+validation. Dev failed because its reconstructed announcements omitted the
+required navigation transitions, and Fintech failed because completed playback
+retained a resume cursor. Supplied-queue recovery accepted all three sessions
+without inventing item identity.
+
+The bounded recovered intake retained two exact wiki-maintenance candidates,
+both from Dev: _How we built a software factory to drive Astro's GitHub issue
+count to zero_ and _Build Wide, Ship Narrow_. It retained six General navigation
+events and no unresolved capture. The malformed-bundle recovery contract
+intentionally kept only explicit wiki captures from Dev and no Fintech events;
+the original artifacts and shared chats therefore remain necessary evidence for
+the other channels.
+
+Across the original bundles, there were seven explicit quality incidents and
+eight general captures. Home validation adds two artifact-contract failures:
+Dev's announcement lifecycle and Fintech's impossible completed/resume state.
+The chats confirm the product impact:
+
+- General invented most of its first seven-headline sweep, including unrelated
+  OpenAI, Gemini, foreign-aid, RevenueCat, and Gemini CLI stories, before Brad
+  forced item-by-item grounding against the actual queue.
+- Dev began reading summaries during the headline sweep, substituted foreign
+  identities for items seven, nine, and ten, and repeatedly paraphrased literal
+  queue summaries. The conversation and bundle agree on both wiki saves.
+- Fintech interrupted its four-headline sweep with an item-three summary, then
+  restarted correctly after Brad identified the error.
+
+Dev also contains one exact depth correction for _HTML over WebSockets: real-time
+SPAs with barely any JavaScript_, from `headline_only` to `in_depth`. The queue,
+bundle, and shared chat agree on the item and Brad's words. As on August 12, the
+append-only recorder cannot store it because the queue declares
+`commute-route-v2` while the label contract requires `routing-rules.v1`; the
+private input and failed recorder result preserve that migration boundary.
+There were no day-level duplicate or prior-awareness observations in these
+three sessions.
+
+Source-grounded maintenance updated _Review-Driven Software Factories_ with
+Astro's label-and-comment state machine, isolated triage stages, reporter
+verification, and the distinction between GitHub Actions, the triage skill, and
+Flue. The Jira, Slack, Datadog, Rollbar, and Claude variants discussed during
+the commute are preserved as design possibilities rather than claims about the
+deployed Astro system. _Wide Exploration, Narrow Delivery_ records the second
+article's distinct pattern: design first, learn on a disposable wide branch,
+demo before review, recut from `main`, stack only real dependencies, and delete
+the replaced path in a final pull request. It explicitly rejects the mistaken
+interpretation that a messy wide branch should be merged before cleanup.
+
+Prompt Revision 3.3 already requires a headline-only sweep, exact identity,
+literal summaries, and queue-grounded playback. These sessions show repeated
+noncompliance rather than a missing instruction. No further prompt wording was
+added, and no live Project synchronization is required by this result.
+
 ## What Worked
 
 - The weekday Task has produced real dated, parseable queues, including four

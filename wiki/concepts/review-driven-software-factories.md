@@ -7,10 +7,10 @@ aliases: ["Why Software Factories Fail","Human-in-the-loop software factories","
 tags: ["ai-agents","software-design","planning","code-review","context-management","documentation","workflow-automation"]
 wiki_slug: review-driven-software-factories
 created: 2026-07-25
-updated: 2026-08-06
+updated: 2026-08-14
 confidence: medium
 # prettier-ignore
-provenance: [{"source_item_id":"dev-20260724-01","url":"https://github.com/humanlayer/advanced-context-engineering-for-coding-agents/blob/main/wsff.md"},{"source_item_id":"19fd6c96b2d39a67-11","url":"https://github.blog/ai-and-ml/github-copilot/automating-cross-repo-documentation-with-github-agentic-workflows/?utm_source=tldrdev"}]
+provenance: [{"source_item_id":"dev-20260724-01","url":"https://github.com/humanlayer/advanced-context-engineering-for-coding-agents/blob/main/wsff.md"},{"source_item_id":"19fd6c96b2d39a67-11","url":"https://github.blog/ai-and-ml/github-copilot/automating-cross-repo-documentation-with-github-agentic-workflows/?utm_source=tldrdev"},{"source_item_id":"19ffad638bac0403-02","url":"https://blog.cloudflare.com/astro-issue-triage/?utm_source=tldrdev"}]
 ---
 
 # Review-Driven Software Factories
@@ -72,6 +72,40 @@ Those results are one team's operational evidence, not a general benchmark, but
 they demonstrate an important shape: frequent automated judgment can coexist
 with sparse writes, constrained authority, and human approval.
 
+## Issue Triage as a Durable State Machine
+
+Astro's automated issue-triage pipeline is a more ambitious instance of the
+same review-driven pattern. Cloudflare reports that it reduced Astro's open
+issue count from more than 200 to about 30 by automating the work between a bug
+report and a reviewable fix—not by auto-closing old reports.
+
+The triage skill mirrors four maintainer stages: reproduce, diagnose, verify,
+and fix. Each stage runs in an isolated subagent and passes a `report.md`
+forward, which makes the handoff explicit and limits the tendency to force a
+solution before establishing that a bug exists. GitHub issue labels provide the
+state machine, while issue comments hold the durable history. When the agents
+find a fix, the workflow publishes a preview for the original reporter; a pull
+request is opened only after the reporter confirms the patch.
+
+This design separates three responsibilities that are easy to blur:
+
+- GitHub Actions is the reproducible execution harness and permission boundary.
+- The triage skill defines the domain procedure and isolated handoffs.
+- Flue is the platform-neutral agent runtime beneath the workflow.
+
+The source says the same event-to-workflow shape could begin with Slack, a cron
+job, or a webhook. The commute discussion extended that into possible Jira,
+Datadog, Rollbar, Slack, and Claude-triggered designs. Those are useful design
+options, not claims about Astro's deployed system: a production variant should
+use a structured alert or ticket as the source of truth and treat chat as a
+trigger or human review surface.
+
+The pipeline's failures also become maintenance evidence. Repeated agent
+mistakes exposed opaque abstractions, missing rationale in documentation, and
+insufficient tests. Fixing those boundaries improved the next agent run and the
+codebase for human contributors too. That is a stronger feedback loop than
+merely retrying the same prompt.
+
 ## Source Notes
 
 ### [Why Software Factories Fail](https://github.com/humanlayer/advanced-context-engineering-for-coding-agents/blob/main/wsff.md)
@@ -96,6 +130,17 @@ security boundary, failure lessons, and reported 30-day results. The published
 numbers describe one team after prompt tightening and should not be treated as
 an independent comparison with manual documentation processes.
 
+### [How we built a software factory to drive Astro's GitHub issue count to zero](https://blog.cloudflare.com/astro-issue-triage/?utm_source=tldrdev)
+
+<!-- source-item-id: 19ffad638bac0403-02 -->
+
+TLDR Dev, 2026-08-13.
+
+Cloudflare's article describes Astro's real issue-triage pipeline, its
+label-and-comment state model, isolated skill stages, reporter verification,
+and the Flue framework extracted from that work. Its issue-count reduction is a
+first-party operational report, not an independently controlled comparison.
+
 ## Related
 
 - {% include wiki-related-link.md slug="ai-native-software-engineering" %}
@@ -103,3 +148,4 @@ an independent comparison with manual documentation processes.
 - {% include wiki-related-link.md slug="agent-context-handoff" %}
 - {% include wiki-related-link.md slug="claude-code-subagents" %}
 - {% include wiki-related-link.md slug="deterministic-agent-workflows" %}
+- {% include wiki-related-link.md slug="wide-exploration-narrow-delivery" %}
