@@ -165,10 +165,17 @@ function declaredSessionId(
   const canonicalEvidence = stableJson({
     ...(sessionDate === undefined ? {} : { sessionDate }),
     queueFingerprint,
-    wikiCaptures,
-    contradictoryWikiCaptures,
+    wikiCaptures: canonicalCaptureOrder(wikiCaptures),
+    contradictoryWikiCaptures: canonicalCaptureOrder(contradictoryWikiCaptures),
   });
   return `recovered-${createHash('sha256').update(canonicalEvidence).digest('hex').slice(0, 16)}`;
+}
+
+function canonicalCaptureOrder<T extends RecoveredWikiCapture>(captures: T[]): T[] {
+  return [...captures].sort((left, right) => {
+    const eventOrder = left.eventId.localeCompare(right.eventId);
+    return eventOrder === 0 ? stableJson(left).localeCompare(stableJson(right)) : eventOrder;
+  });
 }
 
 function inspectArtifactFilenameEvidence(

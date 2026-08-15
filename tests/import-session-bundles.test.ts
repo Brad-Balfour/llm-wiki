@@ -349,6 +349,45 @@ test('uses canonical evidence for a recovered fallback session identity', () => 
   assert.match(result.sessions[1]?.error ?? '', /Duplicate session_id recovered-/);
 });
 
+test('canonicalizes explicit recovered capture order for fallback session identity', () => {
+  const queue = (JSON.parse(validBundle) as { queue_snapshot: { queue: unknown } }).queue_snapshot
+    .queue;
+  const malformed = {
+    schema: 'legacy-summary',
+    session: {
+      session_date: '2026-07-20',
+      queue_filename: 'fixture-queue.txt',
+    },
+    queue_snapshot: { filename: 'fixture-queue.txt', queue: {} },
+    events: [
+      { event_id: 'save-first', sequence: 1, action: 'wiki', item: 1 },
+      { event_id: 'save-second', sequence: 2, action: 'wiki', item: 2 },
+    ],
+  };
+  const reordered = JSON.parse(JSON.stringify(malformed)) as {
+    events: Array<Record<string, unknown>>;
+  };
+  reordered.events.reverse();
+
+  const result = reconcileSessionBundles([
+    {
+      filename: artifactFilename,
+      text: JSON.stringify(malformed),
+      recoveryQueue: { filename: 'fixture-queue.txt', text: JSON.stringify(queue) },
+    },
+    {
+      filename: '202607200745-morning-commute-session-bundle (1).txt',
+      text: JSON.stringify(reordered),
+      recoveryQueue: { filename: 'fixture-queue.txt', text: JSON.stringify(queue) },
+    },
+  ]);
+
+  assert.equal(result.sessions[0]?.status, 'accepted');
+  assert.equal(result.sessions[1]?.status, 'rejected');
+  assert.match(result.sessions[1]?.error ?? '', /Duplicate session_id recovered-/);
+  assert.equal(result.maintenance_candidates.length, 2);
+});
+
 test('warns when an otherwise canonical artifact filename contradicts the session date', () => {
   const malformed = JSON.parse(validBundle) as {
     session: Record<string, unknown>;
