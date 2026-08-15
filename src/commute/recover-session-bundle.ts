@@ -74,8 +74,9 @@ export function recoverSessionBundleWithSuppliedQueue(
       exactItems,
       `Recovery bundle events[${index}].item`
     );
-    const eventId = lenientOptionalString(record.event_id) ?? `recovered-event-${index + 1}`;
-    const sequence = lenientPositiveInteger(record.sequence) ?? index + 1;
+    const captureOrdinal = wikiCaptures.length + contradictoryWikiCaptures.length + 1;
+    const eventId = lenientOptionalString(record.event_id) ?? `recovered-event-${captureOrdinal}`;
+    const sequence = lenientPositiveInteger(record.sequence) ?? captureOrdinal;
     const userWords =
       lenientOptionalString(record.user_words) ?? lenientOptionalString(record.feedback);
     if (userWords && refersToPriorWikiCapture(userWords)) {

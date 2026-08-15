@@ -323,7 +323,8 @@ test('uses canonical evidence for a recovered fallback session identity', () => 
     events: Array<Record<string, unknown>>;
   };
   reformattedAndRenamed.session.artifact_filename = librarySuffixFilename;
-  reformattedAndRenamed.events[0]!.item = {
+  reformattedAndRenamed.events.unshift({ action: 'skip', item: 2 });
+  reformattedAndRenamed.events[1]!.item = {
     source_item_id: 'tldr-demo-001',
     title: 'stale legacy title ignored by recovery',
     url: 'https://example.invalid/stale',
