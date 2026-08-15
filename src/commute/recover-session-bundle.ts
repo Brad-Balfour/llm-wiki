@@ -3,7 +3,7 @@ import { createHash } from 'node:crypto';
 import { errorMessage } from '../shared/errors.js';
 import { optionalRecord, requireArray, requireRecord } from '../shared/validate.js';
 import {
-  canonicalBundleArtifactFilename,
+  bundleArtifactFilenameMatches,
   queueSnapshotFingerprint,
   validateTldrCommuteQueueV2,
 } from './session-bundle.js';
@@ -29,7 +29,8 @@ export interface RecoveredContradictoryWikiCapture extends RecoveredWikiCapture 
 
 export interface RecoveredSessionBundle {
   sessionId: string;
-  artifactFilename: string;
+  declaredArtifactFilename?: string;
+  recoveryWarnings: string[];
   queueFilename: string;
   queueFingerprint: string;
   wikiCaptures: RecoveredWikiCapture[];
@@ -60,10 +61,11 @@ export function recoverSessionBundleWithSuppliedQueue(
   }
   const exactItems = items.map((item, index) => parseQueueItem(item, index));
   const events = requireArray(bundle.events, 'Recovery bundle events');
-  const artifactFilename = declaredArtifactFilename(bundle, input.bundleFilename);
-  const sessionId = declaredSessionId(bundle, artifactFilename);
+  const artifactEvidence = inspectArtifactFilenameEvidence(bundle, input.bundleFilename);
+  const queueFingerprint = queueSnapshotFingerprint(queue);
   const wikiCaptures: RecoveredWikiCapture[] = [];
   const contradictoryWikiCaptures: RecoveredContradictoryWikiCapture[] = [];
+  const recoveredEventIds = new Set<string>();
 
   for (const [index, event] of events.entries()) {
     const record = requireRecord(event, `Recovery bundle events[${index}]`);
@@ -73,11 +75,20 @@ export function recoverSessionBundleWithSuppliedQueue(
       exactItems,
       `Recovery bundle events[${index}].item`
     );
-    const eventId = lenientOptionalString(record.event_id) ?? `recovered-event-${index + 1}`;
-    const sequence = lenientPositiveInteger(record.sequence) ?? index + 1;
+    const captureOrdinal = wikiCaptures.length + contradictoryWikiCaptures.length + 1;
     const userWords =
       lenientOptionalString(record.user_words) ?? lenientOptionalString(record.feedback);
-    if (userWords && refersToPriorWikiCapture(userWords)) {
+    const contradictory = Boolean(userWords && refersToPriorWikiCapture(userWords));
+    const eventId =
+      lenientOptionalString(record.event_id) ?? recoveredCaptureEventId(item, contradictory);
+    if (recoveredEventIds.has(eventId)) {
+      throw new Error(
+        `Recovery bundle wiki captures reuse event identity ${eventId}; distinct actions are ambiguous`
+      );
+    }
+    recoveredEventIds.add(eventId);
+    const sequence = lenientPositiveInteger(record.sequence) ?? captureOrdinal;
+    if (contradictory && userWords) {
       contradictoryWikiCaptures.push({
         eventId,
         sequence,
@@ -97,11 +108,21 @@ export function recoverSessionBundleWithSuppliedQueue(
     });
   }
 
+  const sessionId = declaredSessionId(
+    bundle,
+    queueFingerprint,
+    wikiCaptures,
+    contradictoryWikiCaptures
+  );
+
   return {
     sessionId,
-    artifactFilename,
+    ...(artifactEvidence.declaredArtifactFilename === undefined
+      ? {}
+      : { declaredArtifactFilename: artifactEvidence.declaredArtifactFilename }),
+    recoveryWarnings: artifactEvidence.warnings,
     queueFilename: input.queueFilename,
-    queueFingerprint: queueSnapshotFingerprint(queue),
+    queueFingerprint,
     wikiCaptures,
     contradictoryWikiCaptures,
   };
@@ -139,21 +160,131 @@ function declaredQueueName(bundle: Record<string, unknown>): string {
   return filename;
 }
 
-function declaredSessionId(bundle: Record<string, unknown>, bundleFilename: string): string {
+function declaredSessionId(
+  bundle: Record<string, unknown>,
+  queueFingerprint: string,
+  wikiCaptures: RecoveredWikiCapture[],
+  contradictoryWikiCaptures: RecoveredContradictoryWikiCapture[]
+): string {
   const session = optionalRecord(bundle.session);
   const declared = session && lenientOptionalString(session.session_id);
   if (declared) return declared;
-  return `recovered-${createHash('sha256')
-    .update(canonicalBundleArtifactFilename(bundleFilename))
-    .digest('hex')
-    .slice(0, 16)}`;
+
+  const sessionDate = session && lenientOptionalString(session.session_date);
+  const canonicalEvidence = stableJson({
+    ...(sessionDate === undefined ? {} : { sessionDate }),
+    queueFingerprint,
+    wikiCaptures: canonicalCaptureOrder(wikiCaptures),
+    contradictoryWikiCaptures: canonicalCaptureOrder(contradictoryWikiCaptures),
+  });
+  return `recovered-${createHash('sha256').update(canonicalEvidence).digest('hex').slice(0, 16)}`;
 }
 
-function declaredArtifactFilename(bundle: Record<string, unknown>, inputFilename: string): string {
+function canonicalCaptureOrder<T extends RecoveredWikiCapture>(
+  captures: T[]
+): Array<Omit<T, 'sequence'>> {
+  return captures
+    .map(({ sequence: _sequence, ...capture }) => capture)
+    .sort((left, right) => {
+      const eventOrder = left.eventId.localeCompare(right.eventId);
+      return eventOrder === 0 ? stableJson(left).localeCompare(stableJson(right)) : eventOrder;
+    });
+}
+
+function recoveredCaptureEventId(item: ExactQueueItem, contradictory: boolean): string {
+  const identity = stableJson({
+    kind: contradictory ? 'contradictory_wiki_capture' : 'wiki_capture',
+    sourceItemId: item.sourceItemId,
+    url: item.url,
+  });
+  return `recovered-event-${createHash('sha256').update(identity).digest('hex').slice(0, 16)}`;
+}
+
+function inspectArtifactFilenameEvidence(
+  bundle: Record<string, unknown>,
+  inputFilename: string
+): { declaredArtifactFilename?: string; warnings: string[] } {
   const session = optionalRecord(bundle.session);
-  return canonicalBundleArtifactFilename(
-    (session && lenientOptionalString(session.artifact_filename)) ?? inputFilename
+  const sessionDate = session && lenientOptionalString(session.session_date);
+  const declaredArtifactFilename = session && lenientOptionalString(session.artifact_filename);
+  const warnings = recoveryArtifactFilenameWarnings(
+    inputFilename,
+    'Downloaded bundle filename',
+    sessionDate
   );
+  if (declaredArtifactFilename === undefined) {
+    warnings.push('Malformed bundle does not declare session.artifact_filename.');
+  } else {
+    if (declaredArtifactFilename !== inputFilename) {
+      warnings.push(
+        ...recoveryArtifactFilenameWarnings(
+          declaredArtifactFilename,
+          'Declared artifact filename',
+          sessionDate
+        )
+      );
+    }
+    if (!bundleArtifactFilenameMatches(inputFilename, declaredArtifactFilename)) {
+      warnings.push(
+        `Downloaded bundle filename ${inputFilename} does not match declared artifact filename ${declaredArtifactFilename}.`
+      );
+    }
+  }
+  return {
+    ...(declaredArtifactFilename === undefined ? {} : { declaredArtifactFilename }),
+    warnings,
+  };
+}
+
+export function recoveryArtifactFilenameWarnings(
+  filename: string,
+  field: string,
+  sessionDate?: string
+): string[] {
+  const match =
+    /^(\d{8})(\d{2})(\d{2})-(morning|evening)-commute-session-bundle(?: ?\([1-9][0-9]*\))?\.txt$/.exec(
+      filename
+    );
+  if (!match) return [`${field} ${filename} is not in the canonical bundle filename shape.`];
+
+  const hour = Number(match[2]);
+  const minute = Number(match[3]);
+  const warnings: string[] = [];
+  const hasRealTime = hour <= 23 && minute <= 59;
+  if (!hasRealTime) warnings.push(`${field} ${filename} does not contain a real local time.`);
+  if (/^\d{4}-\d{2}-\d{2}$/.test(sessionDate ?? '')) {
+    const artifactDate = match[1];
+    const expectedDate = sessionDate!.replaceAll('-', '');
+    if (artifactDate !== expectedDate) {
+      warnings.push(
+        `${field} ${filename} uses date ${artifactDate}, which does not match session.session_date ${sessionDate}.`
+      );
+    }
+  }
+  const period = match[4];
+  if (hasRealTime && period === 'morning' && hour >= 12) {
+    warnings.push(`${field} ${filename} labels a time from 1200 onward as morning.`);
+  }
+  if (hasRealTime && period === 'evening' && hour < 12) {
+    warnings.push(`${field} ${filename} labels a time before 1200 as evening.`);
+  }
+  return warnings;
+}
+
+function stableJson(value: unknown): string {
+  if (Array.isArray(value)) return `[${value.map(stableJson).join(',')}]`;
+  if (value !== null && typeof value === 'object') {
+    const record = value as Record<string, unknown>;
+    return `{${Object.keys(record)
+      .sort()
+      .map((key) => `${JSON.stringify(key)}:${stableJson(record[key])}`)
+      .join(',')}}`;
+  }
+  return JSON.stringify(value) ?? 'null';
+}
+
+export function recoveryArtifactKey(filename: string): string {
+  return filename.replace(/ ?\([1-9][0-9]*\)\.txt$/, '.txt');
 }
 
 function parseQueueItem(candidate: unknown, index: number): ExactQueueItem {

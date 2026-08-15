@@ -9,9 +9,13 @@ import {
   bundleArtifactFilenameMatches,
   type CommuteSessionBundle,
   parseCommuteSessionBundleText,
+  parseCommuteSessionBundleTextWithRelaxedArtifactFilename,
   queueSnapshotFingerprint,
+  validateTldrCommuteQueueV2,
 } from './session-bundle.js';
 import {
+  recoveryArtifactKey,
+  recoveryArtifactFilenameWarnings,
   recoverSessionBundleWithSuppliedQueue,
   refersToPriorWikiCapture,
 } from './recover-session-bundle.js';
@@ -59,6 +63,8 @@ interface ImportedSession {
   integrity_state?: CommuteSessionBundle['integrity']['state'];
   queue_filename?: string;
   queue_fingerprint?: string;
+  declared_artifact_filename?: string;
+  recovery_warnings?: string[];
   error?: string;
 }
 
@@ -111,29 +117,103 @@ export function reconcileSessionBundles(
     event_conversions: [],
   };
   const sessionIds = new Set<string>();
-  const artifactFilenames = new Map<string, string>();
+  const strictArtifactFilenames = collectStrictArtifactClaims(inputs);
+  const acceptedStrictArtifactFilenames = new Map<string, string>();
+  const recoveredArtifactFilenames = new Map<string, string>();
   const maintenanceKeys = new Set<string>();
 
   for (const input of inputs) {
-    let bundle: CommuteSessionBundle;
+    let bundle: CommuteSessionBundle | undefined;
+    const strictRecoveryWarnings: string[] = [];
+    let strictIdentityValidated = false;
     try {
       bundle = parseCommuteSessionBundleText(input.text);
       if (!bundleArtifactFilenameMatches(input.filename, bundle.session.artifact_filename)) {
-        throw new Error(
-          'Bundle filename does not match session.artifact_filename (except a Library-added numeric suffix)'
+        strictRecoveryWarnings.push(
+          `Downloaded bundle filename ${input.filename} does not match declared artifact filename ${bundle.session.artifact_filename}.`
         );
       }
+      strictIdentityValidated = true;
       if (sessionIds.has(bundle.session.session_id)) {
         throw new Error(`Duplicate session_id ${bundle.session.session_id}`);
       }
       claimArtifactFilename(
-        artifactFilenames,
+        acceptedStrictArtifactFilenames,
         bundle.session.artifact_filename,
         bundle.session.session_id
       );
       sessionIds.add(bundle.session.session_id);
     } catch (error) {
+      if (strictIdentityValidated) {
+        result.sessions.push({
+          input_filename: input.filename,
+          status: 'rejected',
+          error: errorMessage(error),
+        });
+        continue;
+      }
+      let relaxedBundle: CommuteSessionBundle | undefined;
+      let relaxedDeclaredArtifactFilename: string | undefined;
       if (input.recoveryQueue) {
+        try {
+          const relaxed = parseCommuteSessionBundleTextWithRelaxedArtifactFilename(
+            input.text,
+            input.filename
+          );
+          relaxedBundle = relaxed.bundle;
+          relaxedDeclaredArtifactFilename = relaxed.declaredArtifactFilename;
+        } catch {
+          // Continue to bounded wiki-only recovery for other malformed bundles.
+        }
+      }
+      if (relaxedBundle && input.recoveryQueue) {
+        try {
+          validateFullRecoveryQueue(relaxedBundle, input.recoveryQueue);
+          bundle = relaxedBundle;
+          if (relaxedDeclaredArtifactFilename === undefined) {
+            strictRecoveryWarnings.push(
+              'Malformed bundle does not declare a non-empty session.artifact_filename.'
+            );
+          } else {
+            strictRecoveryWarnings.push(
+              ...recoveryArtifactFilenameWarnings(
+                relaxedDeclaredArtifactFilename,
+                'Declared artifact filename',
+                bundle.session.session_date
+              )
+            );
+          }
+          if (
+            relaxedDeclaredArtifactFilename !== undefined &&
+            !bundleArtifactFilenameMatches(input.filename, relaxedDeclaredArtifactFilename)
+          ) {
+            strictRecoveryWarnings.push(
+              ...recoveryArtifactFilenameWarnings(
+                input.filename,
+                'Downloaded bundle filename',
+                bundle.session.session_date
+              ),
+              `Downloaded bundle filename ${input.filename} does not match declared artifact filename ${relaxedDeclaredArtifactFilename}.`
+            );
+          }
+          if (sessionIds.has(bundle.session.session_id)) {
+            throw new Error(`Duplicate session_id ${bundle.session.session_id}`);
+          }
+          claimArtifactFilename(
+            acceptedStrictArtifactFilenames,
+            bundle.session.artifact_filename,
+            bundle.session.session_id
+          );
+          sessionIds.add(bundle.session.session_id);
+        } catch (fullRecoveryError) {
+          result.sessions.push({
+            input_filename: input.filename,
+            status: 'rejected',
+            error: `Bundle validation failed: ${errorMessage(error)}; full supplied-queue recovery failed: ${errorMessage(fullRecoveryError)}`,
+          });
+          continue;
+        }
+      } else if (input.recoveryQueue) {
         try {
           const recovered = recoverSessionBundleWithSuppliedQueue({
             bundleFilename: input.filename,
@@ -144,12 +224,19 @@ export function reconcileSessionBundles(
           if (sessionIds.has(recovered.sessionId)) {
             throw new Error(`Duplicate session_id ${recovered.sessionId}`);
           }
-          if (!bundleArtifactFilenameMatches(input.filename, recovered.artifactFilename)) {
-            throw new Error(
-              'Recovery bundle filename does not match its declared session.artifact_filename (except a Library-added numeric suffix)'
+          const recoveryWarnings = [...recovered.recoveryWarnings];
+          const artifactKey = recoveryArtifactKey(
+            recovered.declaredArtifactFilename ?? input.filename
+          );
+          const priorArtifactSession =
+            strictArtifactFilenames.get(artifactKey) ?? recoveredArtifactFilenames.get(artifactKey);
+          if (priorArtifactSession === undefined) {
+            recoveredArtifactFilenames.set(artifactKey, recovered.sessionId);
+          } else if (priorArtifactSession !== recovered.sessionId) {
+            recoveryWarnings.push(
+              `Artifact filename ${artifactKey} was also declared by session ${priorArtifactSession}.`
             );
           }
-          claimArtifactFilename(artifactFilenames, recovered.artifactFilename, recovered.sessionId);
           sessionIds.add(recovered.sessionId);
           result.sessions.push({
             input_filename: input.filename,
@@ -158,6 +245,10 @@ export function reconcileSessionBundles(
             integrity_state: 'recovered',
             queue_filename: recovered.queueFilename,
             queue_fingerprint: recovered.queueFingerprint,
+            ...(recovered.declaredArtifactFilename === undefined
+              ? {}
+              : { declared_artifact_filename: recovered.declaredArtifactFilename }),
+            ...(recoveryWarnings.length === 0 ? {} : { recovery_warnings: recoveryWarnings }),
           });
           for (const capture of recovered.wikiCaptures) {
             const maintenanceKey = maintenanceCandidateKey(
@@ -226,10 +317,21 @@ export function reconcileSessionBundles(
           continue;
         }
       }
+      if (!relaxedBundle) {
+        result.sessions.push({
+          input_filename: input.filename,
+          status: 'rejected',
+          error: errorMessage(error),
+        });
+        continue;
+      }
+    }
+
+    if (!bundle) {
       result.sessions.push({
         input_filename: input.filename,
         status: 'rejected',
-        error: errorMessage(error),
+        error: 'Bundle import reached reconciliation without a validated bundle',
       });
       continue;
     }
@@ -241,6 +343,7 @@ export function reconcileSessionBundles(
       integrity_state: bundle.integrity.state,
       queue_filename: bundle.queue_snapshot.filename,
       queue_fingerprint: queueSnapshotFingerprint(bundle.queue_snapshot.queue),
+      ...(strictRecoveryWarnings.length === 0 ? {} : { recovery_warnings: strictRecoveryWarnings }),
     });
 
     for (const event of bundle.events) {
@@ -345,6 +448,54 @@ export function reconcileSessionBundles(
   }
 
   return result;
+}
+
+function collectStrictArtifactClaims(inputs: SessionBundleInput[]): Map<string, string> {
+  const claims = new Map<string, string>();
+  for (const input of inputs) {
+    let bundle: CommuteSessionBundle;
+    try {
+      bundle = parseCommuteSessionBundleText(input.text);
+    } catch {
+      if (!input.recoveryQueue) continue;
+      try {
+        bundle = parseCommuteSessionBundleTextWithRelaxedArtifactFilename(
+          input.text,
+          input.filename
+        ).bundle;
+        validateFullRecoveryQueue(bundle, input.recoveryQueue);
+      } catch {
+        continue;
+      }
+    }
+    const artifactKey = recoveryArtifactKey(bundle.session.artifact_filename);
+    if (!claims.has(artifactKey)) claims.set(artifactKey, bundle.session.session_id);
+  }
+  return claims;
+}
+
+function validateFullRecoveryQueue(
+  bundle: CommuteSessionBundle,
+  recoveryQueue: NonNullable<SessionBundleInput['recoveryQueue']>
+): void {
+  if (recoveryQueue.filename !== bundle.queue_snapshot.filename) {
+    throw new Error(
+      `Recovery queue filename ${recoveryQueue.filename} does not match bundle queue ${bundle.queue_snapshot.filename}`
+    );
+  }
+  let queueCandidate: unknown;
+  try {
+    queueCandidate = JSON.parse(recoveryQueue.text) as unknown;
+  } catch (error) {
+    throw new Error(`Recovery queue is not valid JSON: ${errorMessage(error)}`);
+  }
+  const suppliedQueue = validateTldrCommuteQueueV2(queueCandidate);
+  if (
+    queueSnapshotFingerprint(suppliedQueue) !==
+    queueSnapshotFingerprint(bundle.queue_snapshot.queue)
+  ) {
+    throw new Error('Recovery queue content does not match the bundle queue snapshot');
+  }
 }
 
 function userWordsEvidence(

@@ -170,19 +170,63 @@ export interface CommuteSessionBundle {
 }
 
 export function parseCommuteSessionBundleText(text: string): CommuteSessionBundle {
+  return validateCommuteSessionBundle(parseCommuteSessionBundleJson(text));
+}
+
+export interface RelaxedArtifactFilenameParse {
+  bundle: CommuteSessionBundle;
+  declaredArtifactFilename?: string;
+}
+
+export function parseCommuteSessionBundleTextWithRelaxedArtifactFilename(
+  text: string,
+  fallbackArtifactFilename: string
+): RelaxedArtifactFilenameParse {
+  const candidate = requireRecord(parseCommuteSessionBundleJson(text), 'bundle');
+  const session = requireRecord(candidate.session, 'session');
+  const rawArtifactFilename = session.artifact_filename;
+  const declaredArtifactFilename =
+    typeof rawArtifactFilename === 'string' && rawArtifactFilename.trim().length > 0
+      ? rawArtifactFilename
+      : undefined;
+  if (
+    rawArtifactFilename !== undefined &&
+    !(typeof rawArtifactFilename === 'string' && rawArtifactFilename.trim().length === 0)
+  ) {
+    requireString(rawArtifactFilename, 'session.artifact_filename');
+  }
+  const normalizedCandidate =
+    declaredArtifactFilename === undefined
+      ? {
+          ...candidate,
+          session: { ...session, artifact_filename: fallbackArtifactFilename },
+        }
+      : candidate;
+
+  return {
+    bundle: validateCommuteSessionBundleCandidate(normalizedCandidate, false),
+    ...(declaredArtifactFilename === undefined ? {} : { declaredArtifactFilename }),
+  };
+}
+
+function parseCommuteSessionBundleJson(text: string): unknown {
   const normalized = stripMarkdownFence(text.trim());
-  let candidate: unknown;
 
   try {
-    candidate = JSON.parse(normalized);
+    return JSON.parse(normalized) as unknown;
   } catch (error) {
     throw new Error(`Commute session bundle is not valid JSON: ${errorMessage(error)}`);
   }
-
-  return validateCommuteSessionBundle(candidate);
 }
 
 export function validateCommuteSessionBundle(candidate: unknown): CommuteSessionBundle {
+  return validateCommuteSessionBundleCandidate(candidate, true);
+}
+
+function validateCommuteSessionBundleCandidate(
+  candidate: unknown,
+  validateSessionArtifactFilename: boolean
+): CommuteSessionBundle {
   const record = requireRecord(candidate, 'bundle');
   rejectUnknownKeys(
     record,
@@ -196,7 +240,7 @@ export function validateCommuteSessionBundle(candidate: unknown): CommuteSession
     );
   }
 
-  const session = validateSession(record.session);
+  const session = validateSession(record.session, validateSessionArtifactFilename);
   const queueSnapshot = validateQueueSnapshot(record.queue_snapshot);
   const queueItems = indexQueueItems(queueSnapshot.queue);
   const playback = validatePlayback(record.playback, queueItems);
@@ -252,7 +296,10 @@ export function canonicalBundleArtifactFilename(filename: string): string {
   return filename.replace(/ ?\([1-9][0-9]*\)\.txt$/, '.txt');
 }
 
-function validateSession(candidate: unknown): CommuteSessionBundle['session'] {
+function validateSession(
+  candidate: unknown,
+  validateSessionArtifactFilename: boolean
+): CommuteSessionBundle['session'] {
   const record = requireRecord(candidate, 'session');
   rejectUnknownKeys(
     record,
@@ -265,7 +312,7 @@ function validateSession(candidate: unknown): CommuteSessionBundle['session'] {
   }
 
   const artifactFilename = requireString(record.artifact_filename, 'session.artifact_filename');
-  validateArtifactFilename(artifactFilename, sessionDate);
+  if (validateSessionArtifactFilename) validateArtifactFilename(artifactFilename, sessionDate);
 
   return {
     session_id: requireString(record.session_id, 'session.session_id'),

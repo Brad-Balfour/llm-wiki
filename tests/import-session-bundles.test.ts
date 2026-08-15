@@ -51,14 +51,16 @@ test('preserves an invalid bundle as a rejected independent session', () => {
   assert.equal(result.maintenance_candidates.length, 1);
 });
 
-test('isolates a bundle whose downloaded filename conflicts with its declaration', () => {
+test('warns without dropping events when a downloaded filename conflicts with its declaration', () => {
   const result = reconcileSessionBundles(
     [{ filename: 'commute-session-bundle.txt', text: validBundle }],
     '2026-07-20T12:00:00.000Z'
   );
 
-  assert.equal(result.sessions[0]?.status, 'rejected');
-  assert.match(result.sessions[0]?.error ?? '', /Bundle filename does not match/);
+  assert.equal(result.sessions[0]?.status, 'accepted');
+  assert.match(result.sessions[0]?.recovery_warnings?.[0] ?? '', /does not match declared/);
+  assert.equal(result.maintenance_candidates.length, 1);
+  assert.equal(result.navigation_events.length, 1);
 });
 
 test('recovers a malformed v1-shaped bundle from its named supplied queue', () => {
@@ -113,7 +115,73 @@ test('recovers a malformed v1-shaped bundle from its named supplied queue', () =
   });
 });
 
-test('rejects a recovered bundle that declares an artifact claimed by a distinct session', () => {
+test('recovers an exact wiki capture when the period label contradicts the artifact time', () => {
+  const malformed = JSON.parse(validBundle) as {
+    session: Record<string, unknown>;
+    queue_snapshot: { queue: unknown };
+  };
+  const mismatchedPeriodFilename = '202607201304-morning-commute-session-bundle.txt';
+  malformed.session.artifact_filename = mismatchedPeriodFilename;
+
+  const result = reconcileSessionBundles([
+    {
+      filename: mismatchedPeriodFilename,
+      text: JSON.stringify(malformed),
+      recoveryQueue: {
+        filename: '20260720-tldr-dev.txt',
+        text: JSON.stringify(malformed.queue_snapshot.queue),
+      },
+    },
+  ]);
+
+  assert.equal(result.sessions[0]?.status, 'accepted');
+  assert.equal(result.sessions[0]?.integrity_state, 'partial');
+  assert.equal(result.maintenance_candidates.length, 1);
+  assert.equal(result.maintenance_candidates[0]?.source_item_id, 'tldr-demo-001');
+  assert.equal(result.navigation_events.length, 1);
+  assert.ok(
+    result.sessions[0]?.recovery_warnings?.some((warning) =>
+      warning.includes('from 1200 onward as morning')
+    )
+  );
+});
+
+test('preserves full validated events when the declared artifact filename is missing or blank', () => {
+  for (const artifactFilenameValue of [undefined, '   ']) {
+    const malformed = JSON.parse(validBundle) as {
+      session: Record<string, unknown>;
+      queue_snapshot: { queue: unknown };
+    };
+    if (artifactFilenameValue === undefined) {
+      delete malformed.session.artifact_filename;
+    } else {
+      malformed.session.artifact_filename = artifactFilenameValue;
+    }
+
+    const result = reconcileSessionBundles([
+      {
+        filename: artifactFilename,
+        text: JSON.stringify(malformed),
+        recoveryQueue: {
+          filename: '20260720-tldr-dev.txt',
+          text: JSON.stringify(malformed.queue_snapshot.queue),
+        },
+      },
+    ]);
+
+    assert.equal(result.sessions[0]?.status, 'accepted');
+    assert.equal(result.sessions[0]?.integrity_state, 'partial');
+    assert.equal(result.maintenance_candidates.length, 1);
+    assert.equal(result.navigation_events.length, 1);
+    assert.ok(
+      result.sessions[0]?.recovery_warnings?.some((warning) =>
+        warning.includes('does not declare a non-empty session.artifact_filename')
+      )
+    );
+  }
+});
+
+test('warns but recovers when a distinct session reuses an artifact filename', () => {
   const queue = (JSON.parse(validBundle) as { queue_snapshot: { queue: unknown } }).queue_snapshot
     .queue;
   const malformed = {
@@ -139,12 +207,27 @@ test('rejects a recovered bundle that declares an artifact claimed by a distinct
 
   assert.deepEqual(
     result.sessions.map((session) => session.status),
-    ['accepted', 'rejected']
+    ['accepted', 'accepted']
   );
-  assert.match(result.sessions[1]?.error ?? '', /Canonical artifact filename .* already declared/);
+  assert.match(result.sessions[1]?.recovery_warnings?.[0] ?? '', /also declared by session/);
+
+  const reversed = reconcileSessionBundles([
+    {
+      filename: '202607200745-morning-commute-session-bundle (1).txt',
+      text: JSON.stringify(malformed),
+      recoveryQueue: { filename: 'fixture-queue.txt', text: JSON.stringify(queue) },
+    },
+    { filename: artifactFilename, text: validBundle },
+  ]);
+
+  assert.deepEqual(
+    reversed.sessions.map((session) => session.status),
+    ['accepted', 'accepted']
+  );
+  assert.match(reversed.sessions[0]?.recovery_warnings?.[0] ?? '', /also declared by session/);
 });
 
-test('rejects a recovered bundle whose downloaded filename conflicts with its declaration', () => {
+test('warns but recovers when the downloaded filename conflicts with its declaration', () => {
   const queue = (JSON.parse(validBundle) as { queue_snapshot: { queue: unknown } }).queue_snapshot
     .queue;
   const malformed = {
@@ -166,11 +249,74 @@ test('rejects a recovered bundle whose downloaded filename conflicts with its de
     },
   ]);
 
-  assert.equal(result.sessions[0]?.status, 'rejected');
-  assert.match(result.sessions[0]?.error ?? '', /Recovery bundle filename does not match/);
+  assert.equal(result.sessions[0]?.status, 'accepted');
+  assert.equal(result.maintenance_candidates.length, 1);
+  assert.ok(
+    result.sessions[0]?.recovery_warnings?.some((warning) =>
+      warning.includes('does not match declared artifact filename')
+    )
+  );
 });
 
-test('rejects a recovered bundle without a declared artifact when its filename is noncanonical', () => {
+test('warns when only the declared artifact filename has a Library suffix', () => {
+  const queue = (JSON.parse(validBundle) as { queue_snapshot: { queue: unknown } }).queue_snapshot
+    .queue;
+  const malformed = {
+    schema: 'legacy-summary',
+    session: {
+      session_id: 'reverse-library-suffix-session',
+      artifact_filename: '202607200745-morning-commute-session-bundle (1).txt',
+      queue_filename: 'fixture-queue.txt',
+    },
+    queue_snapshot: { filename: 'fixture-queue.txt', queue: {} },
+    events: [{ action: 'wiki', item: 1 }],
+  };
+
+  const result = reconcileSessionBundles([
+    {
+      filename: artifactFilename,
+      text: JSON.stringify(malformed),
+      recoveryQueue: { filename: 'fixture-queue.txt', text: JSON.stringify(queue) },
+    },
+  ]);
+
+  assert.equal(result.sessions[0]?.status, 'accepted');
+  assert.ok(
+    result.sessions[0]?.recovery_warnings?.some((warning) =>
+      warning.includes('does not match declared artifact filename')
+    )
+  );
+});
+
+test('does not invent a shape warning for a valid no-space Library suffix', () => {
+  const queue = (JSON.parse(validBundle) as { queue_snapshot: { queue: unknown } }).queue_snapshot
+    .queue;
+  const noSpaceSuffix = '202607200745-morning-commute-session-bundle(1).txt';
+  const malformed = {
+    schema: 'legacy-summary',
+    session: {
+      session_id: 'no-space-library-suffix-session',
+      session_date: '2026-07-20',
+      artifact_filename: noSpaceSuffix,
+      queue_filename: 'fixture-queue.txt',
+    },
+    queue_snapshot: { filename: 'fixture-queue.txt', queue: {} },
+    events: [{ action: 'wiki', item: 1 }],
+  };
+
+  const result = reconcileSessionBundles([
+    {
+      filename: noSpaceSuffix,
+      text: JSON.stringify(malformed),
+      recoveryQueue: { filename: 'fixture-queue.txt', text: JSON.stringify(queue) },
+    },
+  ]);
+
+  assert.equal(result.sessions[0]?.status, 'accepted');
+  assert.equal(result.sessions[0]?.recovery_warnings, undefined);
+});
+
+test('warns but recovers without a declared artifact when its filename is noncanonical', () => {
   const queue = (JSON.parse(validBundle) as { queue_snapshot: { queue: unknown } }).queue_snapshot
     .queue;
   const malformed = {
@@ -191,11 +337,16 @@ test('rejects a recovered bundle without a declared artifact when its filename i
     },
   ]);
 
-  assert.equal(result.sessions[0]?.status, 'rejected');
-  assert.match(result.sessions[0]?.error ?? '', /artifact_filename must use YYYYMMDDHHmm/);
+  assert.equal(result.sessions[0]?.status, 'accepted');
+  assert.equal(result.maintenance_candidates.length, 1);
+  assert.ok(
+    result.sessions[0]?.recovery_warnings?.some((warning) =>
+      warning.includes('does not declare session.artifact_filename')
+    )
+  );
 });
 
-test('uses the canonical artifact name for a recovered fallback session identity', () => {
+test('uses canonical evidence for a recovered fallback session identity', () => {
   const queue = (JSON.parse(validBundle) as { queue_snapshot: { queue: unknown } }).queue_snapshot
     .queue;
   const malformed = {
@@ -209,6 +360,19 @@ test('uses the canonical artifact name for a recovered fallback session identity
   };
   const librarySuffixFilename = '202607200745-morning-commute-session-bundle (1).txt';
 
+  const reformattedAndRenamed = JSON.parse(JSON.stringify(malformed)) as {
+    session: Record<string, unknown>;
+    events: Array<Record<string, unknown>>;
+  };
+  reformattedAndRenamed.session.artifact_filename = librarySuffixFilename;
+  reformattedAndRenamed.session.queue_filename = 'ignored-stale-queue-alias.txt';
+  reformattedAndRenamed.events.unshift({ action: 'skip', item: 2 });
+  reformattedAndRenamed.events[1]!.item = {
+    source_item_id: 'tldr-demo-001',
+    title: 'stale legacy title ignored by recovery',
+    url: 'https://example.invalid/stale',
+  };
+
   const result = reconcileSessionBundles([
     {
       filename: artifactFilename,
@@ -217,7 +381,7 @@ test('uses the canonical artifact name for a recovered fallback session identity
     },
     {
       filename: librarySuffixFilename,
-      text: JSON.stringify(malformed),
+      text: JSON.stringify(reformattedAndRenamed, null, 2),
       recoveryQueue: { filename: 'fixture-queue.txt', text: JSON.stringify(queue) },
     },
   ]);
@@ -225,6 +389,174 @@ test('uses the canonical artifact name for a recovered fallback session identity
   assert.equal(result.sessions[0]?.status, 'accepted');
   assert.equal(result.sessions[1]?.status, 'rejected');
   assert.match(result.sessions[1]?.error ?? '', /Duplicate session_id recovered-/);
+});
+
+test('canonicalizes explicit recovered capture order for fallback session identity', () => {
+  const queue = (JSON.parse(validBundle) as { queue_snapshot: { queue: unknown } }).queue_snapshot
+    .queue;
+  const malformed = {
+    schema: 'legacy-summary',
+    session: {
+      session_date: '2026-07-20',
+      queue_filename: 'fixture-queue.txt',
+    },
+    queue_snapshot: { filename: 'fixture-queue.txt', queue: {} },
+    events: [
+      { event_id: 'save-first', sequence: 1, action: 'wiki', item: 1 },
+      { event_id: 'save-second', sequence: 2, action: 'wiki', item: 2 },
+    ],
+  };
+  const reordered = JSON.parse(JSON.stringify(malformed)) as {
+    events: Array<Record<string, unknown>>;
+  };
+  reordered.events.reverse();
+
+  const result = reconcileSessionBundles([
+    {
+      filename: artifactFilename,
+      text: JSON.stringify(malformed),
+      recoveryQueue: { filename: 'fixture-queue.txt', text: JSON.stringify(queue) },
+    },
+    {
+      filename: '202607200745-morning-commute-session-bundle (1).txt',
+      text: JSON.stringify(reordered),
+      recoveryQueue: { filename: 'fixture-queue.txt', text: JSON.stringify(queue) },
+    },
+  ]);
+
+  assert.equal(result.sessions[0]?.status, 'accepted');
+  assert.equal(result.sessions[1]?.status, 'rejected');
+  assert.match(result.sessions[1]?.error ?? '', /Duplicate session_id recovered-/);
+  assert.equal(result.maintenance_candidates.length, 2);
+});
+
+test('canonicalizes missing recovered capture ids across event reordering', () => {
+  const queue = (JSON.parse(validBundle) as { queue_snapshot: { queue: unknown } }).queue_snapshot
+    .queue;
+  const malformed = {
+    schema: 'legacy-summary',
+    session: {
+      session_date: '2026-07-20',
+      queue_filename: 'fixture-queue.txt',
+    },
+    queue_snapshot: { filename: 'fixture-queue.txt', queue: {} },
+    events: [
+      { sequence: 1, action: 'wiki', item: 1 },
+      { sequence: 2, action: 'wiki', item: 2 },
+    ],
+  };
+  const reordered = JSON.parse(JSON.stringify(malformed)) as {
+    events: Array<Record<string, unknown>>;
+  };
+  reordered.events.reverse();
+
+  const result = reconcileSessionBundles([
+    {
+      filename: artifactFilename,
+      text: JSON.stringify(malformed),
+      recoveryQueue: { filename: 'fixture-queue.txt', text: JSON.stringify(queue) },
+    },
+    {
+      filename: '202607200745-morning-commute-session-bundle (1).txt',
+      text: JSON.stringify(reordered),
+      recoveryQueue: { filename: 'fixture-queue.txt', text: JSON.stringify(queue) },
+    },
+  ]);
+
+  assert.equal(result.sessions[0]?.status, 'accepted');
+  assert.equal(result.sessions[1]?.status, 'rejected');
+  assert.match(result.sessions[1]?.error ?? '', /Duplicate session_id recovered-/);
+  assert.equal(result.maintenance_candidates.length, 2);
+});
+
+test('rejects ambiguous repeated same-item saves without event ids', () => {
+  const queue = (JSON.parse(validBundle) as { queue_snapshot: { queue: unknown } }).queue_snapshot
+    .queue;
+  const malformed = {
+    schema: 'legacy-summary',
+    session: {
+      session_date: '2026-07-20',
+      queue_filename: 'fixture-queue.txt',
+    },
+    queue_snapshot: { filename: 'fixture-queue.txt', queue: {} },
+    events: [
+      { sequence: 1, action: 'wiki', item: 1 },
+      { sequence: 2, action: 'wiki', item: 1 },
+    ],
+  };
+
+  const result = reconcileSessionBundles([
+    {
+      filename: artifactFilename,
+      text: JSON.stringify(malformed),
+      recoveryQueue: { filename: 'fixture-queue.txt', text: JSON.stringify(queue) },
+    },
+  ]);
+
+  assert.equal(result.sessions[0]?.status, 'rejected');
+  assert.match(result.sessions[0]?.error ?? '', /distinct actions are ambiguous/);
+  assert.equal(result.maintenance_candidates.length, 0);
+});
+
+test('warns when an otherwise canonical artifact filename contradicts the session date', () => {
+  const malformed = JSON.parse(validBundle) as {
+    session: Record<string, unknown>;
+    queue_snapshot: { queue: unknown };
+  };
+  const wrongDateFilename = '202607210745-morning-commute-session-bundle.txt';
+  malformed.session.artifact_filename = wrongDateFilename;
+
+  const result = reconcileSessionBundles([
+    {
+      filename: wrongDateFilename,
+      text: JSON.stringify(malformed),
+      recoveryQueue: {
+        filename: '20260720-tldr-dev.txt',
+        text: JSON.stringify(malformed.queue_snapshot.queue),
+      },
+    },
+  ]);
+
+  assert.equal(result.sessions[0]?.status, 'accepted');
+  assert.equal(result.sessions[0]?.integrity_state, 'partial');
+  assert.ok(
+    result.sessions[0]?.recovery_warnings?.some((warning) =>
+      warning.includes('does not match session.session_date 2026-07-20')
+    )
+  );
+});
+
+test('retains both invalid-time and contradictory-date filename warnings', () => {
+  const malformed = JSON.parse(validBundle) as {
+    session: Record<string, unknown>;
+    queue_snapshot: { queue: unknown };
+  };
+  const multiplyInvalidFilename = '202607212560-morning-commute-session-bundle.txt';
+  malformed.session.artifact_filename = multiplyInvalidFilename;
+
+  const result = reconcileSessionBundles([
+    {
+      filename: multiplyInvalidFilename,
+      text: JSON.stringify(malformed),
+      recoveryQueue: {
+        filename: '20260720-tldr-dev.txt',
+        text: JSON.stringify(malformed.queue_snapshot.queue),
+      },
+    },
+  ]);
+
+  assert.equal(result.sessions[0]?.status, 'accepted');
+  assert.equal(result.sessions[0]?.integrity_state, 'partial');
+  assert.ok(
+    result.sessions[0]?.recovery_warnings?.some((warning) =>
+      warning.includes('does not contain a real local time')
+    )
+  );
+  assert.ok(
+    result.sessions[0]?.recovery_warnings?.some((warning) =>
+      warning.includes('does not match session.session_date 2026-07-20')
+    )
+  );
 });
 
 test('keeps distinct maintenance candidates whose colon-delimited identities would collide', () => {
