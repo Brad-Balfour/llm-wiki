@@ -65,6 +65,7 @@ export function recoverSessionBundleWithSuppliedQueue(
   const queueFingerprint = queueSnapshotFingerprint(queue);
   const wikiCaptures: RecoveredWikiCapture[] = [];
   const contradictoryWikiCaptures: RecoveredContradictoryWikiCapture[] = [];
+  const recoveredEventIds = new Set<string>();
 
   for (const [index, event] of events.entries()) {
     const record = requireRecord(event, `Recovery bundle events[${index}]`);
@@ -80,6 +81,12 @@ export function recoverSessionBundleWithSuppliedQueue(
     const contradictory = Boolean(userWords && refersToPriorWikiCapture(userWords));
     const eventId =
       lenientOptionalString(record.event_id) ?? recoveredCaptureEventId(item, contradictory);
+    if (recoveredEventIds.has(eventId)) {
+      throw new Error(
+        `Recovery bundle wiki captures reuse event identity ${eventId}; distinct actions are ambiguous`
+      );
+    }
+    recoveredEventIds.add(eventId);
     const sequence = lenientPositiveInteger(record.sequence) ?? captureOrdinal;
     if (contradictory && userWords) {
       contradictoryWikiCaptures.push({
