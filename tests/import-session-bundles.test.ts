@@ -168,6 +168,21 @@ test('warns but recovers when a distinct session reuses an artifact filename', (
     ['accepted', 'accepted']
   );
   assert.match(result.sessions[1]?.recovery_warnings?.[0] ?? '', /also declared by session/);
+
+  const reversed = reconcileSessionBundles([
+    {
+      filename: '202607200745-morning-commute-session-bundle (1).txt',
+      text: JSON.stringify(malformed),
+      recoveryQueue: { filename: 'fixture-queue.txt', text: JSON.stringify(queue) },
+    },
+    { filename: artifactFilename, text: validBundle },
+  ]);
+
+  assert.deepEqual(
+    reversed.sessions.map((session) => session.status),
+    ['accepted', 'accepted']
+  );
+  assert.match(reversed.sessions[0]?.recovery_warnings?.[0] ?? '', /also declared by session/);
 });
 
 test('warns but recovers when the downloaded filename conflicts with its declaration', () => {
@@ -305,8 +320,14 @@ test('uses canonical evidence for a recovered fallback session identity', () => 
 
   const reformattedAndRenamed = JSON.parse(JSON.stringify(malformed)) as {
     session: Record<string, unknown>;
+    events: Array<Record<string, unknown>>;
   };
   reformattedAndRenamed.session.artifact_filename = librarySuffixFilename;
+  reformattedAndRenamed.events[0]!.item = {
+    source_item_id: 'tldr-demo-001',
+    title: 'stale legacy title ignored by recovery',
+    url: 'https://example.invalid/stale',
+  };
 
   const result = reconcileSessionBundles([
     {

@@ -10,7 +10,7 @@ created: 2026-07-29
 updated: 2026-08-15
 confidence: medium
 # prettier-ignore
-provenance: [{"source_item_id":"19fad8d9ff2bc642-08","url":"https://martinfowler.com/articles/orchestrator-tax.html"},{"source_item_id":"1a00096e3b7b2e7f-06","url":"https://links.tldrnewsletter.com/Z7DqEC"}]
+provenance: [{"source_item_id":"19fad8d9ff2bc642-08","url":"https://martinfowler.com/articles/orchestrator-tax.html"},{"source_item_id":"1a00096e3b7b2e7f-06","url":"https://x.com/JoshARosen/status/2087944178558791874"}]
 ---
 
 # Orchestrator Working Memory
@@ -105,7 +105,7 @@ The persistent-versus-dynamic comparison above came from the commute
 discussion. The source raises architectural questions about delegation and
 working memory but does not define an agent API or lifecycle framework.
 
-### [Subagents on Subagents: How Many Layers Deep Is Too Many?](https://links.tldrnewsletter.com/Z7DqEC)
+### [Subagents on Subagents: How Many Layers Deep Is Too Many?](https://x.com/JoshARosen/status/2087944178558791874)
 
 <!-- source-item-id: 1a00096e3b7b2e7f-06 -->
 

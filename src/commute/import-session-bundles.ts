@@ -114,7 +114,9 @@ export function reconcileSessionBundles(
     event_conversions: [],
   };
   const sessionIds = new Set<string>();
-  const artifactFilenames = new Map<string, string>();
+  const strictArtifactFilenames = collectStrictArtifactClaims(inputs);
+  const acceptedStrictArtifactFilenames = new Map<string, string>();
+  const recoveredArtifactFilenames = new Map<string, string>();
   const maintenanceKeys = new Set<string>();
 
   for (const input of inputs) {
@@ -130,7 +132,7 @@ export function reconcileSessionBundles(
         throw new Error(`Duplicate session_id ${bundle.session.session_id}`);
       }
       claimArtifactFilename(
-        artifactFilenames,
+        acceptedStrictArtifactFilenames,
         bundle.session.artifact_filename,
         bundle.session.session_id
       );
@@ -151,9 +153,10 @@ export function reconcileSessionBundles(
           const artifactKey = recoveryArtifactKey(
             recovered.declaredArtifactFilename ?? input.filename
           );
-          const priorArtifactSession = artifactFilenames.get(artifactKey);
+          const priorArtifactSession =
+            strictArtifactFilenames.get(artifactKey) ?? recoveredArtifactFilenames.get(artifactKey);
           if (priorArtifactSession === undefined) {
-            artifactFilenames.set(artifactKey, recovered.sessionId);
+            recoveredArtifactFilenames.set(artifactKey, recovered.sessionId);
           } else if (priorArtifactSession !== recovered.sessionId) {
             recoveryWarnings.push(
               `Artifact filename ${artifactKey} was also declared by session ${priorArtifactSession}.`
@@ -358,6 +361,23 @@ export function reconcileSessionBundles(
   }
 
   return result;
+}
+
+function collectStrictArtifactClaims(inputs: SessionBundleInput[]): Map<string, string> {
+  const claims = new Map<string, string>();
+  for (const input of inputs) {
+    try {
+      const bundle = parseCommuteSessionBundleText(input.text);
+      if (!bundleArtifactFilenameMatches(input.filename, bundle.session.artifact_filename)) {
+        continue;
+      }
+      const artifactKey = recoveryArtifactKey(bundle.session.artifact_filename);
+      if (!claims.has(artifactKey)) claims.set(artifactKey, bundle.session.session_id);
+    } catch {
+      // Only strict-valid bundles establish authoritative artifact claims.
+    }
+  }
+  return claims;
 }
 
 function userWordsEvidence(

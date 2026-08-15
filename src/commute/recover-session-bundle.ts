@@ -63,7 +63,6 @@ export function recoverSessionBundleWithSuppliedQueue(
   const events = requireArray(bundle.events, 'Recovery bundle events');
   const artifactEvidence = inspectArtifactFilenameEvidence(bundle, input.bundleFilename);
   const queueFingerprint = queueSnapshotFingerprint(queue);
-  const sessionId = declaredSessionId(bundle, queueFingerprint, events);
   const wikiCaptures: RecoveredWikiCapture[] = [];
   const contradictoryWikiCaptures: RecoveredContradictoryWikiCapture[] = [];
 
@@ -98,6 +97,13 @@ export function recoverSessionBundleWithSuppliedQueue(
       url: item.url,
     });
   }
+
+  const sessionId = declaredSessionId(
+    bundle,
+    queueFingerprint,
+    wikiCaptures,
+    contradictoryWikiCaptures
+  );
 
   return {
     sessionId,
@@ -147,7 +153,8 @@ function declaredQueueName(bundle: Record<string, unknown>): string {
 function declaredSessionId(
   bundle: Record<string, unknown>,
   queueFingerprint: string,
-  events: unknown[]
+  wikiCaptures: RecoveredWikiCapture[],
+  contradictoryWikiCaptures: RecoveredContradictoryWikiCapture[]
 ): string {
   const session = optionalRecord(bundle.session);
   const declared = session && lenientOptionalString(session.session_id);
@@ -156,7 +163,12 @@ function declaredSessionId(
   const sessionEvidence = { ...(session ?? {}) };
   delete sessionEvidence.session_id;
   delete sessionEvidence.artifact_filename;
-  const canonicalEvidence = stableJson({ session: sessionEvidence, queueFingerprint, events });
+  const canonicalEvidence = stableJson({
+    session: sessionEvidence,
+    queueFingerprint,
+    wikiCaptures,
+    contradictoryWikiCaptures,
+  });
   return `recovered-${createHash('sha256').update(canonicalEvidence).digest('hex').slice(0, 16)}`;
 }
 
