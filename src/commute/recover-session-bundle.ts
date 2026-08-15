@@ -161,11 +161,9 @@ function declaredSessionId(
   const declared = session && lenientOptionalString(session.session_id);
   if (declared) return declared;
 
-  const sessionEvidence = { ...(session ?? {}) };
-  delete sessionEvidence.session_id;
-  delete sessionEvidence.artifact_filename;
+  const sessionDate = session && lenientOptionalString(session.session_date);
   const canonicalEvidence = stableJson({
-    session: sessionEvidence,
+    ...(sessionDate === undefined ? {} : { sessionDate }),
     queueFingerprint,
     wikiCaptures,
     contradictoryWikiCaptures,

@@ -323,6 +323,7 @@ test('uses canonical evidence for a recovered fallback session identity', () => 
     events: Array<Record<string, unknown>>;
   };
   reformattedAndRenamed.session.artifact_filename = librarySuffixFilename;
+  reformattedAndRenamed.session.queue_filename = 'ignored-stale-queue-alias.txt';
   reformattedAndRenamed.events.unshift({ action: 'skip', item: 2 });
   reformattedAndRenamed.events[1]!.item = {
     source_item_id: 'tldr-demo-001',
