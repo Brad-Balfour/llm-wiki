@@ -231,6 +231,34 @@ test('warns when only the declared artifact filename has a Library suffix', () =
   );
 });
 
+test('does not invent a shape warning for a valid no-space Library suffix', () => {
+  const queue = (JSON.parse(validBundle) as { queue_snapshot: { queue: unknown } }).queue_snapshot
+    .queue;
+  const noSpaceSuffix = '202607200745-morning-commute-session-bundle(1).txt';
+  const malformed = {
+    schema: 'legacy-summary',
+    session: {
+      session_id: 'no-space-library-suffix-session',
+      session_date: '2026-07-20',
+      artifact_filename: noSpaceSuffix,
+      queue_filename: 'fixture-queue.txt',
+    },
+    queue_snapshot: { filename: 'fixture-queue.txt', queue: {} },
+    events: [{ action: 'wiki', item: 1 }],
+  };
+
+  const result = reconcileSessionBundles([
+    {
+      filename: noSpaceSuffix,
+      text: JSON.stringify(malformed),
+      recoveryQueue: { filename: 'fixture-queue.txt', text: JSON.stringify(queue) },
+    },
+  ]);
+
+  assert.equal(result.sessions[0]?.status, 'accepted');
+  assert.equal(result.sessions[0]?.recovery_warnings, undefined);
+});
+
 test('warns but recovers without a declared artifact when its filename is noncanonical', () => {
   const queue = (JSON.parse(validBundle) as { queue_snapshot: { queue: unknown } }).queue_snapshot
     .queue;
@@ -319,6 +347,38 @@ test('warns when an otherwise canonical artifact filename contradicts the sessio
 
   assert.equal(result.sessions[0]?.status, 'accepted');
   assert.equal(result.sessions[0]?.integrity_state, 'recovered');
+  assert.ok(
+    result.sessions[0]?.recovery_warnings?.some((warning) =>
+      warning.includes('does not match session.session_date 2026-07-20')
+    )
+  );
+});
+
+test('retains both invalid-time and contradictory-date filename warnings', () => {
+  const malformed = JSON.parse(validBundle) as {
+    session: Record<string, unknown>;
+    queue_snapshot: { queue: unknown };
+  };
+  const multiplyInvalidFilename = '202607212560-morning-commute-session-bundle.txt';
+  malformed.session.artifact_filename = multiplyInvalidFilename;
+
+  const result = reconcileSessionBundles([
+    {
+      filename: multiplyInvalidFilename,
+      text: JSON.stringify(malformed),
+      recoveryQueue: {
+        filename: '20260720-tldr-dev.txt',
+        text: JSON.stringify(malformed.queue_snapshot.queue),
+      },
+    },
+  ]);
+
+  assert.equal(result.sessions[0]?.status, 'accepted');
+  assert.ok(
+    result.sessions[0]?.recovery_warnings?.some((warning) =>
+      warning.includes('does not contain a real local time')
+    )
+  );
   assert.ok(
     result.sessions[0]?.recovery_warnings?.some((warning) =>
       warning.includes('does not match session.session_date 2026-07-20')

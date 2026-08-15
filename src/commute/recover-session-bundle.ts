@@ -198,15 +198,16 @@ function inspectArtifactFilenameEvidence(
 
 function artifactFilenameWarnings(filename: string, field: string, sessionDate?: string): string[] {
   const match =
-    /^(\d{8})(\d{2})(\d{2})-(morning|evening)-commute-session-bundle(?: \([1-9][0-9]*\))?\.txt$/.exec(
+    /^(\d{8})(\d{2})(\d{2})-(morning|evening)-commute-session-bundle(?: ?\([1-9][0-9]*\))?\.txt$/.exec(
       filename
     );
   if (!match) return [`${field} ${filename} is not in the canonical bundle filename shape.`];
 
   const hour = Number(match[2]);
   const minute = Number(match[3]);
-  if (hour > 23 || minute > 59) return [`${field} ${filename} does not contain a real local time.`];
   const warnings: string[] = [];
+  const hasRealTime = hour <= 23 && minute <= 59;
+  if (!hasRealTime) warnings.push(`${field} ${filename} does not contain a real local time.`);
   if (/^\d{4}-\d{2}-\d{2}$/.test(sessionDate ?? '')) {
     const artifactDate = match[1];
     const expectedDate = sessionDate!.replaceAll('-', '');
@@ -217,10 +218,10 @@ function artifactFilenameWarnings(filename: string, field: string, sessionDate?:
     }
   }
   const period = match[4];
-  if (period === 'morning' && hour >= 12) {
+  if (hasRealTime && period === 'morning' && hour >= 12) {
     warnings.push(`${field} ${filename} labels a time from 1200 onward as morning.`);
   }
-  if (period === 'evening' && hour < 12) {
+  if (hasRealTime && period === 'evening' && hour < 12) {
     warnings.push(`${field} ${filename} labels a time before 1200 as evening.`);
   }
   return warnings;
