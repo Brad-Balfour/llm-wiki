@@ -2,7 +2,11 @@ import { createHash } from 'node:crypto';
 
 import { errorMessage } from '../shared/errors.js';
 import { optionalRecord, requireArray, requireRecord } from '../shared/validate.js';
-import { queueSnapshotFingerprint, validateTldrCommuteQueueV2 } from './session-bundle.js';
+import {
+  bundleArtifactFilenameMatches,
+  queueSnapshotFingerprint,
+  validateTldrCommuteQueueV2,
+} from './session-bundle.js';
 
 export interface SuppliedQueueRecoveryInput {
   bundleFilename: string;
@@ -180,7 +184,7 @@ function inspectArtifactFilenameEvidence(
         )
       );
     }
-    if (!recoveryArtifactFilenamesMatch(inputFilename, declaredArtifactFilename)) {
+    if (!bundleArtifactFilenameMatches(inputFilename, declaredArtifactFilename)) {
       warnings.push(
         `Downloaded bundle filename ${inputFilename} does not match declared artifact filename ${declaredArtifactFilename}.`
       );
@@ -232,10 +236,6 @@ function stableJson(value: unknown): string {
       .join(',')}}`;
   }
   return JSON.stringify(value) ?? 'null';
-}
-
-function recoveryArtifactFilenamesMatch(actual: string, declared: string): boolean {
-  return recoveryArtifactKey(actual) === recoveryArtifactKey(declared);
 }
 
 export function recoveryArtifactKey(filename: string): string {

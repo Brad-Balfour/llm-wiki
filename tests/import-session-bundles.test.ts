@@ -201,6 +201,36 @@ test('warns but recovers when the downloaded filename conflicts with its declara
   );
 });
 
+test('warns when only the declared artifact filename has a Library suffix', () => {
+  const queue = (JSON.parse(validBundle) as { queue_snapshot: { queue: unknown } }).queue_snapshot
+    .queue;
+  const malformed = {
+    schema: 'legacy-summary',
+    session: {
+      session_id: 'reverse-library-suffix-session',
+      artifact_filename: '202607200745-morning-commute-session-bundle (1).txt',
+      queue_filename: 'fixture-queue.txt',
+    },
+    queue_snapshot: { filename: 'fixture-queue.txt', queue: {} },
+    events: [{ action: 'wiki', item: 1 }],
+  };
+
+  const result = reconcileSessionBundles([
+    {
+      filename: artifactFilename,
+      text: JSON.stringify(malformed),
+      recoveryQueue: { filename: 'fixture-queue.txt', text: JSON.stringify(queue) },
+    },
+  ]);
+
+  assert.equal(result.sessions[0]?.status, 'accepted');
+  assert.ok(
+    result.sessions[0]?.recovery_warnings?.some((warning) =>
+      warning.includes('does not match declared artifact filename')
+    )
+  );
+});
+
 test('warns but recovers without a declared artifact when its filename is noncanonical', () => {
   const queue = (JSON.parse(validBundle) as { queue_snapshot: { queue: unknown } }).queue_snapshot
     .queue;
