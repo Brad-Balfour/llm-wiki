@@ -557,13 +557,16 @@ required navigation transitions, and Fintech failed because completed playback
 retained a resume cursor. Supplied-queue recovery accepted all three sessions
 without inventing item identity.
 
-The bounded recovered intake retained two exact wiki-maintenance candidates,
-both from Dev: _How we built a software factory to drive Astro's GitHub issue
-count to zero_ and _Build Wide, Ship Narrow_. It retained six General navigation
-events and no unresolved capture. The malformed-bundle recovery contract
-intentionally kept only explicit wiki captures from Dev and no Fintech events;
-the original artifacts and shared chats therefore remain necessary evidence for
-the other channels.
+The combined intake accepted the strictly valid General session normally and
+accepted Dev and Fintech through supplied-queue recovery. From General it
+retained six navigation events, one quality incident, and five general
+captures. From malformed Dev it retained two exact wiki-maintenance candidates:
+_How we built a software factory to drive Astro's GitHub issue count to zero_
+and _Build Wide, Ship Narrow_. From malformed Fintech it retained the recovered
+session identity but no events. No session produced an unresolved capture. The
+malformed-bundle fallback intentionally salvages only explicit wiki captures,
+so the original Dev and Fintech artifacts and shared chats remain necessary
+evidence for their other channels.
 
 Across the original bundles, there were seven explicit quality incidents and
 eight general captures. Home validation adds two artifact-contract failures:
