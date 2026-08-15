@@ -115,9 +115,20 @@ test('two same-day exports and a Library-suffixed artifact remain independent', 
 test('rejects distinct sessions that declare the same canonical artifact filename', () => {
   const firstCase = requiredFixture('valid-single-queue-partial');
   const collisionCase = requiredFixture('distinct-session-reuses-canonical-filename');
+  const collisionText = fixtureText(collisionCase);
+  const collisionBundle = JSON.parse(collisionText) as {
+    queue_snapshot: { filename: string; queue: unknown };
+  };
   const imported = reconcileSessionBundles([
     { filename: firstCase.input_filename, text: fixtureText(firstCase) },
-    { filename: collisionCase.input_filename, text: fixtureText(collisionCase) },
+    {
+      filename: collisionCase.input_filename,
+      text: collisionText,
+      recoveryQueue: {
+        filename: collisionBundle.queue_snapshot.filename,
+        text: JSON.stringify(collisionBundle.queue_snapshot.queue),
+      },
+    },
   ]);
 
   assert.deepEqual(

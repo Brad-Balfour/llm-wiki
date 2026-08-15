@@ -121,6 +121,7 @@ export function reconcileSessionBundles(
 
   for (const input of inputs) {
     let bundle: CommuteSessionBundle;
+    let strictIdentityValidated = false;
     try {
       bundle = parseCommuteSessionBundleText(input.text);
       if (!bundleArtifactFilenameMatches(input.filename, bundle.session.artifact_filename)) {
@@ -128,6 +129,7 @@ export function reconcileSessionBundles(
           'Bundle filename does not match session.artifact_filename (except a Library-added numeric suffix)'
         );
       }
+      strictIdentityValidated = true;
       if (sessionIds.has(bundle.session.session_id)) {
         throw new Error(`Duplicate session_id ${bundle.session.session_id}`);
       }
@@ -138,6 +140,14 @@ export function reconcileSessionBundles(
       );
       sessionIds.add(bundle.session.session_id);
     } catch (error) {
+      if (strictIdentityValidated) {
+        result.sessions.push({
+          input_filename: input.filename,
+          status: 'rejected',
+          error: errorMessage(error),
+        });
+        continue;
+      }
       if (input.recoveryQueue) {
         try {
           const recovered = recoverSessionBundleWithSuppliedQueue({
