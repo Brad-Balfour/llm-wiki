@@ -231,7 +231,7 @@ test('warns but recovers without a declared artifact when its filename is noncan
   );
 });
 
-test('uses bundle content for a recovered fallback session identity', () => {
+test('uses canonical evidence for a recovered fallback session identity', () => {
   const queue = (JSON.parse(validBundle) as { queue_snapshot: { queue: unknown } }).queue_snapshot
     .queue;
   const malformed = {
@@ -245,6 +245,11 @@ test('uses bundle content for a recovered fallback session identity', () => {
   };
   const librarySuffixFilename = '202607200745-morning-commute-session-bundle (1).txt';
 
+  const reformattedAndRenamed = JSON.parse(JSON.stringify(malformed)) as {
+    session: Record<string, unknown>;
+  };
+  reformattedAndRenamed.session.artifact_filename = librarySuffixFilename;
+
   const result = reconcileSessionBundles([
     {
       filename: artifactFilename,
@@ -253,7 +258,7 @@ test('uses bundle content for a recovered fallback session identity', () => {
     },
     {
       filename: librarySuffixFilename,
-      text: JSON.stringify(malformed),
+      text: JSON.stringify(reformattedAndRenamed, null, 2),
       recoveryQueue: { filename: 'fixture-queue.txt', text: JSON.stringify(queue) },
     },
   ]);
@@ -261,6 +266,34 @@ test('uses bundle content for a recovered fallback session identity', () => {
   assert.equal(result.sessions[0]?.status, 'accepted');
   assert.equal(result.sessions[1]?.status, 'rejected');
   assert.match(result.sessions[1]?.error ?? '', /Duplicate session_id recovered-/);
+});
+
+test('warns when an otherwise canonical artifact filename contradicts the session date', () => {
+  const malformed = JSON.parse(validBundle) as {
+    session: Record<string, unknown>;
+    queue_snapshot: { queue: unknown };
+  };
+  const wrongDateFilename = '202607210745-morning-commute-session-bundle.txt';
+  malformed.session.artifact_filename = wrongDateFilename;
+
+  const result = reconcileSessionBundles([
+    {
+      filename: wrongDateFilename,
+      text: JSON.stringify(malformed),
+      recoveryQueue: {
+        filename: '20260720-tldr-dev.txt',
+        text: JSON.stringify(malformed.queue_snapshot.queue),
+      },
+    },
+  ]);
+
+  assert.equal(result.sessions[0]?.status, 'accepted');
+  assert.equal(result.sessions[0]?.integrity_state, 'recovered');
+  assert.ok(
+    result.sessions[0]?.recovery_warnings?.some((warning) =>
+      warning.includes('does not match session.session_date 2026-07-20')
+    )
+  );
 });
 
 test('keeps distinct maintenance candidates whose colon-delimited identities would collide', () => {

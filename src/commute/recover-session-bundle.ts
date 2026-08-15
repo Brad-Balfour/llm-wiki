@@ -58,7 +58,8 @@ export function recoverSessionBundleWithSuppliedQueue(
   const exactItems = items.map((item, index) => parseQueueItem(item, index));
   const events = requireArray(bundle.events, 'Recovery bundle events');
   const artifactEvidence = inspectArtifactFilenameEvidence(bundle, input.bundleFilename);
-  const sessionId = declaredSessionId(bundle, input.bundleText);
+  const queueFingerprint = queueSnapshotFingerprint(queue);
+  const sessionId = declaredSessionId(bundle, queueFingerprint, events);
   const wikiCaptures: RecoveredWikiCapture[] = [];
   const contradictoryWikiCaptures: RecoveredContradictoryWikiCapture[] = [];
 
@@ -101,7 +102,7 @@ export function recoverSessionBundleWithSuppliedQueue(
       : { declaredArtifactFilename: artifactEvidence.declaredArtifactFilename }),
     recoveryWarnings: artifactEvidence.warnings,
     queueFilename: input.queueFilename,
-    queueFingerprint: queueSnapshotFingerprint(queue),
+    queueFingerprint,
     wikiCaptures,
     contradictoryWikiCaptures,
   };
@@ -139,11 +140,20 @@ function declaredQueueName(bundle: Record<string, unknown>): string {
   return filename;
 }
 
-function declaredSessionId(bundle: Record<string, unknown>, bundleText: string): string {
+function declaredSessionId(
+  bundle: Record<string, unknown>,
+  queueFingerprint: string,
+  events: unknown[]
+): string {
   const session = optionalRecord(bundle.session);
   const declared = session && lenientOptionalString(session.session_id);
   if (declared) return declared;
-  return `recovered-${createHash('sha256').update(bundleText).digest('hex').slice(0, 16)}`;
+
+  const sessionEvidence = { ...(session ?? {}) };
+  delete sessionEvidence.session_id;
+  delete sessionEvidence.artifact_filename;
+  const canonicalEvidence = stableJson({ session: sessionEvidence, queueFingerprint, events });
+  return `recovered-${createHash('sha256').update(canonicalEvidence).digest('hex').slice(0, 16)}`;
 }
 
 function inspectArtifactFilenameEvidence(
@@ -151,14 +161,23 @@ function inspectArtifactFilenameEvidence(
   inputFilename: string
 ): { declaredArtifactFilename?: string; warnings: string[] } {
   const session = optionalRecord(bundle.session);
+  const sessionDate = session && lenientOptionalString(session.session_date);
   const declaredArtifactFilename = session && lenientOptionalString(session.artifact_filename);
-  const warnings = artifactFilenameWarnings(inputFilename, 'Downloaded bundle filename');
+  const warnings = artifactFilenameWarnings(
+    inputFilename,
+    'Downloaded bundle filename',
+    sessionDate
+  );
   if (declaredArtifactFilename === undefined) {
     warnings.push('Malformed bundle does not declare session.artifact_filename.');
   } else {
     if (declaredArtifactFilename !== inputFilename) {
       warnings.push(
-        ...artifactFilenameWarnings(declaredArtifactFilename, 'Declared artifact filename')
+        ...artifactFilenameWarnings(
+          declaredArtifactFilename,
+          'Declared artifact filename',
+          sessionDate
+        )
       );
     }
     if (!recoveryArtifactFilenamesMatch(inputFilename, declaredArtifactFilename)) {
@@ -173,7 +192,7 @@ function inspectArtifactFilenameEvidence(
   };
 }
 
-function artifactFilenameWarnings(filename: string, field: string): string[] {
+function artifactFilenameWarnings(filename: string, field: string, sessionDate?: string): string[] {
   const match =
     /^(\d{8})(\d{2})(\d{2})-(morning|evening)-commute-session-bundle(?: \([1-9][0-9]*\))?\.txt$/.exec(
       filename
@@ -183,14 +202,36 @@ function artifactFilenameWarnings(filename: string, field: string): string[] {
   const hour = Number(match[2]);
   const minute = Number(match[3]);
   if (hour > 23 || minute > 59) return [`${field} ${filename} does not contain a real local time.`];
+  const warnings: string[] = [];
+  if (/^\d{4}-\d{2}-\d{2}$/.test(sessionDate ?? '')) {
+    const artifactDate = match[1];
+    const expectedDate = sessionDate!.replaceAll('-', '');
+    if (artifactDate !== expectedDate) {
+      warnings.push(
+        `${field} ${filename} uses date ${artifactDate}, which does not match session.session_date ${sessionDate}.`
+      );
+    }
+  }
   const period = match[4];
   if (period === 'morning' && hour >= 12) {
-    return [`${field} ${filename} labels a time from 1200 onward as morning.`];
+    warnings.push(`${field} ${filename} labels a time from 1200 onward as morning.`);
   }
   if (period === 'evening' && hour < 12) {
-    return [`${field} ${filename} labels a time before 1200 as evening.`];
+    warnings.push(`${field} ${filename} labels a time before 1200 as evening.`);
   }
-  return [];
+  return warnings;
+}
+
+function stableJson(value: unknown): string {
+  if (Array.isArray(value)) return `[${value.map(stableJson).join(',')}]`;
+  if (value !== null && typeof value === 'object') {
+    const record = value as Record<string, unknown>;
+    return `{${Object.keys(record)
+      .sort()
+      .map((key) => `${JSON.stringify(key)}:${stableJson(record[key])}`)
+      .join(',')}}`;
+  }
+  return JSON.stringify(value) ?? 'null';
 }
 
 function recoveryArtifactFilenamesMatch(actual: string, declared: string): boolean {
