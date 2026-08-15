@@ -207,7 +207,7 @@ function inspectArtifactFilenameEvidence(
   const session = optionalRecord(bundle.session);
   const sessionDate = session && lenientOptionalString(session.session_date);
   const declaredArtifactFilename = session && lenientOptionalString(session.artifact_filename);
-  const warnings = artifactFilenameWarnings(
+  const warnings = recoveryArtifactFilenameWarnings(
     inputFilename,
     'Downloaded bundle filename',
     sessionDate
@@ -217,7 +217,7 @@ function inspectArtifactFilenameEvidence(
   } else {
     if (declaredArtifactFilename !== inputFilename) {
       warnings.push(
-        ...artifactFilenameWarnings(
+        ...recoveryArtifactFilenameWarnings(
           declaredArtifactFilename,
           'Declared artifact filename',
           sessionDate
@@ -236,7 +236,11 @@ function inspectArtifactFilenameEvidence(
   };
 }
 
-function artifactFilenameWarnings(filename: string, field: string, sessionDate?: string): string[] {
+export function recoveryArtifactFilenameWarnings(
+  filename: string,
+  field: string,
+  sessionDate?: string
+): string[] {
   const match =
     /^(\d{8})(\d{2})(\d{2})-(morning|evening)-commute-session-bundle(?: ?\([1-9][0-9]*\))?\.txt$/.exec(
       filename

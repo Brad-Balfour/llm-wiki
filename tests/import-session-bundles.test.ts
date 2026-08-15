@@ -135,10 +135,15 @@ test('recovers an exact wiki capture when the period label contradicts the artif
   ]);
 
   assert.equal(result.sessions[0]?.status, 'accepted');
-  assert.equal(result.sessions[0]?.integrity_state, 'recovered');
+  assert.equal(result.sessions[0]?.integrity_state, 'partial');
   assert.equal(result.maintenance_candidates.length, 1);
   assert.equal(result.maintenance_candidates[0]?.source_item_id, 'tldr-demo-001');
-  assert.match(result.sessions[0]?.recovery_warnings?.[0] ?? '', /from 1200 onward as morning/);
+  assert.equal(result.navigation_events.length, 1);
+  assert.ok(
+    result.sessions[0]?.recovery_warnings?.some((warning) =>
+      warning.includes('from 1200 onward as morning')
+    )
+  );
 });
 
 test('warns but recovers when a distinct session reuses an artifact filename', () => {
@@ -478,7 +483,7 @@ test('warns when an otherwise canonical artifact filename contradicts the sessio
   ]);
 
   assert.equal(result.sessions[0]?.status, 'accepted');
-  assert.equal(result.sessions[0]?.integrity_state, 'recovered');
+  assert.equal(result.sessions[0]?.integrity_state, 'partial');
   assert.ok(
     result.sessions[0]?.recovery_warnings?.some((warning) =>
       warning.includes('does not match session.session_date 2026-07-20')
@@ -506,6 +511,7 @@ test('retains both invalid-time and contradictory-date filename warnings', () =>
   ]);
 
   assert.equal(result.sessions[0]?.status, 'accepted');
+  assert.equal(result.sessions[0]?.integrity_state, 'partial');
   assert.ok(
     result.sessions[0]?.recovery_warnings?.some((warning) =>
       warning.includes('does not contain a real local time')
