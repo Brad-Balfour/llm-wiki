@@ -75,11 +75,13 @@ export function recoverSessionBundleWithSuppliedQueue(
       `Recovery bundle events[${index}].item`
     );
     const captureOrdinal = wikiCaptures.length + contradictoryWikiCaptures.length + 1;
-    const eventId = lenientOptionalString(record.event_id) ?? `recovered-event-${captureOrdinal}`;
-    const sequence = lenientPositiveInteger(record.sequence) ?? captureOrdinal;
     const userWords =
       lenientOptionalString(record.user_words) ?? lenientOptionalString(record.feedback);
-    if (userWords && refersToPriorWikiCapture(userWords)) {
+    const contradictory = Boolean(userWords && refersToPriorWikiCapture(userWords));
+    const eventId =
+      lenientOptionalString(record.event_id) ?? recoveredCaptureEventId(item, contradictory);
+    const sequence = lenientPositiveInteger(record.sequence) ?? captureOrdinal;
+    if (contradictory && userWords) {
       contradictoryWikiCaptures.push({
         eventId,
         sequence,
@@ -171,11 +173,24 @@ function declaredSessionId(
   return `recovered-${createHash('sha256').update(canonicalEvidence).digest('hex').slice(0, 16)}`;
 }
 
-function canonicalCaptureOrder<T extends RecoveredWikiCapture>(captures: T[]): T[] {
-  return [...captures].sort((left, right) => {
-    const eventOrder = left.eventId.localeCompare(right.eventId);
-    return eventOrder === 0 ? stableJson(left).localeCompare(stableJson(right)) : eventOrder;
+function canonicalCaptureOrder<T extends RecoveredWikiCapture>(
+  captures: T[]
+): Array<Omit<T, 'sequence'>> {
+  return captures
+    .map(({ sequence: _sequence, ...capture }) => capture)
+    .sort((left, right) => {
+      const eventOrder = left.eventId.localeCompare(right.eventId);
+      return eventOrder === 0 ? stableJson(left).localeCompare(stableJson(right)) : eventOrder;
+    });
+}
+
+function recoveredCaptureEventId(item: ExactQueueItem, contradictory: boolean): string {
+  const identity = stableJson({
+    kind: contradictory ? 'contradictory_wiki_capture' : 'wiki_capture',
+    sourceItemId: item.sourceItemId,
+    url: item.url,
   });
+  return `recovered-event-${createHash('sha256').update(identity).digest('hex').slice(0, 16)}`;
 }
 
 function inspectArtifactFilenameEvidence(

@@ -121,12 +121,13 @@ export function reconcileSessionBundles(
 
   for (const input of inputs) {
     let bundle: CommuteSessionBundle;
+    const strictRecoveryWarnings: string[] = [];
     let strictIdentityValidated = false;
     try {
       bundle = parseCommuteSessionBundleText(input.text);
       if (!bundleArtifactFilenameMatches(input.filename, bundle.session.artifact_filename)) {
-        throw new Error(
-          'Bundle filename does not match session.artifact_filename (except a Library-added numeric suffix)'
+        strictRecoveryWarnings.push(
+          `Downloaded bundle filename ${input.filename} does not match declared artifact filename ${bundle.session.artifact_filename}.`
         );
       }
       strictIdentityValidated = true;
@@ -267,6 +268,7 @@ export function reconcileSessionBundles(
       integrity_state: bundle.integrity.state,
       queue_filename: bundle.queue_snapshot.filename,
       queue_fingerprint: queueSnapshotFingerprint(bundle.queue_snapshot.queue),
+      ...(strictRecoveryWarnings.length === 0 ? {} : { recovery_warnings: strictRecoveryWarnings }),
     });
 
     for (const event of bundle.events) {
@@ -378,9 +380,6 @@ function collectStrictArtifactClaims(inputs: SessionBundleInput[]): Map<string, 
   for (const input of inputs) {
     try {
       const bundle = parseCommuteSessionBundleText(input.text);
-      if (!bundleArtifactFilenameMatches(input.filename, bundle.session.artifact_filename)) {
-        continue;
-      }
       const artifactKey = recoveryArtifactKey(bundle.session.artifact_filename);
       if (!claims.has(artifactKey)) claims.set(artifactKey, bundle.session.session_id);
     } catch {

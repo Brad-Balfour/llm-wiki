@@ -51,14 +51,16 @@ test('preserves an invalid bundle as a rejected independent session', () => {
   assert.equal(result.maintenance_candidates.length, 1);
 });
 
-test('isolates a bundle whose downloaded filename conflicts with its declaration', () => {
+test('warns without dropping events when a downloaded filename conflicts with its declaration', () => {
   const result = reconcileSessionBundles(
     [{ filename: 'commute-session-bundle.txt', text: validBundle }],
     '2026-07-20T12:00:00.000Z'
   );
 
-  assert.equal(result.sessions[0]?.status, 'rejected');
-  assert.match(result.sessions[0]?.error ?? '', /Bundle filename does not match/);
+  assert.equal(result.sessions[0]?.status, 'accepted');
+  assert.match(result.sessions[0]?.recovery_warnings?.[0] ?? '', /does not match declared/);
+  assert.equal(result.maintenance_candidates.length, 1);
+  assert.equal(result.navigation_events.length, 1);
 });
 
 test('recovers a malformed v1-shaped bundle from its named supplied queue', () => {
@@ -362,6 +364,45 @@ test('canonicalizes explicit recovered capture order for fallback session identi
     events: [
       { event_id: 'save-first', sequence: 1, action: 'wiki', item: 1 },
       { event_id: 'save-second', sequence: 2, action: 'wiki', item: 2 },
+    ],
+  };
+  const reordered = JSON.parse(JSON.stringify(malformed)) as {
+    events: Array<Record<string, unknown>>;
+  };
+  reordered.events.reverse();
+
+  const result = reconcileSessionBundles([
+    {
+      filename: artifactFilename,
+      text: JSON.stringify(malformed),
+      recoveryQueue: { filename: 'fixture-queue.txt', text: JSON.stringify(queue) },
+    },
+    {
+      filename: '202607200745-morning-commute-session-bundle (1).txt',
+      text: JSON.stringify(reordered),
+      recoveryQueue: { filename: 'fixture-queue.txt', text: JSON.stringify(queue) },
+    },
+  ]);
+
+  assert.equal(result.sessions[0]?.status, 'accepted');
+  assert.equal(result.sessions[1]?.status, 'rejected');
+  assert.match(result.sessions[1]?.error ?? '', /Duplicate session_id recovered-/);
+  assert.equal(result.maintenance_candidates.length, 2);
+});
+
+test('canonicalizes missing recovered capture ids across event reordering', () => {
+  const queue = (JSON.parse(validBundle) as { queue_snapshot: { queue: unknown } }).queue_snapshot
+    .queue;
+  const malformed = {
+    schema: 'legacy-summary',
+    session: {
+      session_date: '2026-07-20',
+      queue_filename: 'fixture-queue.txt',
+    },
+    queue_snapshot: { filename: 'fixture-queue.txt', queue: {} },
+    events: [
+      { sequence: 1, action: 'wiki', item: 1 },
+      { sequence: 2, action: 'wiki', item: 2 },
     ],
   };
   const reordered = JSON.parse(JSON.stringify(malformed)) as {
