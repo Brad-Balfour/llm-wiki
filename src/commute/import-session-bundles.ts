@@ -12,6 +12,7 @@ import {
   queueSnapshotFingerprint,
 } from './session-bundle.js';
 import {
+  recoveryArtifactKey,
   recoverSessionBundleWithSuppliedQueue,
   refersToPriorWikiCapture,
 } from './recover-session-bundle.js';
@@ -59,6 +60,8 @@ interface ImportedSession {
   integrity_state?: CommuteSessionBundle['integrity']['state'];
   queue_filename?: string;
   queue_fingerprint?: string;
+  declared_artifact_filename?: string;
+  recovery_warnings?: string[];
   error?: string;
 }
 
@@ -144,12 +147,18 @@ export function reconcileSessionBundles(
           if (sessionIds.has(recovered.sessionId)) {
             throw new Error(`Duplicate session_id ${recovered.sessionId}`);
           }
-          if (!bundleArtifactFilenameMatches(input.filename, recovered.artifactFilename)) {
-            throw new Error(
-              'Recovery bundle filename does not match its declared session.artifact_filename (except a Library-added numeric suffix)'
+          const recoveryWarnings = [...recovered.recoveryWarnings];
+          const artifactKey = recoveryArtifactKey(
+            recovered.declaredArtifactFilename ?? input.filename
+          );
+          const priorArtifactSession = artifactFilenames.get(artifactKey);
+          if (priorArtifactSession === undefined) {
+            artifactFilenames.set(artifactKey, recovered.sessionId);
+          } else if (priorArtifactSession !== recovered.sessionId) {
+            recoveryWarnings.push(
+              `Artifact filename ${artifactKey} was also declared by session ${priorArtifactSession}.`
             );
           }
-          claimArtifactFilename(artifactFilenames, recovered.artifactFilename, recovered.sessionId);
           sessionIds.add(recovered.sessionId);
           result.sessions.push({
             input_filename: input.filename,
@@ -158,6 +167,10 @@ export function reconcileSessionBundles(
             integrity_state: 'recovered',
             queue_filename: recovered.queueFilename,
             queue_fingerprint: recovered.queueFingerprint,
+            ...(recovered.declaredArtifactFilename === undefined
+              ? {}
+              : { declared_artifact_filename: recovered.declaredArtifactFilename }),
+            ...(recoveryWarnings.length === 0 ? {} : { recovery_warnings: recoveryWarnings }),
           });
           for (const capture of recovered.wikiCaptures) {
             const maintenanceKey = maintenanceCandidateKey(

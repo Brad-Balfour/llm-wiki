@@ -2,15 +2,15 @@
 type: concept
 title: 'Review-Driven Software Factories'
 # prettier-ignore
-aliases: ["Why Software Factories Fail","Human-in-the-loop software factories","Agentic documentation workflows"]
+aliases: ["Why Software Factories Fail","Human-in-the-loop software factories","Agentic documentation workflows","Foreman software factory"]
 # prettier-ignore
 tags: ["ai-agents","software-design","planning","code-review","context-management","documentation","workflow-automation"]
 wiki_slug: review-driven-software-factories
 created: 2026-07-25
-updated: 2026-08-14
+updated: 2026-08-15
 confidence: medium
 # prettier-ignore
-provenance: [{"source_item_id":"dev-20260724-01","url":"https://github.com/humanlayer/advanced-context-engineering-for-coding-agents/blob/main/wsff.md"},{"source_item_id":"19fd6c96b2d39a67-11","url":"https://github.blog/ai-and-ml/github-copilot/automating-cross-repo-documentation-with-github-agentic-workflows/?utm_source=tldrdev"},{"source_item_id":"19ffad638bac0403-02","url":"https://blog.cloudflare.com/astro-issue-triage/?utm_source=tldrdev"}]
+provenance: [{"source_item_id":"dev-20260724-01","url":"https://github.com/humanlayer/advanced-context-engineering-for-coding-agents/blob/main/wsff.md"},{"source_item_id":"19fd6c96b2d39a67-11","url":"https://github.blog/ai-and-ml/github-copilot/automating-cross-repo-documentation-with-github-agentic-workflows/?utm_source=tldrdev"},{"source_item_id":"19ffad638bac0403-02","url":"https://blog.cloudflare.com/astro-issue-triage/?utm_source=tldrdev"},{"source_item_id":"19ffffe9eeaeab99-06","url":"https://github.com/vercel-labs/eve-software-factory-template?utm_source=tldrnewsletter"}]
 ---
 
 # Review-Driven Software Factories
@@ -106,6 +106,46 @@ insufficient tests. Fixing those boundaries improved the next agent run and the
 codebase for human contributors too. That is a stronger feedback loop than
 merely retrying the same prompt.
 
+## Foreman as a Ready-Made Assembly Line
+
+Vercel Labs' Foreman template packages a similar review-driven loop as a
+deployable `eve` software factory. It moves GitHub or Linear work through four
+stations:
+
+1. A Classifier decides task type, priority, complexity, and whether the request
+   is actionable.
+2. An Analyst works from a live checkout and produces a plan with acceptance
+   criteria.
+3. An Implementer executes in its own sandbox, runs repository checks, and
+   pushes a branch.
+4. A Reviewer judges the pushed branch against the real diff and attaches
+   evidence to its verdict.
+
+Each station has its own instructions, sandbox, and tools. The Reviewer sees the
+branch rather than the Implementer's hidden reasoning, making the diff and test
+evidence the handoff boundary. A shared “factory brain” supplies repository
+notes at the start of later runs without collapsing the four roles into one
+context.
+
+Work can arrive through a `factory` issue label, an authorized GitHub mention,
+a Linear Agent Session, or a local development TUI. The ordinary output is a
+reviewed draft pull request; people still decide when it is ready and whether to
+merge. Red CI on factory-owned branches can trigger another bounded diagnosis
+and fix, while an ordinary pull request receives only an orienting summary.
+
+The published setup is intentionally Vercel-centric. Its deploy flow configures
+GitHub and Linear connectors plus Vercel Blob state, then asks for the target
+repository and issue label. Local development links to a Vercel project, pulls
+its environment, and runs the TUI; local runs are treated as untrusted, so
+GitHub changes wait for explicit approval.
+
+Foreman and Astro's Cloudflare workflow occupy different layers. Foreman is a
+ready-made task-to-draft-PR assembly line built on `eve`; Astro's deployed
+pipeline is a domain-specific issue-triage state machine, with Flue as the
+lower-level runtime extracted from it. The useful common pattern is not their
+hosting provider but their explicit stages, isolated execution, durable state,
+diff-based review, and retained human judgment.
+
 ## Source Notes
 
 ### [Why Software Factories Fail](https://github.com/humanlayer/advanced-context-engineering-for-coding-agents/blob/main/wsff.md)
@@ -140,6 +180,18 @@ Cloudflare's article describes Astro's real issue-triage pipeline, its
 label-and-comment state model, isolated skill stages, reporter verification,
 and the Flue framework extracted from that work. Its issue-count reduction is a
 first-party operational report, not an independently controlled comparison.
+
+### [Meet Foreman, an eve Software Factory](https://github.com/vercel-labs/eve-software-factory-template?utm_source=tldrnewsletter)
+
+<!-- source-item-id: 19ffffe9eeaeab99-06 -->
+
+TLDR, 2026-08-14.
+
+The MIT-licensed template and README define Foreman's four stations, isolated
+review boundary, trigger surfaces, factory memory, Vercel deployment path, and
+human approval behavior for local runs. The comparison with Astro and Flue is
+synthesis from the August 15 commute discussion and the two projects' published
+architecture; it is not a claim that either implementation embeds the other.
 
 ## Related
 

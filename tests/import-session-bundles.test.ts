@@ -113,7 +113,33 @@ test('recovers a malformed v1-shaped bundle from its named supplied queue', () =
   });
 });
 
-test('rejects a recovered bundle that declares an artifact claimed by a distinct session', () => {
+test('recovers an exact wiki capture when the period label contradicts the artifact time', () => {
+  const malformed = JSON.parse(validBundle) as {
+    session: Record<string, unknown>;
+    queue_snapshot: { queue: unknown };
+  };
+  const mismatchedPeriodFilename = '202607201304-morning-commute-session-bundle.txt';
+  malformed.session.artifact_filename = mismatchedPeriodFilename;
+
+  const result = reconcileSessionBundles([
+    {
+      filename: mismatchedPeriodFilename,
+      text: JSON.stringify(malformed),
+      recoveryQueue: {
+        filename: '20260720-tldr-dev.txt',
+        text: JSON.stringify(malformed.queue_snapshot.queue),
+      },
+    },
+  ]);
+
+  assert.equal(result.sessions[0]?.status, 'accepted');
+  assert.equal(result.sessions[0]?.integrity_state, 'recovered');
+  assert.equal(result.maintenance_candidates.length, 1);
+  assert.equal(result.maintenance_candidates[0]?.source_item_id, 'tldr-demo-001');
+  assert.match(result.sessions[0]?.recovery_warnings?.[0] ?? '', /from 1200 onward as morning/);
+});
+
+test('warns but recovers when a distinct session reuses an artifact filename', () => {
   const queue = (JSON.parse(validBundle) as { queue_snapshot: { queue: unknown } }).queue_snapshot
     .queue;
   const malformed = {
@@ -139,12 +165,12 @@ test('rejects a recovered bundle that declares an artifact claimed by a distinct
 
   assert.deepEqual(
     result.sessions.map((session) => session.status),
-    ['accepted', 'rejected']
+    ['accepted', 'accepted']
   );
-  assert.match(result.sessions[1]?.error ?? '', /Canonical artifact filename .* already declared/);
+  assert.match(result.sessions[1]?.recovery_warnings?.[0] ?? '', /also declared by session/);
 });
 
-test('rejects a recovered bundle whose downloaded filename conflicts with its declaration', () => {
+test('warns but recovers when the downloaded filename conflicts with its declaration', () => {
   const queue = (JSON.parse(validBundle) as { queue_snapshot: { queue: unknown } }).queue_snapshot
     .queue;
   const malformed = {
@@ -166,11 +192,16 @@ test('rejects a recovered bundle whose downloaded filename conflicts with its de
     },
   ]);
 
-  assert.equal(result.sessions[0]?.status, 'rejected');
-  assert.match(result.sessions[0]?.error ?? '', /Recovery bundle filename does not match/);
+  assert.equal(result.sessions[0]?.status, 'accepted');
+  assert.equal(result.maintenance_candidates.length, 1);
+  assert.ok(
+    result.sessions[0]?.recovery_warnings?.some((warning) =>
+      warning.includes('does not match declared artifact filename')
+    )
+  );
 });
 
-test('rejects a recovered bundle without a declared artifact when its filename is noncanonical', () => {
+test('warns but recovers without a declared artifact when its filename is noncanonical', () => {
   const queue = (JSON.parse(validBundle) as { queue_snapshot: { queue: unknown } }).queue_snapshot
     .queue;
   const malformed = {
@@ -191,11 +222,16 @@ test('rejects a recovered bundle without a declared artifact when its filename i
     },
   ]);
 
-  assert.equal(result.sessions[0]?.status, 'rejected');
-  assert.match(result.sessions[0]?.error ?? '', /artifact_filename must use YYYYMMDDHHmm/);
+  assert.equal(result.sessions[0]?.status, 'accepted');
+  assert.equal(result.maintenance_candidates.length, 1);
+  assert.ok(
+    result.sessions[0]?.recovery_warnings?.some((warning) =>
+      warning.includes('does not declare session.artifact_filename')
+    )
+  );
 });
 
-test('uses the canonical artifact name for a recovered fallback session identity', () => {
+test('uses bundle content for a recovered fallback session identity', () => {
   const queue = (JSON.parse(validBundle) as { queue_snapshot: { queue: unknown } }).queue_snapshot
     .queue;
   const malformed = {

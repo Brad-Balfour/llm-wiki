@@ -91,6 +91,12 @@ after that bundle's `--input`. The supplied queue must have exactly the filename
 the malformed bundle declares; local tools cannot read the private Project
 Library themselves.
 
+Bundle artifact filenames are not recovery identity. If an LLM emits a missing,
+noncanonical, contradictory, or differently downloaded bundle filename, local
+intake preserves that defect as a warning and continues when the supplied queue,
+item, and explicit wiki action remain exact. Strict bundle validation still
+reports the naming defect so generator quality does not become invisible.
+
 ```sh
 npm run import:commute-session-bundles -- \
   --input /path/to/malformed-bundle.txt \

@@ -57,6 +57,24 @@ queue snapshot rather than conversational claims.
 - **AND** it SHALL not silently downgrade the bundle to a trusted complete
   session.
 
+### Requirement: Fault-Tolerant Artifact Naming Recovery
+
+Supplied-queue recovery SHALL treat LLM-generated bundle filename metadata as
+diagnostic evidence rather than semantic session identity.
+
+#### Scenario: Recover despite malformed or contradictory artifact naming
+
+- **WHEN** a malformed bundle has a missing, noncanonical, contradictory, or
+  differently downloaded artifact filename
+- **AND** the supplied queue, exact item identity, and explicit user action are
+  otherwise unambiguous
+- **THEN** the importer SHALL recover the evidence-supported capture
+- **AND** it SHALL retain each filename defect as a warning in the private
+  normalized intake
+- **AND** strict bundle validation SHALL continue to report the generator defect
+- **AND** recovery SHALL hard-fail only when queue, item, action, or session
+  identity is ambiguous or substantively conflicting.
+
 ### Requirement: Direct Maintenance Nomination
 
 An exact `wiki this` capture SHALL enter the maintenance input set without a

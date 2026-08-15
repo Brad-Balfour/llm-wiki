@@ -2,11 +2,7 @@ import { createHash } from 'node:crypto';
 
 import { errorMessage } from '../shared/errors.js';
 import { optionalRecord, requireArray, requireRecord } from '../shared/validate.js';
-import {
-  canonicalBundleArtifactFilename,
-  queueSnapshotFingerprint,
-  validateTldrCommuteQueueV2,
-} from './session-bundle.js';
+import { queueSnapshotFingerprint, validateTldrCommuteQueueV2 } from './session-bundle.js';
 
 export interface SuppliedQueueRecoveryInput {
   bundleFilename: string;
@@ -29,7 +25,8 @@ export interface RecoveredContradictoryWikiCapture extends RecoveredWikiCapture 
 
 export interface RecoveredSessionBundle {
   sessionId: string;
-  artifactFilename: string;
+  declaredArtifactFilename?: string;
+  recoveryWarnings: string[];
   queueFilename: string;
   queueFingerprint: string;
   wikiCaptures: RecoveredWikiCapture[];
@@ -60,8 +57,8 @@ export function recoverSessionBundleWithSuppliedQueue(
   }
   const exactItems = items.map((item, index) => parseQueueItem(item, index));
   const events = requireArray(bundle.events, 'Recovery bundle events');
-  const artifactFilename = declaredArtifactFilename(bundle, input.bundleFilename);
-  const sessionId = declaredSessionId(bundle, artifactFilename);
+  const artifactEvidence = inspectArtifactFilenameEvidence(bundle, input.bundleFilename);
+  const sessionId = declaredSessionId(bundle, input.bundleText);
   const wikiCaptures: RecoveredWikiCapture[] = [];
   const contradictoryWikiCaptures: RecoveredContradictoryWikiCapture[] = [];
 
@@ -99,7 +96,10 @@ export function recoverSessionBundleWithSuppliedQueue(
 
   return {
     sessionId,
-    artifactFilename,
+    ...(artifactEvidence.declaredArtifactFilename === undefined
+      ? {}
+      : { declaredArtifactFilename: artifactEvidence.declaredArtifactFilename }),
+    recoveryWarnings: artifactEvidence.warnings,
     queueFilename: input.queueFilename,
     queueFingerprint: queueSnapshotFingerprint(queue),
     wikiCaptures,
@@ -139,21 +139,66 @@ function declaredQueueName(bundle: Record<string, unknown>): string {
   return filename;
 }
 
-function declaredSessionId(bundle: Record<string, unknown>, bundleFilename: string): string {
+function declaredSessionId(bundle: Record<string, unknown>, bundleText: string): string {
   const session = optionalRecord(bundle.session);
   const declared = session && lenientOptionalString(session.session_id);
   if (declared) return declared;
-  return `recovered-${createHash('sha256')
-    .update(canonicalBundleArtifactFilename(bundleFilename))
-    .digest('hex')
-    .slice(0, 16)}`;
+  return `recovered-${createHash('sha256').update(bundleText).digest('hex').slice(0, 16)}`;
 }
 
-function declaredArtifactFilename(bundle: Record<string, unknown>, inputFilename: string): string {
+function inspectArtifactFilenameEvidence(
+  bundle: Record<string, unknown>,
+  inputFilename: string
+): { declaredArtifactFilename?: string; warnings: string[] } {
   const session = optionalRecord(bundle.session);
-  return canonicalBundleArtifactFilename(
-    (session && lenientOptionalString(session.artifact_filename)) ?? inputFilename
-  );
+  const declaredArtifactFilename = session && lenientOptionalString(session.artifact_filename);
+  const warnings = artifactFilenameWarnings(inputFilename, 'Downloaded bundle filename');
+  if (declaredArtifactFilename === undefined) {
+    warnings.push('Malformed bundle does not declare session.artifact_filename.');
+  } else {
+    if (declaredArtifactFilename !== inputFilename) {
+      warnings.push(
+        ...artifactFilenameWarnings(declaredArtifactFilename, 'Declared artifact filename')
+      );
+    }
+    if (!recoveryArtifactFilenamesMatch(inputFilename, declaredArtifactFilename)) {
+      warnings.push(
+        `Downloaded bundle filename ${inputFilename} does not match declared artifact filename ${declaredArtifactFilename}.`
+      );
+    }
+  }
+  return {
+    ...(declaredArtifactFilename === undefined ? {} : { declaredArtifactFilename }),
+    warnings,
+  };
+}
+
+function artifactFilenameWarnings(filename: string, field: string): string[] {
+  const match =
+    /^(\d{8})(\d{2})(\d{2})-(morning|evening)-commute-session-bundle(?: \([1-9][0-9]*\))?\.txt$/.exec(
+      filename
+    );
+  if (!match) return [`${field} ${filename} is not in the canonical bundle filename shape.`];
+
+  const hour = Number(match[2]);
+  const minute = Number(match[3]);
+  if (hour > 23 || minute > 59) return [`${field} ${filename} does not contain a real local time.`];
+  const period = match[4];
+  if (period === 'morning' && hour >= 12) {
+    return [`${field} ${filename} labels a time from 1200 onward as morning.`];
+  }
+  if (period === 'evening' && hour < 12) {
+    return [`${field} ${filename} labels a time before 1200 as evening.`];
+  }
+  return [];
+}
+
+function recoveryArtifactFilenamesMatch(actual: string, declared: string): boolean {
+  return recoveryArtifactKey(actual) === recoveryArtifactKey(declared);
+}
+
+export function recoveryArtifactKey(filename: string): string {
+  return filename.replace(/ ?\([1-9][0-9]*\)\.txt$/, '.txt');
 }
 
 function parseQueueItem(candidate: unknown, index: number): ExactQueueItem {
