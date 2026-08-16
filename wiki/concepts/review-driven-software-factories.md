@@ -2,15 +2,15 @@
 type: concept
 title: 'Review-Driven Software Factories'
 # prettier-ignore
-aliases: ["Why Software Factories Fail","Human-in-the-loop software factories","Agentic documentation workflows","Foreman software factory"]
+aliases: ["Why Software Factories Fail","Human-in-the-loop software factories","Agentic documentation workflows","Foreman software factory","Hiring Agents Is the Easy Part"]
 # prettier-ignore
 tags: ["ai-agents","software-design","planning","code-review","context-management","documentation","workflow-automation"]
 wiki_slug: review-driven-software-factories
 created: 2026-07-25
-updated: 2026-08-15
+updated: 2026-08-16
 confidence: medium
 # prettier-ignore
-provenance: [{"source_item_id":"dev-20260724-01","url":"https://github.com/humanlayer/advanced-context-engineering-for-coding-agents/blob/main/wsff.md"},{"source_item_id":"19fd6c96b2d39a67-11","url":"https://github.blog/ai-and-ml/github-copilot/automating-cross-repo-documentation-with-github-agentic-workflows/?utm_source=tldrdev"},{"source_item_id":"19ffad638bac0403-02","url":"https://blog.cloudflare.com/astro-issue-triage/?utm_source=tldrdev"},{"source_item_id":"19ffffe9eeaeab99-06","url":"https://github.com/vercel-labs/eve-software-factory-template?utm_source=tldrnewsletter"}]
+provenance: [{"source_item_id":"dev-20260724-01","url":"https://github.com/humanlayer/advanced-context-engineering-for-coding-agents/blob/main/wsff.md"},{"source_item_id":"19fd6c96b2d39a67-11","url":"https://github.blog/ai-and-ml/github-copilot/automating-cross-repo-documentation-with-github-agentic-workflows/?utm_source=tldrdev"},{"source_item_id":"19ffad638bac0403-02","url":"https://blog.cloudflare.com/astro-issue-triage/?utm_source=tldrdev"},{"source_item_id":"19ffffe9eeaeab99-06","url":"https://github.com/vercel-labs/eve-software-factory-template?utm_source=tldrnewsletter"},{"source_item_id":"19ffb53bd896ad92-11","url":"https://x.com/AlanaDLevin/status/2087526319999303784"}]
 ---
 
 # Review-Driven Software Factories
@@ -146,6 +146,34 @@ lower-level runtime extracted from it. The useful common pattern is not their
 hosting provider but their explicit stages, isolated execution, durable state,
 diff-based review, and retained human judgment.
 
+## Agent Performance Management Beyond Software Review
+
+Alana Levin and Caleb Shack use an employee-management analogy to separate
+three parts of deploying agents:
+
+1. Screening tests whether an agent can perform a workflow; offline evaluations
+   already cover part of this boundary.
+2. Onboarding gives the agent organizational context, tool access, permissions,
+   and a place in existing work.
+3. Ongoing performance review judges whether completed work is actually good
+   and turns feedback into improvement.
+
+Their main interest is the third step. Completion is an inadequate quality
+signal when work must also be efficient, conform to tacit organizational
+standards, and remain safe under real permissions. The article raises open
+questions about who defines quality, whether feedback can compound within an
+agent rather than an external evaluation store, who owns company-specific
+feedback, when every company needs a custom evaluation layer, and where
+liability falls when an agent goes rogue.
+
+This is an organizational evaluation and governance thesis, not a
+software-development review method. The commute discussion found the employee
+lens distinctive but deliberately connected it to this page's existing review
+material: both make verification the constraint after raw capability becomes
+cheap. That relationship is synthesis. The source does not claim that employee
+performance practices validate code, nor does it report measured results from
+a software factory.
+
 ## Source Notes
 
 ### [Why Software Factories Fail](https://github.com/humanlayer/advanced-context-engineering-for-coding-agents/blob/main/wsff.md)
@@ -193,6 +221,18 @@ human approval behavior for local runs. The comparison with Astro and Flue is
 synthesis from the August 15 commute discussion and the two projects' published
 architecture; it is not a claim that either implementation embeds the other.
 
+### [Hiring Agents Is the Easy Part](https://x.com/AlanaDLevin/status/2087526319999303784)
+
+<!-- source-item-id: 19ffb53bd896ad92-11 -->
+
+TLDR AI, 2026-08-13.
+
+Alana Levin's Variant article, co-authored with Caleb Shack, frames agent
+deployment as screening, onboarding, and ongoing performance management. Its
+questions about tacit standards, evaluation ownership, permissions, and
+liability are an investor and operator thesis, not a validated implementation
+or a software-specific review study.
+
 ## Related
 
 - {% include wiki-related-link.md slug="ai-native-software-engineering" %}
@@ -201,3 +241,4 @@ architecture; it is not a claim that either implementation embeds the other.
 - {% include wiki-related-link.md slug="claude-code-subagents" %}
 - {% include wiki-related-link.md slug="deterministic-agent-workflows" %}
 - {% include wiki-related-link.md slug="wide-exploration-narrow-delivery" %}
+- {% include wiki-related-link.md slug="human-understanding-in-agentic-coding" %}
