@@ -213,3 +213,5 @@ this page's verification guidance.
 - {% include wiki-related-link.md slug="state-ownership-before-state-management" %}
 - {% include wiki-related-link.md slug="code-structure-agent-context-economics" %}
 - {% include wiki-related-link.md slug="agent-autonomy-boundaries" %}
+- {% include wiki-related-link.md slug="human-understanding-in-agentic-coding" %}
+- {% include wiki-related-link.md slug="llm-factual-recall" %}
