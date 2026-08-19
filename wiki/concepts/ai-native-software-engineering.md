@@ -2,15 +2,15 @@
 type: concept
 title: 'AI-Native Software Engineering'
 # prettier-ignore
-aliases: ["Control the ideas, not the code","Engineer away the slop","How building software is changing at Anthropic","AI-native fintech architecture","LLMs reward expertise","Agentic Code Quality"]
+aliases: ["Control the ideas, not the code","Engineer away the slop","How building software is changing at Anthropic","AI-native fintech architecture","LLMs reward expertise","Agentic Code Quality","How I use AI in 2026"]
 # prettier-ignore
 tags: ["ai-engineering","software-design","correctness","code-review","formal-verification","quality-gates","multi-agent-systems","fintech","compliance","auditability","domain-expertise","prompting","human-judgment","agentic-code","back-pressure"]
 wiki_slug: ai-native-software-engineering
 created: 2026-07-16
-updated: 2026-08-11
+updated: 2026-08-18
 confidence: high
 # prettier-ignore
-provenance: [{"source_item_id":"19f6057544b9bae7-06","url":"https://antirez.com/news/169"},{"source_item_id":"general-20260724-05","url":"https://ghuntley.com/slop/"},{"source_item_id":"19fadaee19e22a31-18","url":"https://newsletter.pragmaticengineer.com/p/inside-anthropic"},{"source_item_id":"19fb33942bb1cc3e-04","url":"https://hackernoon.com/what-fintech-founders-get-wrong-about-ai-native-development"},{"source_item_id":"19fcc720f38e999b-06","url":"https://www.seangoedecke.com/llms-reward-expertise/?utm_source=tldrnewsletter"},{"source_item_id":"19feb593f3d9a2d9-05","url":"https://addyo.substack.com/p/agentic-code-quality?utm_source=tldrnewsletter"}]
+provenance: [{"source_item_id":"19f6057544b9bae7-06","url":"https://antirez.com/news/169"},{"source_item_id":"general-20260724-05","url":"https://ghuntley.com/slop/"},{"source_item_id":"19fadaee19e22a31-18","url":"https://newsletter.pragmaticengineer.com/p/inside-anthropic"},{"source_item_id":"19fb33942bb1cc3e-04","url":"https://hackernoon.com/what-fintech-founders-get-wrong-about-ai-native-development"},{"source_item_id":"19fcc720f38e999b-06","url":"https://www.seangoedecke.com/llms-reward-expertise/?utm_source=tldrnewsletter"},{"source_item_id":"19feb593f3d9a2d9-05","url":"https://addyo.substack.com/p/agentic-code-quality?utm_source=tldrnewsletter"},{"source_item_id":"1a0148c07c36290e-11","url":"https://blog.sshh.io/p/how-i-use-ai-in-2026-coding-writing?utm_source=tldrnewsletter"}]
 ---
 
 # AI-Native Software Engineering
@@ -139,6 +139,36 @@ raise the value of judgment when the limiting factor is communicating which
 solution fits the actual system and recognizing whether the result satisfies
 that intent.
 
+## Shift the Work Into the Initial Specification
+
+Shrivu Shankar describes a personal research and prototyping workflow that
+front-loads a short concept, an interrogated technical plan, budget and hosting
+constraints, and a single build-and-verify instruction. Long unattended runs
+then produce most of the implementation. When the result is wrong, he discards
+it and strengthens the concept rather than steering a weak build through many
+small conversational corrections.
+
+The useful pattern is not a universal ban on intermediate review. It is a way
+to make the first agent run an evaluation of the specification itself:
+
+- state the thesis and important constraints before implementation;
+- make the agent expose ambiguities while the plan is still cheap to change;
+- ask for verification as part of the implementation goal;
+- inspect system shape, entry points, core algorithms, and output evidence; and
+- feed failures back into the durable concept or plan instead of relying on
+  conversational repair.
+
+The source also uses repeated project prompts as a practical model-evaluation
+corpus and generates interactive HTML explainers for unfamiliar algorithms or
+research. These are practitioner techniques, not controlled evidence that one
+large initial run outperforms decomposition for production systems.
+
+The boundary matters: the author's projects are often disposable experiments
+whose deliverable is an insight. Maintained software still needs ownership,
+incremental delivery, security review, migration planning, and consequential
+action gates. Front-loading intent can improve both cases, but cheap discard is
+not available at every production boundary.
+
 ## Source Notes
 
 ### [Control the ideas, not the code](https://antirez.com/news/169)
@@ -202,6 +232,18 @@ than a final code-review gate. The source adds the staged constraint model,
 multi-signal definition of quality, and low-damage failure requirement used in
 this page's verification guidance.
 
+### [How I use AI in 2026 (Coding, Writing, Learning, Assistant-ing)](https://blog.sshh.io/p/how-i-use-ai-in-2026-coding-writing?utm_source=tldrnewsletter)
+
+<!-- source-item-id: 1a0148c07c36290e-11 -->
+
+TLDR, 2026-08-18.
+
+Shrivu Shankar reports a personal workflow for concept-first long-running
+builds, HTML learning artifacts, and low-interruption background assistants.
+The account is valuable implementation evidence from one power user, but its
+disposable research-project context limits how broadly its unattended-build
+advice should be applied to maintained production software.
+
 ## Related
 
 - {% include wiki-related-link.md slug="deterministic-agent-workflows" %}
@@ -215,3 +257,4 @@ this page's verification guidance.
 - {% include wiki-related-link.md slug="agent-autonomy-boundaries" %}
 - {% include wiki-related-link.md slug="human-understanding-in-agentic-coding" %}
 - {% include wiki-related-link.md slug="llm-factual-recall" %}
+- {% include wiki-related-link.md slug="agentic-consumer-fintech-execution" %}

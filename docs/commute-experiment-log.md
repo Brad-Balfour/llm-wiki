@@ -751,6 +751,71 @@ repeated product-compliance failures, not missing user commands or classifier
 mistakes. No live Project instruction or source file changed, so no live Project
 synchronization is required.
 
+### August 17-18 Acceptance, Recovery, Feedback, And Maintenance Result
+
+All seven supplied August 17-18 queues passed the v2 validator. The five
+session bundles selected August 17 General, Dev, AI, and Fintech plus August 18
+General; each embedded snapshot semantically matched its separately supplied
+canonical queue. The General morning and General evening bundles passed strict
+validation. The other three failed independently:
+
+- Dev declared completed playback while retaining `resume_source_item_id`.
+- AI emitted consecutive `item_announced` events without the required
+  transition lifecycle.
+- Fintech likewise jumped from item one to item five without a valid transition.
+
+Supplied-queue recovery accepted all five sessions with two exact wiki
+maintenance candidates, 11 navigation events, two exact depth-feedback events,
+and no unresolved captures. The original artifacts and shared chats add quality
+evidence that malformed-bundle recovery deliberately omits: repeated fabricated
+or paraphrased queue summaries, summaries read during the opening sweep,
+unrelated Box and container-hosting substitutions, two failed export attempts,
+and a text-started preflight chat in which Live Voice was unavailable.
+
+The exact corrections promote _A quick look at zero-knowledge proofs_ and _Your
+CI should be disposable_ from `headline_only` to `in_depth`. The Dev observation
+that the one-word _Mole_ headline is uninformative is classifier/queue QA rather
+than an exact label because it does not change the item's interest or depth.
+Both exact corrections remain in private normalized evidence, but the
+append-only `classifier-feedback-label.v1` recorder cannot bind them: the queues
+stamp `commute-route-v2` while the committed contract requires
+`routing-rules.v1`. Rewriting that provenance would be false, so this repeats
+the known migration boundary rather than silently manufacturing labels.
+
+The supplied queues also contain exact day-level duplicates even where no
+session reached every queue. August 17 repeats the OpenRouter acquisition in AI
+and Fintech and the GLM-5.3 release in Dev and AI. August 18 repeats Anthropic's
+revenue story in General and AI, Cursor Origin hosting in General and Dev, and
+the Linear software-team dataset across General, Dev, and AI. Tracking
+parameters and newsletter-specific source IDs differ, reinforcing canonical
+destination identity while preserving every source record.
+
+The private conversation-coverage audit assigned dispositions to 30
+substantive entries. It retained two wiki saves, two exact feedback events, one
+classifier-QA observation, 15 quality/artifact events, the Fintech discussion
+context, and the unsaved Dev and General article discussions. Routine playback
+commands and social filler were explicitly excluded. No substantive entry was
+silently converted into a wiki save or left unresolved.
+
+Source-grounded maintenance created _Agentic Consumer Fintech Execution_. It
+separates Foundation Capital's investment thesis from the commute-derived
+critique that credential access is not a concrete scoped-authorization model,
+then preserves the approval-based recommendation and verified-handoff wedge
+without publishing private company context. _AI-Native Software Engineering_
+now records Shrivu Shankar's concept-first long-running build workflow, reusable
+project prompts, and HTML explainers while qualifying the technique as a
+practitioner account whose disposable-prototype context does not remove
+production ownership and review boundaries.
+
+Prompt Revision 3.3 already requires literal queue projection, a headline-only
+opening sweep, valid event lifecycle, and a visible downloadable export. The
+observed Voice and bundle defects are repeated noncompliance, not missing
+natural-language commands. Renaming the queue's `summary` field was retained as
+workflow feedback but not adopted: the current prompt already names literal
+field projection repeatedly, and a contract migration would not establish that
+Voice will follow the renamed field more reliably. No live Project instruction
+or listed source changed, so no live synchronization is required.
+
 ## What Worked
 
 - The weekday Task has produced real dated, parseable queues, including four

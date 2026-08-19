@@ -7,7 +7,7 @@ aliases: ["How much can you delegate to agents?","Reviewability and reversibilit
 tags: ["ai-agents","delegation","verification","reversibility","human-in-the-loop","risk-management"]
 wiki_slug: agent-autonomy-boundaries
 created: 2026-08-03
-updated: 2026-08-03
+updated: 2026-08-18
 confidence: high
 # prettier-ignore
 provenance: [{"source_item_id":"19fb2cd8ae0bed24-09","url":"https://newsletter.posthog.com/p/agent-autonomy?utm_source=tldrdev"}]
@@ -92,3 +92,4 @@ task fits cleanly into one cell.
 - {% include wiki-related-link.md slug="review-driven-software-factories" %}
 - {% include wiki-related-link.md slug="production-ai-agent-architecture" %}
 - {% include wiki-related-link.md slug="prompt-deployment-gates" %}
+- {% include wiki-related-link.md slug="agentic-consumer-fintech-execution" %}
