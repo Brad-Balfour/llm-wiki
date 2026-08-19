@@ -59,7 +59,7 @@ test('ChatGPT Project instructions require explicit classifier feedback', async 
   assert.match(prompt, /A summary request or\s+interrupted playback is not feedback/);
 });
 
-test('daily commute completion cannot omit live Project synchronization', async () => {
+test('daily commute completion cannot omit a required Project update', async () => {
   const [skill, agents] = await Promise.all([
     readFile('.codex/skills/process-daily-commute/SKILL.md', 'utf8'),
     readFile('AGENTS.md', 'utf8'),
@@ -67,7 +67,7 @@ test('daily commute completion cannot omit live Project synchronization', async 
 
   for (const instructions of [skill, agents]) {
     const normalized = instructions.replace(/\s+/g, ' ');
-    assert.match(normalized, /required live-sync action/);
+    assert.match(normalized, /say exactly which Project prompt or document needs to be updated/i);
     assert.match(normalized, /without waiting for Brad to (?:request|ask)/i);
     assert.match(normalized, /exact .*prompt in one copyable block/i);
     assert.match(normalized, /until Brad confirms/i);
