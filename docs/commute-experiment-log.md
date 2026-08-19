@@ -76,6 +76,7 @@ retrieve sources, and preserve history after the drive.
 
 ## Historical Timeline
 
+<!-- prettier-ignore -->
 | Date       | Revision / change                                                                              | What it attempted                                                                                                                                                                                                | What the evidence taught                                                                                                                                                                                                                                                                                                                                                                          |
 | ---------- | ---------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Jul. 12–14 | Legacy v1 prompt, live ledger, and `commute-handoff.v2`                                        | Keep one mutable ledger in the Project Library and reconstruct a handoff at the end.                                                                                                                             | The resulting files were partial, late-created, or inconsistent with claimed live writes. The ledger is not a reliable Voice-state mechanism.                                                                                                                                                                                                                                                     |
@@ -97,12 +98,12 @@ retrieve sources, and preserve history after the drive.
 | Jul. 31    | Morning catch-up, evening General/Dev, and source-grounded maintenance                         | Validate four queues, reconcile four downloaded exports, compare seven unique shared chats with their canonical queues, and process the two explicit saves.                                                      | All queues were valid, but only the two morning exports were individually strict-valid—and they represented one session under conflicting IDs. General retained an impossible completed/resume state; Dev's event lifecycle contradicted its queue and its spoken item eight was a foreign benchmark. Both saves remained recoverable.                                                            |
 | Aug. 4     | Catch-up queues, evening General/Dev, and GPT-Live recovery evidence                           | Validate six supplied queues, reconcile seven exports, compare queue grounding with the shared chats, and process the two genuine saves.                                                                         | Every supplied queue was valid, but only the evening General bundle was strict-valid. Voice skipped the required headline sweep, invented queue contents, lost URLs and reading modes, and repeatedly refused or falsely claimed export. Switching to text created downloads, but did not make their embedded snapshots or events valid.                                                          |
 | Aug. 5     | Per-advance grounding workaround with GPT-Live                                                 | Re-read the bound Project queue before each requested next position during General, Dev, and AI playback, then export after returning to text.                                                                   | Playback was smoother and the August 5 AI sequence stayed aligned with its six-item queue; Dev still mislabeled an in-depth item as headline-only. All three downloads existed, but none passed strict bundle validation. The workaround needs a longer-session test.                                                                                                                             |
-| Aug. 7     | Three-queue playback and recovered-bundle control                                              | Validate General, Dev, and AI queues and bundles, compare their retained events with the shared chats, and separate exact classifier feedback from presentation and duplicate signals.                           | All six artifacts passed local validation and all snapshots matched their canonical queues. Playback nevertheless omitted or paraphrased summaries for six in-depth item presentations. One depth promotion is exact evidence but cannot enter the label store while the queue's route-version stamp disagrees with the committed recorder contract.                                              |
+| Aug. 7     | Three-queue playback and recovered-bundle control                                              | Validate General, Dev, and AI queues and bundles, compare their retained events with the shared chats, and separate exact classifier feedback from presentation and duplicate signals.                           | All six artifacts passed local validation and all snapshots matched their canonical queues. Intake retained one exact depth promotion. The separate calibration file did not accept it because the Project queue used an unrecognized route-version value.                                                                         |
 | Aug. 10    | Four-queue commute, fragmented-Voice recovery, and source-access audit                         | Validate all four daily queues, reconcile four recovered exports with nine shared chats, retain the explicit wiki save and preference signal, and distinguish website failures from product safety denials.      | All queues were valid, but every downloaded bundle violated the lifecycle contract. Evidence-backed local repair accepted all four sessions with no unresolved captures. Switching to Siri, dictation, or calls repeatedly started new chats; ordinary public text pages were denied at the browsing safety layer even though host-side deterministic retrieval succeeded.                        |
 | Aug. 11    | Three-queue playback, literal-summary feedback, and back-navigation audit                      | Validate General, Dev, and AI queues and bundles, compare three shared chats, retain presentation and duplicate signals, and test a deliberate item-seven-to-item-six return.                                    | All queues matched their embedded snapshots. Dev was strict-valid; General retained an illegal completed-session resume cursor; and AI exposed that the contract cannot represent deliberate previous-item navigation. Recovered intake accepted all three sessions with no wiki save, classifier label, or unresolved capture.                                                                   |
 | Aug. 12    | Three-queue playback, on-demand summary audit, and decision-roadmap save                       | Validate General, Dev, and AI queues and bundles, reconcile a retrospective feedback lifecycle error, preserve the roadmap discussion, and separate navigation, classifier, duplicate, and playback evidence.    | All queues and snapshots matched. General and AI were strict-valid; Dev required bounded normalization because feedback about item six arrived after item seven was current. Intake accepted all three sessions with one wiki save, one exact depth correction, seven incidents, seven general captures, and no unresolved capture.                                                               |
-| Aug. 13-14 | General, Dev, and Fintech grounding audit plus two software-factory saves                      | Validate three queues and recovered exports, compare literal playback with three shared chats, retain an exact Dev depth correction, and maintain the two saved software-factory sources.                        | All snapshots matched, but only General was strict-valid. Dev omitted required navigation transitions, Fintech retained an impossible resume cursor, and the chats showed extensive foreign or paraphrased playback. Supplied-queue recovery retained both Dev saves; the label recorder exposed the continuing route-version migration boundary.                                                 |
-| Aug. 15    | Fault-tolerant naming recovery and three source-grounded maintenance captures                  | Validate two queues and malformed bundles, compare three shared chats, preserve three exact depth corrections, recover three wiki saves, and make LLM-generated artifact naming diagnostic rather than identity. | Both snapshots matched, but neither bundle was strict-valid. AI misordered an item-eight save after item nine became current; General labeled a 13:04 export as morning. Recovery retained all three exact saves and one naming warning. Five recorded incidents plus the chats showed repeated non-literal summaries; all three classifier labels remain blocked by route-version mismatch.      |
+| Aug. 13-14 | General, Dev, and Fintech grounding audit plus two software-factory saves                      | Validate three queues and recovered exports, compare literal playback with three shared chats, retain an exact Dev depth correction, and maintain the two saved software-factory sources.                        | All snapshots matched, but only General was strict-valid. Dev omitted required navigation transitions, Fintech retained an impossible resume cursor, and the chats showed extensive foreign or paraphrased playback. Recovery retained both Dev saves and the exact correction. The label file separately exposed noncanonical Project queue metadata.                                          |
+| Aug. 15    | Fault-tolerant naming recovery and three source-grounded maintenance captures                  | Validate two queues and malformed bundles, compare three shared chats, preserve three exact depth corrections, recover three wiki saves, and make LLM-generated artifact naming diagnostic rather than identity. | Both snapshots matched, but neither bundle was strict-valid. AI misordered a save; General mislabeled an afternoon export as morning. Recovery retained all three saves and corrections. The label file did not accept the corrections because the Project queues used noncanonical metadata.                                                                                              |
 | Aug. 16    | Two recovered catch-up sessions and three discussion-enriched wiki saves                       | Validate the August 14 Dev and August 13 AI queues, reconcile two malformed noon exports with three chats, preserve three exact saves and their discussion, and audit every substantive user turn.               | Both snapshots matched, but both bundles labeled post-noon exports as morning; Dev also retained an illegal resume cursor after completed playback. Recovery preserved three exact saves. The chats added a Voice/context interruption, headline-sweep violation, false verbatim claim, wrong reading mode, and failed first export. There were no classifier corrections or unresolved captures. |
 
 ### July 24 Bundle Acceptance Result
@@ -374,11 +375,12 @@ The intake retained two item actions, six explicit playback-quality incidents,
 and four general captures. The strongest exact classifier correction is Dev's
 _Building Progressively Enhanced Forms Using HTMX_: Brad promoted it from the
 canonical `maybe` / `headline_only` classification to `in_depth`. Its original
-depth score was 0.45. The evidence is exact, but the queue stamps
-`commute-route-v2` while the committed append-only recorder accepts
-`routing-rules.v1`; silently replacing that provenance would make the label
-look more trustworthy than its source. Retain it as a verified correction
-candidate until the version-binding work in #66 provides an explicit migration.
+depth score was 0.45. The evidence is exact and is retained in the intake and
+this tracked log. The label-writing command did not add it to the classifier
+label file because the Project queue uses the unrecognized value
+`commute-route-v2`; that command accepts `routing-rules.v1`. This metadata error
+is not a schema migration and does not make the correction less valid. Issue #66
+tracks the problem.
 The AI item-one `skip` is a synonym for moving to the next item, not an
 unambiguous interest or depth correction, so it belongs with navigation rather
 than classifier feedback.
@@ -527,9 +529,10 @@ import incorrectly counted two ordinary `skip` actions as classifier feedback;
 the importer now preserves them in the navigation channel and a focused test
 guards their item binding, user words, and evidence. The genuine correction promoted _Roadmap decisions rather
 than dates_ from `headline_only` / `quick_read` to `in_depth` / `discuss`.
-Recording remains blocked because the queue stamps `commute-route-v2` while
-the append-only label contract accepts only `routing-rules.v1`; the private
-input and failed recorder result preserve that exact migration boundary.
+The intake and this tracked log retain the correction. The label-writing command
+did not add it to the classifier label file because the Project queue uses the
+unrecognized value `commute-route-v2`; that command accepts only
+`routing-rules.v1`. This metadata error does not invalidate or hide the feedback.
 
 Brad explicitly saved the roadmap article and asked the wiki text to include
 the discussion about decision milestones, cross-team dependencies, progress
@@ -593,10 +596,11 @@ The chats confirm the product impact:
 
 Dev also contains one exact depth correction for _HTML over WebSockets: real-time
 SPAs with barely any JavaScript_, from `headline_only` to `in_depth`. The queue,
-bundle, and shared chat agree on the item and Brad's words. As on August 12, the
-append-only recorder cannot store it because the queue declares
-`commute-route-v2` while the label contract requires `routing-rules.v1`; the
-private input and failed recorder result preserve that migration boundary.
+bundle, and shared chat agree on the item and Brad's words. The intake and this
+tracked log retain it. The label-writing command did not add it to the
+classifier label file because the Project queue uses the unrecognized value
+`commute-route-v2`; that command accepts `routing-rules.v1`. This metadata error
+does not suppress or invalidate the correction.
 There were no day-level duplicate or prior-awareness observations in these
 three sessions.
 
@@ -657,12 +661,13 @@ impact and recover evidence absent from the bundles:
   `headline_only` to `in_depth`. The first two are absent from the AI bundle;
   the General bundle retains the third.
 
-All three exact corrections were normalized privately and tested separately
-against their canonical queues. The append-only recorder rejected each because
-the queue stamps `commute-route-v2` while the committed label contract requires
-`routing-rules.v1`. Rewriting either version would falsify provenance, so the
-private inputs and three exact failures preserve the migration boundary. There
-were no unresolved captures and no day-level duplicate or prior-awareness
+All three exact corrections were normalized, tested separately against their
+canonical queues, retained in the intake, and recorded in this tracked log. The
+label-writing command did not add them to the classifier label file because the
+Project queues use the unrecognized value `commute-route-v2`; that command
+accepts `routing-rules.v1`. The command's error does not invalidate, suppress,
+or hide the corrections.
+There were no unresolved captures and no day-level duplicate or prior-awareness
 observations.
 
 Source-grounded maintenance added _Multiagent Systemic Risk_ from Anthropic's
@@ -750,6 +755,73 @@ correct reading mode, New York filename period, and actual download. These are
 repeated product-compliance failures, not missing user commands or classifier
 mistakes. No live Project instruction or source file changed, so no live Project
 synchronization is required.
+
+### August 17-18 Acceptance, Recovery, Feedback, And Maintenance Result
+
+All seven supplied August 17-18 queues passed the v2 validator. The five
+session bundles selected August 17 General, Dev, AI, and Fintech plus August 18
+General; each embedded snapshot semantically matched its separately supplied
+canonical queue. The General morning and General evening bundles passed strict
+validation. The other three failed independently:
+
+- Dev declared completed playback while retaining `resume_source_item_id`.
+- AI emitted consecutive `item_announced` events without the required
+  transition lifecycle.
+- Fintech likewise jumped from item one to item five without a valid transition.
+
+Supplied-queue recovery accepted all five sessions with two exact wiki
+maintenance candidates, 11 navigation events, two exact depth-feedback events,
+and no unresolved captures. The original artifacts and shared chats add quality
+evidence that malformed-bundle recovery deliberately omits: repeated fabricated
+or paraphrased queue summaries, summaries read during the opening sweep,
+unrelated Box and container-hosting substitutions, two failed export attempts,
+and a text-started preflight chat in which Live Voice was unavailable.
+
+The exact corrections promote _A quick look at zero-knowledge proofs_ and _Your
+CI should be disposable_ from `headline_only` to `in_depth`. The Dev observation
+that the one-word _Mole_ headline is uninformative is classifier/queue QA rather
+than an exact label because it does not change the item's interest or depth.
+Both exact corrections are retained in the normalized intake and recorded in
+this tracked log and issue #35. The command that writes
+`classifier-feedback-label.v1` records did not add them to the classifier label
+file because the Project queues use the unrecognized value `commute-route-v2`;
+that command accepts `routing-rules.v1`. This metadata error is not a schema
+migration and does not suppress the feedback. The daily process accepted and
+audited the corrections while keeping the queue metadata exactly as received.
+
+The supplied queues also contain exact day-level duplicates even where no
+session reached every queue. August 17 repeats the OpenRouter acquisition in AI
+and Fintech and the GLM-5.3 release in Dev and AI. August 18 repeats Anthropic's
+revenue story in General and AI, Cursor Origin hosting in General and Dev, and
+the Linear software-team dataset across General, Dev, and AI. Tracking
+parameters and newsletter-specific source IDs differ, reinforcing canonical
+destination identity while preserving every source record.
+
+The private conversation-coverage audit assigned dispositions to 30
+substantive entries. It retained two wiki saves, two exact feedback events, one
+classifier-QA observation, 15 quality/artifact events, the Fintech discussion
+context, and the unsaved Dev and General article discussions. Routine playback
+commands and social filler were explicitly excluded. No substantive entry was
+silently converted into a wiki save or left unresolved.
+
+Source-grounded maintenance created _Agentic Consumer Fintech Execution_. It
+separates Foundation Capital's investment thesis from the commute-derived
+critique that credential access is not a concrete scoped-authorization model,
+then preserves the approval-based recommendation and verified-handoff wedge
+without publishing private company context. _AI-Native Software Engineering_
+now records Shrivu Shankar's concept-first long-running build workflow, reusable
+project prompts, and HTML explainers while qualifying the technique as a
+practitioner account whose disposable-prototype context does not remove
+production ownership and review boundaries.
+
+Prompt Revision 3.3 already requires literal queue projection, a headline-only
+opening sweep, valid event lifecycle, and a visible downloadable export. The
+observed Voice and bundle defects are repeated noncompliance, not missing
+natural-language commands. Renaming the queue's `summary` field was retained as
+workflow feedback but not adopted: the current prompt already names literal
+field projection repeatedly, and a contract migration would not establish that
+Voice will follow the renamed field more reliably. No live Project instruction
+or listed source changed, so no live synchronization is required.
 
 ## What Worked
 

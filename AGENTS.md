@@ -89,6 +89,11 @@ the task introduces that surface.
 
 ## Implementation rules
 
+- Use plain, direct language in user-facing updates and durable documentation.
+  Name the actual file, check, program, or action. Avoid abstract shorthand such
+  as “live-sync action,” “migration boundary,” or “downstream store” when a
+  simple sentence can say exactly what happened and what, if anything, needs to
+  be done.
 - Keep raw credentials, API keys, `.env` contents, raw Gmail bodies, and private
   work material out of Git.
 - Preserve stable source identifiers and article URLs in wiki provenance.
@@ -134,10 +139,10 @@ For every daily commute intake:
    same omission or mistake could recur, add the smallest durable instruction,
    test, or automation guard that makes the next daily pass simpler and safer.
 6. Compare the diff with the live Project instructions and source list in
-   `chatgpt-project/README.md`. If a live prompt or Project source changed, the
-   daily loop has a required live-sync action. Without waiting for Brad to ask,
-   provide the exact prompt in one copyable block or name every exact source file
-   and destination. Keep that action explicitly unresolved until Brad confirms
+   `chatgpt-project/README.md`. If a live prompt or Project source changed, say
+   exactly which Project prompt or document needs to be updated. Without waiting
+   for Brad to ask, provide the exact prompt in one copyable block or name every
+   exact source file and destination. Keep the update open until Brad confirms
    it was applied, then update the tracked live-version record. Do not make Brad
    infer or remember an external deployment step from a repository diff or PR.
 7. Run the relevant local validation, commit the tracked daily evidence, push
@@ -146,10 +151,10 @@ For every daily commute intake:
    checks and report their state.
 8. Cross-link the PR and issue comments, then finish with the remote branch,
    commit, PR URL, validation result, issue updates, and any genuinely
-   unresolved evidence or next action. Never call the loop complete while a
-   required live-sync action is unconfirmed. Keep that action visible before
-   merge, but do not change the PR's draft/ready state because of it; ready for
-   review is compatible with pending live synchronization.
+   unresolved evidence or next action. Never call the loop complete while the
+   Project's prompt or documents still need to be updated. Keep the needed
+   update visible before merge, but do not change the PR's draft/ready state
+   because of it; ready for review is compatible with a pending Project update.
 
 If the day produces no justified tracked change, report an explicit no-change
 result with the validation and issue-routing evidence; do not manufacture a PR
