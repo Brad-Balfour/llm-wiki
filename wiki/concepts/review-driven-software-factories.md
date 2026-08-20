@@ -10,7 +10,7 @@ created: 2026-07-25
 updated: 2026-08-19
 confidence: medium
 # prettier-ignore
-provenance: [{"source_item_id":"dev-20260724-01","url":"https://github.com/humanlayer/advanced-context-engineering-for-coding-agents/blob/main/wsff.md"},{"source_item_id":"19fd6c96b2d39a67-11","url":"https://github.blog/ai-and-ml/github-copilot/automating-cross-repo-documentation-with-github-agentic-workflows/?utm_source=tldrdev"},{"source_item_id":"19ffad638bac0403-02","url":"https://blog.cloudflare.com/astro-issue-triage/?utm_source=tldrdev"},{"source_item_id":"19ffffe9eeaeab99-06","url":"https://github.com/vercel-labs/eve-software-factory-template?utm_source=tldrnewsletter"},{"source_item_id":"19ffb53bd896ad92-11","url":"https://x.com/AlanaDLevin/status/2087526319999303784"},{"source_item_id":"1a01a57197aa438b-18","url":"https://techcrunch.com/2026/08/18/warps-new-system-is-an-out-of-the-box-software-factory-for-ai-development/?utm_source=tldrai"}]
+provenance: [{"source_item_id":"dev-20260724-01","url":"https://github.com/humanlayer/advanced-context-engineering-for-coding-agents/blob/main/wsff.md"},{"source_item_id":"19fd6c96b2d39a67-11","url":"https://github.blog/ai-and-ml/github-copilot/automating-cross-repo-documentation-with-github-agentic-workflows/?utm_source=tldrdev"},{"source_item_id":"19ffad638bac0403-02","url":"https://blog.cloudflare.com/astro-issue-triage/?utm_source=tldrdev"},{"source_item_id":"19ffffe9eeaeab99-06","url":"https://github.com/vercel-labs/eve-software-factory-template?utm_source=tldrnewsletter"},{"source_item_id":"19ffb53bd896ad92-11","url":"https://x.com/AlanaDLevin/status/2087526319999303784"},{"source_item_id":"1a01a57197aa438b-18","url":"https://techcrunch.com/2026/08/18/warps-new-system-is-an-out-of-the-box-software-factory-for-ai-development/?utm_source=tldrai"},{"source_item_id":"url_adf03cc09f382e8e","url":"https://www.warp.dev/factories/request-access"},{"source_item_id":"url_79e1f7b5ba46a169","url":"https://docs.warp.dev/factories/"},{"source_item_id":"url_80300d7978de226c","url":"https://docs.warp.dev/factories/infrastructure-and-security/"}]
 ---
 
 # Review-Driven Software Factories
@@ -276,6 +276,29 @@ model and harness choice, performance tracking, and retained human role. Warp's
 own product page and documentation corroborate the deployment, orchestration,
 memory, audit, and control-plane capabilities. The launch coverage and vendor
 materials establish product shape, not comparative reliability.
+
+### [Warp Factories](https://www.warp.dev/factories/request-access)
+
+<!-- source-item-id: url_adf03cc09f382e8e -->
+
+Warp's product page describes the factory workflow, evaluation loop, and memory
+capabilities. It is first-party product evidence, not an independent reliability
+assessment.
+
+### [Warp Factories documentation](https://docs.warp.dev/factories/)
+
+<!-- source-item-id: url_79e1f7b5ba46a169 -->
+
+Warp's documentation describes deployed factory instances, orchestration,
+integrations, dashboards, costs, benchmarks, and self-improvement mechanisms.
+
+### [Warp Factories infrastructure and security](https://docs.warp.dev/factories/infrastructure-and-security/)
+
+<!-- source-item-id: url_80300d7978de226c -->
+
+Warp's infrastructure documentation distinguishes its control and execution
+planes and describes coordination, identity, configuration, observability,
+storage, inference routing, runners, and deployment choices.
 
 ## Related
 

@@ -17,12 +17,16 @@ attachments as a retrieval task, not a reason to ask him to download and attach
 the artifacts. Use the signed-in ChatGPT web Library before requesting files:
 
 1. Resolve relative dates in `America/New_York` and form `YYYYMMDD`.
-2. Open the `LLM-Wiki-Car` folder in ChatGPT Library and inventory every file
-   whose artifact filename matches
-   `YYYYMMDDHHmm-(morning|evening)-commute-session-bundle.txt`, including a
-   Library duplicate suffix such as ` (1)`. Use the filename date as session
-   identity; the visible Modified value is only a discovery and freshness
-   signal.
+2. Open the `LLM-Wiki-Car` folder in ChatGPT Library. Bound discovery from the
+   last successfully recorded commute intake through the requested time, then
+   inventory both canonical files matching
+   `YYYYMMDDHHmm-(morning|evening)-commute-session-bundle.txt` and plausible
+   bundle rows whose displayed name is missing, noncanonical, contradictory, or
+   Library-suffixed. Use the displayed Modified value, nearby dated rows, and
+   inspection-only preview to discover plausible exports; do not treat any
+   filename as semantic session identity before validation. Record every
+   displayed filename exactly, including a Library duplicate suffix such as
+   ` (1)`.
 3. Retrieve every matching bundle with the Library row's original `Download`
    action. Do not use copied or scraped preview text as the artifact: the
    rendered preview can remove JSON escape characters while the original file
@@ -35,10 +39,13 @@ the artifacts. Use the signed-in ChatGPT web Library before requesting files:
    canonical queue from the main ChatGPT Library. Deduplicate repeated queue
    names after retrieval. Do not infer the queue from the bundle's period,
    timestamp, topic, or nearby filenames. When a malformed bundle cannot expose
-   its declared queue name, inventory exact dated queue candidates
-   (`YYYYMMDD-tldr.txt`, `YYYYMMDD-tldr-dev.txt`,
-   `YYYYMMDD-tldr-ai.txt`, and `YYYYMMDD-tldr-fintech.txt`) but keep the mapping
-   unresolved until validation or bounded conversation evidence establishes it.
+   its declared queue name, search the main Library's bounded intake inventory
+   and any source dates established by bounded session evidence. Inventory the
+   exact dated candidates (`YYYYMMDD-tldr.txt`, `YYYYMMDD-tldr-dev.txt`,
+   `YYYYMMDD-tldr-ai.txt`, and `YYYYMMDD-tldr-fintech.txt`) for every relevant
+   source date; do not limit fallback discovery to the requested or export date.
+   Keep the mapping unresolved until validation or bounded conversation evidence
+   establishes it.
 5. Retrieve each exact queue with its Library row's original `Download` action
    as well; the same preview-text restriction applies.
 6. Store the retrieved artifacts with the normalized private intake under
@@ -115,20 +122,23 @@ only when the intended action or target genuinely cannot be determined.
 1. Before treating repository edits as the whole deliverable, compare the diff
    with the live Project instructions and source list in
    `chatgpt-project/README.md`. Any changed live prompt or Project source creates
-   a required live-sync action; never leave Brad to infer it from the diff.
-2. When a live-sync action exists, immediately provide the exact merged or
-   review-ready prompt in one copyable block, or list the exact source files and
-   destination. Say exactly which Project prompt or document needs to be
-   updated. Do this without waiting for Brad to request it. Repository and
-   GitHub writes do not authorize changing the live Project UI, so keep the
-   action explicitly unresolved until Brad confirms it was applied. Then update
-   the repository's live-version record in the active PR or a focused follow-up.
+   a required ChatGPT Project prompt replacement or named source-document
+   upload; never leave Brad to infer it from the diff.
+2. When that ChatGPT Project update is required, immediately provide the exact
+   merged or review-ready prompt in one copyable block, or list every exact
+   source file and its Project destination. Say exactly which Project prompt or
+   document needs to be updated. Do this without waiting for Brad to request it.
+   Repository and GitHub writes do not authorize changing the live Project UI,
+   so keep the required prompt replacement or source-document upload explicitly
+   unresolved until Brad confirms it was applied. Then update the repository's
+   live-version record in the active PR or a focused follow-up.
 3. Run focused tests while iterating, then run `npm run check`, strict validation
    for every touched OpenSpec change, and `git diff --check`.
 4. Commit only the intended tracked files, push the branch to `origin`, and open
    or update the draft PR required by the repository's `AGENTS.md`. Never stop
    at a local commit; use the PR body or checklist for unfinished review, CI, or
-   live-sync state without changing the repository-authorized draft state.
+   a concrete Project prompt replacement or source-document upload without
+   changing the repository-authorized draft state.
 5. Keep the PR body current with user impact, root cause, evidence counts,
    validation, and the latest head commit. Cross-link relevant issues.
 6. Inspect all review threads. Fix actionable comments, reply with the commit and
@@ -177,12 +187,13 @@ counts, Library retrieval results, and any genuinely unresolved item. Explicitly
 report conversation coverage: substantive entries audited, wiki saves reflected
 with discussion context, classifier/quality annotations retained, workflow
 observations routed, issue comment URLs, and any excluded entries with reasons. Do not call the daily
-loop complete while a required live-sync action is unconfirmed. Keep the action
-visible as a pre-merge checklist item, but do not change the PR's draft/ready
-state because of it; ready for review is compatible with pending live
-synchronization. For every changed live prompt, return the exact file contents
-in one copyable block before handoff; never reconstruct them from memory and
-never make Brad remember to ask.
+loop complete while a required ChatGPT Project prompt replacement or named
+source-document upload is unconfirmed. Keep that concrete update visible as a
+pre-merge checklist item, but do not change the PR's draft/ready
+state because of it; ready for review is compatible with pending confirmation
+of that concrete update. For every changed live prompt, return the exact file
+contents in one copyable block before handoff; never reconstruct them from
+memory and never make Brad remember to ask.
 When a PR exists, make its clickable URL the final content in every completion
 handoff. Render it as a level-one Markdown heading with a bold linked label so it
 is large and cannot be buried; place no text, list item, or footer after it.
