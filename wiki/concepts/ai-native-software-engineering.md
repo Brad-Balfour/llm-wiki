@@ -2,15 +2,15 @@
 type: concept
 title: 'AI-Native Software Engineering'
 # prettier-ignore
-aliases: ["Control the ideas, not the code","Engineer away the slop","How building software is changing at Anthropic","AI-native fintech architecture","LLMs reward expertise","Agentic Code Quality","How I use AI in 2026"]
+aliases: ["Control the ideas, not the code","Engineer away the slop","How building software is changing at Anthropic","AI-native fintech architecture","LLMs reward expertise","Agentic Code Quality","How I use AI in 2026","How teams build"]
 # prettier-ignore
 tags: ["ai-engineering","software-design","correctness","code-review","formal-verification","quality-gates","multi-agent-systems","fintech","compliance","auditability","domain-expertise","prompting","human-judgment","agentic-code","back-pressure"]
 wiki_slug: ai-native-software-engineering
 created: 2026-07-16
-updated: 2026-08-18
+updated: 2026-08-19
 confidence: high
 # prettier-ignore
-provenance: [{"source_item_id":"19f6057544b9bae7-06","url":"https://antirez.com/news/169"},{"source_item_id":"general-20260724-05","url":"https://ghuntley.com/slop/"},{"source_item_id":"19fadaee19e22a31-18","url":"https://newsletter.pragmaticengineer.com/p/inside-anthropic"},{"source_item_id":"19fb33942bb1cc3e-04","url":"https://hackernoon.com/what-fintech-founders-get-wrong-about-ai-native-development"},{"source_item_id":"19fcc720f38e999b-06","url":"https://www.seangoedecke.com/llms-reward-expertise/?utm_source=tldrnewsletter"},{"source_item_id":"19feb593f3d9a2d9-05","url":"https://addyo.substack.com/p/agentic-code-quality?utm_source=tldrnewsletter"},{"source_item_id":"1a0148c07c36290e-11","url":"https://blog.sshh.io/p/how-i-use-ai-in-2026-coding-writing?utm_source=tldrnewsletter"}]
+provenance: [{"source_item_id":"19f6057544b9bae7-06","url":"https://antirez.com/news/169"},{"source_item_id":"general-20260724-05","url":"https://ghuntley.com/slop/"},{"source_item_id":"19fadaee19e22a31-18","url":"https://newsletter.pragmaticengineer.com/p/inside-anthropic"},{"source_item_id":"19fb33942bb1cc3e-04","url":"https://hackernoon.com/what-fintech-founders-get-wrong-about-ai-native-development"},{"source_item_id":"19fcc720f38e999b-06","url":"https://www.seangoedecke.com/llms-reward-expertise/?utm_source=tldrnewsletter"},{"source_item_id":"19feb593f3d9a2d9-05","url":"https://addyo.substack.com/p/agentic-code-quality?utm_source=tldrnewsletter"},{"source_item_id":"1a0148c07c36290e-11","url":"https://blog.sshh.io/p/how-i-use-ai-in-2026-coding-writing?utm_source=tldrnewsletter"},{"source_item_id":"1a014a54dae9b027-09","url":"https://linear.app/data?utm_source=tldrdev"}]
 ---
 
 # AI-Native Software Engineering
@@ -169,6 +169,39 @@ incremental delivery, security review, migration planning, and consequential
 action gates. Front-loading intent can improve both cases, but cheap discard is
 not available at every production boundary.
 
+## More Output Is Not Yet Less Work
+
+Linear's first _How teams build_ report offers a product-workflow view of AI
+adoption rather than another model-token or generated-code count. Across its
+own paid customer base, use of Linear's AI features more than doubled in every
+function from January to June 2026. Product users rose from 12% to 34%, while
+engineering rose from 12% to 30%. The source is explicit that activity outside
+Linear is invisible, so these figures describe adoption inside one product,
+not the whole software market.
+
+The output measures moved sharply too. Pull requests opened per paid workspace
+were 111% above the June 2024 baseline by June 2026. In a fixed cohort, teams
+that connected a coding agent rose from 21 to 65 pull requests per week, while
+teams without one moved from 8 to 10. This is correlation, not a causal
+comparison: agent-using teams were already higher-output before coding agents
+appeared, and an opened pull request does not establish useful business value.
+
+The more durable signal is how work is changing around that output:
+
+- agents and MCP clients were creating almost as many Linear issues as people
+  and conventional integrations by early August 2026;
+- the share of product managers attaching pull requests rose from 3% to 10%
+  over two years, and designers from 1% to 8%;
+- time spent creating, triaging, and commenting generally increased; and
+- time spent on planning inside Linear stayed roughly flat while AI chat and
+  delegated-agent work appeared as an additional layer.
+
+The data therefore supports a narrower conclusion than “AI saves engineering
+time.” Teams using coding agents are producing substantially more observable
+work, roles are becoming more permeable, and the coordination system is taking
+on more context. Whether that extra output is valuable still depends on product
+judgment, verification, and outcome measures outside the development tool.
+
 ## Source Notes
 
 ### [Control the ideas, not the code](https://antirez.com/news/169)
@@ -243,6 +276,18 @@ builds, HTML learning artifacts, and low-interruption background assistants.
 The account is valuable implementation evidence from one power user, but its
 disposable research-project context limits how broadly its unattended-build
 advice should be applied to maintained production software.
+
+### [How teams build](https://linear.app/data?utm_source=tldrdev)
+
+<!-- source-item-id: 1a014a54dae9b027-09 -->
+
+TLDR Dev, 2026-08-18.
+
+Linear analyzes activity inside its own product across adoption, coordination,
+and pull-request measures. The report supplies useful observational evidence
+about changing software-team behavior, but it cannot see work outside Linear,
+does not measure business value, and does not make the coding-agent and
+non-agent cohorts directly comparable.
 
 ## Related
 

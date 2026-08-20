@@ -7,7 +7,15 @@ import js from '@eslint/js';
 /** @type {import("eslint").Linter.Config[]} */
 export default [
   {
-    ignores: ['node_modules/', 'dist/', '*.min.js', 'build/', 'coverage/', 'test-results/'],
+    ignores: [
+      'node_modules/',
+      'dist/',
+      '*.min.js',
+      'build/',
+      'coverage/',
+      'test-results/',
+      'worktrees/',
+    ],
   },
   js.configs.recommended,
   {

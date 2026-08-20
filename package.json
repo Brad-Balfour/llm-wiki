@@ -11,7 +11,7 @@
   "packageManager": "npm@11.6.1",
   "scripts": {
     "ci:install": "npm ci --prefer-offline --no-audit --no-fund",
-    "build": "tsc -p tsconfig.json",
+    "build": "node scripts/clean-dist.mjs && tsc -p tsconfig.json",
     "ci:build": "npm run build",
     "compile": "npm run build",
     "validate:site": "npm run build --silent && node scripts/validate-jekyll.mjs",

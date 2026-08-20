@@ -2,15 +2,15 @@
 type: concept
 title: 'Review-Driven Software Factories'
 # prettier-ignore
-aliases: ["Why Software Factories Fail","Human-in-the-loop software factories","Agentic documentation workflows","Foreman software factory","Hiring Agents Is the Easy Part"]
+aliases: ["Why Software Factories Fail","Human-in-the-loop software factories","Agentic documentation workflows","Foreman software factory","Hiring Agents Is the Easy Part","Warp Factories"]
 # prettier-ignore
 tags: ["ai-agents","software-design","planning","code-review","context-management","documentation","workflow-automation"]
 wiki_slug: review-driven-software-factories
 created: 2026-07-25
-updated: 2026-08-16
+updated: 2026-08-19
 confidence: medium
 # prettier-ignore
-provenance: [{"source_item_id":"dev-20260724-01","url":"https://github.com/humanlayer/advanced-context-engineering-for-coding-agents/blob/main/wsff.md"},{"source_item_id":"19fd6c96b2d39a67-11","url":"https://github.blog/ai-and-ml/github-copilot/automating-cross-repo-documentation-with-github-agentic-workflows/?utm_source=tldrdev"},{"source_item_id":"19ffad638bac0403-02","url":"https://blog.cloudflare.com/astro-issue-triage/?utm_source=tldrdev"},{"source_item_id":"19ffffe9eeaeab99-06","url":"https://github.com/vercel-labs/eve-software-factory-template?utm_source=tldrnewsletter"},{"source_item_id":"19ffb53bd896ad92-11","url":"https://x.com/AlanaDLevin/status/2087526319999303784"}]
+provenance: [{"source_item_id":"dev-20260724-01","url":"https://github.com/humanlayer/advanced-context-engineering-for-coding-agents/blob/main/wsff.md"},{"source_item_id":"19fd6c96b2d39a67-11","url":"https://github.blog/ai-and-ml/github-copilot/automating-cross-repo-documentation-with-github-agentic-workflows/?utm_source=tldrdev"},{"source_item_id":"19ffad638bac0403-02","url":"https://blog.cloudflare.com/astro-issue-triage/?utm_source=tldrdev"},{"source_item_id":"19ffffe9eeaeab99-06","url":"https://github.com/vercel-labs/eve-software-factory-template?utm_source=tldrnewsletter"},{"source_item_id":"19ffb53bd896ad92-11","url":"https://x.com/AlanaDLevin/status/2087526319999303784"},{"source_item_id":"1a01a57197aa438b-18","url":"https://techcrunch.com/2026/08/18/warps-new-system-is-an-out-of-the-box-software-factory-for-ai-development/?utm_source=tldrai"},{"source_item_id":"url_adf03cc09f382e8e","url":"https://www.warp.dev/factories/request-access"},{"source_item_id":"url_79e1f7b5ba46a169","url":"https://docs.warp.dev/factories/"},{"source_item_id":"url_80300d7978de226c","url":"https://docs.warp.dev/factories/infrastructure-and-security/"}]
 ---
 
 # Review-Driven Software Factories
@@ -174,6 +174,38 @@ cheap. That relationship is synthesis. The source does not claim that employee
 performance practices validate code, nor does it report measured results from
 a software factory.
 
+## Factory Infrastructure as a Product
+
+Warp Factories packages the common infrastructure beneath a software factory
+instead of prescribing one fixed development agent. Its published workflow
+uses the familiar triage, specification, implementation, review, and
+verification stages, while allowing a team to decide which stages are
+automated. Work can enter from systems such as Linear, Jira, Slack, or Teams,
+and execution can use different coding models and harnesses, including Codex
+and Claude Code.
+
+The product claim is broader than task orchestration. Warp describes cloud or
+self-hosted execution, shared agent memory, cross-run evaluation, centralized
+visibility, token-spend measurement, audit trails, and self-improvement loops.
+Those capabilities turn the factory itself into an operated system: teams can
+compare configurations, inspect runs, and change the loop rather than managing
+each agent as an isolated coding session.
+
+This extends the patterns already visible in Foreman and Astro without making
+them interchangeable. Foreman is a concrete task-to-draft-PR template, and
+Astro's workflow is a domain-specific issue-triage state machine. Warp
+Factories is positioned as reusable infrastructure for teams that do not want
+to assemble the cloud execution, memory, evaluation, integration, and
+observability layers themselves. That comparison is synthesis from the three
+published systems, not a benchmark showing that one implementation is more
+reliable than another.
+
+The human boundary remains important. Warp's own account says its factory is
+not intended to eliminate software engineers, and its public materials stress
+visibility, auditability, and operator control. A packaged platform can reduce
+the infrastructure burden, but it does not remove the need to define success,
+constrain authority, verify artifacts, or decide when work is ready to ship.
+
 ## Source Notes
 
 ### [Why Software Factories Fail](https://github.com/humanlayer/advanced-context-engineering-for-coding-agents/blob/main/wsff.md)
@@ -232,6 +264,41 @@ deployment as screening, onboarding, and ongoing performance management. Its
 questions about tacit standards, evaluation ownership, permissions, and
 liability are an investor and operator thesis, not a validated implementation
 or a software-specific review study.
+
+### [Warp's new system is an out-of-the-box software factory for AI development](https://techcrunch.com/2026/08/18/warps-new-system-is-an-out-of-the-box-software-factory-for-ai-development/?utm_source=tldrai)
+
+<!-- source-item-id: 1a01a57197aa438b-18 -->
+
+TLDR AI, 2026-08-19.
+
+TechCrunch describes the launch, standard development stages, integrations,
+model and harness choice, performance tracking, and retained human role. Warp's
+own product page and documentation corroborate the deployment, orchestration,
+memory, audit, and control-plane capabilities. The launch coverage and vendor
+materials establish product shape, not comparative reliability.
+
+### [Warp Factories](https://www.warp.dev/factories/request-access)
+
+<!-- source-item-id: url_adf03cc09f382e8e -->
+
+Warp's product page describes the factory workflow, evaluation loop, and memory
+capabilities. It is first-party product evidence, not an independent reliability
+assessment.
+
+### [Warp Factories documentation](https://docs.warp.dev/factories/)
+
+<!-- source-item-id: url_79e1f7b5ba46a169 -->
+
+Warp's documentation describes deployed factory instances, orchestration,
+integrations, dashboards, costs, benchmarks, and self-improvement mechanisms.
+
+### [Warp Factories infrastructure and security](https://docs.warp.dev/factories/infrastructure-and-security/)
+
+<!-- source-item-id: url_80300d7978de226c -->
+
+Warp's infrastructure documentation distinguishes its control and execution
+planes and describes coordination, identity, configuration, observability,
+storage, inference routing, runners, and deployment choices.
 
 ## Related
 

@@ -823,6 +823,80 @@ field projection repeatedly, and a contract migration would not establish that
 Voice will follow the renamed field more reliably. No live Project instruction
 or listed source changed, so no live synchronization is required.
 
+### August 19 Acceptance, Recovery, Feedback, And Maintenance Result
+
+The processing boundary begins immediately after the August 17-18 result above.
+The next five ChatGPT Library bundle rows comprise two August 18 catch-up
+sessions exported early on August 19 and the three August 19 sessions. Their
+five exact original queues were retrieved directly from Library row downloads,
+and all pass the v2 validator. Each bundle names the correct queue and embeds a
+queue whose canonical fingerprint matches the separately downloaded original.
+
+Only `202608192122-evening-commute-session-bundle.txt` passes strict validation.
+The two morning bundles omit required transitions before an announcement, and
+the General and Dev evening bundles declare completed playback while retaining
+a resume cursor. Supplied-queue recovery accepted all five sessions with three
+wiki maintenance candidates, 15 navigation events, one `save_for_review`
+event, and two unresolved feedback captures. Seven quality incidents and seven
+general captures in the original bundles remain supplemental evidence because
+malformed recovery deliberately does not manufacture their lifecycle context.
+
+Four supplied shared chats were captured from `Prompt 1` through every
+reachable virtualized message and reconciled with the bundles. They cover the
+August 18 Dev session, all of August 19 General, a middle-to-end August 19 Dev
+segment, and a later August 19 AI segment. No shared URL was supplied for the
+August 18 AI catch-up session, but its original bundle and exact queue provide
+complete artifact coverage. The private ledger records the segment boundaries
+instead of treating a partial share as a complete transcript.
+
+The August 19 Dev session contains three exact depth corrections:
+
+- _The Case for Software Craftsmanship in the Era of Vibes_;
+- _Saggar_; and
+- _TermDOM_.
+
+All three were canonical `headline_only` items and were explicitly recorded as
+`promote_to_in_depth` actions. Their exact candidate records are retained
+privately, but the append-only label command again rejected the Project queue's
+`commute-route-v2` metadata because the stored-label contract accepts
+`routing-rules.v1`. The evidence remains valid and is routed to issues #35 and
+#66 without rewriting received provenance.
+
+The complaints about _Hunk_, Mojo, _fx_, and _Introducing Harvey II_ are kept as
+headline-informativeness and classifier-QA evidence. They say that an unknown
+one-word product name is useless as a headline-only presentation, but they are
+not silently converted into score-bearing corrections where the user did not
+specify a new interest/depth outcome. Duplicate and prior-awareness evidence is
+kept separately: the Linear dataset appeared across all three August 18
+newsletters; Mojo appeared in August 19 General and Dev; _Git at any scale_ and
+_Rethinking the Data Moat_ repeat across August 19 queues; and the paused OpenAI
+training story reappears through distinct sources. These signals route to #36,
+not classifier learning.
+
+Source-grounded wiki maintenance produced three outcomes. _AI-Native Software
+Engineering_ now uses Linear's own dataset to distinguish higher observable
+output and role permeability from proven time savings or business value.
+_Frontend Soak Testing_ records the Playwright repeated-flow technique and
+connects it explicitly to React lifecycle cleanup and layered testing.
+_Review-Driven Software Factories_ now places Warp Factories alongside Foreman
+and Astro while distinguishing reusable factory infrastructure from a concrete
+template or domain-specific state machine.
+
+The AI commute also retained two non-wiki requests. _A Policy Algebra for
+Trust-Preserving Agentic AI Execution_ is saved for work review and requested
+to resurface during ingestion. The discussion around Liquid AI's production
+agent loops is routed to the existing commute product issues, with the durable
+question framed as the gap between an explicit, externally verified programmed
+loop and the implicit loop exercised by ChatGPT Voice.
+
+Library retrieval exposed one local workflow hazard: rendered file previews can
+remove JSON escape characters from quoted titles even when the original file
+is valid. Original row-level downloads are therefore the evidence source;
+preview text is inspection-only. Prompt Revision 3.3 already covers the
+observed sweep, summary, identity, lifecycle, and export failures, so this run
+does not add another wording-only live prompt revision and requires no Project
+source synchronization.
+
 ## What Worked
 
 - The weekday Task has produced real dated, parseable queues, including four
