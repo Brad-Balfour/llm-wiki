@@ -150,11 +150,12 @@ only when the intended action or target genuinely cannot be determined.
 
 ## Post-merge artifact cleanup
 
-Cleanup of transient source artifacts is destructive. Perform it only when
-Brad's current request explicitly authorizes deletion or repository guidance
-records canonical standing authorization; this skill text alone is not
-authorization. Record the authorizing request in the private retrieval manifest.
-When authorized, cleanup may begin only after processing is durably complete:
+Cleanup of transient source artifacts is destructive. `AGENTS.md` records
+Brad's standing authorization for the exact queue and session-bundle artifacts
+consumed by durably completed commute runs; this skill text alone is not
+authorization. Record the applicable standing or current-request authorization
+in the private retrieval manifest. Cleanup may begin only after processing is
+durably complete:
 
 1. If the run has a PR, do not delete anything until that exact PR is merged.
    An open, draft, closed-unmerged, or checks-pending PR leaves cleanup pending.
@@ -177,6 +178,12 @@ When authorized, cleanup may begin only after processing is durably complete:
    append the exact targets, deletion time, and verification result to the
    private retrieval manifest. Report partial failures precisely and leave
    unmatched or ambiguous files untouched.
+
+When cleaning historical residue, build the allowlist from merged repository
+history plus preserved private intake. A matching date or artifact-shaped name
+alone is insufficient: require durable evidence that the exact queue or bundle
+was validated and consumed into a completed commute result. Apply the same
+preservation, exact-match, verification, and audit rules as the current run.
 
 Keep the original task and worktree responsible for post-merge cleanup because
 its gitignored private manifest does not follow a new isolated worktree. If
