@@ -150,8 +150,11 @@ only when the intended action or target genuinely cannot be determined.
 
 ## Post-merge artifact cleanup
 
-Brad has authorized cleanup of the transient source artifacts used by this
-workflow, but only after processing is durably complete:
+Cleanup of transient source artifacts is destructive. Perform it only when
+Brad's current request explicitly authorizes deletion or repository guidance
+records canonical standing authorization; this skill text alone is not
+authorization. Record the authorizing request in the private retrieval manifest.
+When authorized, cleanup may begin only after processing is durably complete:
 
 1. If the run has a PR, do not delete anything until that exact PR is merged.
    An open, draft, closed-unmerged, or checks-pending PR leaves cleanup pending.
@@ -175,10 +178,13 @@ workflow, but only after processing is durably complete:
    private retrieval manifest. Report partial failures precisely and leave
    unmatched or ambiguous files untouched.
 
-If Codex is not active when the PR later merges, cleanup cannot happen by
-itself. Report it as the one pending post-merge action; the next invocation of
-this skill should check the recorded PR state and perform the cleanup before
-starting a newer intake.
+Keep the original task and worktree responsible for post-merge cleanup because
+its gitignored private manifest does not follow a new isolated worktree. If
+Codex is not active when the PR later merges, report cleanup as pending and ask
+Brad to resume that task. If the original context is unavailable, do not delete
+from a guessed target list: re-inventory the Library and Downloads, re-establish
+exact filenames and content matches, and obtain any deletion authorization not
+already recorded before removing anything.
 
 ## Completion
 

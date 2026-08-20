@@ -116,7 +116,10 @@ When Brad supplies dated commute queues, session bundles, and shared-chat URLs
 with shorthand such as "today's commute," treat that as a request to complete
 the full daily evidence loop. This is a recurring operating workflow, not a
 one-off file inspection. The request authorizes the normal repository and
-GitHub writes needed to finish that loop.
+GitHub writes needed to finish that loop. It also authorizes read-only discovery
+and download of commute queue and session-bundle artifacts from Brad's signed-in
+ChatGPT Library for private local intake. It does not authorize changing or
+deleting Library content or unrelated private files.
 
 For every daily commute intake:
 

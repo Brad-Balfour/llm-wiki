@@ -92,7 +92,7 @@ is `morning`; 12:00 or later is `evening`.
 - **AND** it SHALL report export failure only if no uniquely matching validated
   queue can be recovered or no downloadable artifact can be created.
 
-#### Scenario: Local recovery uses a supplied matching queue
+#### Scenario: Local importer recovery uses a supplied matching queue
 
 - **WHEN** a downloaded bundle is malformed but names its selected queue file
   and Brad supplies that exact queue file to local intake
@@ -104,8 +104,20 @@ is `morning`; 12:00 or later is `evening`.
 - **AND** the recovered session SHALL be marked `recovered`
 - **AND** the importer SHALL reject a mismatched queue, an out-of-range position,
   or an event that was not explicitly marked as a wiki capture
-- **AND** local intake SHALL not access the private ChatGPT Project Library;
-  Brad supplies the queue download when this rare recovery is needed.
+- **AND** the local importer SHALL not access the private ChatGPT Project
+  Library; it receives the queue as a local input.
+
+#### Scenario: Authorized agent-mediated intake retrieves original artifacts
+
+- **WHEN** Brad invokes the full daily commute workflow with shorthand such as
+  "today's commute" or explicitly asks Codex to retrieve commute artifacts
+- **AND** Codex has access to Brad's signed-in ChatGPT Library session
+- **THEN** Codex MAY discover and download the relevant original queue and
+  session-bundle artifacts into private local intake
+- **AND** Library access SHALL remain read-only unless Brad separately
+  authorizes a specific mutation
+- **AND** the local importer SHALL still receive only local file inputs and
+  SHALL NOT authenticate to or access the private Library itself.
 
 ### Requirement: Exact Item Binding
 
