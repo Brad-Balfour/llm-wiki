@@ -30,6 +30,17 @@ test('legacy handoff and approved-source workflows stay retired', async () => {
     assert.equal(packageJson.scripts[script], undefined, `${script} must remain retired`);
   }
 
+  const buildScript = packageJson.scripts.build;
+  assert.ok(buildScript, 'build script must exist');
+  assert.match(
+    buildScript,
+    /clean-dist/,
+    'build must remove stale compiled tests before TypeScript emits current sources'
+  );
+
+  const eslintConfig = await readFile('eslint.config.mjs', 'utf8');
+  assert.match(eslintConfig, /['"]worktrees\//, 'lint must ignore local isolated worktrees');
+
   await Promise.all(
     retiredPaths.map(async (retiredPath) => {
       await assert.rejects(access(retiredPath), `${retiredPath} must remain absent`);

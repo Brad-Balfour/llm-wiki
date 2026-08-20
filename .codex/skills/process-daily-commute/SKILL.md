@@ -118,7 +118,8 @@ only when the intended action or target genuinely cannot be determined.
    a required live-sync action; never leave Brad to infer it from the diff.
 2. When a live-sync action exists, immediately provide the exact merged or
    review-ready prompt in one copyable block, or list the exact source files and
-   destination. Do this without waiting for Brad to request it. Repository and
+   destination. Say exactly which Project prompt or document needs to be
+   updated. Do this without waiting for Brad to request it. Repository and
    GitHub writes do not authorize changing the live Project UI, so keep the
    action explicitly unresolved until Brad confirms it was applied. Then update
    the repository's live-version record in the active PR or a focused follow-up.
