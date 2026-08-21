@@ -78,3 +78,22 @@ test('daily commute completion cannot omit a required Project update', async () 
 
   assert.doesNotMatch(skill, /If Brad requests the live Project prompt/);
 });
+
+test('daily commute cleanup covers both Library locations and Downloads', async () => {
+  const skill = await readFile('.codex/skills/process-daily-commute/SKILL.md', 'utf8');
+  const normalized = skill.replace(/\s+/g, ' ');
+
+  assert.match(normalized, /main ChatGPT Library, delete only the exact queue rows/i);
+  assert.match(
+    normalized,
+    /`LLM-Wiki-Car` Project Library folder, separately delete only the exact commute-session bundle rows/i
+  );
+  assert.match(
+    normalized,
+    /successful deletion in one location does not establish deletion of its matching copy in the other/i
+  );
+  assert.match(
+    normalized,
+    /Verify that every targeted queue row is absent from the main ChatGPT Library, every targeted bundle row is absent from the `LLM-Wiki-Car` Project Library folder, and every targeted Downloads file is absent/i
+  );
+});

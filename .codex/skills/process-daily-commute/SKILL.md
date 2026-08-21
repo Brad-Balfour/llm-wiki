@@ -150,19 +150,24 @@ only when the intended action or target genuinely cannot be determined.
 
 ## Post-merge artifact cleanup
 
-Cleanup of transient source artifacts is destructive. Perform it only when
-Brad's current request explicitly authorizes deletion or repository guidance
-records canonical standing authorization; this skill text alone is not
-authorization. Record the authorizing request in the private retrieval manifest.
-When authorized, cleanup may begin only after processing is durably complete:
+Cleanup of transient source artifacts is destructive. `AGENTS.md` records
+Brad's standing authorization for the exact queue and session-bundle artifacts
+consumed by durably completed commute runs; this skill text alone is not
+authorization. Record the applicable standing or current-request authorization
+in the private retrieval manifest. Cleanup may begin only after processing is
+durably complete:
 
 1. If the run has a PR, do not delete anything until that exact PR is merged.
    An open, draft, closed-unmerged, or checks-pending PR leaves cleanup pending.
    If the run has a justified no-change result and no PR, cleanup may begin only
    after the complete no-change handoff is recorded.
-2. Resolve cleanup targets from the private retrieval manifest. In ChatGPT
-   Library, delete only the exact queue rows and commute-session bundle rows
-   consumed by the completed run. Do not delete shared chats, Project source
+2. Resolve cleanup targets from the private retrieval manifest and inventory
+   each Library location independently. In the main ChatGPT Library, delete
+   only the exact queue rows consumed by the completed run. In the
+   `LLM-Wiki-Car` Project Library folder, separately delete only the exact
+   commute-session bundle rows consumed by that run. A successful deletion in
+   one location does not establish deletion of its matching copy in the other.
+   Do not delete the Project Library folder itself, shared chats, Project source
    documents, schemas, prompts, unrelated dated artifacts, or a plausible row
    that was not validated into the final intake.
 3. In `~/Downloads`, remove only the exact queue and bundle downloads created
@@ -173,10 +178,19 @@ When authorized, cleanup may begin only after processing is durably complete:
 4. Keep the normalized `.private/` intake, coverage ledger, and retrieval
    manifest as the durable audit and recovery record. Library and Downloads are
    transient copies; `.private/` is not part of this cleanup request.
-5. Verify that every targeted Library row and Downloads file is absent, then
-   append the exact targets, deletion time, and verification result to the
-   private retrieval manifest. Report partial failures precisely and leave
-   unmatched or ambiguous files untouched.
+5. Reopen and inventory both Library locations after deletion. Verify that
+   every targeted queue row is absent from the main ChatGPT Library, every
+   targeted bundle row is absent from the `LLM-Wiki-Car` Project Library
+   folder, and every targeted Downloads file is absent. Then append the exact
+   targets, deletion time, and per-location verification result to the private
+   retrieval manifest. Report partial failures precisely and leave unmatched
+   or ambiguous files untouched.
+
+When cleaning historical residue, build the allowlist from merged repository
+history plus preserved private intake. A matching date or artifact-shaped name
+alone is insufficient: require durable evidence that the exact queue or bundle
+was validated and consumed into a completed commute result. Apply the same
+preservation, exact-match, verification, and audit rules as the current run.
 
 Keep the original task and worktree responsible for post-merge cleanup because
 its gitignored private manifest does not follow a new isolated worktree. If
