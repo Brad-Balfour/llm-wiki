@@ -44,7 +44,43 @@ test('rejects a completed bundle whose revisit cursor contradicts the final anno
 
   assert.throws(
     () => parseCommuteSessionBundleText(JSON.stringify(bundle)),
-    /completed playback resume cursor must match the final announced item/
+    /completed playback resume cursor must match the final current item/
+  );
+});
+
+test('rejects a completed revisit cursor when no current item can be verified', () => {
+  const bundle = clone(validBundle);
+  bundle.events = [];
+  const playback = bundle.playback as Record<string, unknown>;
+  playback.status = 'completed';
+
+  assert.throws(
+    () => parseCommuteSessionBundleText(JSON.stringify(bundle)),
+    /completed playback resume cursor requires a final verified current item/
+  );
+});
+
+test('rejects a completed revisit cursor after a terminal transition clears the current item', () => {
+  const bundle = clone(validBundle);
+  const events = bundle.events as Array<Record<string, unknown>>;
+  events.push({
+    event_id: 'event-interrupted-after-final-announcement',
+    sequence: 5,
+    kind: 'playback_transition',
+    transition: 'interrupted',
+    item: {
+      source_item_id: 'tldr-demo-002',
+      title: 'Second exact headline',
+      url: 'https://example.com/second',
+    },
+    evidence: [{ source: 'explicit_user_capture', reference: 'Brad reported an interruption.' }],
+  });
+  const playback = bundle.playback as Record<string, unknown>;
+  playback.status = 'completed';
+
+  assert.throws(
+    () => parseCommuteSessionBundleText(JSON.stringify(bundle)),
+    /completed playback resume cursor requires a final verified current item/
   );
 });
 
