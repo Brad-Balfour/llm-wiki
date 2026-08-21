@@ -7,7 +7,7 @@ aliases: ["Reducing Agent Token Spend"]
 tags: ["ai-agents","deterministic-tools","token-efficiency","workflow-design"]
 wiki_slug: deterministic-agent-workflows
 created: 2026-07-21
-updated: 2026-07-29
+updated: 2026-08-20
 confidence: medium
 # prettier-ignore
 provenance: [{"source_item_id":"url_a3f46c0ffd32ff76","url":"https://www.adamhjk.com/blog/a-practical-guide-to-reducing-token-spend/"}]
@@ -43,3 +43,4 @@ Saved from TLDR Dev, 2026-07-20.
 - {% include wiki-related-link.md slug="orchestrator-working-memory" %}
 - {% include wiki-related-link.md slug="production-ai-agent-architecture" %}
 - {% include wiki-related-link.md slug="ai-native-software-engineering" %}
+- {% include wiki-related-link.md slug="governed-agent-memory" %}

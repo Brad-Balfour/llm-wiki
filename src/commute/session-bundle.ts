@@ -246,8 +246,8 @@ function validateCommuteSessionBundleCandidate(
   const playback = validatePlayback(record.playback, queueItems);
   const events = validateEvents(record.events, queueItems);
   const integrity = validateIntegrity(record.integrity, events);
-  validateLifecycle(events, queueItems, integrity.state);
-  validatePlaybackMatchesEvents(playback, events);
+  const finalCurrentSourceItemId = validateLifecycle(events, queueItems, integrity.state);
+  validatePlaybackMatchesEvents(playback, events, finalCurrentSourceItemId);
 
   return {
     schema_version: COMMUTE_SESSION_BUNDLE_SCHEMA_VERSION,
@@ -555,9 +555,6 @@ function validatePlayback(candidate: unknown, queueItems: QueueItemIndex): Playb
 
   if (status === 'partial' && resume === undefined) {
     throw new Error('playback.resume_source_item_id is required for partial playback');
-  }
-  if (status === 'completed' && resume !== undefined) {
-    throw new Error('playback.resume_source_item_id is not allowed for completed playback');
   }
   if (status === 'not_started' && lastAnnounced !== undefined) {
     throw new Error(
@@ -893,7 +890,7 @@ function validateLifecycle(
   events: SessionEvent[],
   queueItems: QueueItemIndex,
   integrityState: IntegrityState
-): void {
+): string | undefined {
   let currentItemIndex: number | undefined;
   let expectedItemIndex: number | undefined = 0;
   let jumpDepartingItemIndex: number | undefined;
@@ -1038,16 +1035,34 @@ function validateLifecycle(
       'complete integrity cannot end with navigation awaiting its destination announcement'
     );
   }
+
+  return currentItemIndex === undefined
+    ? undefined
+    : queueItems.ordered[currentItemIndex]?.source_item_id;
 }
 
-function validatePlaybackMatchesEvents(playback: PlaybackState, events: SessionEvent[]): void {
+function validatePlaybackMatchesEvents(
+  playback: PlaybackState,
+  events: SessionEvent[],
+  finalCurrentSourceItemId: string | undefined
+): void {
   const announced = [...events].reverse().find((event) => event.kind === 'item_announced');
+  const finalAnnouncedId =
+    announced?.kind === 'item_announced' ? announced.item.source_item_id : undefined;
   if (
     playback.last_announced_source_item_id !== undefined &&
-    announced?.kind === 'item_announced' &&
-    announced.item.source_item_id !== playback.last_announced_source_item_id
+    finalAnnouncedId !== undefined &&
+    finalAnnouncedId !== playback.last_announced_source_item_id
   ) {
     throw new Error('playback.last_announced_source_item_id must match the final announced item');
+  }
+  if (playback.status === 'completed' && playback.resume_source_item_id !== undefined) {
+    if (finalCurrentSourceItemId === undefined) {
+      throw new Error('completed playback resume cursor requires a final verified current item');
+    }
+    if (playback.resume_source_item_id !== finalCurrentSourceItemId) {
+      throw new Error('completed playback resume cursor must match the final current item');
+    }
   }
 }
 

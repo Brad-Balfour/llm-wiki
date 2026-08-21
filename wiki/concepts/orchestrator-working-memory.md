@@ -7,7 +7,7 @@ aliases: ["The Orchestrator's Tax","Cognitive locality in multi-agent work","Sub
 tags: ["ai-agents","context-management","multi-agent-systems","delegation","workflow-design"]
 wiki_slug: orchestrator-working-memory
 created: 2026-07-29
-updated: 2026-08-15
+updated: 2026-08-20
 confidence: medium
 # prettier-ignore
 provenance: [{"source_item_id":"19fad8d9ff2bc642-08","url":"https://martinfowler.com/articles/orchestrator-tax.html"},{"source_item_id":"1a00096e3b7b2e7f-06","url":"https://x.com/JoshARosen/status/2087944178558791874"}]
@@ -125,3 +125,4 @@ approval—are design guidance rather than measured reliability thresholds.
 - {% include wiki-related-link.md slug="agent-context-handoff" %}
 - {% include wiki-related-link.md slug="agent-autonomy-boundaries" %}
 - {% include wiki-related-link.md slug="multiagent-systemic-risk" %}
+- {% include wiki-related-link.md slug="governed-agent-memory" %}

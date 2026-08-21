@@ -26,6 +26,39 @@ successful export.
 - **AND** it SHALL NOT auto-advance, auto-export, discard the active queue, or
   start another queue.
 
+#### Scenario: Completed playback retains a revisit cursor
+
+- **WHEN** a completed session bundle retains `resume_source_item_id`
+- **THEN** local validation SHALL accept it when it names the final verified
+  current item
+- **AND** it SHALL treat that field as a revisit cursor rather than evidence
+  that playback is incomplete
+- **AND** it SHALL reject the cursor only when it contradicts the final
+  announced item.
+
+### Requirement: Evidence-Oriented Voice Validation
+
+Local validation SHALL account for the nondeterminism of both human speech and
+LLM-generated session artifacts. Structural parsing, exact item identity, and
+contradictory evidence remain safety boundaries; harmless or recoverable
+variation SHALL not become a fatal error merely because it is unexpected.
+
+#### Scenario: Unexpected state remains non-contradictory
+
+- **WHEN** a parseable bundle contains unexpected state that preserves exact
+  queue identity and does not contradict the event evidence
+- **THEN** local intake SHALL accept it or retain it with a diagnostic
+- **AND** it SHALL NOT discard otherwise usable session evidence solely to
+  enforce a preferred static shape.
+
+#### Scenario: Variation makes an item action unsafe to bind
+
+- **WHEN** variation creates conflicting item identity, unsupported action
+  attribution, or contradictory event order
+- **THEN** local intake SHALL reject that exact claim or preserve it as an
+  unresolved capture
+- **AND** it SHALL retain any independent evidence that remains safe to use.
+
 ### Requirement: Observable Bundle Delivery
 
 A successful session export SHALL be an identifiable downloadable artifact, not
