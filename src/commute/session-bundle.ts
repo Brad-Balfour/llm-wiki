@@ -556,9 +556,6 @@ function validatePlayback(candidate: unknown, queueItems: QueueItemIndex): Playb
   if (status === 'partial' && resume === undefined) {
     throw new Error('playback.resume_source_item_id is required for partial playback');
   }
-  if (status === 'completed' && resume !== undefined) {
-    throw new Error('playback.resume_source_item_id is not allowed for completed playback');
-  }
   if (status === 'not_started' && lastAnnounced !== undefined) {
     throw new Error(
       'playback.last_announced_source_item_id is not allowed for not_started playback'
@@ -1042,12 +1039,22 @@ function validateLifecycle(
 
 function validatePlaybackMatchesEvents(playback: PlaybackState, events: SessionEvent[]): void {
   const announced = [...events].reverse().find((event) => event.kind === 'item_announced');
+  const finalAnnouncedId =
+    announced?.kind === 'item_announced' ? announced.item.source_item_id : undefined;
   if (
     playback.last_announced_source_item_id !== undefined &&
-    announced?.kind === 'item_announced' &&
-    announced.item.source_item_id !== playback.last_announced_source_item_id
+    finalAnnouncedId !== undefined &&
+    finalAnnouncedId !== playback.last_announced_source_item_id
   ) {
     throw new Error('playback.last_announced_source_item_id must match the final announced item');
+  }
+  if (
+    playback.status === 'completed' &&
+    playback.resume_source_item_id !== undefined &&
+    finalAnnouncedId !== undefined &&
+    playback.resume_source_item_id !== finalAnnouncedId
+  ) {
+    throw new Error('completed playback resume cursor must match the final announced item');
   }
 }
 

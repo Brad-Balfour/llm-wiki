@@ -25,6 +25,29 @@ test('validates a self-contained partial session bundle and fingerprints its emb
   );
 });
 
+test('accepts a completed bundle that retains its final current item as a revisit cursor', () => {
+  const bundle = clone(validBundle);
+  const playback = bundle.playback as Record<string, unknown>;
+  playback.status = 'completed';
+
+  const parsed = parseCommuteSessionBundleText(JSON.stringify(bundle));
+
+  assert.equal(parsed.playback.status, 'completed');
+  assert.equal(parsed.playback.resume_source_item_id, 'tldr-demo-002');
+});
+
+test('rejects a completed bundle whose revisit cursor contradicts the final announced item', () => {
+  const bundle = clone(validBundle);
+  const playback = bundle.playback as Record<string, unknown>;
+  playback.status = 'completed';
+  playback.resume_source_item_id = 'tldr-demo-001';
+
+  assert.throws(
+    () => parseCommuteSessionBundleText(JSON.stringify(bundle)),
+    /completed playback resume cursor must match the final announced item/
+  );
+});
+
 test('rejects a complete bundle without durable contemporaneous evidence for every event', () => {
   const malformed = clone(validBundle);
   const integrity = malformed.integrity as Record<string, unknown>;

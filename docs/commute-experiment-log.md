@@ -51,6 +51,8 @@ found a queue as proof.
 - The August 14 Dev and August 13 AI queues, two August 16 recovered session
   bundles, and three shared conversations covering the initial Dev segment,
   recovered Dev continuation, AI playback, and AI export retry.
+- The August 20 General and Dev queues, their two evening session bundles, and
+  two shared conversations covering both sessions from start through export.
 - The live `Weekday TLDR Queues` Task conversation/configuration, the July
   21-24 Task Update emails, the July 24 manual queue-generation control, and
   the live Project settings/sources inspected on July 26.
@@ -95,16 +97,17 @@ retrieve sources, and preserve history after the drive.
 | Jul. 28    | Scheduled failure, manual control, and queue-selection audit                                   | Re-run the weekday Task, validate its manual outputs, process five commute bundles, and compare the queues with the source newsletters and profile.                                                              | The 11:05 AM scheduled run found General, Dev, and AI but failed both file-writing paths with the same `ClientError`; the 12:43 PM manual control created three valid queues. All five sessions were locally recoverable, but the General and Dev queues each contained only one item and omitted several direct profile matches.                                                                 |
 | Jul. 29    | General and Dev sessions plus source-grounded wiki maintenance                                 | Validate three four-item queues, reconcile two downloaded bundles, recover explicit saves from the shared conversations, and preserve the commute discussion in the wiki.                                        | The queue artifacts were valid, but both session bundles violated the contract. Supplied-queue recovery retained the two General saves; the empty Dev bundle lost its save entirely, so the user-provided chat was required to prove the exact item-specific action.                                                                                                                              |
 | Jul. 30    | Four-queue commute and bundle-grounding audit                                                  | Validate General, Dev, AI, and Fintech queues; reconcile four bundles; and compare recovered saves with the five shared conversations.                                                                           | The four queues were valid and most spoken playback was smooth, but only the Dev bundle was strictly valid. General and AI exported placeholder snapshots, Fintech used an unsupported pseudo-ID and UTC filename, and resumed Dev playback replaced its canonical queue with four unrelated items.                                                                                               |
-| Jul. 31    | Morning catch-up, evening General/Dev, and source-grounded maintenance                         | Validate four queues, reconcile four downloaded exports, compare seven unique shared chats with their canonical queues, and process the two explicit saves.                                                      | All queues were valid, but only the two morning exports were individually strict-valid—and they represented one session under conflicting IDs. General retained an impossible completed/resume state; Dev's event lifecycle contradicted its queue and its spoken item eight was a foreign benchmark. Both saves remained recoverable.                                                            |
+| Jul. 31    | Morning catch-up, evening General/Dev, and source-grounded maintenance                         | Validate four queues, reconcile four downloaded exports, compare seven unique shared chats with their canonical queues, and process the two explicit saves.                                                      | All queues were valid, but only the two morning exports were individually strict-valid under the validator used that day—and they represented one session under conflicting IDs. General retained a completed-session cursor rejected categorically at the time; Dev's event lifecycle contradicted its queue and its spoken item eight was a foreign benchmark. Both saves remained recoverable. |
 | Aug. 4     | Catch-up queues, evening General/Dev, and GPT-Live recovery evidence                           | Validate six supplied queues, reconcile seven exports, compare queue grounding with the shared chats, and process the two genuine saves.                                                                         | Every supplied queue was valid, but only the evening General bundle was strict-valid. Voice skipped the required headline sweep, invented queue contents, lost URLs and reading modes, and repeatedly refused or falsely claimed export. Switching to text created downloads, but did not make their embedded snapshots or events valid.                                                          |
 | Aug. 5     | Per-advance grounding workaround with GPT-Live                                                 | Re-read the bound Project queue before each requested next position during General, Dev, and AI playback, then export after returning to text.                                                                   | Playback was smoother and the August 5 AI sequence stayed aligned with its six-item queue; Dev still mislabeled an in-depth item as headline-only. All three downloads existed, but none passed strict bundle validation. The workaround needs a longer-session test.                                                                                                                             |
 | Aug. 7     | Three-queue playback and recovered-bundle control                                              | Validate General, Dev, and AI queues and bundles, compare their retained events with the shared chats, and separate exact classifier feedback from presentation and duplicate signals.                           | All six artifacts passed local validation and all snapshots matched their canonical queues. Intake retained one exact depth promotion. The separate calibration file did not accept it because the Project queue used an unrecognized route-version value.                                                                         |
 | Aug. 10    | Four-queue commute, fragmented-Voice recovery, and source-access audit                         | Validate all four daily queues, reconcile four recovered exports with nine shared chats, retain the explicit wiki save and preference signal, and distinguish website failures from product safety denials.      | All queues were valid, but every downloaded bundle violated the lifecycle contract. Evidence-backed local repair accepted all four sessions with no unresolved captures. Switching to Siri, dictation, or calls repeatedly started new chats; ordinary public text pages were denied at the browsing safety layer even though host-side deterministic retrieval succeeded.                        |
-| Aug. 11    | Three-queue playback, literal-summary feedback, and back-navigation audit                      | Validate General, Dev, and AI queues and bundles, compare three shared chats, retain presentation and duplicate signals, and test a deliberate item-seven-to-item-six return.                                    | All queues matched their embedded snapshots. Dev was strict-valid; General retained an illegal completed-session resume cursor; and AI exposed that the contract cannot represent deliberate previous-item navigation. Recovered intake accepted all three sessions with no wiki save, classifier label, or unresolved capture.                                                                   |
+| Aug. 11    | Three-queue playback, literal-summary feedback, and back-navigation audit                      | Validate General, Dev, and AI queues and bundles, compare three shared chats, retain presentation and duplicate signals, and test a deliberate item-seven-to-item-six return.                                    | All queues matched their embedded snapshots. Dev was strict-valid; General retained a completed-session cursor rejected by the then-current validator; and AI exposed that the contract could not represent deliberate previous-item navigation. Recovered intake accepted all three sessions with no wiki save, classifier label, or unresolved capture. |
 | Aug. 12    | Three-queue playback, on-demand summary audit, and decision-roadmap save                       | Validate General, Dev, and AI queues and bundles, reconcile a retrospective feedback lifecycle error, preserve the roadmap discussion, and separate navigation, classifier, duplicate, and playback evidence.    | All queues and snapshots matched. General and AI were strict-valid; Dev required bounded normalization because feedback about item six arrived after item seven was current. Intake accepted all three sessions with one wiki save, one exact depth correction, seven incidents, seven general captures, and no unresolved capture.                                                               |
-| Aug. 13-14 | General, Dev, and Fintech grounding audit plus two software-factory saves                      | Validate three queues and recovered exports, compare literal playback with three shared chats, retain an exact Dev depth correction, and maintain the two saved software-factory sources.                        | All snapshots matched, but only General was strict-valid. Dev omitted required navigation transitions, Fintech retained an impossible resume cursor, and the chats showed extensive foreign or paraphrased playback. Recovery retained both Dev saves and the exact correction. The label file separately exposed noncanonical Project queue metadata.                                          |
+| Aug. 13-14 | General, Dev, and Fintech grounding audit plus two software-factory saves                      | Validate three queues and recovered exports, compare literal playback with three shared chats, retain an exact Dev depth correction, and maintain the two saved software-factory sources.                        | All snapshots matched, but only General was strict-valid under the validator used that day. Dev omitted required navigation transitions, Fintech retained a completed-session cursor rejected categorically at the time, and the chats showed extensive foreign or paraphrased playback. Recovery retained both Dev saves and the exact correction. The label file separately exposed noncanonical Project queue metadata. |
 | Aug. 15    | Fault-tolerant naming recovery and three source-grounded maintenance captures                  | Validate two queues and malformed bundles, compare three shared chats, preserve three exact depth corrections, recover three wiki saves, and make LLM-generated artifact naming diagnostic rather than identity. | Both snapshots matched, but neither bundle was strict-valid. AI misordered a save; General mislabeled an afternoon export as morning. Recovery retained all three saves and corrections. The label file did not accept the corrections because the Project queues used noncanonical metadata.                                                                                              |
-| Aug. 16    | Two recovered catch-up sessions and three discussion-enriched wiki saves                       | Validate the August 14 Dev and August 13 AI queues, reconcile two malformed noon exports with three chats, preserve three exact saves and their discussion, and audit every substantive user turn.               | Both snapshots matched, but both bundles labeled post-noon exports as morning; Dev also retained an illegal resume cursor after completed playback. Recovery preserved three exact saves. The chats added a Voice/context interruption, headline-sweep violation, false verbatim claim, wrong reading mode, and failed first export. There were no classifier corrections or unresolved captures. |
+| Aug. 16    | Two recovered catch-up sessions and three discussion-enriched wiki saves                       | Validate the August 14 Dev and August 13 AI queues, reconcile two malformed noon exports with three chats, preserve three exact saves and their discussion, and audit every substantive user turn.               | Both snapshots matched, but both bundles labeled post-noon exports as morning; Dev also retained a completed-session cursor rejected categorically by the then-current validator. Recovery preserved three exact saves. The chats added a Voice/context interruption, headline-sweep violation, false verbatim claim, wrong reading mode, and failed first export. There were no classifier corrections or unresolved captures. |
+| Aug. 20    | General and Dev playback audit plus governed-memory save                                      | Retrieve and validate the two exact queues and bundles, reconcile both complete shared chats, preserve the Redis memory-governance discussion, and separate headline QA from classifier labels.                  | Both snapshots matched and both bundles became strict-valid after the local validator stopped treating a truthful completed-session revisit cursor as an error. The two Dev save events named one article and were consolidated into one discussion-enriched wiki result. The repeated _fx_ complaint remained headline-informativeness QA because Brad explicitly left the depth judgment open. |
 
 ### July 24 Bundle Acceptance Result
 
@@ -263,8 +266,9 @@ corrected evidence because it retained the failed first export; the other was
 rejected during combined intake as a conflicting duplicate, not counted as a
 second commute.
 
-General failed strict validation because completed playback retained a resume
-item. Supplied-queue recovery accepted its exact queue but found no wiki save.
+General failed the then-current strict validator solely because completed
+playback retained a resume item; that categorical rule has since been removed.
+Supplied-queue recovery accepted its exact queue but found no wiki save.
 Dev failed strict validation because its announced-event sequence did not match
 the expected queue positions. Bounded recovery retained the exact saved Martin
 Fowler item. Combined intake therefore recorded three accepted sessions, one
@@ -316,11 +320,11 @@ queue was not supplied.
 
 Only the August 4 evening General export passed strict bundle validation. Five
 other exports embedded placeholder or incomplete queue objects. Four more
-embedded usable queues but violated playback lifecycle invariants: an impossible
-completed/resume state, an announcement at the wrong queue position, a
-transition without a current announced item, or an announcement that did not
-follow the required transition. The August 3 AI export could not enter bounded
-recovery without its original queue.
+embedded usable queues but violated the then-current playback checks: a
+completed/resume state then treated as fatal, an announcement at the wrong
+queue position, a transition without a current announced item, or an
+announcement that did not follow the required transition. The August 3 AI
+export could not enter bounded recovery without its original queue.
 
 Supplied-queue recovery accepted nine sessions and rejected only that missing-
 queue AI export. Semantic normalization then retained two genuine maintenance
@@ -406,8 +410,8 @@ Voice sessions even when each queue and bundle is otherwise valid.
 
 The four downloaded queues passed the v2 validator: seven General items and
 eight items each for Dev, Fintech, and AI. None of the four downloaded bundles
-passed strict validation. General retained a completed playback state with an
-illegal resume cursor; Dev used duplicate recognition as a terminal transition
+passed the validator used that day. General retained a completed playback
+cursor that was then rejected categorically; Dev used duplicate recognition as a terminal transition
 before announcing item eight; Fintech omitted the cursor transition across a
 direct jump; and AI recorded the opening headline sweep as consecutive current
 item announcements without navigation events.
@@ -461,7 +465,8 @@ together.
 The three downloaded queues passed the v2 validator: eight General items,
 seven Dev items, and seven AI items. Their embedded snapshots matched the
 separately downloaded queues exactly. Dev's downloaded bundle passed strict
-validation. General failed because completed playback retained a resume cursor.
+validation. General failed because the then-current validator categorically
+rejected a resume cursor on completed playback.
 AI failed because the commute deliberately advanced to item seven and then
 returned to item six, while the then-current event contract offered `next`,
 `repeat`, `interrupted`, `voice_restart`, and `duplicate_recognition` but no
@@ -470,8 +475,9 @@ playback defect. Prompt Revision 3.2 and the additive `previous` and `jump`
 events now make internal navigation normalization explicit without constraining
 Brad's wording or inventing playback of intervening items.
 
-Home-side normalization removed General's impossible resume cursor and retained
-that export contradiction as a quality incident. For AI, it preserved Brad's
+Home-side normalization removed General's cursor under the rule used that day.
+That field alone is no longer treated as a quality incident or contradiction.
+For AI, normalization preserved Brad's
 direct clarification and the shared-chat evidence by normalizing the clear
 return as `previous`, while keeping both the item-seven announcement and the
 true final item-six cursor. All three repaired bundles then passed strict
@@ -565,9 +571,9 @@ The three August 13 queues passed the v2 validator with seven General items,
 ten Dev items, and four Fintech items. Every embedded snapshot matched its
 separately supplied canonical queue. The August 13 General bundle passed strict
 validation. Dev failed because its reconstructed announcements omitted the
-required navigation transitions, and Fintech failed because completed playback
-retained a resume cursor. Supplied-queue recovery accepted all three sessions
-without inventing item identity.
+required navigation transitions. The then-current validator rejected Fintech
+because completed playback retained a resume cursor. Supplied-queue recovery
+accepted all three sessions without inventing item identity.
 
 The combined intake accepted the strictly valid General session normally and
 accepted Dev and Fintech through supplied-queue recovery. From General it
@@ -581,8 +587,9 @@ so the original Dev and Fintech artifacts and shared chats remain necessary
 evidence for their other channels.
 
 Across the original bundles, there were seven explicit quality incidents and
-eight general captures. Home validation adds two artifact-contract failures:
-Dev's announcement lifecycle and Fintech's impossible completed/resume state.
+eight general captures. Home validation established Dev's announcement-lifecycle
+failure. Fintech's completed/resume state was rejected under the rule used that
+day but is not, by itself, a quality incident under the current validator.
 The chats confirm the product impact:
 
 - General invented most of its first seven-headline sweep, including unrelated
@@ -693,8 +700,9 @@ nine and ten items. Each bundle's embedded snapshot semantically matched its
 separately supplied queue. Neither bundle passed strict validation because
 `202608161230-morning-commute-session-bundle.txt` and
 `202608161251-morning-commute-session-bundle.txt` label post-noon New York times
-as `morning`. With only that label corrected in memory, Dev exposed a second
-contract error: completed playback retained `resume_source_item_id`. The AI
+as `morning`. With only that label corrected in memory, the then-current
+validator also rejected Dev because completed playback retained
+`resume_source_item_id`; that field is no longer categorically invalid. The AI
 bundle otherwise passed validation.
 
 Supplied-queue recovery accepted both sessions with two naming warnings, three
@@ -832,14 +840,16 @@ five exact original queues were retrieved directly from Library row downloads,
 and all pass the v2 validator. Each bundle names the correct queue and embeds a
 queue whose canonical fingerprint matches the separately downloaded original.
 
-Only `202608192122-evening-commute-session-bundle.txt` passes strict validation.
-The two morning bundles omit required transitions before an announcement, and
-the General and Dev evening bundles declare completed playback while retaining
-a resume cursor. Supplied-queue recovery accepted all five sessions with three
-wiki maintenance candidates, 15 navigation events, one `save_for_review`
-event, and two unresolved feedback captures. Seven quality incidents and seven
-general captures in the original bundles remain supplemental evidence because
-malformed recovery deliberately does not manufacture their lifecycle context.
+Only `202608192122-evening-commute-session-bundle.txt` passed the validator used
+that day. The two morning bundles omitted required transitions before an
+announcement, while the General and Dev evening bundles were rejected solely
+because completed playback retained a resume cursor. That categorical cursor
+rule has since been removed. Supplied-queue recovery accepted all five sessions
+with three wiki maintenance candidates, 15 navigation events, one
+`save_for_review` event, and two unresolved feedback captures. Seven quality
+incidents and seven general captures in the original bundles remain
+supplemental evidence because malformed recovery deliberately does not
+manufacture their lifecycle context.
 
 Four supplied shared chats were captured from `Prompt 1` through every
 reachable virtualized message and reconciled with the bundles. They cover the
@@ -896,6 +906,92 @@ preview text is inspection-only. Prompt Revision 3.3 already covers the
 observed sweep, summary, identity, lifecycle, and export failures, so this run
 does not add another wording-only live prompt revision and requires no Project
 source synchronization.
+
+### August 20 Acceptance, Coverage, And Maintenance Result
+
+The bounded Library inventory found two August 20 bundle rows:
+`202608201845-evening-commute-session-bundle.txt` for General and
+`202608202102-evening-commute-session-bundle.txt` for Dev. Each declared queue
+was retrieved from its exact main-Library row. Both queues passed the v2
+validator, and both embedded snapshots canonically matched the separately
+downloaded originals.
+
+The Dev bundle passed strict validation with recovered integrity. The first
+General validation run rejected its completed playback because it retained
+`resume_source_item_id`, even though the attached JSON schema permits the field
+and the cursor exactly matched the final announced item. Brad challenged the
+restriction: a completed queue may still keep an article current for later
+questions or revisiting, and the cursor creates no contradictory user state.
+
+The local validator was stricter than the Project's attached schema. It now
+accepts a completed-session revisit cursor when it matches the final announced
+item and rejects only a contradictory cursor. Focused tests cover both cases.
+After that alignment, both original August 20 bundles passed strict validation,
+and combined intake accepted two sessions with no unresolved captures.
+
+The two complete shared chats were audited against the artifacts. Eight distinct
+quality or artifact observations were retained:
+
+- General began item one before completing the required ordered headline sweep.
+- General base playback replaced the literal item-five and item-six summaries
+  with materially different descriptions.
+- Dev paraphrased the literal queue summaries for items nine and ten; Brad
+  challenged both, and Voice then read the queue text.
+- Dev described item eleven, _Munder Difflin_, as an ERP system rather than the
+  queue's desktop multi-agent harness.
+- Dev replaced item twelve's literal queue summary with a different account of
+  fabricated progress and logs before later retrieving the article.
+- The Dev bundle converted the _fx_ presentation complaint into a
+  `promote_to_in_depth` action even though Brad explicitly said the depth might
+  be right.
+
+The General robotics note affirms an existing topic preference but does not
+change the canonical item's already-`interested` label. The _fx_ observation is
+therefore repeated headline-informativeness and
+classifier-QA evidence, not a score-bearing correction. An unfamiliar one-word
+title is useless as headline-only playback when it does not communicate what
+the item is, but Brad did not supply a replacement interest or depth outcome.
+The bundle's standardized action does not override that natural-language
+boundary.
+
+Dev events `evt-021` and `evt-023` both name the same exact Redis article. The
+first is the save; the second asks that the surrounding conversation be included
+and is treated as discussion emphasis rather than a duplicate maintenance
+candidate. Source-grounded maintenance creates _Governed Agent Memory_. It
+separates Redis's write-manage-read, scope, retention, access-control, security,
+and recall-latency material from the commute-derived multi-writer design:
+append-only candidates, provenance, explicit promotion, and policy-based
+arbitration for semantic conflicts.
+
+The daily queue set also repeats the Stripe/OpenRouter acquisition as a
+same-story item across General and Dev under different titles and destination
+URLs. That is day-level duplicate-product evidence, not classifier feedback.
+
+The private conversation-coverage audit assigned a disposition to all 18
+substantive user entries: four in General and 14 in Dev. It retained one unique
+wiki save with its full discussion context, one headline-informativeness QA
+observation, one robotics topic-preference affirmation, eight quality/artifact
+observations, one same-story duplicate, and
+the unsaved article discussions without promoting them to wiki content. Sixteen
+routine navigation commands and four session start/end commands were explicitly
+excluded. There were no unresolved substantive entries.
+
+Prompt Revision 3.3 and the attached bundle contract already require the
+opening sweep, literal queue projection, and exact identity. The playback
+failures are repeated product noncompliance rather than a missing spoken
+command. The completed/revisit cursor was instead a local validation defect.
+Historical entries should report that result as a categorical rule of the
+then-current validator instead of describing a benign cursor as illegal or
+impossible.
+
+The operating rule is evidence-oriented because both the human and LLM sides of
+Voice are nondeterministic. Validation should remain fatal for unreadable
+structure, conflicting item identity, unsupported action attribution, and
+contradictory event evidence. Unexpected but non-contradictory state should be
+accepted or retained with a diagnostic, and bounded recovery should preserve
+independent evidence rather than discard a whole session. No live Project
+instruction or listed source changed, so no Project synchronization is
+required.
 
 ## What Worked
 
