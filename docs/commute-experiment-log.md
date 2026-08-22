@@ -53,6 +53,9 @@ found a queue as proof.
   recovered Dev continuation, AI playback, and AI export retry.
 - The August 20 General and Dev queues, their two evening session bundles, and
   two shared conversations covering both sessions from start through export.
+- The August 20 AI and Fintech catch-up queues, the August 21 General, Dev, and
+  AI queues, five August 21 session bundles, and six complete shared chats. The
+  General commute spans a pre-glitch chat and a resumed recovery/export chat.
 - The live `Weekday TLDR Queues` Task conversation/configuration, the July
   21-24 Task Update emails, the July 24 manual queue-generation control, and
   the live Project settings/sources inspected on July 26.
@@ -108,6 +111,7 @@ retrieve sources, and preserve history after the drive.
 | Aug. 15    | Fault-tolerant naming recovery and three source-grounded maintenance captures                  | Validate two queues and malformed bundles, compare three shared chats, preserve three exact depth corrections, recover three wiki saves, and make LLM-generated artifact naming diagnostic rather than identity. | Both snapshots matched, but neither bundle was strict-valid. AI misordered a save; General mislabeled an afternoon export as morning. Recovery retained all three saves and corrections. The label file did not accept the corrections because the Project queues used noncanonical metadata.                                                                                              |
 | Aug. 16    | Two recovered catch-up sessions and three discussion-enriched wiki saves                       | Validate the August 14 Dev and August 13 AI queues, reconcile two malformed noon exports with three chats, preserve three exact saves and their discussion, and audit every substantive user turn.               | Both snapshots matched, but both bundles labeled post-noon exports as morning; Dev also retained a completed-session cursor rejected categorically by the then-current validator. Recovery preserved three exact saves. The chats added a Voice/context interruption, headline-sweep violation, false verbatim claim, wrong reading mode, and failed first export. There were no classifier corrections or unresolved captures. |
 | Aug. 20    | General and Dev playback audit plus governed-memory save                                      | Retrieve and validate the two exact queues and bundles, reconcile both complete shared chats, preserve the Redis memory-governance discussion, and separate headline QA from classifier labels.                  | Both snapshots matched and both bundles became strict-valid after the local validator stopped treating a truthful completed-session revisit cursor as an error. The two Dev save events named one article and were consolidated into one discussion-enriched wiki result. The repeated _fx_ complaint remained headline-informativeness QA because Brad explicitly left the depth judgment open. |
+| Aug. 21    | Two catch-up queues, three current queues, exact feedback audit, and no-save control            | Retrieve five exact queues and bundles, reconcile six complete shared chats, preserve five exact classifier corrections, and separate unsaved discussion, playback defects, and duplicate signals.                | Every queue validated and every embedded snapshot matched. Fintech, Dev, and AI bundles were strict-valid; AI catch-up and General required supplied-queue recovery for lifecycle errors. Intake accepted all five sessions with no unresolved captures or wiki candidates. The chats established three additional exact General corrections omitted by malformed recovery. |
 
 ### July 24 Bundle Acceptance Result
 
@@ -992,6 +996,79 @@ accepted or retained with a diagnostic, and bounded recovery should preserve
 independent evidence rather than discard a whole session. No live Project
 instruction or listed source changed, so no Project synchronization is
 required.
+
+### August 21 Acceptance, Feedback, And No-Save Result
+
+The bounded Library inventory found five August 21 bundle rows: two morning
+catch-up sessions for the August 20 AI and Fintech queues and three evening
+sessions for the August 21 General, Dev, and AI queues. Every exact original
+queue passed the v2 validator, and every embedded queue snapshot canonically
+matched its separately downloaded Library original.
+
+Fintech, Dev, and AI passed strict bundle validation with recovered integrity.
+The AI catch-up bundle omitted a required transition before a repeated
+announcement. The General bundle began its recovered event lifecycle at a queue
+position inconsistent with its first announcement. Supplied-queue recovery
+accepted all five sessions without manufacturing the malformed lifecycle data:
+18 navigation events, two Dev feedback actions, no wiki candidates, and no
+unresolved captures.
+
+Six complete shared chats supplied the bounded evidence intentionally omitted by
+that recovery. The General session spans a pre-glitch chat and a resumed chat;
+the user named the exact item-five position and Waymo headline before playback
+recovered the canonical queue. Across the six chats, five exact classifier
+corrections bind to canonical item identity and original scores:
+
+- General _Slack launches Slack Code, where teams and AI agents build together_:
+  retain `interested`; promote `headline_only` to `in_depth`.
+- General _Better Batteries_: change `maybe` to `uninterested`; retain
+  `headline_only`.
+- General _Waymo has designed a robocar chip to stay ahead of Tesla_: retain
+  `interested`; promote `headline_only` to `in_depth`.
+- Dev _Bun 1.4_: change `interested` to `uninterested`; retain `headline_only`.
+- Dev _Fig_: retain `interested`; promote `headline_only` to `in_depth`.
+
+The append-only label command did not write these candidates because the
+received Project queues still stamp `commute-route-v2`, while the recorder
+accepts `routing-rules.v1` and requires an explicit historical migration. The
+private candidate file keeps the received provenance unchanged. Tesla
+robotaxi/full-self-driving and robotics statements affirm strong topic
+preferences, but their canonical items were already `interested`; they are not
+silently converted into score changes. The unfamiliar one-word _Router_ and
+_Fig_ complaints also remain headline-informativeness QA; _Fig_ separately has
+the explicit depth correction above.
+
+Playback again violated Prompt Revision 3.3 without exposing a new command gap.
+Observed failures include incomplete opening sweeps, paraphrased or omitted
+literal summaries, inserted assistant commentary during Fintech playback,
+network context loss, a false claim that Dev item eight had no summary, and a
+first Dev end-commute attempt that did not create the promised bundle. The
+prompt already requires the complete ordered sweep, literal queue fields,
+exact-first recovery, and a visible downloadable export, so another wording-only
+revision is not justified.
+
+Day-level duplicate evidence now includes exact canonical matches for _Sol
+loves to cheat_ across the August 20 Dev and AI queues and _PagedAttention:
+Virtual Memory for the KV Cache_ across the August 21 Dev and AI queues. Slack
+Code is the same August 21 product story across General, Dev, and AI under three
+titles and three destination sources; Brad explicitly identified it as a
+cross-newsletter duplicate during Dev playback. These are queue-product signals,
+not classifier corrections.
+
+The private coverage ledger assigns dispositions to all 41 substantive user
+entries among 92 total user turns. It retains five exact feedback candidates,
+topic and presentation QA, playback/export incidents, duplicate evidence, and
+unsaved product/article discussions. The other 51 turns are explicitly excluded
+as session commands, navigation, playback-only requests, pauses, thanks, or
+social filler. No chat contains `wiki this` or an equivalent save, so no article
+discussion was promoted into public wiki content or a maintenance candidate.
+
+The processing run itself exposed one repeatable intake hazard: a single
+rendered shared-chat DOM snapshot can omit early turns because the page
+virtualizes messages. The repository agent guide now requires the complete
+serialized message sequence or traversal of every prompt before building the
+coverage ledger. No live Project instruction or listed Project source changed,
+so no Project synchronization is required.
 
 ## What Worked
 
