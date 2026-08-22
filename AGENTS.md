@@ -131,7 +131,10 @@ For every daily commute intake:
 
 1. Validate each queue and bundle, compare every embedded snapshot with the
    separately supplied canonical queue, and use shared chats only as bounded
-   recovery evidence. Never invent missing item identity or user intent.
+   recovery evidence. Capture the complete shared-chat conversation by reading
+   its serialized message sequence or traversing every prompt; a single rendered
+   DOM snapshot may be virtualized and omit early turns. Never invent missing
+   item identity or user intent.
 2. Reconcile the day into the correct evidence channels: wiki-maintenance
    candidates, exact classifier feedback, product/quality incidents, general
    captures, duplicate/prior-awareness signals, and unresolved evidence.
