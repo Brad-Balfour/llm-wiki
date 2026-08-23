@@ -86,10 +86,12 @@ npm run validate:commute-session-bundle -- \
 ```
 
 If an older malformed bundle names its queue but omitted its snapshot, recover
-only its explicitly marked wiki saves by placing `--recover-with` immediately
+its explicitly marked wiki saves and any independently well-formed non-item
+quality incidents or general captures by placing `--recover-with` immediately
 after that bundle's `--input`. The supplied queue must have exactly the filename
 the malformed bundle declares; local tools cannot read the private Project
-Library themselves.
+Library themselves. Unsupported non-item observations are warnings, not a reason
+to reject the recovered session.
 
 Bundle artifact filenames are not recovery identity. If an LLM emits a missing,
 noncanonical, contradictory, or differently downloaded bundle filename, local

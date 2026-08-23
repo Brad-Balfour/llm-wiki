@@ -132,11 +132,16 @@ is `morning`; 12:00 or later is `evening`.
 - **THEN** local intake MAY recover an explicitly marked wiki capture by mapping
   an exact item identifier or one-based legacy item position to the supplied
   queue's exact identifier, title, and URL
+- **AND** it MAY retain an independently well-formed `quality_incident` or
+  `general_capture` when its stable event identity and evidence satisfy the
+  normal non-item requirements
 - **AND** the supplied queue filename SHALL exactly match the filename declared
   by the malformed bundle
 - **AND** the recovered session SHALL be marked `recovered`
-- **AND** the importer SHALL reject a mismatched queue, an out-of-range position,
-  or an event that was not explicitly marked as a wiki capture
+- **AND** the importer SHALL reject a mismatched queue, an out-of-range item
+  position, or an item action that was not explicitly marked as a wiki capture
+- **AND** it SHALL emit a recovery warning and omit unsupported or ambiguous
+  non-item observations without rejecting the recovered session
 - **AND** the local importer SHALL not access the private ChatGPT Project
   Library; it receives the queue as a local input.
 
