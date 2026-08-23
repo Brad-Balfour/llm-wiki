@@ -116,6 +116,31 @@ test('parser skips an unlabeled Together With sponsor block', () => {
   );
 });
 
+test('parser skips sponsor copy that resembles a section heading within an item summary', () => {
+  const result = parseTldrEditionBody(
+    [
+      'TLDR',
+      '[View Online](https://a.tldrnewsletter.com/web-version)',
+      '',
+      'TLDR AI 2026-07-12',
+      '',
+      'Headlines & Launches',
+      '',
+      '[Real Title](https://example.com/a)',
+      'Why teams run their agents here',
+      'Real summary text.',
+      'Manage your subscriptions',
+    ].join('\n'),
+    { extractedAt: EXTRACTED_AT }
+  );
+
+  assert.equal(result.reviews.length, 0);
+  assert.deepEqual(
+    result.items.map((item) => ({ title: item.title, summary: item.summary })),
+    [{ title: 'Real Title', summary: 'Real summary text.' }]
+  );
+});
+
 test('file ingestion command writes sanitized item and review outputs', async () => {
   const records = JSON.parse(
     await readFile(
