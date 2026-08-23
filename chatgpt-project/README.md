@@ -129,7 +129,11 @@ The importer keeps every valid session even when another is malformed and
 writes a private normalized intake record. Exact `wiki this` captures become
 pending maintenance candidates without another approval step; classifier
 corrections, product-quality incidents, and unresolved captures stay in their
-separate private lists.
+separate private lists. When an exact `wiki this` capture has supported
+surrounding discussion, the bundle may include an optional item-bound discussion
+record with a concise summary, questions, conclusions, requested emphasis, and
+direct evidence. Do not infer this record from proximity to another save or
+general capture, and do not refuse the bundle when no such record is available.
 
 ```sh
 npm run import:commute-session-bundles -- \

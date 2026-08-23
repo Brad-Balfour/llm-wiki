@@ -8,7 +8,18 @@
  */
 
 import { requireHttpUrl } from '../shared/url.js';
-import { requireRecord, requireString } from '../shared/validate.js';
+import { requireRecord, requireString, requireStringArray } from '../shared/validate.js';
+import { createHash } from 'node:crypto';
+import type { EventEvidence } from './session-bundle.js';
+
+export interface DiscussionContext {
+  discussion_key: string;
+  summary: string;
+  important_questions: string[];
+  conclusions: string[];
+  requested_emphasis: string[];
+  evidence: EventEvidence[];
+}
 
 export const MAINTENANCE_ATTEMPT_SOURCES = ['retrieval', 'maintainer'] as const;
 export type MaintenanceAttemptSource = (typeof MAINTENANCE_ATTEMPT_SOURCES)[number];
@@ -33,6 +44,7 @@ export interface MaintenanceCandidate {
   title: string;
   url: string;
   status: 'pending';
+  discussion?: DiscussionContext;
 }
 
 export interface MaintenanceAttemptInput {
@@ -41,6 +53,23 @@ export interface MaintenanceAttemptInput {
   status: MaintenanceAttemptStatus;
   detail: string;
   attempted_at: string;
+  discussion_disposition?: DiscussionDisposition;
+}
+
+export type DiscussionDisposition = 'incorporated' | 'omitted_unsupported' | 'unresolved';
+
+export function requireDiscussionDisposition(
+  candidate: unknown,
+  field: string
+): DiscussionDisposition {
+  if (
+    candidate !== 'incorporated' &&
+    candidate !== 'omitted_unsupported' &&
+    candidate !== 'unresolved'
+  ) {
+    throw new Error(`${field} has an unsupported status`);
+  }
+  return candidate;
 }
 
 export interface MaintenanceAttempt extends MaintenanceAttemptInput {
@@ -73,7 +102,61 @@ export function parseMaintenanceCandidate(candidate: unknown, field: string): Ma
     title: requireString(record.title, `${field}.title`),
     url: requireMaintenanceHttpUrl(record.url, `${field}.url`),
     status: 'pending',
+    ...optionalDiscussionContext(record.discussion, `${field}.discussion`),
   };
+}
+
+function optionalDiscussionContext(
+  candidate: unknown,
+  field: string
+): { discussion?: DiscussionContext } {
+  if (candidate === undefined) return {};
+  try {
+    return { discussion: parseDiscussionContext(candidate, field) };
+  } catch {
+    return {};
+  }
+}
+
+export function discussionContextKey(sessionId: string, eventId: string, url: string): string {
+  return `discussion-${createHash('sha256')
+    .update(JSON.stringify([sessionId, eventId, url]))
+    .digest('hex')
+    .slice(0, 16)}`;
+}
+
+function parseDiscussionContext(candidate: unknown, field: string): DiscussionContext {
+  const record = requireRecord(candidate, field);
+  const evidence = requireRecordArray(record.evidence, `${field}.evidence`).map((entry, index) => {
+    const value = requireRecord(entry, `${field}.evidence[${index}]`);
+    return {
+      source: requireString(
+        value.source,
+        `${field}.evidence[${index}].source`
+      ) as EventEvidence['source'],
+      reference: requireString(value.reference, `${field}.evidence[${index}].reference`),
+    };
+  });
+  if (evidence.length === 0) throw new Error(`${field}.evidence must not be empty`);
+  return {
+    discussion_key: requireString(record.discussion_key, `${field}.discussion_key`),
+    summary: requireString(record.summary, `${field}.summary`),
+    important_questions: requireStringArray(
+      record.important_questions,
+      `${field}.important_questions`
+    ),
+    conclusions: requireStringArray(record.conclusions, `${field}.conclusions`),
+    requested_emphasis: requireStringArray(
+      record.requested_emphasis,
+      `${field}.requested_emphasis`
+    ),
+    evidence,
+  };
+}
+
+function requireRecordArray(candidate: unknown, field: string): unknown[] {
+  if (!Array.isArray(candidate)) throw new Error(`${field} must be an array`);
+  return candidate;
 }
 
 export function requireMaintenanceAttemptSource(

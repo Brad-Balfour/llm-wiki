@@ -40,6 +40,9 @@ test('builds a maintainer prompt with no intermediate approval gate', () => {
   assert.match(prompt, /Do not invent approval, public, reviewer, safety-review/);
   assert.match(prompt, /The exact wiki_this capture authorizes maintenance/);
   assert.match(prompt, /the PR diff is the review point/);
+  assert.match(prompt, /item-bound discussion record/);
+  assert.match(prompt, /Do not infer or borrow discussion from another saved item/);
+  assert.match(prompt, /incorporated, omitted as unsupported, or left unresolved/);
   assert.match(prompt, /create one GitHub PR with gh/);
   assert.match(prompt, /\/private\/sources\.json/);
   assert.match(prompt, /Use per-candidate status "pr_created" only/);

@@ -23,6 +23,15 @@ export interface RecoveredWikiCapture {
   sourceItemId: string;
   title: string;
   url: string;
+  discussion?: RecoveredDiscussion;
+}
+
+export interface RecoveredDiscussion {
+  summary: string;
+  importantQuestions: string[];
+  conclusions: string[];
+  requestedEmphasis: string[];
+  evidence: EventEvidence[];
 }
 
 export interface RecoveredContradictoryWikiCapture extends RecoveredWikiCapture {
@@ -141,6 +150,11 @@ export function recoverSessionBundleWithSuppliedQueue(
     }
     recoveredEventIds.add(eventId);
     const sequence = lenientPositiveInteger(record.sequence) ?? captureOrdinal;
+    const discussion = recoverDiscussion(
+      record.discussion,
+      `${field}.discussion`,
+      recoveryWarnings
+    );
     if (contradictory && userWords) {
       contradictoryWikiCaptures.push({
         eventId,
@@ -149,6 +163,7 @@ export function recoverSessionBundleWithSuppliedQueue(
         title: item.title,
         url: item.url,
         userWords,
+        ...(discussion === undefined ? {} : { discussion }),
       });
       continue;
     }
@@ -158,6 +173,7 @@ export function recoverSessionBundleWithSuppliedQueue(
       sourceItemId: item.sourceItemId,
       title: item.title,
       url: item.url,
+      ...(discussion === undefined ? {} : { discussion }),
     });
   }
 
@@ -183,6 +199,34 @@ export function recoverSessionBundleWithSuppliedQueue(
     qualityIncidents,
     generalCaptures,
   };
+}
+
+function recoverDiscussion(
+  candidate: unknown,
+  field: string,
+  recoveryWarnings: string[]
+): RecoveredDiscussion | undefined {
+  if (candidate === undefined) return undefined;
+  const record = optionalRecord(candidate);
+  const summary = record && lenientOptionalString(record.summary);
+  const importantQuestions = record && lenientStringArray(record.important_questions);
+  const conclusions = record && lenientStringArray(record.conclusions);
+  const requestedEmphasis = record && lenientStringArray(record.requested_emphasis);
+  const evidence = record && recoverEvidence(record.evidence);
+  if (
+    !summary ||
+    !importantQuestions ||
+    !conclusions ||
+    !requestedEmphasis ||
+    !evidence ||
+    !hasUserActionEvidence(evidence)
+  ) {
+    recoveryWarnings.push(
+      `${field} lacks supported item-bound discussion evidence and was not recovered.`
+    );
+    return undefined;
+  }
+  return { summary, importantQuestions, conclusions, requestedEmphasis, evidence };
 }
 
 export function refersToPriorWikiCapture(userWords: string): boolean {
@@ -566,4 +610,10 @@ function lenientPositiveInteger(candidate: unknown): number | undefined {
   return typeof candidate === 'number' && Number.isInteger(candidate) && candidate > 0
     ? candidate
     : undefined;
+}
+
+function lenientStringArray(candidate: unknown): string[] | undefined {
+  if (!Array.isArray(candidate)) return undefined;
+  const values = candidate.map(lenientOptionalString);
+  return values.every((value) => value !== undefined) ? (values as string[]) : undefined;
 }

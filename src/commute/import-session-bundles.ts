@@ -21,8 +21,10 @@ import {
 } from './recover-session-bundle.js';
 import {
   parseMaintenanceCandidate,
+  discussionContextKey,
   requireMaintenanceAttemptSource,
   requireMaintenanceAttemptStatus,
+  requireDiscussionDisposition,
   requireMaintenanceHttpUrl,
 } from './maintenance.js';
 import { requireIsoTimestamp } from '../shared/time.js';
@@ -33,6 +35,7 @@ export type {
   MaintenanceAttemptInput,
   MaintenanceAttemptStatus,
   MaintenanceCandidate,
+  DiscussionDisposition,
   MaintenanceLatestResult,
 } from './maintenance.js';
 
@@ -266,6 +269,22 @@ export function reconcileSessionBundles(
               title: capture.title,
               url: capture.url,
               status: 'pending',
+              ...(capture.discussion === undefined
+                ? {}
+                : {
+                    discussion: {
+                      discussion_key: discussionContextKey(
+                        recovered.sessionId,
+                        capture.eventId,
+                        capture.url
+                      ),
+                      summary: capture.discussion.summary,
+                      important_questions: capture.discussion.importantQuestions,
+                      conclusions: capture.discussion.conclusions,
+                      requested_emphasis: capture.discussion.requestedEmphasis,
+                      evidence: capture.discussion.evidence,
+                    },
+                  }),
             });
           }
           for (const capture of recovered.contradictoryWikiCaptures) {
@@ -384,6 +403,25 @@ export function reconcileSessionBundles(
       };
 
       if (event.kind === 'item_action') {
+        if (event.discussion_warning !== undefined) {
+          const warningEventId = uniqueDiscussionWarningEventId(
+            event.event_id,
+            new Set(bundle.events.map((candidate) => candidate.event_id))
+          );
+          result.quality_incidents.push({
+            session_id: bundle.session.session_id,
+            event_id: warningEventId,
+            kind: 'quality_incident',
+            event: {
+              event_id: warningEventId,
+              sequence: event.sequence,
+              kind: 'quality_incident',
+              observed_behavior: event.discussion_warning,
+              boundary: 'optional discussion validation',
+              evidence: event.evidence,
+            },
+          });
+        }
         if (event.action === 'wiki_this') {
           if (refersToPriorWikiCapture(event.user_words)) {
             const convertedEvent: CommuteSessionBundle['events'][number] = {
@@ -426,6 +464,18 @@ export function reconcileSessionBundles(
                 title: event.item.title,
                 url: event.item.url,
                 status: 'pending',
+                ...(event.discussion === undefined
+                  ? {}
+                  : {
+                      discussion: {
+                        discussion_key: discussionContextKey(
+                          bundle.session.session_id,
+                          event.event_id,
+                          event.item.url
+                        ),
+                        ...event.discussion,
+                      },
+                    }),
               });
             }
           }
@@ -477,6 +527,17 @@ export function reconcileSessionBundles(
   }
 
   return result;
+}
+
+function uniqueDiscussionWarningEventId(eventId: string, existingEventIds: Set<string>): string {
+  const base = `${eventId}-discussion-warning`;
+  let candidate = base;
+  let suffix = 1;
+  while (existingEventIds.has(candidate)) {
+    candidate = `${base}-${suffix}`;
+    suffix += 1;
+  }
+  return candidate;
 }
 
 function collectStrictArtifactClaims(inputs: SessionBundleInput[]): Map<string, string> {
@@ -589,6 +650,9 @@ export function recordMaintenanceAttempts(
       status: input.status,
       detail: input.detail,
       attempted_at: input.attempted_at,
+      ...(input.discussion_disposition === undefined
+        ? {}
+        : { discussion_disposition: input.discussion_disposition }),
     };
     if (attemptIds.has(attempt.attempt_id)) continue;
     attemptIds.add(attempt.attempt_id);
@@ -711,6 +775,14 @@ function parsePriorMaintenanceAttempt(
     status,
     detail: requireString(record.detail, `${field}.detail`),
     attempted_at: requireIsoTimestamp(record.attempted_at, `${field}.attempted_at`),
+    ...(record.discussion_disposition === undefined
+      ? {}
+      : {
+          discussion_disposition: requireDiscussionDisposition(
+            record.discussion_disposition,
+            `${field}.discussion_disposition`
+          ),
+        }),
   };
   const parsed: MaintenanceAttempt = {
     ...input,
@@ -739,6 +811,7 @@ function maintenanceAttemptId(input: MaintenanceAttemptInput): string {
     input.status,
     input.detail,
     input.attempted_at,
+    input.discussion_disposition ?? '',
   ].join('\u0000');
   return `sha256:${createHash('sha256').update(identity, 'utf8').digest('hex')}`;
 }
