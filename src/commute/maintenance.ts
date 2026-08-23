@@ -58,6 +58,20 @@ export interface MaintenanceAttemptInput {
 
 export type DiscussionDisposition = 'incorporated' | 'omitted_unsupported' | 'unresolved';
 
+export function requireDiscussionDisposition(
+  candidate: unknown,
+  field: string
+): DiscussionDisposition {
+  if (
+    candidate !== 'incorporated' &&
+    candidate !== 'omitted_unsupported' &&
+    candidate !== 'unresolved'
+  ) {
+    throw new Error(`${field} has an unsupported status`);
+  }
+  return candidate;
+}
+
 export interface MaintenanceAttempt extends MaintenanceAttemptInput {
   attempt_id: string;
   bundle_session_id: string;

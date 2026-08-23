@@ -99,6 +99,7 @@ export interface ItemActionEvent extends BaseSessionEvent {
   item: QueueItemIdentity;
   user_words: string;
   discussion?: ItemDiscussion;
+  discussion_warning?: string;
 }
 
 export interface ItemDiscussion {
@@ -636,15 +637,14 @@ function validateEvent(
       const action = requireEnum(record.action, ITEM_ACTIONS, `${field}.action`);
       const userWords = requireString(record.user_words, `${field}.user_words`);
       requireUserActionEvidence(base.evidence, `${field}.evidence`);
-      if (record.discussion !== undefined && action !== 'wiki_this') {
-        throw new Error(`${field}.discussion is allowed only for wiki_this`);
-      }
       let discussion: ItemDiscussion | undefined;
+      let discussionWarning: string | undefined;
       if (record.discussion !== undefined) {
         try {
+          if (action !== 'wiki_this') throw new Error('is allowed only for wiki_this');
           discussion = validateItemDiscussion(record.discussion, `${field}.discussion`);
-        } catch {
-          // Optional context must never discard an otherwise exact wiki capture.
+        } catch (error) {
+          discussionWarning = `${field}.discussion was omitted: ${error instanceof Error ? error.message : 'invalid discussion'}`;
         }
       }
       return {
@@ -654,6 +654,7 @@ function validateEvent(
         item: validateExactItem(record.item, `${field}.item`, queueItems),
         user_words: userWords,
         ...(discussion === undefined ? {} : { discussion }),
+        ...(discussionWarning === undefined ? {} : { discussion_warning: discussionWarning }),
       };
     }
     case 'unresolved_capture':

@@ -24,6 +24,7 @@ import {
   discussionContextKey,
   requireMaintenanceAttemptSource,
   requireMaintenanceAttemptStatus,
+  requireDiscussionDisposition,
   requireMaintenanceHttpUrl,
 } from './maintenance.js';
 import { requireIsoTimestamp } from '../shared/time.js';
@@ -402,6 +403,21 @@ export function reconcileSessionBundles(
       };
 
       if (event.kind === 'item_action') {
+        if (event.discussion_warning !== undefined) {
+          result.quality_incidents.push({
+            session_id: bundle.session.session_id,
+            event_id: `${event.event_id}-discussion-warning`,
+            kind: 'quality_incident',
+            event: {
+              event_id: `${event.event_id}-discussion-warning`,
+              sequence: event.sequence,
+              kind: 'quality_incident',
+              observed_behavior: event.discussion_warning,
+              boundary: 'optional discussion validation',
+              evidence: event.evidence,
+            },
+          });
+        }
         if (event.action === 'wiki_this') {
           if (refersToPriorWikiCapture(event.user_words)) {
             const convertedEvent: CommuteSessionBundle['events'][number] = {
@@ -619,6 +635,9 @@ export function recordMaintenanceAttempts(
       status: input.status,
       detail: input.detail,
       attempted_at: input.attempted_at,
+      ...(input.discussion_disposition === undefined
+        ? {}
+        : { discussion_disposition: input.discussion_disposition }),
     };
     if (attemptIds.has(attempt.attempt_id)) continue;
     attemptIds.add(attempt.attempt_id);
@@ -741,6 +760,14 @@ function parsePriorMaintenanceAttempt(
     status,
     detail: requireString(record.detail, `${field}.detail`),
     attempted_at: requireIsoTimestamp(record.attempted_at, `${field}.attempted_at`),
+    ...(record.discussion_disposition === undefined
+      ? {}
+      : {
+          discussion_disposition: requireDiscussionDisposition(
+            record.discussion_disposition,
+            `${field}.discussion_disposition`
+          ),
+        }),
   };
   const parsed: MaintenanceAttempt = {
     ...input,
@@ -769,6 +796,7 @@ function maintenanceAttemptId(input: MaintenanceAttemptInput): string {
     input.status,
     input.detail,
     input.attempted_at,
+    input.discussion_disposition ?? '',
   ].join('\u0000');
   return `sha256:${createHash('sha256').update(identity, 'utf8').digest('hex')}`;
 }

@@ -17,6 +17,7 @@ import {
   reconcileSessionBundles,
   recordMaintenanceAttempts,
 } from '../commute/import-session-bundles.js';
+import { requireDiscussionDisposition } from '../commute/maintenance.js';
 import {
   retrieveMaintenanceSources,
   type SourceRetrievalRecord,
@@ -106,7 +107,7 @@ Before finishing, write JSON to ${options.resultPath} with this shape:
   "status": "pr_created" | "no_change" | "insufficient_source" | "failed",
   "branch": "${options.branch}",
   "pr_url": "string when created",
-"results": [{ "maintenance_key": "...", "status": "pr_created" | "no_change" | "insufficient_source" | "unresolved" | "failed", "detail": "...", "discussion_disposition": "incorporated" | "omitted_unsupported" | "unresolved when that candidate has discussion" }]
+"results": [{ "maintenance_key": "...", "status": "pr_created" | "no_change" | "insufficient_source" | "unresolved" | "failed", "detail": "...", "discussion_disposition": "incorporated" | "omitted_unsupported" | "unresolved" }]
 }
 Use per-candidate status "pr_created" only for a candidate included in the PR, and put the specific change summary (for example, that an existing page was updated) in "detail". Use "no_change", "insufficient_source", "unresolved", or "failed" for every other candidate. Do not invent additional status values.
 Do not ask Brad for an intermediate approval. The resulting PR is the review point.`;
@@ -483,17 +484,6 @@ function parseAgentResultEntry(
           ),
         }),
   };
-}
-
-function requireDiscussionDisposition(candidate: unknown, field: string): DiscussionDisposition {
-  if (
-    candidate !== 'incorporated' &&
-    candidate !== 'omitted_unsupported' &&
-    candidate !== 'unresolved'
-  ) {
-    throw new Error(`${field} has an unsupported status`);
-  }
-  return candidate;
 }
 
 function requireMaintainerCandidateStatus(
