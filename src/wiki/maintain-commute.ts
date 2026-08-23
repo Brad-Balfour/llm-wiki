@@ -343,9 +343,9 @@ export function maintenanceAttemptsFromAgentResult(
   }
   const discussions = new Set(discussionMaintenanceKeys);
   for (const entry of result.results) {
-    if (discussions.has(entry.maintenance_key) && entry.discussion_disposition === undefined) {
+    if (discussions.has(entry.maintenance_key) !== (entry.discussion_disposition !== undefined)) {
       throw new Error(
-        `Maintainer result is missing discussion disposition for ${entry.maintenance_key}`
+        `Maintainer result discussion disposition does not match candidate ${entry.maintenance_key}`
       );
     }
   }

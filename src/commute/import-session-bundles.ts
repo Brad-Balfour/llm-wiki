@@ -404,12 +404,16 @@ export function reconcileSessionBundles(
 
       if (event.kind === 'item_action') {
         if (event.discussion_warning !== undefined) {
+          const warningEventId = uniqueDiscussionWarningEventId(
+            event.event_id,
+            new Set(bundle.events.map((candidate) => candidate.event_id))
+          );
           result.quality_incidents.push({
             session_id: bundle.session.session_id,
-            event_id: `${event.event_id}-discussion-warning`,
+            event_id: warningEventId,
             kind: 'quality_incident',
             event: {
-              event_id: `${event.event_id}-discussion-warning`,
+              event_id: warningEventId,
               sequence: event.sequence,
               kind: 'quality_incident',
               observed_behavior: event.discussion_warning,
@@ -523,6 +527,17 @@ export function reconcileSessionBundles(
   }
 
   return result;
+}
+
+function uniqueDiscussionWarningEventId(eventId: string, existingEventIds: Set<string>): string {
+  const base = `${eventId}-discussion-warning`;
+  let candidate = base;
+  let suffix = 1;
+  while (existingEventIds.has(candidate)) {
+    candidate = `${base}-${suffix}`;
+    suffix += 1;
+  }
+  return candidate;
 }
 
 function collectStrictArtifactClaims(inputs: SessionBundleInput[]): Map<string, string> {
