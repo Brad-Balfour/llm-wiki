@@ -82,6 +82,7 @@ export function recoverSessionBundleWithSuppliedQueue(
   const exactItems = items.map((item, index) => parseQueueItem(item, index));
   const events = requireArray(bundle.events, 'Recovery bundle events');
   const reservedWikiEventIds = recoveredWikiEventIds(events, exactItems);
+  const ambiguousNonItemEventIds = duplicateNonItemEventIds(events);
   const artifactEvidence = inspectArtifactFilenameEvidence(bundle, input.bundleFilename);
   const queueFingerprint = queueSnapshotFingerprint(queue);
   const wikiCaptures: RecoveredWikiCapture[] = [];
@@ -104,6 +105,7 @@ export function recoverSessionBundleWithSuppliedQueue(
       field,
       recoveredEventIds,
       reservedWikiEventIds,
+      ambiguousNonItemEventIds,
       recoveryWarnings
     );
     if (qualityIncident) {
@@ -116,6 +118,7 @@ export function recoverSessionBundleWithSuppliedQueue(
       field,
       recoveredEventIds,
       reservedWikiEventIds,
+      ambiguousNonItemEventIds,
       recoveryWarnings
     );
     if (generalCapture) {
@@ -251,6 +254,7 @@ function recoverQualityIncident(
   field: string,
   recoveredEventIds: Set<string>,
   reservedWikiEventIds: Set<string>,
+  ambiguousNonItemEventIds: Set<string>,
   recoveryWarnings: string[]
 ): RecoveredQualityIncident | undefined {
   if (record.kind !== 'quality_incident') return undefined;
@@ -259,6 +263,7 @@ function recoverQualityIncident(
     field,
     recoveredEventIds,
     reservedWikiEventIds,
+    ambiguousNonItemEventIds,
     recoveryWarnings
   );
   const observedBehavior = lenientOptionalString(record.observed_behavior);
@@ -278,6 +283,7 @@ function recoverGeneralCapture(
   field: string,
   recoveredEventIds: Set<string>,
   reservedWikiEventIds: Set<string>,
+  ambiguousNonItemEventIds: Set<string>,
   recoveryWarnings: string[]
 ): RecoveredGeneralCapture | undefined {
   if (record.kind !== 'general_capture') return undefined;
@@ -286,6 +292,7 @@ function recoverGeneralCapture(
     field,
     recoveredEventIds,
     reservedWikiEventIds,
+    ambiguousNonItemEventIds,
     recoveryWarnings
   );
   const userWords = lenientOptionalString(record.user_words);
@@ -304,12 +311,19 @@ function recoverNonItemEventBase(
   field: string,
   recoveredEventIds: Set<string>,
   reservedWikiEventIds: Set<string>,
+  ambiguousNonItemEventIds: Set<string>,
   recoveryWarnings: string[]
 ): { eventId: string; sequence: number; evidence: EventEvidence[] } | undefined {
   const eventId = lenientOptionalString(record.event_id);
   const sequence = lenientPositiveInteger(record.sequence);
   const evidence = recoverEvidence(record.evidence);
   if (!eventId || sequence === undefined || !evidence) return undefined;
+  if (ambiguousNonItemEventIds.has(eventId)) {
+    recoveryWarnings.push(
+      `${field} reuses non-item event identity ${eventId} and was not recovered.`
+    );
+    return undefined;
+  }
   if (reservedWikiEventIds.has(eventId)) {
     recoveryWarnings.push(
       `${field} reuses event identity ${eventId} reserved for a wiki capture and was not recovered.`
@@ -341,6 +355,19 @@ function recoveredWikiEventIds(events: unknown[], queueItems: ExactQueueItem[]):
     );
   }
   return eventIds;
+}
+
+function duplicateNonItemEventIds(events: unknown[]): Set<string> {
+  const counts = new Map<string, number>();
+  for (const event of events) {
+    const record = optionalRecord(event);
+    if (!record || (record.kind !== 'quality_incident' && record.kind !== 'general_capture')) {
+      continue;
+    }
+    const eventId = lenientOptionalString(record.event_id);
+    if (eventId) counts.set(eventId, (counts.get(eventId) ?? 0) + 1);
+  }
+  return new Set([...counts].flatMap(([eventId, count]) => (count > 1 ? [eventId] : [])));
 }
 
 function recoverEvidence(candidate: unknown): EventEvidence[] | undefined {

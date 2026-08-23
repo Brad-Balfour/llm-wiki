@@ -244,6 +244,53 @@ test('gives a recovered wiki capture precedence over a duplicate non-item event 
   }
 });
 
+test('omits duplicate recovered non-item event ids regardless of event order', () => {
+  const queue = (JSON.parse(validBundle) as { queue_snapshot: { queue: unknown } }).queue_snapshot
+    .queue;
+  const events = [
+    {
+      event_id: 'duplicate-non-item-id',
+      sequence: 1,
+      kind: 'quality_incident',
+      observed_behavior: 'The download was announced before it existed.',
+      boundary: 'bundle export',
+      evidence: [{ source: 'durable_contemporaneous_record', reference: 'Artifact list' }],
+    },
+    {
+      event_id: 'duplicate-non-item-id',
+      sequence: 2,
+      kind: 'general_capture',
+      user_words: 'Keep this unrelated observation.',
+      evidence: [{ source: 'explicit_user_capture', reference: 'Brad said this.' }],
+    },
+  ];
+
+  for (const orderedEvents of [events, [...events].reverse()]) {
+    const result = reconcileSessionBundles([
+      {
+        filename: artifactFilename,
+        text: JSON.stringify({
+          schema_version: 'commute-session-bundle.v1',
+          session: { session_id: `duplicate-non-item-${orderedEvents[0]!.kind}` },
+          queue_snapshot: { filename: 'fixture-queue.txt', queue: {} },
+          events: orderedEvents,
+        }),
+        recoveryQueue: { filename: 'fixture-queue.txt', text: JSON.stringify(queue) },
+      },
+    ]);
+
+    assert.equal(result.sessions[0]?.status, 'accepted');
+    assert.equal(result.quality_incidents.length, 0);
+    assert.equal(result.general_captures.length, 0);
+    assert.equal(
+      result.sessions[0]?.recovery_warnings?.filter((warning) =>
+        warning.includes('reuses non-item event identity')
+      ).length,
+      2
+    );
+  }
+});
+
 test('recovers an exact wiki capture when the period label contradicts the artifact time', () => {
   const malformed = JSON.parse(validBundle) as {
     session: Record<string, unknown>;
