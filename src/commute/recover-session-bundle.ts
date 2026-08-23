@@ -57,10 +57,11 @@ export interface RecoveredSessionBundle {
 }
 
 /**
- * Recover only explicitly marked wiki captures from a malformed historical
- * bundle. This is intentionally separate from v1 validation: the supplied
- * queue supplies exact item identity; the malformed bundle supplies only its
- * named queue and legacy item reference.
+ * Recover evidence-supported observations from a malformed historical bundle.
+ * Exact wiki captures remain the only recovered item actions: the supplied
+ * queue supplies their exact identity. Non-item observations can be retained
+ * when they are independently well-formed, without making recovery depend on
+ * malformed item lifecycle data.
  */
 export function recoverSessionBundleWithSuppliedQueue(
   input: SuppliedQueueRecoveryInput
@@ -80,6 +81,7 @@ export function recoverSessionBundleWithSuppliedQueue(
   }
   const exactItems = items.map((item, index) => parseQueueItem(item, index));
   const events = requireArray(bundle.events, 'Recovery bundle events');
+  const reservedWikiEventIds = recoveredWikiEventIds(events, exactItems);
   const artifactEvidence = inspectArtifactFilenameEvidence(bundle, input.bundleFilename);
   const queueFingerprint = queueSnapshotFingerprint(queue);
   const wikiCaptures: RecoveredWikiCapture[] = [];
@@ -101,6 +103,7 @@ export function recoverSessionBundleWithSuppliedQueue(
       record,
       field,
       recoveredEventIds,
+      reservedWikiEventIds,
       recoveryWarnings
     );
     if (qualityIncident) {
@@ -112,6 +115,7 @@ export function recoverSessionBundleWithSuppliedQueue(
       record,
       field,
       recoveredEventIds,
+      reservedWikiEventIds,
       recoveryWarnings
     );
     if (generalCapture) {
@@ -246,10 +250,17 @@ function recoverQualityIncident(
   record: Record<string, unknown>,
   field: string,
   recoveredEventIds: Set<string>,
+  reservedWikiEventIds: Set<string>,
   recoveryWarnings: string[]
 ): RecoveredQualityIncident | undefined {
   if (record.kind !== 'quality_incident') return undefined;
-  const event = recoverNonItemEventBase(record, field, recoveredEventIds, recoveryWarnings);
+  const event = recoverNonItemEventBase(
+    record,
+    field,
+    recoveredEventIds,
+    reservedWikiEventIds,
+    recoveryWarnings
+  );
   const observedBehavior = lenientOptionalString(record.observed_behavior);
   const boundary = lenientOptionalString(record.boundary);
   if (!event || !observedBehavior || !boundary) {
@@ -266,10 +277,17 @@ function recoverGeneralCapture(
   record: Record<string, unknown>,
   field: string,
   recoveredEventIds: Set<string>,
+  reservedWikiEventIds: Set<string>,
   recoveryWarnings: string[]
 ): RecoveredGeneralCapture | undefined {
   if (record.kind !== 'general_capture') return undefined;
-  const event = recoverNonItemEventBase(record, field, recoveredEventIds, recoveryWarnings);
+  const event = recoverNonItemEventBase(
+    record,
+    field,
+    recoveredEventIds,
+    reservedWikiEventIds,
+    recoveryWarnings
+  );
   const userWords = lenientOptionalString(record.user_words);
   if (!event || !userWords || !hasUserActionEvidence(event.evidence)) {
     recoveryWarnings.push(
@@ -285,17 +303,44 @@ function recoverNonItemEventBase(
   record: Record<string, unknown>,
   field: string,
   recoveredEventIds: Set<string>,
+  reservedWikiEventIds: Set<string>,
   recoveryWarnings: string[]
 ): { eventId: string; sequence: number; evidence: EventEvidence[] } | undefined {
   const eventId = lenientOptionalString(record.event_id);
   const sequence = lenientPositiveInteger(record.sequence);
   const evidence = recoverEvidence(record.evidence);
   if (!eventId || sequence === undefined || !evidence) return undefined;
+  if (reservedWikiEventIds.has(eventId)) {
+    recoveryWarnings.push(
+      `${field} reuses event identity ${eventId} reserved for a wiki capture and was not recovered.`
+    );
+    return undefined;
+  }
   if (recoveredEventIds.has(eventId)) {
     recoveryWarnings.push(`${field} reuses event identity ${eventId} and was not recovered.`);
     return undefined;
   }
   return { eventId, sequence, evidence };
+}
+
+function recoveredWikiEventIds(events: unknown[], queueItems: ExactQueueItem[]): Set<string> {
+  const eventIds = new Set<string>();
+  for (const [index, event] of events.entries()) {
+    const record = optionalRecord(event);
+    if (!record || !isWikiCapture(record)) continue;
+    const item = resolveLegacyItem(
+      record.item,
+      queueItems,
+      `Recovery bundle events[${index}].item`
+    );
+    const userWords =
+      lenientOptionalString(record.user_words) ?? lenientOptionalString(record.feedback);
+    const contradictory = Boolean(userWords && refersToPriorWikiCapture(userWords));
+    eventIds.add(
+      lenientOptionalString(record.event_id) ?? recoveredCaptureEventId(item, contradictory)
+    );
+  }
+  return eventIds;
 }
 
 function recoverEvidence(candidate: unknown): EventEvidence[] | undefined {

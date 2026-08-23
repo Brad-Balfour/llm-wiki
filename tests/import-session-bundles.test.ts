@@ -179,6 +179,71 @@ test('retains supported non-item observations while recovering a malformed bundl
   );
 });
 
+test('recovers from an embedded queue snapshot missing v2 metadata', () => {
+  const malformed = JSON.parse(validBundle) as {
+    queue_snapshot: { filename: string; queue: Record<string, unknown> };
+  };
+  delete malformed.queue_snapshot.queue.queue_version;
+
+  const result = reconcileSessionBundles([
+    {
+      filename: artifactFilename,
+      text: JSON.stringify(malformed),
+      recoveryQueue: {
+        filename: malformed.queue_snapshot.filename,
+        text: JSON.stringify(
+          (JSON.parse(validBundle) as { queue_snapshot: { queue: unknown } }).queue_snapshot.queue
+        ),
+      },
+    },
+  ]);
+
+  assert.equal(result.sessions[0]?.status, 'accepted');
+  assert.equal(result.sessions[0]?.integrity_state, 'recovered');
+  assert.equal(result.maintenance_candidates.length, 1);
+});
+
+test('gives a recovered wiki capture precedence over a duplicate non-item event id', () => {
+  const queue = (JSON.parse(validBundle) as { queue_snapshot: { queue: unknown } }).queue_snapshot
+    .queue;
+  const events = [
+    {
+      event_id: 'shared-event-id',
+      sequence: 1,
+      kind: 'quality_incident',
+      observed_behavior: 'The download was announced before it existed.',
+      boundary: 'bundle export',
+      evidence: [{ source: 'durable_contemporaneous_record', reference: 'Artifact list' }],
+    },
+    { event_id: 'shared-event-id', sequence: 2, action: 'wiki', item: 1 },
+  ];
+
+  for (const orderedEvents of [events, [...events].reverse()]) {
+    const malformed = {
+      schema_version: 'commute-session-bundle.v1',
+      session: { session_id: `duplicate-id-${orderedEvents[0]!.kind ?? 'wiki'}` },
+      queue_snapshot: { filename: 'fixture-queue.txt', queue: {} },
+      events: orderedEvents,
+    };
+    const result = reconcileSessionBundles([
+      {
+        filename: artifactFilename,
+        text: JSON.stringify(malformed),
+        recoveryQueue: { filename: 'fixture-queue.txt', text: JSON.stringify(queue) },
+      },
+    ]);
+
+    assert.equal(result.sessions[0]?.status, 'accepted');
+    assert.equal(result.maintenance_candidates.length, 1);
+    assert.equal(result.quality_incidents.length, 0);
+    assert.ok(
+      result.sessions[0]?.recovery_warnings?.some((warning) =>
+        warning.includes('reserved for a wiki capture')
+      )
+    );
+  }
+});
+
 test('recovers an exact wiki capture when the period label contradicts the artifact time', () => {
   const malformed = JSON.parse(validBundle) as {
     session: Record<string, unknown>;
