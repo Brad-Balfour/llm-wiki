@@ -5,6 +5,7 @@ import path from 'node:path';
 import { reconcileSessionBundles } from './import-session-bundles.js';
 import {
   parseCommuteSessionBundleText,
+  parseCommuteSessionBundleTextWithRelaxedArtifactFilename,
   queueSnapshotFingerprint,
   validateTldrCommuteQueueV2,
 } from './session-bundle.js';
@@ -75,14 +76,8 @@ export async function runPreflight(
       general_captures: intake.general_captures,
       navigation_events: intake.navigation_events,
       event_conversions: intake.event_conversions,
-      unresolved_captures: intake.unresolved_captures.map(({ session_id, event_id }) => ({
-        session_id,
-        event_id,
-      })),
-      quality_incidents: intake.quality_incidents.map(({ session_id, event_id }) => ({
-        session_id,
-        event_id,
-      })),
+      unresolved_captures: intake.unresolved_captures,
+      quality_incidents: intake.quality_incidents,
     },
     conversation_coverage: intake.maintenance_candidates.map((candidate) => ({
       maintenance_key: candidate.maintenance_key,
@@ -109,7 +104,15 @@ function compareRecoveryQueue(input: {
   recoveryQueue: { filename: string; text: string };
 }) {
   try {
-    const bundle = parseCommuteSessionBundleText(input.text);
+    let bundle;
+    try {
+      bundle = parseCommuteSessionBundleText(input.text);
+    } catch {
+      bundle = parseCommuteSessionBundleTextWithRelaxedArtifactFilename(
+        input.text,
+        input.filename
+      ).bundle;
+    }
     const supplied = validateTldrCommuteQueueV2(JSON.parse(input.recoveryQueue.text) as unknown);
     const suppliedFingerprint = queueSnapshotFingerprint(supplied);
     const embeddedFingerprint = queueSnapshotFingerprint(bundle.queue_snapshot.queue);

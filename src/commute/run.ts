@@ -10,22 +10,42 @@ interface RunOptions extends PreflightOptions {
   watchSeconds?: number;
 }
 
-export async function runCommute(options: RunOptions) {
+interface RunDependencies {
+  githubState: typeof githubState;
+  watchGithubState: typeof watchGithubState;
+}
+
+const defaultDependencies: RunDependencies = { githubState, watchGithubState };
+
+export async function runCommute(options: RunOptions, dependencies = defaultDependencies) {
   const startedAt = new Date().toISOString();
   const preflight = await runPreflight(options, startedAt, false);
-  const github =
-    options.githubPr === undefined
-      ? { outcome: 'not_requested' as const }
-      : options.watchSeconds === undefined
-        ? {
-            outcome: 'snapshot' as const,
-            state: await githubState(options.githubPr.repository, options.githubPr.number),
-          }
-        : await watchGithubState(
-            options.githubPr.repository,
-            options.githubPr.number,
-            options.watchSeconds * 1_000
-          );
+  let github:
+    | { outcome: 'not_requested' }
+    | { outcome: 'snapshot'; state: unknown }
+    | { outcome: 'state_changed' | 'timeout'; state: unknown; observations: number }
+    | { outcome: 'error'; error: string };
+  if (options.githubPr === undefined) github = { outcome: 'not_requested' };
+  else {
+    try {
+      github =
+        options.watchSeconds === undefined
+          ? {
+              outcome: 'snapshot',
+              state: await dependencies.githubState(
+                options.githubPr.repository,
+                options.githubPr.number
+              ),
+            }
+          : await dependencies.watchGithubState(
+              options.githubPr.repository,
+              options.githubPr.number,
+              options.watchSeconds * 1_000
+            );
+    } catch (error) {
+      github = { outcome: 'error', error: error instanceof Error ? error.message : String(error) };
+    }
+  }
   const completedAt = new Date().toISOString();
   const result = {
     schema_version: 'commute-run.v1',
@@ -49,6 +69,7 @@ export async function runCommute(options: RunOptions) {
       ...preflight.conversation_coverage
         .filter((coverage) => coverage.shared_chat_recovery_required)
         .map((coverage) => ({ type: 'shared_chat_recovery', ...coverage })),
+      ...(github.outcome === 'error' ? [{ type: 'github_state', ...github }] : []),
     ],
   };
   await mkdir(path.dirname(options.output), { recursive: true });

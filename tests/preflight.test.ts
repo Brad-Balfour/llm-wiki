@@ -74,3 +74,26 @@ test('one commute command emits a single private orchestration result', async ()
   assert.equal(result.output, output);
   assert.match(await readFile(output, 'utf8'), /commute-run.v1/);
 });
+
+test('a GitHub state error does not discard successful local intake', async () => {
+  const directory = await mkdtemp(path.join(os.tmpdir(), 'llm-wiki-preflight-'));
+  const bundle = path.join(directory, 'bundle.txt');
+  const output = path.join(directory, '.private', 'commute-run.json');
+  await writeFile(bundle, await readFile(fixture, 'utf8'));
+  const result = await runCommute(
+    {
+      inputs: [{ bundle }],
+      sharedChats: [],
+      output,
+      githubPr: { repository: 'Brad-Balfour/llm-wiki', number: 92 },
+    },
+    {
+      githubState: async () => {
+        throw new Error('offline');
+      },
+      watchGithubState: async () => ({ outcome: 'timeout', state: {}, observations: 1 }),
+    }
+  );
+  assert.equal(result.github.outcome, 'error');
+  assert.match(await readFile(output, 'utf8'), /offline/);
+});
