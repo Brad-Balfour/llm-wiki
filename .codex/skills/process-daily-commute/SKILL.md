@@ -10,6 +10,26 @@ file review. Read the `Recurring daily commute processing` section of
 `AGENTS.md` first; it is the authoritative policy. Use this skill for execution
 order and completion checks.
 
+## Publication scope and communication
+
+Follow the risk-tiered publication policy in `AGENTS.md`. Content- and
+evidence-only daily publication relies on deterministic gates and explicit
+merge authorization; it does not require a general-purpose AI review unless a
+gate or maintainer identifies ambiguity. Routine generated state updates need
+at most one required latest-head review. Code, schema, routing, prompt, or
+workflow behavior changes need one latest-head review after local checks.
+
+Batch findings from one review round into one fix commit. Request another full
+review only when a fix materially changes behavior or invalidates the prior
+review. Keep the daily PR to the day's evidence and the smallest directly
+necessary guard; route larger workflow refactors, historical cleanup, and
+unrelated product work to linked follow-up issues.
+
+Use only these routine progress updates: intake validated (including a genuine
+evidence problem), PR ready (including checks and any action Brad must take),
+and merged and finished or concretely blocked. Do not ask for acknowledgment,
+narrate routine tool calls, or repeat unchanged polling state.
+
 ## Retrieve Library intake
 
 When Brad names a commute date or says "today's commute," treat missing file
@@ -135,18 +155,18 @@ only when the intended action or target genuinely cannot be determined.
 3. Run focused tests while iterating, then run `npm run check`, strict validation
    for every touched OpenSpec change, and `git diff --check`.
 4. Commit only the intended tracked files, push the branch to `origin`, and open
-   or update the draft PR required by the repository's `AGENTS.md`. Never stop
-   at a local commit; use the PR body or checklist for unfinished review, CI, or
-   a concrete Project prompt replacement or source-document upload without
-   changing the repository-authorized draft state.
+   or update the PR required by the repository's `AGENTS.md`. Use draft status
+   only for a genuine unfinished item. Never stop at a local commit; use the PR
+   body or checklist for unfinished review, CI, or a concrete Project prompt
+   replacement or source-document upload without delaying a review-ready PR.
 5. Keep the PR body current with user impact, root cause, evidence counts,
    validation, and the latest head commit. Cross-link relevant issues.
-6. Inspect all review threads. Fix actionable comments, reply with the commit and
-   validation evidence, resolve the thread, and request a fresh Codex review of
-   the new head when the fix materially changes behavior.
-7. Wait for the latest-head CI checks and required review workflows. Merge only
-   with explicit user authorization and only when checks and actionable review
-   threads are clean.
+6. Inspect all required review threads. Fix actionable comments, reply with the
+   commit and validation evidence, resolve the thread, and request a fresh
+   review only when the fix materially changes behavior.
+7. Wait for the latest-head CI checks and the review workflows required by the
+   applicable risk tier. Merge only with explicit user authorization and only
+   when checks and actionable review threads are clean.
 
 ## Post-merge artifact cleanup
 
@@ -156,6 +176,11 @@ consumed by durably completed commute runs; this skill text alone is not
 authorization. Record the applicable standing or current-request authorization
 in the private retrieval manifest. Cleanup may begin only after processing is
 durably complete:
+
+After an authorized merge, pull `main` and verify the repository before cleanup.
+Complete already-authorized exact cleanup and the final handoff without asking
+Brad to repeat authorization already recorded in `AGENTS.md`; report any
+mandatory environment safety confirmation precisely.
 
 1. If the run has a PR, do not delete anything until that exact PR is merged.
    An open, draft, closed-unmerged, or checks-pending PR leaves cleanup pending.

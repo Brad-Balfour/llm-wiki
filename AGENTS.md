@@ -110,6 +110,34 @@ the task introduces that surface.
 - LLM enrichment may be optional, but deterministic URL and source ingestion
   must not require an API key or a paid model.
 
+## Commute publication policy
+
+Keep the PR as the publication record, review boundary, rollback point, and
+Pages trigger. Make review proportional to risk rather than adding automatic
+general-purpose review rounds.
+
+- Content- and evidence-only daily publication relies on deterministic gates
+  and explicit merge authorization. Do not require a general-purpose AI review
+  unless a gate or maintainer identifies ambiguity.
+- Routine generated provenance or state updates use deterministic gates first.
+  Require at most one latest-head review when repository policy or a maintainer
+  requires it.
+- Code, schema, routing, prompt, workflow, or other behavior changes receive
+  one review of the latest complete head after local checks.
+- Batch findings from one review round into one fix commit. Request another
+  full review only when that fix materially changes behavior or invalidates the
+  earlier review; documentation-only or mechanical fixes do not restart it.
+
+Keep a commute PR limited to the day’s evidence and the smallest directly
+necessary guard. Put substantial workflow refactors, historical cleanup, and
+unrelated product work in linked follow-up issues instead of extending the
+daily critical path.
+
+Use brief, non-interrupting milestone updates: intake validated (including a
+genuine evidence problem), PR ready (including checks and any action Brad must
+take), and merged and finished or concretely blocked. Do not request an
+acknowledgment or narrate routine tool calls and unchanged polling state.
+
 ## Recurring daily commute processing
 
 When Brad supplies dated commute queues, session bundles, and shared-chat URLs
@@ -146,7 +174,9 @@ For every daily commute intake:
    when one fits. Add an evidence-backed comment with the exact date, artifact
    identity, observed behavior, boundary, and resulting PR. Avoid duplicating
    an equivalent comment already on the issue. If no issue fits, keep the
-   finding visible in the PR and call out the missing issue explicitly.
+   finding visible in the PR and call out the missing issue explicitly. Do not
+   turn substantial workflow refactors, historical cleanup, or unrelated
+   product work into same-run implementation scope.
 5. Treat friction in the processing run itself as workflow evidence. When the
    same omission or mistake could recur, add the smallest durable instruction,
    test, or automation guard that makes the next daily pass simpler and safer.
@@ -158,7 +188,8 @@ For every daily commute intake:
    it was applied, then update the tracked live-version record. Do not make Brad
    infer or remember an external deployment step from a repository diff or PR.
 7. Run the relevant local validation, commit the tracked daily evidence, push
-   the branch, and open a draft PR against the intended base. A local-only
+   the branch, and open a PR against the intended base. Use draft status only
+   for a genuine unfinished item, not as a routine review delay. A local-only
    commit is not a completed daily commute handoff. Wait for the initial PR
    checks and report their state.
 8. Cross-link the PR and issue comments, then finish with the remote branch,
@@ -167,6 +198,10 @@ For every daily commute intake:
    Project's prompt or documents still need to be updated. Keep the needed
    update visible before merge, but do not change the PR's draft/ready state
    because of it; ready for review is compatible with a pending Project update.
+9. After an authorized merge, pull `main`, verify the repository, complete any
+   already-authorized exact artifact cleanup, and issue the final handoff
+   without asking Brad to repeat authorization already recorded here. Report
+   any mandatory environment safety confirmation precisely.
 
 If the day produces no justified tracked change, report an explicit no-change
 result with the validation and issue-routing evidence; do not manufacture a PR
@@ -183,11 +218,12 @@ or public wiki content merely to make the loop look active.
   the review is read-only, and the user has authorized sending the committed
   diff to Claude so the external-data reviewer has the relevant context.
 - Do not merge or deploy without explicit user authorization. A request to
-  create a PR authorizes a branch, commit, push, and draft PR.
-- Before merging, wait for the PR head SHA's Copilot review workflow to reach a
-  completed state, then inspect its submitted review and every unresolved review
-  thread. An absent review result while the workflow is running is never
-  clearance to merge; address actionable findings in that PR or a clearly linked
+  create a PR authorizes a branch, commit, push, and review-ready PR unless a
+  genuine unfinished item requires draft status.
+- Apply the commute publication risk tiers above before requesting or waiting
+  for general-purpose AI review. When a review is required, wait for the latest
+  head's review workflow to complete, inspect submitted reviews and unresolved
+  threads, and address actionable findings in that PR or a clearly linked
   follow-up before publishing.
 - After addressing a PR review comment, reply in that thread with the fix and
   validation evidence, then resolve the thread. The user has given standing
