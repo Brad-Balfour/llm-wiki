@@ -13,6 +13,7 @@ import {
   type CommuteSessionImport,
   type MaintenanceCandidate,
   type MaintenanceAttemptInput,
+  type DiscussionDisposition,
   reconcileSessionBundles,
   recordMaintenanceAttempts,
 } from '../commute/import-session-bundles.js';
@@ -68,6 +69,7 @@ export interface AgentResult {
     maintenance_key: string;
     status: MaintainerCandidateStatus;
     detail: string;
+    discussion_disposition?: DiscussionDisposition;
   }>;
 }
 
@@ -104,7 +106,7 @@ Before finishing, write JSON to ${options.resultPath} with this shape:
   "status": "pr_created" | "no_change" | "insufficient_source" | "failed",
   "branch": "${options.branch}",
   "pr_url": "string when created",
-  "results": [{ "maintenance_key": "...", "status": "pr_created" | "no_change" | "insufficient_source" | "unresolved" | "failed", "detail": "..." }]
+"results": [{ "maintenance_key": "...", "status": "pr_created" | "no_change" | "insufficient_source" | "unresolved" | "failed", "detail": "...", "discussion_disposition": "incorporated" | "omitted_unsupported" | "unresolved when that candidate has discussion" }]
 }
 Use per-candidate status "pr_created" only for a candidate included in the PR, and put the specific change summary (for example, that an existing page was updated) in "detail". Use "no_change", "insufficient_source", "unresolved", or "failed" for every other candidate. Do not invent additional status values.
 Do not ask Brad for an intermediate approval. The resulting PR is the review point.`;
@@ -225,7 +227,10 @@ async function main(): Promise<void> {
       maintenanceAttemptsFromAgentResult(
         agentResult,
         viableSources.map((source) => source.maintenance_key),
-        new Date().toISOString()
+        new Date().toISOString(),
+        candidatesToAttempt
+          .filter((candidate) => candidate.discussion !== undefined)
+          .map((candidate) => candidate.maintenance_key)
       )
     );
     await writeJson(intakePath, intake);
@@ -311,7 +316,8 @@ export function maintenanceCandidatesForAttempt(
 export function maintenanceAttemptsFromAgentResult(
   result: AgentResult,
   expectedMaintenanceKeys: string[],
-  attemptedAt: string
+  attemptedAt: string,
+  discussionMaintenanceKeys: string[] = []
 ): MaintenanceAttemptInput[] {
   const expected = new Set(expectedMaintenanceKeys);
   const seen = new Set<string>();
@@ -334,6 +340,14 @@ export function maintenanceAttemptsFromAgentResult(
       `Maintainer agent result is missing maintenance candidate(s): ${missing.join(', ')}`
     );
   }
+  const discussions = new Set(discussionMaintenanceKeys);
+  for (const entry of result.results) {
+    if (discussions.has(entry.maintenance_key) && entry.discussion_disposition === undefined) {
+      throw new Error(
+        `Maintainer result is missing discussion disposition for ${entry.maintenance_key}`
+      );
+    }
+  }
   if (
     result.status === 'pr_created' &&
     !result.results.some((entry) => entry.status === 'pr_created')
@@ -349,6 +363,9 @@ export function maintenanceAttemptsFromAgentResult(
     status: normalizedAgentAttemptStatus(result.status, entry.status),
     detail: entry.detail,
     attempted_at: attemptedAt,
+    ...(entry.discussion_disposition === undefined
+      ? {}
+      : { discussion_disposition: entry.discussion_disposition }),
   }));
 }
 
@@ -443,7 +460,12 @@ export function parseAgentResult(candidate: unknown, branch: string): AgentResul
 function parseAgentResultEntry(
   candidate: unknown,
   index: number
-): { maintenance_key: string; status: MaintainerCandidateStatus; detail: string } {
+): {
+  maintenance_key: string;
+  status: MaintainerCandidateStatus;
+  detail: string;
+  discussion_disposition?: DiscussionDisposition;
+} {
   if (typeof candidate !== 'object' || candidate === null || Array.isArray(candidate)) {
     throw new Error(`Maintainer agent result results[${index}] must be an object`);
   }
@@ -452,7 +474,26 @@ function parseAgentResultEntry(
     maintenance_key: requireString(result.maintenance_key, `results[${index}].maintenance_key`),
     status: requireMaintainerCandidateStatus(result.status, `results[${index}].status`),
     detail: requireString(result.detail, `results[${index}].detail`),
+    ...(result.discussion_disposition === undefined
+      ? {}
+      : {
+          discussion_disposition: requireDiscussionDisposition(
+            result.discussion_disposition,
+            `results[${index}].discussion_disposition`
+          ),
+        }),
   };
+}
+
+function requireDiscussionDisposition(candidate: unknown, field: string): DiscussionDisposition {
+  if (
+    candidate !== 'incorporated' &&
+    candidate !== 'omitted_unsupported' &&
+    candidate !== 'unresolved'
+  ) {
+    throw new Error(`${field} has an unsupported status`);
+  }
+  return candidate;
 }
 
 function requireMaintainerCandidateStatus(

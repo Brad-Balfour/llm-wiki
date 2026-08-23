@@ -53,7 +53,10 @@ export interface MaintenanceAttemptInput {
   status: MaintenanceAttemptStatus;
   detail: string;
   attempted_at: string;
+  discussion_disposition?: DiscussionDisposition;
 }
+
+export type DiscussionDisposition = 'incorporated' | 'omitted_unsupported' | 'unresolved';
 
 export interface MaintenanceAttempt extends MaintenanceAttemptInput {
   attempt_id: string;
@@ -85,10 +88,20 @@ export function parseMaintenanceCandidate(candidate: unknown, field: string): Ma
     title: requireString(record.title, `${field}.title`),
     url: requireMaintenanceHttpUrl(record.url, `${field}.url`),
     status: 'pending',
-    ...(record.discussion === undefined
-      ? {}
-      : { discussion: parseDiscussionContext(record.discussion, `${field}.discussion`) }),
+    ...optionalDiscussionContext(record.discussion, `${field}.discussion`),
   };
+}
+
+function optionalDiscussionContext(
+  candidate: unknown,
+  field: string
+): { discussion?: DiscussionContext } {
+  if (candidate === undefined) return {};
+  try {
+    return { discussion: parseDiscussionContext(candidate, field) };
+  } catch {
+    return {};
+  }
 }
 
 export function discussionContextKey(sessionId: string, eventId: string, url: string): string {

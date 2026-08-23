@@ -184,6 +184,37 @@
                 },
                 "item": { "$ref": "#/$defs/item" },
                 "user_words": { "type": "string", "minLength": 1 },
+                "discussion": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "summary",
+                    "important_questions",
+                    "conclusions",
+                    "requested_emphasis",
+                    "evidence"
+                  ],
+                  "properties": {
+                    "summary": { "type": "string", "minLength": 1 },
+                    "important_questions": {
+                      "type": "array",
+                      "items": { "type": "string", "minLength": 1 }
+                    },
+                    "conclusions": {
+                      "type": "array",
+                      "items": { "type": "string", "minLength": 1 }
+                    },
+                    "requested_emphasis": {
+                      "type": "array",
+                      "items": { "type": "string", "minLength": 1 }
+                    },
+                    "evidence": {
+                      "type": "array",
+                      "minItems": 1,
+                      "items": { "$ref": "#/$defs/evidence" }
+                    }
+                  }
+                },
                 "evidence": {
                   "type": "array",
                   "minItems": 1,

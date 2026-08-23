@@ -34,6 +34,7 @@ export type {
   MaintenanceAttemptInput,
   MaintenanceAttemptStatus,
   MaintenanceCandidate,
+  DiscussionDisposition,
   MaintenanceLatestResult,
 } from './maintenance.js';
 

@@ -636,12 +636,16 @@ function validateEvent(
       const action = requireEnum(record.action, ITEM_ACTIONS, `${field}.action`);
       const userWords = requireString(record.user_words, `${field}.user_words`);
       requireUserActionEvidence(base.evidence, `${field}.evidence`);
-      const discussion =
-        record.discussion === undefined
-          ? undefined
-          : validateItemDiscussion(record.discussion, `${field}.discussion`);
-      if (discussion !== undefined && action !== 'wiki_this') {
+      if (record.discussion !== undefined && action !== 'wiki_this') {
         throw new Error(`${field}.discussion is allowed only for wiki_this`);
+      }
+      let discussion: ItemDiscussion | undefined;
+      if (record.discussion !== undefined) {
+        try {
+          discussion = validateItemDiscussion(record.discussion, `${field}.discussion`);
+        } catch {
+          // Optional context must never discard an otherwise exact wiki capture.
+        }
       }
       return {
         ...base,
