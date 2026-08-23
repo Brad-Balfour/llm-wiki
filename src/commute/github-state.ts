@@ -1,6 +1,4 @@
 import { execFile } from 'node:child_process';
-import { fileURLToPath } from 'node:url';
-import path from 'node:path';
 import { promisify } from 'node:util';
 
 const execFileAsync = promisify(execFile);
@@ -29,11 +27,25 @@ export async function githubState(repository: string, pr: number): Promise<unkno
   return JSON.parse(stdout) as unknown;
 }
 
-if (
-  process.argv[1] &&
-  path.resolve(process.argv[1]) === path.resolve(fileURLToPath(import.meta.url))
-) {
-  const [repository, number] = process.argv.slice(2);
-  const state = await githubState(repository ?? '', Number(number));
-  process.stdout.write(`${JSON.stringify(state, null, 2)}\n`);
+export async function watchGithubState(
+  repository: string,
+  pr: number,
+  timeoutMs: number,
+  intervalMs = 5_000,
+  sleep: (milliseconds: number) => Promise<void> = (milliseconds) =>
+    new Promise((resolve) => setTimeout(resolve, milliseconds))
+): Promise<{ outcome: 'state_changed' | 'timeout'; state: unknown; observations: number }> {
+  const initial = await githubState(repository, pr);
+  const initialFingerprint = JSON.stringify(initial);
+  const deadline = Date.now() + timeoutMs;
+  let observations = 1;
+  let latest = initial;
+  while (Date.now() < deadline) {
+    await sleep(Math.min(intervalMs, Math.max(0, deadline - Date.now())));
+    latest = await githubState(repository, pr);
+    observations += 1;
+    if (JSON.stringify(latest) !== initialFingerprint)
+      return { outcome: 'state_changed', state: latest, observations };
+  }
+  return { outcome: 'timeout', state: latest, observations };
 }
