@@ -4,7 +4,7 @@ import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 
-import { runPreflight } from '../src/commute/preflight.js';
+import { parsePreflightOptions, runPreflight } from '../src/commute/preflight.js';
 import { runCommute } from '../src/commute/run.js';
 
 const fixture = path.resolve('tests/fixtures/commute-bundles/valid-partial-bundle.json');
@@ -96,4 +96,30 @@ test('a GitHub state error does not discard successful local intake', async () =
   );
   assert.equal(result.github.outcome, 'error');
   assert.match(await readFile(output, 'utf8'), /offline/);
+});
+
+test('preflight does not allow a recovery queue to be silently replaced', () => {
+  assert.throws(
+    () =>
+      parsePreflightOptions([
+        '--input',
+        'bundle.txt',
+        '--recover-with',
+        'first.txt',
+        '--recover-with',
+        'second.txt',
+        '--output',
+        '.private/result.json',
+      ]),
+    /only once/
+  );
+});
+
+test('a rejected bundle is retained as an unresolved orchestration item', async () => {
+  const directory = await mkdtemp(path.join(os.tmpdir(), 'llm-wiki-preflight-'));
+  const bundle = path.join(directory, 'invalid-bundle.txt');
+  const output = path.join(directory, '.private', 'commute-run.json');
+  await writeFile(bundle, '{not json');
+  const result = await runCommute({ inputs: [{ bundle }], sharedChats: [], output });
+  assert.equal(result.unresolved_items[0]?.type, 'rejected_session');
 });

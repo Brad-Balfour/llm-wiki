@@ -52,13 +52,16 @@ export async function runCommute(options: RunOptions, dependencies = defaultDepe
     result: 'completed',
     phases: {
       intake_started_at: startedAt,
-      preflight_completed_at: preflight.generated_at,
+      preflight_completed_at: preflight.phases.validation_completed_at,
       github_state_completed_at: completedAt,
       command_completed_at: completedAt,
     },
     preflight,
     github,
     unresolved_items: [
+      ...preflight.intake.sessions
+        .filter((session) => session.status === 'rejected')
+        .map((session) => ({ type: 'rejected_session', ...session })),
       ...preflight.intake.unresolved_captures.map((capture) => ({
         type: 'unresolved_capture',
         ...capture,

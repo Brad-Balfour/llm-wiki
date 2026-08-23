@@ -62,11 +62,24 @@ export async function runPreflight(
     },
     intake: {
       sessions: intake.sessions.map(
-        ({ input_filename, status, session_id, integrity_state, recovery_warnings, error }) => ({
+        ({
+          input_filename,
+          status,
+          session_id,
+          integrity_state,
+          queue_filename,
+          queue_fingerprint,
+          declared_artifact_filename,
+          recovery_warnings,
+          error,
+        }) => ({
           input_filename,
           status,
           ...(session_id === undefined ? {} : { session_id }),
           ...(integrity_state === undefined ? {} : { integrity_state }),
+          ...(queue_filename === undefined ? {} : { queue_filename }),
+          ...(queue_fingerprint === undefined ? {} : { queue_fingerprint }),
+          ...(declared_artifact_filename === undefined ? {} : { declared_artifact_filename }),
           ...(recovery_warnings === undefined ? {} : { recovery_warnings }),
           ...(error === undefined ? {} : { error }),
         })
@@ -148,6 +161,8 @@ export function parsePreflightOptions(args: string[]): PreflightOptions {
       inputs.push({ bundle: value });
       index += 1;
     } else if (arg === '--recover-with' && value && inputs.at(-1)) {
+      if (inputs.at(-1)!.recoveryQueue !== undefined)
+        throw new Error('--recover-with may appear only once for each --input');
       inputs.at(-1)!.recoveryQueue = value;
       index += 1;
     } else if (arg === '--shared-chat' && value) {
