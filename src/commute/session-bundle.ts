@@ -98,6 +98,15 @@ export interface ItemActionEvent extends BaseSessionEvent {
   action: ItemAction;
   item: QueueItemIdentity;
   user_words: string;
+  discussion?: ItemDiscussion;
+}
+
+export interface ItemDiscussion {
+  summary: string;
+  important_questions: string[];
+  conclusions: string[];
+  requested_emphasis: string[];
+  evidence: EventEvidence[];
 }
 
 export interface UnresolvedCaptureEvent extends BaseSessionEvent {
@@ -621,18 +630,26 @@ function validateEvent(
     case 'item_action': {
       rejectUnknownKeys(
         record,
-        ['event_id', 'sequence', 'kind', 'action', 'item', 'user_words', 'evidence'],
+        ['event_id', 'sequence', 'kind', 'action', 'item', 'user_words', 'discussion', 'evidence'],
         field
       );
       const action = requireEnum(record.action, ITEM_ACTIONS, `${field}.action`);
       const userWords = requireString(record.user_words, `${field}.user_words`);
       requireUserActionEvidence(base.evidence, `${field}.evidence`);
+      const discussion =
+        record.discussion === undefined
+          ? undefined
+          : validateItemDiscussion(record.discussion, `${field}.discussion`);
+      if (discussion !== undefined && action !== 'wiki_this') {
+        throw new Error(`${field}.discussion is allowed only for wiki_this`);
+      }
       return {
         ...base,
         kind,
         action,
         item: validateExactItem(record.item, `${field}.item`, queueItems),
         user_words: userWords,
+        ...(discussion === undefined ? {} : { discussion }),
       };
     }
     case 'unresolved_capture':
@@ -709,6 +726,30 @@ function validateEvent(
         boundary: requireEnum(record.boundary, ['start', 'end'] as const, `${field}.boundary`),
       };
   }
+}
+
+function validateItemDiscussion(candidate: unknown, field: string): ItemDiscussion {
+  const record = requireRecord(candidate, field);
+  rejectUnknownKeys(
+    record,
+    ['summary', 'important_questions', 'conclusions', 'requested_emphasis', 'evidence'],
+    field
+  );
+  const evidence = validateEvidence(record.evidence, `${field}.evidence`);
+  requireUserActionEvidence(evidence, `${field}.evidence`);
+  return {
+    summary: requireString(record.summary, `${field}.summary`),
+    important_questions: requireStringArray(
+      record.important_questions,
+      `${field}.important_questions`
+    ),
+    conclusions: requireStringArray(record.conclusions, `${field}.conclusions`),
+    requested_emphasis: requireStringArray(
+      record.requested_emphasis,
+      `${field}.requested_emphasis`
+    ),
+    evidence,
+  };
 }
 
 function validateEvidence(candidate: unknown, field: string): EventEvidence[] {

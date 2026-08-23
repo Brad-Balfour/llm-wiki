@@ -60,6 +60,24 @@ on a queue summary for wiki synthesis.
   the capture context and existing wiki
 - **AND** it SHALL not treat the queue headline/summary as the complete source.
 
+### Requirement: Item-Bound Discussion Context
+
+An exact `wiki_this` capture MAY include a concise, evidence-backed discussion
+record bound to that same session, event, queue item, and URL. The maintainer
+SHALL use supported context when it materially improves the page and SHALL keep
+it visibly distinct from retrieved-source facts. Absence or invalidity of a
+discussion record SHALL NOT block bundle export, import, or maintenance.
+
+#### Scenario: A saved item has supported discussion context
+
+- **WHEN** a maintenance candidate carries a discussion record with direct
+  evidence and exact saved-item identity
+- **THEN** the maintainer SHALL receive that record with the retrieved source
+- **AND** its private result SHALL state whether the discussion was incorporated,
+  omitted as unsupported, or left unresolved
+- **AND** it SHALL NOT attach a general capture or another item's discussion by
+  proximity or inference.
+
 #### Scenario: Source is inaccessible
 
 - **WHEN** a saved URL cannot be retrieved sufficiently

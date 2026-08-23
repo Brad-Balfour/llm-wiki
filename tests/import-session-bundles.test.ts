@@ -36,6 +36,26 @@ test('reconciles a valid partial bundle without a second approval step', () => {
   });
 });
 
+test('carries evidence-backed discussion only with its exact wiki capture', () => {
+  const bundle = JSON.parse(validBundle) as { events: Array<Record<string, unknown>> };
+  const wikiCapture = bundle.events[1]!;
+  const discussion = {
+    summary: 'Compare permanent specialist interfaces with task-created agents.',
+    important_questions: ['Which capabilities should remain stable across tasks?'],
+    conclusions: ['Use explicit contracts at the durable specialist boundary.'],
+    requested_emphasis: ['Keep this separate from source claims.'],
+    evidence: [{ source: 'explicit_user_capture', reference: 'Brad stated this during the save.' }],
+  };
+  wikiCapture.discussion = discussion;
+
+  const result = reconcileSessionBundles([
+    { filename: artifactFilename, text: JSON.stringify(bundle) },
+  ]);
+  const candidate = result.maintenance_candidates[0];
+  assert.equal(candidate?.discussion?.summary, discussion.summary);
+  assert.equal(candidate?.discussion?.discussion_key.startsWith('discussion-'), true);
+});
+
 test('preserves an invalid bundle as a rejected independent session', () => {
   const result = reconcileSessionBundles(
     [

@@ -21,6 +21,7 @@ import {
 } from './recover-session-bundle.js';
 import {
   parseMaintenanceCandidate,
+  discussionContextKey,
   requireMaintenanceAttemptSource,
   requireMaintenanceAttemptStatus,
   requireMaintenanceHttpUrl,
@@ -266,6 +267,22 @@ export function reconcileSessionBundles(
               title: capture.title,
               url: capture.url,
               status: 'pending',
+              ...(capture.discussion === undefined
+                ? {}
+                : {
+                    discussion: {
+                      discussion_key: discussionContextKey(
+                        recovered.sessionId,
+                        capture.eventId,
+                        capture.url
+                      ),
+                      summary: capture.discussion.summary,
+                      important_questions: capture.discussion.importantQuestions,
+                      conclusions: capture.discussion.conclusions,
+                      requested_emphasis: capture.discussion.requestedEmphasis,
+                      evidence: capture.discussion.evidence,
+                    },
+                  }),
             });
           }
           for (const capture of recovered.contradictoryWikiCaptures) {
@@ -426,6 +443,18 @@ export function reconcileSessionBundles(
                 title: event.item.title,
                 url: event.item.url,
                 status: 'pending',
+                ...(event.discussion === undefined
+                  ? {}
+                  : {
+                      discussion: {
+                        discussion_key: discussionContextKey(
+                          bundle.session.session_id,
+                          event.event_id,
+                          event.item.url
+                        ),
+                        ...event.discussion,
+                      },
+                    }),
               });
             }
           }
