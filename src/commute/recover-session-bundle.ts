@@ -4,7 +4,9 @@ import { errorMessage } from '../shared/errors.js';
 import { optionalRecord, requireArray, requireRecord } from '../shared/validate.js';
 import {
   bundleArtifactFilenameMatches,
+  EVIDENCE_SOURCES,
   queueSnapshotFingerprint,
+  type EventEvidence,
   validateTldrCommuteQueueV2,
 } from './session-bundle.js';
 
@@ -27,6 +29,21 @@ export interface RecoveredContradictoryWikiCapture extends RecoveredWikiCapture 
   userWords: string;
 }
 
+export interface RecoveredQualityIncident {
+  eventId: string;
+  sequence: number;
+  observedBehavior: string;
+  boundary: string;
+  evidence: EventEvidence[];
+}
+
+export interface RecoveredGeneralCapture {
+  eventId: string;
+  sequence: number;
+  userWords: string;
+  evidence: EventEvidence[];
+}
+
 export interface RecoveredSessionBundle {
   sessionId: string;
   declaredArtifactFilename?: string;
@@ -35,6 +52,8 @@ export interface RecoveredSessionBundle {
   queueFingerprint: string;
   wikiCaptures: RecoveredWikiCapture[];
   contradictoryWikiCaptures: RecoveredContradictoryWikiCapture[];
+  qualityIncidents: RecoveredQualityIncident[];
+  generalCaptures: RecoveredGeneralCapture[];
 }
 
 /**
@@ -65,16 +84,43 @@ export function recoverSessionBundleWithSuppliedQueue(
   const queueFingerprint = queueSnapshotFingerprint(queue);
   const wikiCaptures: RecoveredWikiCapture[] = [];
   const contradictoryWikiCaptures: RecoveredContradictoryWikiCapture[] = [];
+  const qualityIncidents: RecoveredQualityIncident[] = [];
+  const generalCaptures: RecoveredGeneralCapture[] = [];
   const recoveredEventIds = new Set<string>();
+  const recoveryWarnings = [...artifactEvidence.warnings];
 
   for (const [index, event] of events.entries()) {
-    const record = requireRecord(event, `Recovery bundle events[${index}]`);
-    if (!isWikiCapture(record)) continue;
-    const item = resolveLegacyItem(
-      record.item,
-      exactItems,
-      `Recovery bundle events[${index}].item`
+    const field = `Recovery bundle events[${index}]`;
+    const record = optionalRecord(event);
+    if (!record) {
+      recoveryWarnings.push(`${field} is not an object and was not recovered.`);
+      continue;
+    }
+
+    const qualityIncident = recoverQualityIncident(
+      record,
+      field,
+      recoveredEventIds,
+      recoveryWarnings
     );
+    if (qualityIncident) {
+      qualityIncidents.push(qualityIncident);
+      continue;
+    }
+
+    const generalCapture = recoverGeneralCapture(
+      record,
+      field,
+      recoveredEventIds,
+      recoveryWarnings
+    );
+    if (generalCapture) {
+      generalCaptures.push(generalCapture);
+      continue;
+    }
+
+    if (!isWikiCapture(record)) continue;
+    const item = resolveLegacyItem(record.item, exactItems, `${field}.item`);
     const captureOrdinal = wikiCaptures.length + contradictoryWikiCaptures.length + 1;
     const userWords =
       lenientOptionalString(record.user_words) ?? lenientOptionalString(record.feedback);
@@ -112,7 +158,9 @@ export function recoverSessionBundleWithSuppliedQueue(
     bundle,
     queueFingerprint,
     wikiCaptures,
-    contradictoryWikiCaptures
+    contradictoryWikiCaptures,
+    qualityIncidents,
+    generalCaptures
   );
 
   return {
@@ -120,11 +168,13 @@ export function recoverSessionBundleWithSuppliedQueue(
     ...(artifactEvidence.declaredArtifactFilename === undefined
       ? {}
       : { declaredArtifactFilename: artifactEvidence.declaredArtifactFilename }),
-    recoveryWarnings: artifactEvidence.warnings,
+    recoveryWarnings,
     queueFilename: input.queueFilename,
     queueFingerprint,
     wikiCaptures,
     contradictoryWikiCaptures,
+    qualityIncidents,
+    generalCaptures,
   };
 }
 
@@ -164,7 +214,9 @@ function declaredSessionId(
   bundle: Record<string, unknown>,
   queueFingerprint: string,
   wikiCaptures: RecoveredWikiCapture[],
-  contradictoryWikiCaptures: RecoveredContradictoryWikiCapture[]
+  contradictoryWikiCaptures: RecoveredContradictoryWikiCapture[],
+  qualityIncidents: RecoveredQualityIncident[],
+  generalCaptures: RecoveredGeneralCapture[]
 ): string {
   const session = optionalRecord(bundle.session);
   const declared = session && lenientOptionalString(session.session_id);
@@ -176,8 +228,99 @@ function declaredSessionId(
     queueFingerprint,
     wikiCaptures: canonicalCaptureOrder(wikiCaptures),
     contradictoryWikiCaptures: canonicalCaptureOrder(contradictoryWikiCaptures),
+    qualityIncidents: canonicalObservationOrder(qualityIncidents),
+    generalCaptures: canonicalObservationOrder(generalCaptures),
   });
   return `recovered-${createHash('sha256').update(canonicalEvidence).digest('hex').slice(0, 16)}`;
+}
+
+function canonicalObservationOrder<T extends { eventId: string; sequence: number }>(
+  observations: T[]
+): Array<Omit<T, 'sequence'>> {
+  return observations
+    .map(({ sequence: _sequence, ...observation }) => observation)
+    .sort((left, right) => left.eventId.localeCompare(right.eventId));
+}
+
+function recoverQualityIncident(
+  record: Record<string, unknown>,
+  field: string,
+  recoveredEventIds: Set<string>,
+  recoveryWarnings: string[]
+): RecoveredQualityIncident | undefined {
+  if (record.kind !== 'quality_incident') return undefined;
+  const event = recoverNonItemEventBase(record, field, recoveredEventIds, recoveryWarnings);
+  const observedBehavior = lenientOptionalString(record.observed_behavior);
+  const boundary = lenientOptionalString(record.boundary);
+  if (!event || !observedBehavior || !boundary) {
+    recoveryWarnings.push(
+      `${field} quality incident lacks supported non-item fields and was not recovered.`
+    );
+    return undefined;
+  }
+  recoveredEventIds.add(event.eventId);
+  return { ...event, observedBehavior, boundary };
+}
+
+function recoverGeneralCapture(
+  record: Record<string, unknown>,
+  field: string,
+  recoveredEventIds: Set<string>,
+  recoveryWarnings: string[]
+): RecoveredGeneralCapture | undefined {
+  if (record.kind !== 'general_capture') return undefined;
+  const event = recoverNonItemEventBase(record, field, recoveredEventIds, recoveryWarnings);
+  const userWords = lenientOptionalString(record.user_words);
+  if (!event || !userWords || !hasUserActionEvidence(event.evidence)) {
+    recoveryWarnings.push(
+      `${field} general capture lacks direct supported evidence and was not recovered.`
+    );
+    return undefined;
+  }
+  recoveredEventIds.add(event.eventId);
+  return { ...event, userWords };
+}
+
+function recoverNonItemEventBase(
+  record: Record<string, unknown>,
+  field: string,
+  recoveredEventIds: Set<string>,
+  recoveryWarnings: string[]
+): { eventId: string; sequence: number; evidence: EventEvidence[] } | undefined {
+  const eventId = lenientOptionalString(record.event_id);
+  const sequence = lenientPositiveInteger(record.sequence);
+  const evidence = recoverEvidence(record.evidence);
+  if (!eventId || sequence === undefined || !evidence) return undefined;
+  if (recoveredEventIds.has(eventId)) {
+    recoveryWarnings.push(`${field} reuses event identity ${eventId} and was not recovered.`);
+    return undefined;
+  }
+  return { eventId, sequence, evidence };
+}
+
+function recoverEvidence(candidate: unknown): EventEvidence[] | undefined {
+  if (!Array.isArray(candidate) || candidate.length === 0) return undefined;
+  const evidence: EventEvidence[] = [];
+  for (const item of candidate) {
+    const record = optionalRecord(item);
+    const source = record && lenientOptionalString(record.source);
+    const reference = record && lenientOptionalString(record.reference);
+    if (!source || !reference || !(EVIDENCE_SOURCES as readonly string[]).includes(source)) {
+      return undefined;
+    }
+    evidence.push({ source: source as EventEvidence['source'], reference });
+  }
+  return evidence;
+}
+
+function hasUserActionEvidence(evidence: EventEvidence[]): boolean {
+  return evidence.some((item) =>
+    [
+      'durable_contemporaneous_record',
+      'explicit_user_capture',
+      'user_provided_chat_or_ui_observation',
+    ].includes(item.source)
+  );
 }
 
 function canonicalCaptureOrder<T extends RecoveredWikiCapture>(

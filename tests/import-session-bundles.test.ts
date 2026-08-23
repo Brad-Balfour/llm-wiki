@@ -115,6 +115,70 @@ test('recovers a malformed v1-shaped bundle from its named supplied queue', () =
   });
 });
 
+test('retains supported non-item observations while recovering a malformed bundle', () => {
+  const queue = (JSON.parse(validBundle) as { queue_snapshot: { queue: unknown } }).queue_snapshot
+    .queue;
+  const malformed = {
+    schema_version: 'commute-session-bundle.v1',
+    session: {
+      session_id: 'recovered-observations',
+      session_date: '2026-07-20',
+      artifact_filename: artifactFilename,
+      voice_surface: 'chatgpt_standard',
+    },
+    queue_snapshot: { filename: 'fixture-queue.txt', queue: {} },
+    playback: { status: 'partial' },
+    integrity: { state: 'partial', incomplete_reason: 'Queue omitted.', unresolved_event_ids: [] },
+    events: [
+      {
+        event_id: 'quality-001',
+        sequence: 1,
+        kind: 'quality_incident',
+        observed_behavior: 'Voice reported a bundle before creating a download.',
+        boundary: 'bundle export',
+        evidence: [
+          { source: 'durable_contemporaneous_record', reference: 'Downloaded artifact list' },
+        ],
+      },
+      {
+        event_id: 'capture-001',
+        sequence: 2,
+        kind: 'general_capture',
+        user_words: 'Preserve this product observation for later review.',
+        evidence: [{ source: 'explicit_user_capture', reference: 'Brad said this.' }],
+      },
+      {
+        event_id: 'capture-malformed',
+        sequence: 3,
+        kind: 'general_capture',
+        user_words: 'This lacks direct evidence and must not be promoted.',
+        evidence: [{ source: 'selected_queue_snapshot', reference: 'Queue only' }],
+      },
+    ],
+  };
+
+  const result = reconcileSessionBundles([
+    {
+      filename: artifactFilename,
+      text: JSON.stringify(malformed),
+      recoveryQueue: { filename: 'fixture-queue.txt', text: JSON.stringify(queue) },
+    },
+  ]);
+
+  assert.equal(result.sessions[0]?.status, 'accepted');
+  assert.equal(result.sessions[0]?.integrity_state, 'recovered');
+  assert.equal(result.quality_incidents.length, 1);
+  assert.equal(result.quality_incidents[0]?.event_id, 'quality-001');
+  assert.equal(result.general_captures.length, 1);
+  assert.equal(result.general_captures[0]?.event_id, 'capture-001');
+  assert.equal(result.maintenance_candidates.length, 0);
+  assert.ok(
+    result.sessions[0]?.recovery_warnings?.some((warning) =>
+      warning.includes('general capture lacks direct supported evidence')
+    )
+  );
+});
+
 test('recovers an exact wiki capture when the period label contradicts the artifact time', () => {
   const malformed = JSON.parse(validBundle) as {
     session: Record<string, unknown>;

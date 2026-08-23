@@ -307,6 +307,35 @@ export function reconcileSessionBundles(
               event: convertedEvent,
             });
           }
+          for (const incident of recovered.qualityIncidents) {
+            result.quality_incidents.push({
+              session_id: recovered.sessionId,
+              event_id: incident.eventId,
+              kind: 'quality_incident',
+              event: {
+                event_id: incident.eventId,
+                sequence: incident.sequence,
+                kind: 'quality_incident',
+                observed_behavior: incident.observedBehavior,
+                boundary: incident.boundary,
+                evidence: incident.evidence,
+              },
+            });
+          }
+          for (const capture of recovered.generalCaptures) {
+            result.general_captures.push({
+              session_id: recovered.sessionId,
+              event_id: capture.eventId,
+              kind: 'general_capture',
+              event: {
+                event_id: capture.eventId,
+                sequence: capture.sequence,
+                kind: 'general_capture',
+                user_words: capture.userWords,
+                evidence: capture.evidence,
+              },
+            });
+          }
           continue;
         } catch (recoveryError) {
           result.sessions.push({
