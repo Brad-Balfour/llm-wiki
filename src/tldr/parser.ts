@@ -328,6 +328,11 @@ function collectSummaryBlock(
       continue;
     }
 
+    if (isKnownWrapperOrAdLine(trimmed)) {
+      index += 1;
+      continue;
+    }
+
     if (
       isFooterStart(trimmed) ||
       isEmojiSeparator(trimmed) ||
