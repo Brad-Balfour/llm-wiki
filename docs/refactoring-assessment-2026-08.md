@@ -172,6 +172,7 @@ and structured-result behavior unchanged.
 **Validation:** focused phase tests with injected filesystem, process, and
 clock dependencies; unchanged fixtures and error text; `npm run check`; strict
 validation of both active OpenSpec changes if requirements change.
+**Issue:** #96.
 
 ### 3. Make active commands import-safe and fail-fast
 
@@ -190,6 +191,7 @@ contracts.
 ten-command proposal. Decide one repository-root `.private` rule.  
 **Validation:** table-driven missing/duplicate/unknown flag cases for every
 active command; subprocess smoke tests; unchanged happy-path output.
+**Issue:** #94.
 
 ### 4. Extract the session lifecycle validator, then reassess table driving
 
@@ -206,6 +208,7 @@ event and discussion semantics.
 do not merge, stale PR #65.  
 **Validation:** all session-contract fixtures unchanged; export-compatibility
 test; one move per commit; `npm run check`.
+**Issue:** #95.
 
 ### 5. Accumulate intake validation errors only if reruns are measured
 
