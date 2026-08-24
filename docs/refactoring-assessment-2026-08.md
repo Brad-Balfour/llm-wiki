@@ -138,9 +138,12 @@ versioned finalizer is the smallest missing prerequisite.
 
 **Type:** operational tooling and measurement contract, not a behavior-
 preserving refactor.  
-**Active files:** new focused performance module and tests around
-`src/commute/run.ts`; a private output under `.private/`; one concise operator
-document.  
+**Active files:** `src/commute/run.ts`, the new
+`src/commute/performance.ts`, `tests/commute-performance.test.ts`, versioned
+input/output schemas under `schema/`, `package.json`, and
+`docs/commute-performance-experiment.md`. The final private record also consumes
+task/agent activity fields and authoritative PR state that `commute-run.v1`
+does not currently own.
 **Expected benefit:** makes gross, pre-PR, PR-to-merge, post-merge, model,
 effort, tool time, intervention count, review cycles, and quality outcomes
 comparable without another user prompt. This is required to rank later work by
@@ -186,9 +189,10 @@ and must be called out separately.
 `src/commute/run.ts`, `src/commute/import-session-bundles.ts`,
 `src/wiki/maintain-commute.ts`, `src/wiki/retrieve-maintenance-sources.ts`,
 `src/classifier/feedback-label.ts`, and focused CLI tests.
-**Expected benefit:** catches bad invocations before build, retrieval, or
-maintainer launch; enables direct command imports in tests; removes a class of
-avoidable reruns.  
+**Expected benefit:** catches bad invocations before retrieval or maintainer
+launch; enables direct command imports in tests; removes a class of avoidable
+reruns. The existing npm wrappers still build before invoking their compiled
+commands; changing that wrapper behavior is outside this item.
 **Risk:** low-medium because scripts and exact errors are operator-facing
 contracts.  
 **Dependencies:** build around `commute:run`; do not resurrect the retired
@@ -234,11 +238,30 @@ independently valid sessions; strict OpenSpec validation.
 
 ### 6. Low-priority structural hygiene
 
-Move feedback labeling to a neutral package, share small filesystem/hash
-helpers, separate parser sponsor data, and remove dead exports only when those
-files are otherwise touched. Stale PRs #62-#64 must be refreshed from current
-`origin/main`, not merged as-is. These changes improve navigation and DRY but
-have no measured direct effect on nightly wall time.
+These are retained ideas, not standalone implementation backlog. Apply them
+only in a PR already touching the named file; stale PRs #62-#64 must not be
+merged as-is.
+
+- **Feedback package placement.** Files:
+  `src/classifier/feedback-label.ts`, its direct importers, and
+  `tests/classifier-feedback-label.test.ts`. Benefit: a clearer package
+  boundary. Risk: low for a pure move. Dependency: refresh PR #63 from current
+  main. Validation: unchanged exports and the focused feedback suite.
+- **Filesystem and hashing helpers.** Files: the duplicated `readStdin` helpers
+  in `src/tldr/ingest-file.ts` and `src/classifier/feedback-label.ts`, plus local
+  hash/write helpers only in a file selected by higher-priority work. Benefit:
+  smaller local duplication. Risk: low-medium around exclusive/atomic writes.
+  Dependency: do not reuse stale stacked PR #64. Validation: preserve byte-
+  exact hashes, write flags, and existing CLI tests.
+- **Parser sponsor data.** Files: `src/tldr/parser.ts` and
+  `tests/parser.test.ts`. Benefit: easier sponsor-list updates. Risk: low but
+  currently unnecessary. Dependency: parser churn or a measured review
+  incident. Validation: unchanged parsed-item/review fixtures; refresh PR #62
+  rather than merging it.
+- **Dead public members.** Files: only the module already being changed under
+  issues #94-#96. Benefit: smaller local surface. Risk: low if repository-wide
+  usage is checked. Dependency: an owning PR. Validation: TypeScript build plus
+  an `rg` reference audit.
 
 ## Candidates where no change is recommended now
 
@@ -290,13 +313,17 @@ npm run ci:install
 npm run check
 find src -name '*.ts' -print0 | xargs -0 wc -l | sort -nr
 node --experimental-test-coverage --test dist/tests/*.test.js
-rg -c '^import .* from' src -g '*.ts' | sort -t: -k2,2nr
+rg -n "from ['\"]\.{1,2}/" src -g '*.ts'
 rg -n 'process\.argv|import\.meta\.url|await main\(|parse[A-Za-z]+Options|parseArgs' src -g '*.ts'
+git log --since=2026-07-19 --numstat --format= -- src
 git log --since=2026-08-13 --numstat --format= -- src
 git log --since=2026-08-13 --format='@@%H' --name-only -- src
 ```
 
-For churn, sum additions plus deletions by path. For coupling, split the
-name-only log at each `@@` marker and count unordered TypeScript path pairs once
-per commit. Use only paths present in the active tree for the July 19 lifetime
-ranking; the August 13 window already follows retirement.
+For churn, sum additions plus deletions by path. The July 19 command feeds the
+active-workflow lifetime ranking in the baseline table; the August 13 command
+feeds the post-retirement co-change view. For coupling, split the name-only log
+at each `@@` marker and count unordered TypeScript path pairs once per commit.
+Use only paths present in the active tree for the July 19 lifetime ranking; the
+August 13 window already follows retirement. The relative-import command emits
+each target, including the closing `from` line of multiline imports.
