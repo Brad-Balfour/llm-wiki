@@ -56,6 +56,9 @@ found a queue as proof.
 - The August 20 AI and Fintech catch-up queues, the August 21 General, Dev, and
   AI queues, five August 21 session bundles, and six complete shared chats. The
   General commute spans a pre-glitch chat and a resumed recovery/export chat.
+- The August 24 General and Dev queues, three session-bundle downloads, and
+  three complete shared chats. Two displayed Dev bundle rows were byte-identical
+  copies of one recovered session.
 - The live `Weekday TLDR Queues` Task conversation/configuration, the July
   21-24 Task Update emails, the July 24 manual queue-generation control, and
   the live Project settings/sources inspected on July 26.
@@ -1069,6 +1072,66 @@ virtualizes messages. The repository agent guide now requires the complete
 serialized message sequence or traversal of every prompt before building the
 coverage ledger. No live Project instruction or listed Project source changed,
 so no Project synchronization is required.
+
+### August 24 Acceptance, Grounding, And Maintenance Result
+
+The bounded Library inventory found three August 24 bundle rows. The General
+export `202608241759-evening-commute-session-bundle.txt` declared
+`20260824-tldr.txt`. The Dev export
+`202608241821-evening-commute-session-bundle.txt` and its Library-suffixed copy
+`202608241821-evening-commute-session-bundle(1).txt` both declared
+`20260824-tldr-dev.txt`; those two downloads were byte-identical. The two exact
+canonical queues passed the v2 validator. General's embedded snapshot matched
+its queue and passed strict bundle validation. Both Dev files embedded the
+exact canonical Dev queue, but strict validation rejected their event lifecycle
+because event two announced queue item five without the preceding queue
+position. Combined intake accepted one recovered Dev session and retained the
+identical second file as duplicate provenance rather than treating it as a
+second commute.
+
+Three complete shared chats supplied the user-intent and playback evidence. The
+General session paraphrased or substituted the summaries for canonical items
+five, six, and seven; item seven was initially conflated with a different
+article named Fable. Its first end-commute response also stopped before creating
+the promised download. The first Dev chat started at item two instead of item
+one, needed a user correction to perform the ordered sweep, paraphrased queue
+summaries, and ended mid-response. The continuation recovered canonical item
+five and one exact wiki save, then drifted after item six into three foreign
+articles before Brad challenged items eight and nine. Voice also interpreted
+the conversational word “finish” as an end-commute command despite the ongoing
+article discussion.
+
+The Dev conversation explicitly saved _How I Find Problems to Solve as a Staff
+Engineer_. Source-grounded maintenance creates _Evidence-Accumulating Problem
+Discovery_. It preserves Lalit Maganti's sequence—absorb problems rather than
+requests, let evidence accumulate, find a common shape, and pressure-test it—
+along with the commute discussion's practical emphasis on repeated friction,
+false unification, and avoiding ownership of every one-off request. The public
+page excludes private workplace context.
+
+Brad explicitly identified _There's no reason for software to be slow anymore_
+as a duplicate across General and Dev. The two queue records use different
+newsletter source IDs and tracking parameters but resolve to the same Dan Luu
+article. This is day-level duplicate-product evidence for issue #36, not a
+classifier correction. No exact classifier feedback was supplied in any of the
+three chats.
+
+The private coverage ledger assigns dispositions to 25 substantive entries
+among 51 user turns. It retains one wiki save with its surrounding discussion,
+11 playback, intent, interruption, and export incidents, one cross-newsletter
+duplicate observation, four queue-grounding and product-enforcement comments,
+and eight unsaved source or article-discussion requests without promoting them
+to wiki content. The other 26 turns are explicitly excluded as session starts,
+navigation, pauses, acknowledgments, or end commands.
+
+Prompt Revision 3.3 already requires an ordered sweep, literal queue-field
+projection, per-item verification, recovery on identity loss, ordinary-English
+intent interpretation, and a visible download. Brad's observation that the
+prompt is re-injected on every turn but still loses queue binding therefore
+reinforces the known product boundary: prompt-only discipline does not provide
+deterministic per-turn enforcement in stock ChatGPT Voice. Another wording-only
+prompt revision would not close that gap. No live Project instruction or listed
+source changed, so no Project synchronization is required.
 
 ## What Worked
 
