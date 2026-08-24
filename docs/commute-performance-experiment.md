@@ -53,7 +53,8 @@ orchestration duration meaningful.
 The finalizer validates the complete `commute-run.v1` record, cross-checks its
 deterministic unresolved-item count, and links it by hash. For a merged run, one
 bounded GitHub state call verifies the PR URL, head SHA, merged state, and merge
-timestamp without asking Brad for input. It derives gross, busy-adjusted, pre-
+timestamp without asking Brad for input. It captures its finalization clock once
+and rejects any lifecycle phase later than that instant. It derives gross, busy-adjusted, pre-
 PR, PR-to-merge, post-merge, authorization-wait, tool-execution, agent-
 orchestration, and user-attention measurements and refuses to overwrite an
 existing result. Both inputs and outputs must remain in the gitignored

@@ -17,5 +17,12 @@ test('commute publication policy keeps review proportional and updates brief', a
   }
 
   assert.match(agents, /After an authorized merge, pull `main`, verify the repository/i);
+  assert.match(agents, /every assigned\s+experimental `\/process daily commute` run/i);
+  assert.match(agents, /finalize:commute-performance` exactly once/i);
+  assert.match(
+    agents,
+    /after merged\s+cleanup is complete or after the complete no-change result/i
+  );
+  assert.match(agents, /passive measurement must not add a user prompt/i);
   assert.match(skill, /After an authorized merge, pull `main` and verify the repository/i);
 });

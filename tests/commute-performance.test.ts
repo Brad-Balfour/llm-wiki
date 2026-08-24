@@ -124,7 +124,7 @@ async function finalize(
 ) {
   return finalizeCommutePerformance(
     { input: paths.inputPath, commuteRun: paths.commuteRunPath, output: paths.outputPath },
-    { githubState }
+    { githubState, now: () => new Date('2026-08-24T01:00:00.000Z') }
   );
 }
 
@@ -137,6 +137,7 @@ test('finalizer derives metrics and verifies publication in one GitHub call', as
   });
   assert.deepEqual(calls, [['Brad-Balfour/llm-wiki', 100]]);
   assert.equal(result.schema_version, 'commute-performance-run.v1');
+  assert.equal(result.finalized_at, '2026-08-24T01:00:00.000Z');
   assert.equal(result.durations_seconds.gross_lifecycle, 1_440);
   assert.equal(result.durations_seconds.busy_adjusted_lifecycle, 1_320);
   assert.equal(result.durations_seconds.pre_pr, 720);
@@ -146,6 +147,28 @@ test('finalizer derives metrics and verifies publication in one GitHub call', as
   assert.equal(result.activity.required_intervention_count, 1);
   assert.equal(result.activity.user_attention_seconds, 40);
   assert.match(await readFile(paths.outputPath, 'utf8'), /commute-performance-run\.v1/);
+});
+
+test('finalizer captures its clock once and rejects future terminal lifecycle phases', async () => {
+  const input = validInput();
+  input.phases.post_merge_completed_at = '2026-08-24T01:01:00.000Z';
+  input.phases.terminal_completed_at = '2026-08-24T01:01:00.000Z';
+  const paths = await setup(input);
+  let clockCalls = 0;
+  await assert.rejects(
+    finalizeCommutePerformance(
+      { input: paths.inputPath, commuteRun: paths.commuteRunPath, output: paths.outputPath },
+      {
+        githubState: async () => authoritativeState(),
+        now: () => {
+          clockCalls += 1;
+          return new Date('2026-08-24T01:00:00.000Z');
+        },
+      }
+    ),
+    /lifecycle phases later than finalized_at:.*phases\.terminal_completed_at.*phases\.post_merge_completed_at/
+  );
+  assert.equal(clockCalls, 1);
 });
 
 test('no-change run retains telemetry without GitHub or PR-only metrics', async () => {
@@ -280,7 +303,10 @@ test('private path checks reject symlink escapes for inputs and output', async (
   await assert.rejects(
     finalizeCommutePerformance(
       { input: linkedInput, commuteRun: paths.commuteRunPath, output: paths.outputPath },
-      { githubState: async () => authoritativeState() }
+      {
+        githubState: async () => authoritativeState(),
+        now: () => new Date('2026-08-24T01:00:00.000Z'),
+      }
     ),
     /--input must not resolve outside/
   );
@@ -294,7 +320,10 @@ test('private path checks reject symlink escapes for inputs and output', async (
         commuteRun: paths.commuteRunPath,
         output: path.join(linkedParent, 'metrics.json'),
       },
-      { githubState: async () => authoritativeState() }
+      {
+        githubState: async () => authoritativeState(),
+        now: () => new Date('2026-08-24T01:00:00.000Z'),
+      }
     ),
     /--output parent must not resolve outside/
   );
@@ -310,7 +339,10 @@ test('private path checks reject symlink escapes for inputs and output', async (
         commuteRun: targetPaths.commuteRunPath,
         output: targetPaths.outputPath,
       },
-      { githubState: async () => authoritativeState() }
+      {
+        githubState: async () => authoritativeState(),
+        now: () => new Date('2026-08-24T01:00:00.000Z'),
+      }
     ),
     /--output must not resolve outside/
   );
@@ -321,7 +353,10 @@ test('all telemetry paths remain private and output is immutable', async () => {
   await assert.rejects(
     finalizeCommutePerformance(
       { input: 'input.json', commuteRun: paths.commuteRunPath, output: paths.outputPath },
-      { githubState: async () => authoritativeState() }
+      {
+        githubState: async () => authoritativeState(),
+        now: () => new Date('2026-08-24T01:00:00.000Z'),
+      }
     ),
     /--input must be inside the gitignored \.private directory/
   );

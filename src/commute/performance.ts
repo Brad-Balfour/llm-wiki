@@ -97,14 +97,17 @@ interface FinalizeOptions {
 
 interface FinalizeDependencies {
   githubState: typeof githubState;
+  now: () => Date;
 }
 
-const defaultDependencies: FinalizeDependencies = { githubState };
+const defaultDependencies: FinalizeDependencies = { githubState, now: () => new Date() };
 
 export async function finalizeCommutePerformance(
   options: FinalizeOptions,
-  dependencies: FinalizeDependencies = defaultDependencies
+  dependencyOverrides: Partial<FinalizeDependencies> = {}
 ) {
+  const dependencies = { ...defaultDependencies, ...dependencyOverrides };
+  const finalizedAt = dependencies.now().toISOString();
   await Promise.all([
     assertPrivateInputPath(options.input, '--input'),
     assertPrivateInputPath(options.commuteRun, '--commute-run'),
@@ -116,6 +119,7 @@ export async function finalizeCommutePerformance(
   ]);
   const input = validatePerformanceInput(parseJsonObject(inputText, options.input));
   const commuteRun = validateCommuteRun(parseJsonObject(commuteRunText, options.commuteRun));
+  rejectFutureLifecyclePhases(input.phases, finalizedAt);
   if (input.quality.unresolved_items !== commuteRun.unresolved_items.length)
     throw new Error(
       `quality.unresolved_items must equal commute run unresolved_items length (${commuteRun.unresolved_items.length})`
@@ -139,7 +143,7 @@ export async function finalizeCommutePerformance(
 
   const result = {
     schema_version: OUTPUT_VERSION,
-    finalized_at: new Date().toISOString(),
+    finalized_at: finalizedAt,
     run_id: input.run_id,
     experiment: input.experiment,
     publication: input.publication,
@@ -520,6 +524,18 @@ function deriveDurations(input: PerformanceInput) {
     post_merge: secondsBetween(merged, postMerge),
     merge_authorization_wait: Math.max(0, secondsBetween(prCreated, authorized)),
   };
+}
+
+function rejectFutureLifecyclePhases(
+  phases: MergedPhases | CommonPhases,
+  finalizedAt: string
+): void {
+  const finalizedMilliseconds = timestamp(finalizedAt, 'finalized_at');
+  const future = Object.entries(phases)
+    .filter(([name, value]) => timestamp(value, `phases.${name}`) > finalizedMilliseconds)
+    .map(([name]) => `phases.${name}`);
+  if (future.length > 0)
+    throw new Error(`lifecycle phases later than finalized_at: ${future.join(', ')}`);
 }
 
 function commonTimestamps(phases: CommonPhases) {
