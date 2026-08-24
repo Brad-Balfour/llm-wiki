@@ -10,13 +10,14 @@ Treat the August 23, 2026 merges of the publication-policy and unified-
 orchestration changes as a new operating epoch. The August 5–21 history remains
 the baseline, but it is not directly comparable model evidence for this epoch.
 
-Run the first representative commute on Sol Medium as the post-change control,
-the second on Terra Medium, then alternate those arms for 6–10 representative
-runs. Keep prompts, deterministic validation, review policy, and daily scope as
-stable as practical. Test Terra Low only if Terra Medium preserves quality.
-Escalate malformed or ambiguous work to Sol Medium when needed and record both
-the actual configuration and reason. Exclude a run from the model comparison
-only with a concrete recorded reason; retain its telemetry.
+Collect 6–10 representative runs in total. Run the first on Sol Medium as the
+post-change control, the second on Terra Medium, then continue alternating the
+two arms for the remaining runs. An odd-sized sample ends on the next arm in
+that sequence. Keep prompts, deterministic validation, review policy, and daily
+scope as stable as practical. Test Terra Low only if Terra Medium preserves
+quality. Escalate malformed or ambiguous work to Sol Medium when needed and
+record both the actual configuration and reason. Exclude a run from the model
+comparison only with a concrete recorded reason; retain its telemetry.
 
 ## Passive recording
 
