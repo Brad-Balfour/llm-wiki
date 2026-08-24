@@ -1131,7 +1131,9 @@ prompt is re-injected on every turn but still loses queue binding therefore
 reinforces the known product boundary: prompt-only discipline does not provide
 deterministic per-turn enforcement in stock ChatGPT Voice. Another wording-only
 prompt revision would not close that gap. No live Project instruction or listed
-source changed, so no Project synchronization is required.
+source changed, so no Project synchronization is required. Issue #100 tracks
+the supported-product mechanism and observable-mitigation question without
+asking Brad to build a replacement Voice client.
 
 ## What Worked
 
