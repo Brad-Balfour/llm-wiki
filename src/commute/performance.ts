@@ -20,6 +20,7 @@ import { githubState } from './github-state.js';
 
 const INPUT_VERSION = 'commute-performance-input.v1';
 const OUTPUT_VERSION = 'commute-performance-run.v1';
+const RUN_ID_PATTERN = /^[a-z0-9][a-z0-9_-]{0,127}$/;
 const EFFORTS = ['low', 'medium', 'high', 'xhigh', 'max', 'ultra'] as const;
 const REVIEW_KEYS = ['findings', 'fix_commits', 'failed_checks', 'rereview_cycles'] as const;
 const QUALITY_KEYS = [
@@ -119,7 +120,9 @@ export async function finalizeCommutePerformance(
   ]);
   const input = validatePerformanceInput(parseJsonObject(inputText, options.input));
   const commuteRun = validateCommuteRun(parseJsonObject(commuteRunText, options.commuteRun));
+  assertCanonicalOutputPath(options.output, input.run_id);
   rejectFutureLifecyclePhases(input.phases, finalizedAt);
+  validateCommuteRunEnvelope(commuteRun.phases, input.phases);
   if (input.quality.unresolved_items !== commuteRun.unresolved_items.length)
     throw new Error(
       `quality.unresolved_items must equal commute run unresolved_items length (${commuteRun.unresolved_items.length})`
@@ -191,7 +194,7 @@ function validatePerformanceInput(value: unknown): PerformanceInput {
   const publication = validatePublication(input.publication);
   return {
     schema_version: INPUT_VERSION,
-    run_id: requireString(input.run_id, 'run_id'),
+    run_id: requireRunId(input.run_id),
     experiment: validateExperiment(input.experiment),
     publication,
     phases: validatePhases(input.phases, publication.outcome),
@@ -229,20 +232,26 @@ function validateExperiment(value: unknown): Experiment {
     throw new Error('experiment.escalation_reason is required exactly when escalated is true');
   if (representative === (exclusionReason !== undefined))
     throw new Error('experiment.exclusion_reason is required exactly when representative is false');
+  const assignedModel = requireString(record.assigned_model, 'experiment.assigned_model');
+  const assignedEffort = requireEnum(
+    record.assigned_reasoning_effort,
+    EFFORTS,
+    'experiment.assigned_reasoning_effort'
+  );
+  const actualModel = requireString(record.actual_model, 'experiment.actual_model');
+  const actualEffort = requireEnum(
+    record.actual_reasoning_effort,
+    EFFORTS,
+    'experiment.actual_reasoning_effort'
+  );
+  if ((assignedModel !== actualModel || assignedEffort !== actualEffort) && !escalated)
+    throw new Error('experiment model or effort mismatch requires escalated=true and a reason');
   return {
     epoch: requireString(record.epoch, 'experiment.epoch'),
-    assigned_model: requireString(record.assigned_model, 'experiment.assigned_model'),
-    assigned_reasoning_effort: requireEnum(
-      record.assigned_reasoning_effort,
-      EFFORTS,
-      'experiment.assigned_reasoning_effort'
-    ),
-    actual_model: requireString(record.actual_model, 'experiment.actual_model'),
-    actual_reasoning_effort: requireEnum(
-      record.actual_reasoning_effort,
-      EFFORTS,
-      'experiment.actual_reasoning_effort'
-    ),
+    assigned_model: assignedModel,
+    assigned_reasoning_effort: assignedEffort,
+    actual_model: actualModel,
+    actual_reasoning_effort: actualEffort,
     escalated,
     ...(escalationReason === undefined ? {} : { escalation_reason: escalationReason }),
     representative,
@@ -357,7 +366,15 @@ function validateIntervention(value: unknown, index: number): Intervention {
 
 interface ValidatedCommuteRun {
   schema_version: 'commute-run.v1';
+  phases: CommuteRunPhases;
   unresolved_items: unknown[];
+}
+
+interface CommuteRunPhases {
+  intake_started_at: string;
+  preflight_completed_at: string;
+  github_state_completed_at: string;
+  command_completed_at: string;
 }
 
 function validateCommuteRun(value: unknown): ValidatedCommuteRun {
@@ -370,16 +387,17 @@ function validateCommuteRun(value: unknown): ValidatedCommuteRun {
   if (run.schema_version !== 'commute-run.v1')
     throw new Error('commute run.schema_version must be commute-run.v1');
   if (run.result !== 'completed') throw new Error('commute run.result must be completed');
-  validateCommuteRunPhases(run.phases);
+  const phases = validateCommuteRunPhases(run.phases);
   validatePreflight(run.preflight);
   validateGithubResult(run.github);
   return {
     schema_version: 'commute-run.v1',
+    phases,
     unresolved_items: requireArray(run.unresolved_items, 'commute run.unresolved_items'),
   };
 }
 
-function validateCommuteRunPhases(value: unknown): void {
+function validateCommuteRunPhases(value: unknown): CommuteRunPhases {
   const record = requireRecord(value, 'commute run.phases');
   const keys = [
     'intake_started_at',
@@ -388,9 +406,11 @@ function validateCommuteRunPhases(value: unknown): void {
     'command_completed_at',
   ] as const;
   rejectUnknownKeys(record, keys, 'commute run.phases');
-  validateOrderedTimestamps(
+  const phases = Object.fromEntries(
     keys.map((key) => [key, utcTimestamp(record[key], `commute run.phases.${key}`)])
-  );
+  ) as unknown as CommuteRunPhases;
+  validateOrderedTimestamps(keys.map((key) => [key, phases[key]]));
+  return phases;
 }
 
 function validatePreflight(value: unknown): void {
@@ -517,6 +537,13 @@ function deriveDurations(input: PerformanceInput) {
   if (authorized < common.task_invoked_at)
     throw new Error('merge_authorized_at must not precede task_invoked_at');
   if (authorized > merged) throw new Error('merge_authorized_at must not follow merged_at');
+  if (
+    authorized > common.task_invoked_at &&
+    !input.interventions.some((intervention) => intervention.required)
+  )
+    throw new Error(
+      'merge authorization after task invocation requires at least one required intervention'
+    );
   return {
     ...base,
     pre_pr: secondsBetween(common.task_invoked_at, prCreated),
@@ -536,6 +563,22 @@ function rejectFutureLifecyclePhases(
     .map(([name]) => `phases.${name}`);
   if (future.length > 0)
     throw new Error(`lifecycle phases later than finalized_at: ${future.join(', ')}`);
+}
+
+function validateCommuteRunEnvelope(
+  commutePhases: CommuteRunPhases,
+  performancePhases: MergedPhases | CommonPhases
+): void {
+  const start = timestamp(performancePhases.task_invoked_at, 'phases.task_invoked_at');
+  const end = timestamp(performancePhases.terminal_completed_at, 'phases.terminal_completed_at');
+  const outside = Object.entries(commutePhases)
+    .filter(([name, value]) => {
+      const measured = timestamp(value, `commute run.phases.${name}`);
+      return measured < start || measured > end;
+    })
+    .map(([name]) => `commute run.phases.${name}`);
+  if (outside.length > 0)
+    throw new Error(`commute run phases outside performance lifecycle: ${outside.join(', ')}`);
 }
 
 function commonTimestamps(phases: CommonPhases) {
@@ -580,6 +623,12 @@ function validateAuthoritativePublication(
     throw new Error('publication.head_sha does not match authoritative GitHub state');
   if (pullRequest.state !== 'MERGED' || pullRequest.mergedAt === null)
     throw new Error('publication pull request must be merged in authoritative GitHub state');
+  const createdAt = utcTimestamp(
+    pullRequest.createdAt,
+    'GitHub state.data.repository.pullRequest.createdAt'
+  );
+  if (Date.parse(createdAt) !== Date.parse(phases.pr_created_at))
+    throw new Error('phases.pr_created_at does not match authoritative GitHub state');
   const mergedAt = utcTimestamp(
     pullRequest.mergedAt,
     'GitHub state.data.repository.pullRequest.mergedAt'
@@ -619,6 +668,13 @@ function requireSha(value: unknown, field: string): string {
   const result = requireString(value, field);
   if (!/^[0-9a-f]{40}$/.test(result))
     throw new Error(`${field} must be a 40-character lowercase commit SHA`);
+  return result;
+}
+
+function requireRunId(value: unknown): string {
+  const result = requireString(value, 'run_id');
+  if (!RUN_ID_PATTERN.test(result))
+    throw new Error('run_id must contain only lowercase letters, digits, underscores, or hyphens');
   return result;
 }
 
@@ -721,6 +777,12 @@ async function assertPrivateOutputPath(
     if (!isWithin(root, physicalTarget))
       throw new Error(`${flag} must not resolve outside the gitignored .private directory`);
   }
+}
+
+function assertCanonicalOutputPath(filename: string, runId: string): void {
+  const expected = path.resolve('.private', 'commute-performance', `${runId}.json`);
+  if (path.resolve(filename) !== expected)
+    throw new Error(`--output must be .private/commute-performance/${runId}.json`);
 }
 
 async function nearestExistingAncestor(filename: string): Promise<string> {

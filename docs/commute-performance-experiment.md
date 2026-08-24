@@ -18,6 +18,10 @@ scope as stable as practical. Test Terra Low only if Terra Medium preserves
 quality. Escalate malformed or ambiguous work to Sol Medium when needed and
 record both the actual configuration and reason. Exclude a run from the model
 comparison only with a concrete recorded reason; retain its telemetry.
+Any assigned/actual model or effort mismatch must set `escalated` to true and
+record a reason. An attempted escalation reverted before the final
+configuration changed may retain the same assigned and actual values; keep
+`escalated: true` and explain the attempt so it remains visible.
 
 ## Passive recording
 
@@ -30,7 +34,7 @@ post-merge or complete no-change step, write one `commute-performance-input.v1` 
 npm run finalize:commute-performance -- \
   --input .private/commute-performance/20260824-input.json \
   --commute-run .private/commute-runs/20260824.json \
-  --output .private/commute-performance/20260824.json
+  --output .private/commute-performance/2026-08-24-tldr.json
 ```
 
 The input records the assigned and actual model/effort, escalation or exclusion
@@ -51,16 +55,25 @@ than or equal to strict agent-active time and makes the derived agent-
 orchestration duration meaningful.
 
 The finalizer validates the complete `commute-run.v1` record, cross-checks its
-deterministic unresolved-item count, and links it by hash. For a merged run, one
-bounded GitHub state call verifies the PR URL, head SHA, merged state, and merge
-timestamp without asking Brad for input. It captures its finalization clock once
-and rejects any lifecycle phase later than that instant. It derives gross, busy-adjusted, pre-
-PR, PR-to-merge, post-merge, authorization-wait, tool-execution, agent-
-orchestration, and user-attention measurements and refuses to overwrite an
-existing result. Both inputs and outputs must remain in the gitignored
-`.private/` tree, and symbolic links may not escape it. The tracked contracts
-are `schema/commute-performance-input-v1.schema.json` and
+deterministic unresolved-item count, requires its intake and completion phases
+to fall inside the measured lifecycle, and links it by hash. For a merged run,
+one bounded GitHub state call verifies the PR URL, head SHA, merged state, and
+creation and merge timestamps without asking Brad for input. Merge
+authorization after task invocation requires a required intervention record;
+equality with task invocation is the preauthorized exception. The finalizer
+captures its finalization clock once and rejects any lifecycle phase later than
+that instant. It derives gross, busy-adjusted, pre-PR, PR-to-merge, post-merge,
+authorization-wait, tool-execution, agent-orchestration, and user-attention
+measurements and refuses to overwrite an existing result. Both inputs and
+outputs must remain in the gitignored `.private/` tree, and symbolic links may
+not escape it. The tracked contracts are
+`schema/commute-performance-input-v1.schema.json` and
 `schema/commute-performance-run-v1.schema.json`.
+
+`run_id` uses only lowercase letters, digits, underscores, and hyphens. Its one
+canonical finalized destination is
+`.private/commute-performance/<run_id>.json`; aliases are rejected and the
+existing no-overwrite rule remains in force.
 
 ## Decision boundary
 

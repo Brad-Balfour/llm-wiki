@@ -17,7 +17,7 @@
   ],
   "properties": {
     "schema_version": { "const": "commute-performance-input.v1" },
-    "run_id": { "type": "string", "minLength": 1 },
+    "run_id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9_-]{0,127}$" },
     "experiment": { "$ref": "#/$defs/experiment" },
     "publication": { "$ref": "#/$defs/publication" },
     "phases": { "type": "object" },

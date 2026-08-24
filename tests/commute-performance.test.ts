@@ -97,6 +97,7 @@ function authoritativeState(overrides: Record<string, unknown> = {}) {
           url: PR_URL,
           headRefOid: SHA,
           state: 'MERGED',
+          createdAt: '2026-08-24T00:12:00.000Z',
           mergedAt: '2026-08-24T00:22:00.000Z',
           ...overrides,
         },
@@ -109,10 +110,26 @@ async function setup(input: unknown = validInput(), commuteRun: unknown = validC
   const privateRoot = path.join(process.cwd(), '.private');
   await mkdir(privateRoot, { recursive: true });
   const directory = await mkdtemp(path.join(privateRoot, 'performance-test-'));
+  const normalizedInput = structuredClone(input);
+  if (
+    typeof normalizedInput === 'object' &&
+    normalizedInput !== null &&
+    'run_id' in normalizedInput &&
+    normalizedInput.run_id === '2026-08-24-tldr'
+  )
+    normalizedInput.run_id = `test-${path.basename(directory).toLowerCase()}`;
   const inputPath = path.join(directory, 'input.json');
   const commuteRunPath = path.join(directory, 'commute-run.json');
-  const outputPath = path.join(directory, 'metrics.json');
-  await writeFile(inputPath, JSON.stringify(input));
+  const runId =
+    typeof normalizedInput === 'object' &&
+    normalizedInput !== null &&
+    'run_id' in normalizedInput &&
+    typeof normalizedInput.run_id === 'string' &&
+    /^[a-z0-9][a-z0-9_-]{0,127}$/.test(normalizedInput.run_id)
+      ? normalizedInput.run_id
+      : 'invalid-run';
+  const outputPath = path.join(privateRoot, 'commute-performance', `${runId}.json`);
+  await writeFile(inputPath, JSON.stringify(normalizedInput));
   await writeFile(commuteRunPath, JSON.stringify(commuteRun));
   return { directory, inputPath, commuteRunPath, outputPath };
 }
@@ -213,6 +230,7 @@ test('authoritative GitHub state must match URL, head, and merged timestamp', as
     [{ url: 'https://github.com/Brad-Balfour/llm-wiki/pull/101' }, /pr_url does not match/],
     [{ headRefOid: 'f'.repeat(40) }, /head_sha does not match/],
     [{ state: 'OPEN', mergedAt: null }, /must be merged/],
+    [{ createdAt: '2026-08-24T00:13:00.000Z' }, /pr_created_at does not match/],
     [{ mergedAt: '2026-08-24T00:23:00.000Z' }, /merged_at does not match/],
   ] as const) {
     const paths = await setup();
@@ -243,6 +261,17 @@ test('finalizer rejects out-of-order and impossible timestamps', async () => {
   await assert.rejects(finalize(paths), /task_invoked_at date must be a real calendar date/);
 });
 
+test('commute-run phases must stay inside the measured lifecycle', async () => {
+  const commuteRun = validCommuteRun();
+  commuteRun.phases.intake_started_at = '2026-08-23T23:59:00.000Z';
+  commuteRun.phases.preflight_completed_at = '2026-08-24T00:02:00.000Z';
+  const paths = await setup(validInput(), commuteRun);
+  await assert.rejects(
+    finalize(paths),
+    /commute run phases outside performance lifecycle: commute run\.phases\.intake_started_at/
+  );
+});
+
 test('unknown telemetry fields fail closed', async () => {
   const input = validInput() as ReturnType<typeof validInput> & {
     activity: ReturnType<typeof validInput>['activity'] & { tool_calls?: number };
@@ -260,6 +289,30 @@ test('preauthorized merge adds no authorization wait or intervention', async () 
   const result = await finalize(paths);
   assert.equal(result.durations_seconds.merge_authorization_wait, 0);
   assert.equal(result.activity.required_intervention_count, 0);
+});
+
+test('later merge authorization requires a required intervention', async () => {
+  const input = validInput();
+  input.interventions = [];
+  const paths = await setup(input);
+  await assert.rejects(finalize(paths), /requires at least one required intervention/);
+});
+
+test('configuration mismatch requires escalation, while attempted same-config escalation is retained', async () => {
+  let input = validInput();
+  input.experiment.actual_model = 'gpt-5.6-terra';
+  let paths = await setup(input);
+  await assert.rejects(finalize(paths), /model or effort mismatch requires escalated=true/);
+
+  const attempted = validInput() as ReturnType<typeof validInput> & {
+    experiment: ReturnType<typeof validInput>['experiment'] & { escalation_reason?: string };
+  };
+  attempted.experiment.escalated = true;
+  attempted.experiment.escalation_reason = 'Attempted escalation reverted before substantive work.';
+  paths = await setup(attempted);
+  const result = await finalize(paths);
+  assert.equal(result.experiment.escalated, true);
+  assert.equal(result.experiment.actual_model, result.experiment.assigned_model);
 });
 
 test('finalizer rejects impossible active, attention, and overflow durations', async () => {
@@ -369,26 +422,52 @@ test('all telemetry paths remain private and output is immutable', async () => {
   assert.equal(await readFile(paths.outputPath, 'utf8'), 'preserve me');
 });
 
+test('run id and output path form one canonical private record', async () => {
+  let input = validInput();
+  input.run_id = '../escape';
+  let paths = await setup(input);
+  await assert.rejects(finalize(paths), /run_id must contain only lowercase/);
+
+  input = validInput();
+  paths = await setup(input);
+  await assert.rejects(
+    finalizeCommutePerformance(
+      {
+        input: paths.inputPath,
+        commuteRun: paths.commuteRunPath,
+        output: path.join(paths.directory, 'wrong.json'),
+      },
+      {
+        githubState: async () => authoritativeState(),
+        now: () => new Date('2026-08-24T01:00:00.000Z'),
+      }
+    ),
+    /--output must be \.private\/commute-performance\/.*\.json/
+  );
+});
+
 test('tracked schemas retain runtime versions and fail-closed unions', async () => {
   const inputSchema = JSON.parse(
     await readFile('schema/commute-performance-input-v1.schema.json', 'utf8')
   ) as {
-    properties: { schema_version: { const: string } };
+    properties: { schema_version: { const: string }; run_id: { pattern: string } };
     additionalProperties: boolean;
     $defs: { publication: { oneOf: unknown[] }; merged_phases: { additionalProperties: boolean } };
   };
   const runSchema = JSON.parse(
     await readFile('schema/commute-performance-run-v1.schema.json', 'utf8')
   ) as {
-    properties: { schema_version: { const: string } };
+    properties: { schema_version: { const: string }; run_id: { pattern: string } };
     additionalProperties: boolean;
     allOf: unknown[];
   };
   assert.equal(inputSchema.properties.schema_version.const, 'commute-performance-input.v1');
+  assert.equal(inputSchema.properties.run_id.pattern, '^[a-z0-9][a-z0-9_-]{0,127}$');
   assert.equal(inputSchema.additionalProperties, false);
   assert.equal(inputSchema.$defs.publication.oneOf.length, 2);
   assert.equal(inputSchema.$defs.merged_phases.additionalProperties, false);
   assert.equal(runSchema.properties.schema_version.const, 'commute-performance-run.v1');
+  assert.equal(runSchema.properties.run_id.pattern, '^[a-z0-9][a-z0-9_-]{0,127}$');
   assert.equal(runSchema.additionalProperties, false);
   assert.equal(runSchema.allOf.length, 1);
 });
