@@ -71,14 +71,14 @@ interface ImportedSession {
   error?: string;
 }
 
-interface ReconciledEvent {
+export interface ReconciledEvent {
   session_id: string;
   event_id: string;
   kind: string;
   event: CommuteSessionBundle['events'][number];
 }
 
-interface EventConversion {
+export interface EventConversion {
   session_id: string;
   event_id: string;
   reason: string;

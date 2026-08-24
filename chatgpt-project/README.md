@@ -120,10 +120,27 @@ npm run validate:commute-queue -- /path/to/queue.txt
 
 The supported user workflow is chat-mediated: supply the original downloaded
 queue file(s) and session bundle(s) to a repository maintenance/debug chat and
-ask the agent to debug and process them. The agent invokes the package scripts
-below to validate and import each session independently. Brad does not need to
-combine queues, bundles, or conversations, and does not need to run a
-human-facing consolidated CLI.
+ask the agent to process them. Brad does not need to combine queues, bundles,
+or conversations. The agent starts with one deterministic orchestration command:
+
+```sh
+npm run commute:run -- \
+  --input /path/to/morning-bundle.txt \
+  --recover-with /path/to/named-queue.txt \
+  --input /path/to/evening-bundle.txt \
+  --shared-chat https://chatgpt.com/share/example \
+  --output .private/commute-runs/20260720.json
+```
+
+`commute:run` inventories and reconciles every supplied artifact, compares
+recovery queues to embedded snapshots, retains all normalized evidence in one
+private versioned record, and lists unresolved evidence without deciding its
+meaning. Add `--github-pr OWNER/REPO#NUMBER` to capture one batched PR-state
+snapshot, or also `--watch-seconds 1..900` for a bounded watcher. A GitHub
+failure is recorded in the private result and never discards validated local
+intake. The command does not retrieve a shared chat, make subjective
+wiki/classifier decisions, create a PR, or merge; those remain explicit agent
+work after the deterministic record is available.
 
 The importer keeps every valid session even when another is malformed and
 writes a private normalized intake record. Exact `wiki this` captures become
