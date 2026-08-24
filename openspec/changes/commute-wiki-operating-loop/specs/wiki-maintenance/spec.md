@@ -62,10 +62,11 @@ on a queue summary for wiki synthesis.
 
 ### Requirement: Item-Bound Discussion Context
 
-An exact `wiki_this` capture MAY include a concise, evidence-backed discussion
-record bound to that same session, event, queue item, and URL. The maintainer
-SHALL use supported context when it materially improves the page and SHALL keep
-it visibly distinct from retrieved-source facts. Absence or invalidity of a
+The direct-maintainer workflow SHALL accept an optional concise,
+evidence-backed discussion record on an exact `wiki_this` capture when it is
+bound to that same session, event, queue item, and URL. The maintainer SHALL use
+supported context when it materially improves the page and SHALL keep it
+visibly distinct from retrieved-source facts. Absence or invalidity of a
 discussion record SHALL NOT block bundle export, import, or maintenance.
 
 #### Scenario: A saved item has supported discussion context
