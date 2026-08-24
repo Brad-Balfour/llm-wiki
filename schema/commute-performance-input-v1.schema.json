@@ -1,0 +1,206 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://brad-balfour.github.io/llm-wiki/schema/commute-performance-input-v1.schema.json",
+  "title": "Commute Performance Input v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "run_id",
+    "experiment",
+    "publication",
+    "phases",
+    "activity",
+    "interventions",
+    "review",
+    "quality"
+  ],
+  "properties": {
+    "schema_version": { "const": "commute-performance-input.v1" },
+    "run_id": { "type": "string", "minLength": 1 },
+    "experiment": { "$ref": "#/$defs/experiment" },
+    "publication": { "$ref": "#/$defs/publication" },
+    "phases": { "type": "object" },
+    "activity": { "$ref": "#/$defs/activity_input" },
+    "interventions": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/intervention" }
+    },
+    "review": { "$ref": "#/$defs/review" },
+    "quality": { "$ref": "#/$defs/quality" }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "publication": {
+            "properties": { "outcome": { "const": "merged" } },
+            "required": ["outcome"]
+          }
+        }
+      },
+      "then": { "properties": { "phases": { "$ref": "#/$defs/merged_phases" } } },
+      "else": { "properties": { "phases": { "$ref": "#/$defs/no_change_phases" } } }
+    }
+  ],
+  "$defs": {
+    "utc_timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "pattern": "Z$"
+    },
+    "non_negative_number": { "type": "number", "minimum": 0 },
+    "non_negative_integer": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991
+    },
+    "experiment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "epoch",
+        "assigned_model",
+        "assigned_reasoning_effort",
+        "actual_model",
+        "actual_reasoning_effort",
+        "escalated",
+        "representative"
+      ],
+      "properties": {
+        "epoch": { "type": "string", "minLength": 1 },
+        "assigned_model": { "type": "string", "minLength": 1 },
+        "assigned_reasoning_effort": { "$ref": "#/$defs/reasoning_effort" },
+        "actual_model": { "type": "string", "minLength": 1 },
+        "actual_reasoning_effort": { "$ref": "#/$defs/reasoning_effort" },
+        "escalated": { "type": "boolean" },
+        "escalation_reason": { "type": "string", "minLength": 1 },
+        "representative": { "type": "boolean" },
+        "exclusion_reason": { "type": "string", "minLength": 1 }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "escalated": { "const": true } } },
+          "then": { "required": ["escalation_reason"] },
+          "else": { "not": { "required": ["escalation_reason"] } }
+        },
+        {
+          "if": { "properties": { "representative": { "const": false } } },
+          "then": { "required": ["exclusion_reason"] },
+          "else": { "not": { "required": ["exclusion_reason"] } }
+        }
+      ]
+    },
+    "reasoning_effort": {
+      "enum": ["low", "medium", "high", "xhigh", "max", "ultra"]
+    },
+    "publication": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["outcome", "pr_url", "head_sha"],
+          "properties": {
+            "outcome": { "const": "merged" },
+            "pr_url": {
+              "type": "string",
+              "pattern": "^https://github\\.com/[^/]+/[^/]+/pull/[1-9][0-9]*$"
+            },
+            "head_sha": { "type": "string", "pattern": "^[0-9a-f]{40}$" }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["outcome"],
+          "properties": { "outcome": { "const": "no_change" } }
+        }
+      ]
+    },
+    "merged_phases": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "task_invoked_at",
+        "intake_validated_at",
+        "pr_created_at",
+        "merge_authorized_at",
+        "merged_at",
+        "post_merge_completed_at",
+        "terminal_completed_at"
+      ],
+      "properties": {
+        "task_invoked_at": { "$ref": "#/$defs/utc_timestamp" },
+        "intake_validated_at": { "$ref": "#/$defs/utc_timestamp" },
+        "pr_created_at": { "$ref": "#/$defs/utc_timestamp" },
+        "merge_authorized_at": { "$ref": "#/$defs/utc_timestamp" },
+        "merged_at": { "$ref": "#/$defs/utc_timestamp" },
+        "post_merge_completed_at": { "$ref": "#/$defs/utc_timestamp" },
+        "terminal_completed_at": { "$ref": "#/$defs/utc_timestamp" }
+      }
+    },
+    "no_change_phases": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["task_invoked_at", "intake_validated_at", "terminal_completed_at"],
+      "properties": {
+        "task_invoked_at": { "$ref": "#/$defs/utc_timestamp" },
+        "intake_validated_at": { "$ref": "#/$defs/utc_timestamp" },
+        "terminal_completed_at": { "$ref": "#/$defs/utc_timestamp" }
+      }
+    },
+    "activity_input": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "busy_adjusted_excluded_seconds",
+        "strict_agent_active_seconds",
+        "tool_call_count",
+        "tool_execution_seconds"
+      ],
+      "properties": {
+        "busy_adjusted_excluded_seconds": { "$ref": "#/$defs/non_negative_number" },
+        "strict_agent_active_seconds": { "$ref": "#/$defs/non_negative_number" },
+        "tool_call_count": { "$ref": "#/$defs/non_negative_integer" },
+        "tool_execution_seconds": { "$ref": "#/$defs/non_negative_number" }
+      }
+    },
+    "intervention": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["reason", "required", "active_seconds"],
+      "properties": {
+        "reason": { "type": "string", "minLength": 1 },
+        "required": { "type": "boolean" },
+        "active_seconds": { "$ref": "#/$defs/non_negative_number" }
+      }
+    },
+    "review": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["findings", "fix_commits", "failed_checks", "rereview_cycles"],
+      "properties": {
+        "findings": { "$ref": "#/$defs/non_negative_integer" },
+        "fix_commits": { "$ref": "#/$defs/non_negative_integer" },
+        "failed_checks": { "$ref": "#/$defs/non_negative_integer" },
+        "rereview_cycles": { "$ref": "#/$defs/non_negative_integer" }
+      }
+    },
+    "quality": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "evidence_coverage_misses",
+        "incorrect_durable_claims",
+        "unresolved_items",
+        "manual_corrections"
+      ],
+      "properties": {
+        "evidence_coverage_misses": { "$ref": "#/$defs/non_negative_integer" },
+        "incorrect_durable_claims": { "$ref": "#/$defs/non_negative_integer" },
+        "unresolved_items": { "$ref": "#/$defs/non_negative_integer" },
+        "manual_corrections": { "$ref": "#/$defs/non_negative_integer" }
+      }
+    }
+  }
+}
