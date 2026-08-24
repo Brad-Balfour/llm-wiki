@@ -116,11 +116,12 @@ batched GitHub state. There are zero representative runs after both changes.
 
 The experiment should therefore use this fixed sequence:
 
-1. run the first representative post-change commute on Sol Medium as the new
-   control;
-2. run the next on Terra Medium;
-3. alternate Sol Medium and Terra Medium for 6-10 representative runs while
-   prompts, validation, review policy, and orchestration remain fixed;
+1. include 6-10 representative runs in the comparison in total;
+2. run the first post-change commute on Sol Medium as the new control and the
+   second on Terra Medium;
+3. continue alternating the two arms for the remaining runs while prompts,
+   validation, review policy, and orchestration remain fixed; an odd-sized
+   sample ends on the next arm in that sequence;
 4. test Terra Low only if Terra Medium preserves validation, conversation
    coverage, provenance, and publication quality;
 5. record exclusions and every escalation back to Sol Medium.
@@ -161,9 +162,10 @@ included, is a separate measurement-contract change.
 `tests/maintain-commute.test.ts`, and only the minimum shared types needed by
 the extracted phases.  
 **Expected benefit:** isolates intake, retrieval, maintainer launch, and result
-recording so a failure can resume at the correct boundary. It also exposes the
-pre-PR phases that #85 currently cannot distinguish. Fewer whole-pass retries
-mean less wall time and fewer requests for user recovery.  
+recording so failures can be diagnosed and retried without reworking unrelated
+logic. It also exposes the pre-PR phases that #85 currently cannot distinguish.
+Persisted checkpoint/restart behavior would be a separate contract change, not
+an automatic result of this refactor.
 **Risk:** medium because this is the PR-creating path and its main orchestration
 is not currently executed by tests.  
 **Dependencies:** add success, retrieval-failure, launcher-failure, malformed-
@@ -179,9 +181,11 @@ validation of both active OpenSpec changes if requirements change.
 **Type:** mixed. Extracting a shared parser/guard is behavior-preserving;
 rejecting a following flag as a missing value is an intentional CLI correction
 and must be called out separately.  
-**Active files:** the two validators, `commute/preflight.ts`, `commute/run.ts`,
-`commute/import-session-bundles.ts`, `wiki/maintain-commute.ts`,
-`classifier/feedback-label.ts`, and focused CLI tests.  
+**Active files:** `src/commute/validate-queue.ts`,
+`src/commute/validate-session-bundle.ts`, `src/commute/preflight.ts`,
+`src/commute/run.ts`, `src/commute/import-session-bundles.ts`,
+`src/wiki/maintain-commute.ts`, `src/wiki/retrieve-maintenance-sources.ts`,
+`src/classifier/feedback-label.ts`, and focused CLI tests.
 **Expected benefit:** catches bad invocations before build, retrieval, or
 maintainer launch; enables direct command imports in tests; removes a class of
 avoidable reruns.  
@@ -213,8 +217,12 @@ test; one move per commit; `npm run check`.
 ### 5. Accumulate intake validation errors only if reruns are measured
 
 **Type:** product/contract change, not a refactor.  
-**Active files:** bundle and queue validators, validation CLIs, schemas/docs,
-and their tests.  
+**Active files:** `src/commute/session-bundle.ts`,
+`src/commute/validate-session-bundle.ts`, `src/commute/validate-queue.ts`,
+`tests/session-bundle.test.ts`, `tests/session-contract-fixtures.test.ts`,
+`tests/preflight.test.ts`, `schema/commute-session-bundle-v1.schema.json`,
+`schema/tldr-commute-queue-v2.schema.json`, and the matching active OpenSpec
+requirements.
 **Expected benefit:** one malformed artifact can report all independent defects
 in one pass instead of creating a fix-run-fix loop.  
 **Risk:** medium-high because ordering, wording, and fail-soft boundaries are
