@@ -1,0 +1,154 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://brad-balfour.github.io/llm-wiki/schema/commute-performance-run-v1.schema.json",
+  "title": "Commute Performance Run v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "finalized_at",
+    "run_id",
+    "experiment",
+    "publication",
+    "phases",
+    "durations_seconds",
+    "activity",
+    "review",
+    "quality",
+    "orchestration"
+  ],
+  "properties": {
+    "schema_version": { "const": "commute-performance-run.v1" },
+    "finalized_at": { "type": "string", "format": "date-time", "pattern": "Z$" },
+    "run_id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9_-]{0,127}$" },
+    "experiment": {
+      "$ref": "commute-performance-input-v1.schema.json#/$defs/experiment"
+    },
+    "publication": {
+      "$ref": "commute-performance-input-v1.schema.json#/$defs/publication"
+    },
+    "phases": { "type": "object" },
+    "durations_seconds": { "$ref": "#/$defs/durations" },
+    "activity": { "$ref": "#/$defs/activity" },
+    "review": { "$ref": "commute-performance-input-v1.schema.json#/$defs/review" },
+    "quality": { "$ref": "commute-performance-input-v1.schema.json#/$defs/quality" },
+    "orchestration": { "$ref": "#/$defs/orchestration" }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "publication": {
+            "properties": { "outcome": { "const": "merged" } },
+            "required": ["outcome"]
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "phases": {
+            "$ref": "commute-performance-input-v1.schema.json#/$defs/merged_phases"
+          },
+          "durations_seconds": { "$ref": "#/$defs/merged_durations" }
+        }
+      },
+      "else": {
+        "properties": {
+          "phases": {
+            "$ref": "commute-performance-input-v1.schema.json#/$defs/no_change_phases"
+          },
+          "durations_seconds": { "$ref": "#/$defs/no_change_durations" }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "non_negative": { "type": "number", "minimum": 0 },
+    "durations": { "type": "object" },
+    "merged_durations": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "gross_lifecycle",
+        "busy_adjusted_lifecycle",
+        "strict_agent_active",
+        "tool_execution",
+        "agent_orchestration",
+        "pre_pr",
+        "pr_to_merge",
+        "post_merge",
+        "merge_authorization_wait"
+      ],
+      "properties": {
+        "gross_lifecycle": { "$ref": "#/$defs/non_negative" },
+        "busy_adjusted_lifecycle": { "$ref": "#/$defs/non_negative" },
+        "strict_agent_active": { "$ref": "#/$defs/non_negative" },
+        "tool_execution": { "$ref": "#/$defs/non_negative" },
+        "agent_orchestration": { "$ref": "#/$defs/non_negative" },
+        "pre_pr": { "$ref": "#/$defs/non_negative" },
+        "pr_to_merge": { "$ref": "#/$defs/non_negative" },
+        "post_merge": { "$ref": "#/$defs/non_negative" },
+        "merge_authorization_wait": { "$ref": "#/$defs/non_negative" }
+      }
+    },
+    "no_change_durations": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "gross_lifecycle",
+        "busy_adjusted_lifecycle",
+        "strict_agent_active",
+        "tool_execution",
+        "agent_orchestration",
+        "pre_pr",
+        "pr_to_merge",
+        "post_merge",
+        "merge_authorization_wait"
+      ],
+      "properties": {
+        "gross_lifecycle": { "$ref": "#/$defs/non_negative" },
+        "busy_adjusted_lifecycle": { "$ref": "#/$defs/non_negative" },
+        "strict_agent_active": { "$ref": "#/$defs/non_negative" },
+        "tool_execution": { "$ref": "#/$defs/non_negative" },
+        "agent_orchestration": { "$ref": "#/$defs/non_negative" },
+        "pre_pr": { "type": "null" },
+        "pr_to_merge": { "type": "null" },
+        "post_merge": { "type": "null" },
+        "merge_authorization_wait": { "type": "null" }
+      }
+    },
+    "activity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "tool_call_count",
+        "interventions",
+        "intervention_count",
+        "required_intervention_count",
+        "user_attention_seconds"
+      ],
+      "properties": {
+        "tool_call_count": { "type": "integer", "minimum": 0 },
+        "interventions": {
+          "type": "array",
+          "items": {
+            "$ref": "commute-performance-input-v1.schema.json#/$defs/intervention"
+          }
+        },
+        "intervention_count": { "type": "integer", "minimum": 0 },
+        "required_intervention_count": { "type": "integer", "minimum": 0 },
+        "user_attention_seconds": { "$ref": "#/$defs/non_negative" }
+      }
+    },
+    "orchestration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schema_version", "source_path", "sha256"],
+      "properties": {
+        "schema_version": { "const": "commute-run.v1" },
+        "source_path": { "type": "string", "minLength": 1 },
+        "sha256": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" }
+      }
+    }
+  }
+}

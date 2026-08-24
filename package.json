@@ -22,6 +22,7 @@
     "validate:commute-queue": "npm run build --silent && node dist/src/commute/validate-queue.js",
     "validate:commute-session-bundle": "npm run build --silent && node dist/src/commute/validate-session-bundle.js",
     "commute:run": "npm run build --silent && node dist/src/commute/run.js",
+    "finalize:commute-performance": "npm run build --silent && node dist/src/commute/performance.js",
     "retrieve:commute-sources": "npm run build --silent && node dist/src/wiki/retrieve-maintenance-sources.js",
     "record:classifier-feedback": "npm run build --silent && node dist/src/classifier/feedback-label.js",
     "test": "npm run build && node --test dist/tests/*.test.js",

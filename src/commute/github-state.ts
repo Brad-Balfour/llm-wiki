@@ -4,7 +4,7 @@ import { promisify } from 'node:util';
 const execFileAsync = promisify(execFile);
 
 export async function githubState(repository: string, pr: number): Promise<unknown> {
-  const query = `query($owner:String!,$repo:String!,$number:Int!){repository(owner:$owner,name:$repo){pullRequest(number:$number){url headRefOid mergeable reviewDecision isDraft reviews(last:20){nodes{state author{login}}} reviewThreads(first:100){nodes{isResolved}} closingIssuesReferences(first:50){nodes{number title state url}} commits(last:1){nodes{commit{statusCheckRollup{contexts(first:100){nodes{__typename ... on CheckRun{name status conclusion detailsUrl}}}}}}}}}}`;
+  const query = `query($owner:String!,$repo:String!,$number:Int!){repository(owner:$owner,name:$repo){pullRequest(number:$number){number url headRefOid state createdAt mergedAt mergeable reviewDecision isDraft reviews(last:20){nodes{state author{login}}} reviewThreads(first:100){nodes{isResolved}} closingIssuesReferences(first:50){nodes{number title state url}} commits(last:1){nodes{commit{statusCheckRollup{contexts(first:100){nodes{__typename ... on CheckRun{name status conclusion detailsUrl}}}}}}}}}}`;
   const [owner, repo] = repository.split('/');
   if (!owner || !repo || !Number.isInteger(pr) || pr < 1)
     throw new Error('Use OWNER/REPO and a positive PR number');
@@ -22,7 +22,7 @@ export async function githubState(repository: string, pr: number): Promise<unkno
       '-F',
       `number=${pr}`,
     ],
-    { maxBuffer: 1024 * 1024 }
+    { maxBuffer: 1024 * 1024, timeout: 30_000 }
   );
   return JSON.parse(stdout) as unknown;
 }

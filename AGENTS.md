@@ -207,6 +207,16 @@ If the day produces no justified tracked change, report an explicit no-change
 result with the validation and issue-routing evidence; do not manufacture a PR
 or public wiki content merely to make the loop look active.
 
+While the issue #85 model/effort experiment is active, every assigned
+experimental `/process daily commute` run must create its private
+`commute-performance-input.v1` record and invoke
+`npm run finalize:commute-performance` exactly once. Finalize only after merged
+cleanup is complete or after the complete no-change result is established, so
+the record covers the full terminal lifecycle. Use timestamps and counts already
+available to the agent; this passive measurement must not add a user prompt or
+ask Brad for a timing acknowledgment. Keep the input, linked `commute-run.v1`,
+and finalized output under `.private/`.
+
 ## Git and handoff
 
 - Keep each worktree to one focused task. Stage only its intended files; do not
