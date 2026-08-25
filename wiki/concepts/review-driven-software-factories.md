@@ -2,15 +2,15 @@
 type: concept
 title: 'Review-Driven Software Factories'
 # prettier-ignore
-aliases: ["Why Software Factories Fail","Human-in-the-loop software factories","Agentic documentation workflows","Foreman software factory","Hiring Agents Is the Easy Part","Warp Factories"]
+aliases: ["Why Software Factories Fail","Human-in-the-loop software factories","Agentic documentation workflows","Foreman software factory","Hiring Agents Is the Easy Part","Warp Factories","Quality Assurance Agent","Stop being the code review bottleneck"]
 # prettier-ignore
 tags: ["ai-agents","software-design","planning","code-review","context-management","documentation","workflow-automation"]
 wiki_slug: review-driven-software-factories
 created: 2026-07-25
-updated: 2026-08-19
+updated: 2026-08-24
 confidence: medium
 # prettier-ignore
-provenance: [{"source_item_id":"dev-20260724-01","url":"https://github.com/humanlayer/advanced-context-engineering-for-coding-agents/blob/main/wsff.md"},{"source_item_id":"19fd6c96b2d39a67-11","url":"https://github.blog/ai-and-ml/github-copilot/automating-cross-repo-documentation-with-github-agentic-workflows/?utm_source=tldrdev"},{"source_item_id":"19ffad638bac0403-02","url":"https://blog.cloudflare.com/astro-issue-triage/?utm_source=tldrdev"},{"source_item_id":"19ffffe9eeaeab99-06","url":"https://github.com/vercel-labs/eve-software-factory-template?utm_source=tldrnewsletter"},{"source_item_id":"19ffb53bd896ad92-11","url":"https://x.com/AlanaDLevin/status/2087526319999303784"},{"source_item_id":"1a01a57197aa438b-18","url":"https://techcrunch.com/2026/08/18/warps-new-system-is-an-out-of-the-box-software-factory-for-ai-development/?utm_source=tldrai"},{"source_item_id":"url_adf03cc09f382e8e","url":"https://www.warp.dev/factories/request-access"},{"source_item_id":"url_79e1f7b5ba46a169","url":"https://docs.warp.dev/factories/"},{"source_item_id":"url_80300d7978de226c","url":"https://docs.warp.dev/factories/infrastructure-and-security/"}]
+provenance: [{"source_item_id":"dev-20260724-01","url":"https://github.com/humanlayer/advanced-context-engineering-for-coding-agents/blob/main/wsff.md"},{"source_item_id":"19fd6c96b2d39a67-11","url":"https://github.blog/ai-and-ml/github-copilot/automating-cross-repo-documentation-with-github-agentic-workflows/?utm_source=tldrdev"},{"source_item_id":"19ffad638bac0403-02","url":"https://blog.cloudflare.com/astro-issue-triage/?utm_source=tldrdev"},{"source_item_id":"19ffffe9eeaeab99-06","url":"https://github.com/vercel-labs/eve-software-factory-template?utm_source=tldrnewsletter"},{"source_item_id":"19ffb53bd896ad92-11","url":"https://x.com/AlanaDLevin/status/2087526319999303784"},{"source_item_id":"1a01a57197aa438b-18","url":"https://techcrunch.com/2026/08/18/warps-new-system-is-an-out-of-the-box-software-factory-for-ai-development/?utm_source=tldrai"},{"source_item_id":"url_adf03cc09f382e8e","url":"https://www.warp.dev/factories/request-access"},{"source_item_id":"url_79e1f7b5ba46a169","url":"https://docs.warp.dev/factories/"},{"source_item_id":"url_80300d7978de226c","url":"https://docs.warp.dev/factories/infrastructure-and-security/"},{"source_item_id":"url_853c86ea5e82c5b4","url":"https://www.linkedin.com/blog/engineering/ai/qa-agent-reimagining-software-quality-with-ai-driven-autonomous-testing"},{"source_item_id":"url_f7ffc84157ac5d1c","url":"https://newsletter.posthog.com/p/code-review-tips"}]
 ---
 
 # Review-Driven Software Factories
@@ -206,6 +206,42 @@ visibility, auditability, and operator control. A packaged platform can reduce
 the infrastructure burden, but it does not remove the need to define success,
 constrain authority, verify artifacts, or decide when work is ready to ship.
 
+## Autonomous Testing as a Factory Reviewer
+
+LinkedIn's QA Agent is a concrete example of specialized review work moving
+into an agent loop. It combines a high-level planner, an analytical model, a
+visual grounding model, device drivers, deterministic replay of previously
+successful actions, and independent evaluators. The agent reportedly found
+more than 200 valid bugs, including regressions in revenue-impacting flows.
+
+The architecture matters more than the headline count. Known stable paths run
+cheaply and deterministically, while changed screens invoke visual reasoning.
+View-tree changes, analytics logs, action history, and a two-stage error check
+act as separate guardrails before a bug report is filed. Natural-language test
+authoring broadens who can specify coverage, but the surrounding evaluators and
+false-positive filtering are what make that flexibility usable at scale.
+
+These are LinkedIn's own production results, not an independent comparison with
+scripted testing or human exploratory QA. The system also tests observable UI
+behavior; it does not replace lower-level correctness, security, accessibility,
+or performance evidence.
+
+## Review Pipelines Should Route Human Attention
+
+PostHog describes four complementary patterns: independent agent reviewers,
+loops that handle CI and review toil, deterministic gates for low-risk
+approvals, and small changes that can be verified by direct observation. The
+reviewer that wrote the code should not be the only reviewer, and ambiguous
+findings should remain visible for a person rather than being forced into an
+automatic fix or dismissal.
+
+Its StampHog report is especially useful because the approval boundary is
+explicit: clean PR state, deny-listed high-risk areas, diff-size limits, and an
+LLM check that may tighten but not loosen the deterministic gate. PostHog says
+the agent handled 1,600 PRs in one month and roughly one third of final stamps
+in a quarter. Those figures demonstrate local operating scale, not a general
+benchmark for safe automated approval.
+
 ## Source Notes
 
 ### [Why Software Factories Fail](https://github.com/humanlayer/advanced-context-engineering-for-coding-agents/blob/main/wsff.md)
@@ -300,6 +336,22 @@ Warp's infrastructure documentation distinguishes its control and execution
 planes and describes coordination, identity, configuration, observability,
 storage, inference routing, runners, and deployment choices.
 
+### [Quality Assurance Agent: Reimagining Software Quality with AI-Driven Autonomous Testing](https://www.linkedin.com/blog/engineering/ai/qa-agent-reimagining-software-quality-with-ai-driven-autonomous-testing)
+
+<!-- source-item-id: url_853c86ea5e82c5b4 -->
+
+LinkedIn Engineering, 2026-06-18. A first-party production report on hybrid
+deterministic and vision-model testing, independent evaluators, natural-language
+test authoring, and more than 200 reported valid bugs.
+
+### [Stop being the code review bottleneck](https://newsletter.posthog.com/p/code-review-tips)
+
+<!-- source-item-id: url_f7ffc84157ac5d1c -->
+
+PostHog, 2026-07-09. Practitioner patterns for independent review agents, PR
+babysitting loops, risk-gated approvals, and verification through observable
+small changes.
+
 ## Related
 
 - {% include wiki-related-link.md slug="ai-native-software-engineering" %}
@@ -309,3 +361,4 @@ storage, inference routing, runners, and deployment choices.
 - {% include wiki-related-link.md slug="deterministic-agent-workflows" %}
 - {% include wiki-related-link.md slug="wide-exploration-narrow-delivery" %}
 - {% include wiki-related-link.md slug="human-understanding-in-agentic-coding" %}
+- {% include wiki-related-link.md slug="long-running-agent-harnesses" %}
