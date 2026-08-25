@@ -38,10 +38,10 @@ handoff preparation therefore includes blind-spot searches, concrete
 prototypes, implementation logs, and comprehension checks—not only a polished
 task description.
 
-The TLDR tracking link supplied for this source resolves to the X article. The
-publicly indexed companion material supports the title and workflow themes, but
-the X rendering is not a stable archival format; the provenance preserves the
-canonical article URL.
+The TLDR tracking link supplied for this source resolves to the X article.
+Because X is not a stable archival format, the provenance records that resolved
+destination while the summary is corroborated by publicly indexed companion
+material.
 
 ## Preserve the Seat Without Assuming Sentience
 
