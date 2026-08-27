@@ -2,15 +2,15 @@
 type: concept
 title: 'Review-Driven Software Factories'
 # prettier-ignore
-aliases: ["Why Software Factories Fail","Human-in-the-loop software factories","Agentic documentation workflows","Foreman software factory","Hiring Agents Is the Easy Part","Warp Factories","Quality Assurance Agent","Stop being the code review bottleneck"]
+aliases: ["Why Software Factories Fail","Human-in-the-loop software factories","Agentic documentation workflows","Foreman software factory","Hiring Agents Is the Easy Part","Warp Factories","Quality Assurance Agent","Stop being the code review bottleneck","How Uber built a software factory for agentic coding","When code is abundant"]
 # prettier-ignore
-tags: ["ai-agents","software-design","planning","code-review","context-management","documentation","workflow-automation"]
+tags: ["ai-agents","software-design","planning","code-review","context-management","documentation","workflow-automation","platform-engineering","governance","mcp"]
 wiki_slug: review-driven-software-factories
 created: 2026-07-25
-updated: 2026-08-24
+updated: 2026-08-26
 confidence: medium
 # prettier-ignore
-provenance: [{"source_item_id":"dev-20260724-01","url":"https://github.com/humanlayer/advanced-context-engineering-for-coding-agents/blob/main/wsff.md"},{"source_item_id":"19fd6c96b2d39a67-11","url":"https://github.blog/ai-and-ml/github-copilot/automating-cross-repo-documentation-with-github-agentic-workflows/?utm_source=tldrdev"},{"source_item_id":"19ffad638bac0403-02","url":"https://blog.cloudflare.com/astro-issue-triage/?utm_source=tldrdev"},{"source_item_id":"19ffffe9eeaeab99-06","url":"https://github.com/vercel-labs/eve-software-factory-template?utm_source=tldrnewsletter"},{"source_item_id":"19ffb53bd896ad92-11","url":"https://x.com/AlanaDLevin/status/2087526319999303784"},{"source_item_id":"1a01a57197aa438b-18","url":"https://techcrunch.com/2026/08/18/warps-new-system-is-an-out-of-the-box-software-factory-for-ai-development/?utm_source=tldrai"},{"source_item_id":"url_adf03cc09f382e8e","url":"https://www.warp.dev/factories/request-access"},{"source_item_id":"url_79e1f7b5ba46a169","url":"https://docs.warp.dev/factories/"},{"source_item_id":"url_80300d7978de226c","url":"https://docs.warp.dev/factories/infrastructure-and-security/"},{"source_item_id":"url_853c86ea5e82c5b4","url":"https://www.linkedin.com/blog/engineering/ai/qa-agent-reimagining-software-quality-with-ai-driven-autonomous-testing"},{"source_item_id":"url_f7ffc84157ac5d1c","url":"https://newsletter.posthog.com/p/code-review-tips"}]
+provenance: [{"source_item_id":"dev-20260724-01","url":"https://github.com/humanlayer/advanced-context-engineering-for-coding-agents/blob/main/wsff.md"},{"source_item_id":"19fd6c96b2d39a67-11","url":"https://github.blog/ai-and-ml/github-copilot/automating-cross-repo-documentation-with-github-agentic-workflows/?utm_source=tldrdev"},{"source_item_id":"19ffad638bac0403-02","url":"https://blog.cloudflare.com/astro-issue-triage/?utm_source=tldrdev"},{"source_item_id":"19ffffe9eeaeab99-06","url":"https://github.com/vercel-labs/eve-software-factory-template?utm_source=tldrnewsletter"},{"source_item_id":"19ffb53bd896ad92-11","url":"https://x.com/AlanaDLevin/status/2087526319999303784"},{"source_item_id":"1a01a57197aa438b-18","url":"https://techcrunch.com/2026/08/18/warps-new-system-is-an-out-of-the-box-software-factory-for-ai-development/?utm_source=tldrai"},{"source_item_id":"url_adf03cc09f382e8e","url":"https://www.warp.dev/factories/request-access"},{"source_item_id":"url_79e1f7b5ba46a169","url":"https://docs.warp.dev/factories/"},{"source_item_id":"url_80300d7978de226c","url":"https://docs.warp.dev/factories/infrastructure-and-security/"},{"source_item_id":"url_853c86ea5e82c5b4","url":"https://www.linkedin.com/blog/engineering/ai/qa-agent-reimagining-software-quality-with-ai-driven-autonomous-testing"},{"source_item_id":"url_f7ffc84157ac5d1c","url":"https://newsletter.posthog.com/p/code-review-tips"},{"source_item_id":"1a038ac5916976e5-05","url":"https://newsletter.port.io/p/how-uber-built-a-software-factory?utm_source=tldrnewsletter"},{"source_item_id":"1a03919a99717a24-09","url":"https://about.gitlab.com/blog/when-code-is-abundant/?utm_source=tldrai"},{"source_item_id":"url_74ac61e244043f10","url":"https://claude.com/blog/the-ai-native-sdlc-playbook"}]
 ---
 
 # Review-Driven Software Factories
@@ -242,6 +242,57 @@ the agent handled 1,600 PRs in one month and roughly one third of final stamps
 in a quarter. Those figures demonstrate local operating scale, not a general
 benchmark for safe automated approval.
 
+## The Factory Needs a Platform Substrate
+
+An account of Uber's internal software factory shows what sits underneath the
+review loop when it has to serve thousands of engineers. The reported platform
+combines a context graph, a registry of reusable skills, warm execution
+environments, an inference gateway, and an MCP gateway. Together these pieces
+make organizational context and tools discoverable without placing every API
+description or credential directly into an agent's prompt.
+
+The MCP gateway is the most reusable architectural idea. It provides a single
+governed entry point for more than 1,000 reported tools, spanning internal APIs
+and services such as Google, Slack, and Jira. Agents first discover the narrow
+tool they need and then call it through centrally managed authentication and
+policy. Compact responses and executable helper scripts reportedly reduced
+tool-related token use by more than 40 percent. This is context engineering at
+the platform boundary: constrain discovery, mediate authority, and return only
+the evidence needed for the current step.
+
+The source reports that Uber's context graph contains 40 million entries across
+150 types, its skills registry contains 2,500 skills used in 20,000 daily runs,
+more than 70 percent of pull requests are agent-written, and code shipped per
+engineer doubled in a year. These figures come from Port's account of an Uber
+presentation rather than an independent study or Uber engineering publication.
+They are useful evidence of the claimed operating scale, not proof that the
+platform components caused the productivity change.
+
+## When Code Becomes Abundant, Trust Becomes Scarce
+
+GitLab's response to Anthropic's
+[AI-Native SDLC Playbook](https://claude.com/blog/the-ai-native-sdlc-playbook)
+argues that faster generation moves the constraint from producing code to
+accepting trustworthy changes. Its proposed unit of economics is therefore
+**cost per accepted change**, which includes the context, environment,
+verification, governance, and evidence required to ship—not cost per line or
+raw pull-request volume.
+
+This sharpens Anthropic's staged playbook rather than rejecting it. Anthropic
+describes a versioned flow through planning, design, building, testing,
+deployment, and maintenance, with human gates and reusable skills, hooks, and
+MCP connections. GitLab emphasizes the control plane around that loop:
+organizationally owned instructions and context, model-neutral execution,
+policy, identity, auditability, and durable evidence. Human judgment moves
+toward intent, architecture, constraints, and exception handling while tests,
+policies, and evaluations capture what the organization learns.
+
+GitLab frames this as a move from a software development lifecycle to a broader
+product development lifecycle, where business intent, support signals, and
+compliance requirements can initiate governed changes. That extension is a
+vendor thesis, but it identifies the same boundary seen throughout this page:
+autonomy scales only when review criteria, authority, and proof scale with it.
+
 ## Source Notes
 
 ### [Why Software Factories Fail](https://github.com/humanlayer/advanced-context-engineering-for-coding-agents/blob/main/wsff.md)
@@ -351,6 +402,33 @@ test authoring, and more than 200 reported valid bugs.
 PostHog, 2026-07-09. Practitioner patterns for independent review agents, PR
 babysitting loops, risk-gated approvals, and verification through observable
 small changes.
+
+### [How Uber built a software factory for agentic coding: the MCP gateway and the platform underneath](https://newsletter.port.io/p/how-uber-built-a-software-factory?utm_source=tldrnewsletter)
+
+<!-- source-item-id: 1a038ac5916976e5-05 -->
+
+TLDR, 2026-08-25. Port CEO Zohar Einy's article summarizes an Uber
+presentation by Uday Kiran Medisetty and Adam Huda. It supplies the platform
+components, gateway design, tool categories, and reported scale metrics. The
+article is a secondary account of Uber's presentation, so the page attributes
+its operational figures rather than treating them as independently verified.
+
+### [When code is abundant](https://about.gitlab.com/blog/when-code-is-abundant/?utm_source=tldrai)
+
+<!-- source-item-id: 1a03919a99717a24-09 -->
+
+TLDR AI, 2026-08-25. GitLab CEO Bill Staples argues that trust and accepted
+changes become the limiting factors as generated code gets cheaper. This is a
+first-party vendor thesis about governance and GitLab's place in the toolchain,
+not comparative evidence for GitLab's product.
+
+### [The AI-Native SDLC Playbook](https://claude.com/blog/the-ai-native-sdlc-playbook)
+
+<!-- source-item-id: url_74ac61e244043f10 -->
+
+Anthropic, 2026-08-21. Louis Claxton's first-party playbook is the article to
+which GitLab explicitly responds. It is included as related primary context for
+the saved GitLab source, not as a separate commute save.
 
 ## Related
 
