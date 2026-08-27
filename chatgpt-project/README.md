@@ -11,9 +11,10 @@ Paste `chatgpt-project/CHATGPT_CAR_QUEUE_PROMPT.md` into the **Instructions**
 field of `LLM-Wiki-Car`. It supersedes the former commute prompt and the
 earlier separate-Project v2 Pilot.
 
-The repository file is Prompt Revision 3.3, prepared from the August 4-5 and
-August 11-12 commute evidence. Brad confirmed that the live Project Instructions
-were updated to Prompt Revision 3.3 on August 12, 2026.
+The repository file is Prompt Revision 3.4. It makes Brad's settled
+per-advance grounding wording—“go to next and reread the queue”—an explicit
+natural-language navigation instruction. The live Project Instructions remain
+at Prompt Revision 3.3 until Brad applies this replacement.
 
 The prompt heading carries two distinct versions. `Queue Contract v2` changes
 only when the queue/schema contract changes. `Prompt Revision` increments for

@@ -1331,6 +1331,18 @@ This is a bounded recovery strategy, not an explanation of root cause. It
 addresses the observed difference between exact search and recent-file listing
 without permitting silent stale-queue substitution.
 
+### August 26 Per-Advance Grounding Choice
+
+Brad settled on “go to next and reread the queue” as the spoken per-advance
+prompt. It keeps ordinary-language navigation anchored to the bound queue
+instead of inviting a conversation-level recap, article-summary inference, or
+topic substitution. Prompt Revision 3.4 recognizes the wording as an ordinary
+`next` request, requires a direct re-read and verification of the bound queue
+and destination item before playback, and permits only literal destination
+fields to be spoken. This promotes the August 5 workaround from a provisional
+operator practice to a specific, test-covered Project instruction; it does not
+claim that prompt wording alone makes ChatGPT Voice state durable.
+
 ## Next Diagnostic: Library Discovery Probe
 
 Run this as a short text-chat experiment before a Voice commute, using one
