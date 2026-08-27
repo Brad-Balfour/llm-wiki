@@ -59,6 +59,8 @@ found a queue as proof.
 - The August 24 General and Dev queues, three session-bundle downloads, and
   three complete shared chats. Two displayed Dev bundle rows were byte-identical
   copies of one recovered session.
+- The August 24 AI and Fintech queues, the August 25 General, Dev, and AI
+  queues, five August 26 session bundles, and five complete shared chats.
 - The live `Weekday TLDR Queues` Task conversation/configuration, the July
   21-24 Task Update emails, the July 24 manual queue-generation control, and
   the live Project settings/sources inspected on July 26.
@@ -1134,6 +1136,61 @@ prompt revision would not close that gap. No live Project instruction or listed
 source changed, so no Project synchronization is required. Issue #100 tracks
 the supported-product mechanism and observable-mitigation question without
 asking Brad to build a replacement Voice client.
+
+### August 26 Acceptance, Grounding, Feedback, And Maintenance Result
+
+The bounded Project Library inventory found exactly five August 26 bundle rows.
+Their declared queues were the August 24 AI and Fintech editions plus the
+August 25 General, Dev, and AI editions. All five exact queues passed queue-v2
+validation, and all five embedded snapshots matched their canonical files.
+Four bundles passed strict lifecycle validation. The final AI bundle did not:
+it announced item five immediately after item one without recording the
+required jump transition. Supplied-queue recovery retained the session and its
+exact save while preserving the malformed lifecycle as an unresolved quality
+incident rather than manufacturing a transition.
+
+Five complete serialized shared chats supplied the discussion and intent
+evidence. They contain 82 visible user turns. The private coverage ledger maps
+56 substantive turns to two wiki saves, article discussion, playback and
+grounding incidents, presentation QA, prior-awareness evidence, or explicit
+no-public-action dispositions. The remaining 26 turns are excluded session
+controls, plain navigation, pauses, acknowledgments, and recognition noise.
+
+The General conversation explicitly saved _How Uber built a software factory
+for agentic coding: the MCP gateway and the platform underneath_ into the
+existing _Review-Driven Software Factories_ concept. Source-grounded maintenance
+adds the context graph, skills registry, warm environments, MCP gateway, tool
+discovery, and reported scale while identifying Port's article as a secondary
+account of an Uber presentation. The final AI conversation explicitly saved
+GitLab's _When code is abundant_ and requested an interlink to Anthropic's
+_AI-Native SDLC Playbook_, which the GitLab article directly answers. The page
+now distinguishes Anthropic's staged playbook from GitLab's trust, governance,
+and cost-per-accepted-change thesis.
+
+No score-bearing classifier correction was supplied. In Dev playback Brad said
+that _GlassBox_ was useless as a headline-only experience even though the
+classification itself might be right. The recovered bundle standardized that
+comment as `promote_to_in_depth`, but the exact words control: this remains
+headline-informativeness and classifier QA, not a recorded depth label. Issues
+#35 and #66 retain the discrepancy for diagnostics without silently changing
+the preference corpus.
+
+The chats preserve at least ten quality incidents: an incomplete and
+hallucinated morning sweep; an incomplete Fintech sweep, a paraphrased summary,
+and failure to obey the literal queue; three General paraphrase or invention
+incidents; the false claim that a Dev headline-only item had no summary; and two
+final-AI navigation or pause failures. The final malformed jump adds bundle
+lifecycle evidence. The phrase “go to next and reread the queue” emerged during
+Voice use as an operator technique for keeping the current item anchored. It
+helped express the desired behavior but did not prevent every repeat,
+auto-advance, or paraphrase.
+
+That observation is not new command grammar, and this content/evidence change
+does not revise Prompt 3.3. A grounding redesign belongs in a separate follow-up
+that considers product behavior and enforcement rather than inserting one
+settled phrase into the accepted-command list. The rejected prompt-edit PR was
+closed at Brad's direction. No live Project instruction or listed source
+changed, so no Project synchronization is required for this run.
 
 ## What Worked
 
