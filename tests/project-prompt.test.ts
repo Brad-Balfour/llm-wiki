@@ -12,12 +12,12 @@ test('ChatGPT Project instructions fit the 8,000-character limit', async () => {
 test('ChatGPT Project instructions require a grounded headline sweep and URL handling', async () => {
   const prompt = await readFile('chatgpt-project/CHATGPT_CAR_QUEUE_PROMPT.md', 'utf8');
 
-  assert.match(prompt, /Prompt Revision 3\.3/);
+  assert.match(prompt, /Prompt Revision 3\.4/);
   assert.match(prompt, /one ordered headline sweep directly from the queue/);
-  assert.match(prompt, /Do\s+not begin item 1's summary\s+before completing the sweep/);
-  assert.match(prompt, /Immediately after headline `M`/);
-  assert.match(prompt, /begin item 1\s+base playback without waiting for Brad to ask/);
-  assert.doesNotMatch(prompt, /make `items\[0\]` current and wait/);
+  assert.match(prompt, /After headline `M`, pause without making an item current/);
+  assert.match(prompt, /may begin\s+detailed playback at any verified queue item/);
+  assert.match(prompt, /if he says only to proceed or\s+continue, begin at item 1/);
+  assert.match(prompt, /Do not begin any item's base playback before completing\s+the sweep/);
   assert.match(prompt, /Every valid queue item has a URL/);
   assert.match(prompt, /literal reading mode cannot be read/);
   assert.match(prompt, /`headline_only`: read exact\s+`item\.title`; omit `item\.summary`/);
@@ -33,19 +33,29 @@ test('ChatGPT Project instructions require a grounded headline sweep and URL han
   assert.match(prompt, /no search or\s+paraphrase/);
 });
 
+test('ChatGPT Project instructions preserve arbitrary navigation and incomplete evidence', async () => {
+  const prompt = await readFile('chatgpt-project/CHATGPT_CAR_QUEUE_PROMPT.md', 'utf8');
+
+  assert.match(prompt, /first\s+post-sweep\s+`item_announced` may name any verified queue item/);
+  assert.match(prompt, /`items` is canonical\s+identity\/order, not required visit order/);
+  assert.match(prompt, /later exact announcement when visible\s+evidence lacks its transition/);
+  assert.match(prompt, /use `partial` or `recovered`/);
+  assert.match(prompt, /`completed` means the commute ended, not every item was visited/);
+  assert.match(prompt, /relative destinations, and final\s+cursor/);
+});
+
 test('ChatGPT Project instructions treat natural language as intent rather than a CLI', async () => {
   const prompt = await readFile('chatgpt-project/CHATGPT_CAR_QUEUE_PROMPT.md', 'utf8');
 
   assert.match(prompt, /Interpret Brad's ordinary English by intent, not exact wording/);
-  assert.match(prompt, /Examples are illustrative, not exhaustive/);
+  assert.match(prompt, /examples are illustrative,\s+not exhaustive/i);
   assert.match(prompt, /Never require\s+command labels, schema terms/);
-  assert.match(prompt, /moving forward one item or skipping is `next`/);
-  assert.match(prompt, /returning one item is\s+`previous`/);
-  assert.match(prompt, /going directly to any other named or\s+numbered queue item is `jump`/);
-  assert.match(prompt, /“item 6” or “6 of 14,” exact or unambiguous headline references/);
-  assert.match(prompt, /does not announce or mark as heard the items\s+between/);
-  assert.match(prompt, /do not\s+offer a list of allowed\s+commands/);
-  assert.match(prompt, /question about what he wants to do/);
+  assert.match(prompt, /Normalize forward\/skip as `next`, back one as `previous`/);
+  assert.match(prompt, /any other exact named\/numbered item as `jump`/);
+  assert.match(prompt, /“item\s+6,” “6 of 14,” or an unambiguous headline/);
+  assert.match(prompt, /A jump neither announces nor marks\s+intervening items heard/);
+  assert.match(prompt, /do not list allowed commands/);
+  assert.match(prompt, /ask a short plain-English question/);
   assert.doesNotMatch(prompt, /question about which item he wants/);
   assert.match(prompt, /What would you like me to do\?/);
   assert.doesNotMatch(prompt, /Which item do you want\?/);

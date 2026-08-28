@@ -253,7 +253,7 @@
       "description": "Playback cannot repeat a prior item after a next transition without a repeat transition.",
       "input_filename": "202607200745-morning-commute-session-bundle.txt",
       "expected": "rejected",
-      "error": "item_announced does not match the expected queue position",
+      "error": "item_announced is an impossible destination for the recorded relative transition",
       "mutations": [
         {
           "op": "set",

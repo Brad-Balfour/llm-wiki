@@ -13,12 +13,14 @@ Library.
 - **WHEN** Brad names one exact queue filename or an unambiguous
   date/newsletter request in Voice and its canonical filename validates from the
   live Project Library
-- **THEN** it SHALL begin from that queue's first item
+- **THEN** it SHALL bind that queue without making a detailed-playback item current
 - **AND** before any summary or article commentary it SHALL announce
   `Reading: <M> items from <filename>.`, give one ordered sweep containing each
-  item's literal position, reading mode, and headline, and then immediately make
-  item 1 current and begin its base playback without waiting for another user turn
-- **AND** it SHALL NOT begin item 1's summary before completing the sweep
+  item's literal position, reading mode, and headline, and then wait for Brad's
+  post-sweep playback selection
+- **AND** Brad MAY start detailed playback at any exact queue item
+- **AND** an unqualified request to proceed or continue SHALL start at item 1
+- **AND** it SHALL NOT begin any item's base playback before completing the sweep
 - **AND** it SHALL NOT insert items from another queue
 - **AND** the resulting canonical-filename lookup SHALL occur only for session
   start, not as a fallback after another queue has become active.
@@ -120,6 +122,15 @@ can provide a measured timer or capture every overlapping interruption.
 - **AND** a clear request for item N of M, a named item, or another unambiguous
   queue reference SHALL make that verified item current without announcing or
   marking intervening items as heard.
+
+#### Scenario: Brad chooses a post-sweep starting point
+
+- **WHEN** the ordered headline sweep is complete and Brad selects any exact
+  queue item
+- **THEN** Voice SHALL make that item the first current detailed-playback item
+- **AND** it SHALL NOT announce or mark earlier queue positions as visited
+- **AND** the queue's ordered `items` array SHALL remain canonical identity and
+  position metadata rather than a required visitation sequence.
 
 #### Scenario: Voice combines spoken intents
 

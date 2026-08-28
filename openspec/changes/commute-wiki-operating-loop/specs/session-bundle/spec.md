@@ -247,10 +247,19 @@ The bundle SHALL declare event-level evidence sources and an integrity state of
 - **THEN** its integrity SHALL be `partial` or `recovered`
 - **AND** it SHALL NOT declare itself `complete`.
 
-### Requirement: Ordered Current-Item Lifecycle
+### Requirement: Evidence-Ordered Current-Item Lifecycle
 
-The bundle SHALL record ordered queue-state and action transitions so that an
-item-specific action can be validated against the announced current item.
+The bundle SHALL record session evidence in event order so that an item-specific
+action can be validated against the announced current item. The queue's item
+order SHALL define canonical identity and relative positions, not a required
+visitation sequence.
+
+#### Scenario: First post-sweep announcement selects any queue item
+
+- **WHEN** the first post-sweep `item_announced` event exactly identifies any
+  item in the embedded queue
+- **THEN** that event SHALL establish the current item
+- **AND** it SHALL NOT require announcements for earlier queue positions.
 
 #### Scenario: Feedback follows an announced item
 
@@ -291,6 +300,34 @@ item-specific action can be validated against the announced current item.
   destination item
 - **AND** the bundle SHALL NOT invent announcements or playback for intervening
   queue items.
+
+#### Scenario: Incomplete exporter evidence omits a navigation transition
+
+- **WHEN** a `partial` or `recovered` event history contains a later exact
+  `item_announced` event but lacks the transition that selected it
+- **THEN** the validator SHALL accept that announcement as the new current item
+- **AND** the integrity declaration SHALL preserve that the event history is
+  incomplete
+- **AND** it SHALL NOT treat the missing exporter evidence as proof that Brad's
+  arbitrary navigation was invalid.
+
+#### Scenario: Recorded relative transition has an impossible destination
+
+- **WHEN** a recorded `next`, `previous`, or `repeat` transition is followed by
+  an `item_announced` destination that contradicts the queue-relative result
+- **THEN** the validator SHALL reject the bundle
+- **AND** a recorded `jump` SHALL likewise reject the departing item as its
+  destination.
+
+#### Scenario: Completed commute visits only selected items
+
+- **WHEN** Brad ends a commute after visiting any subset of queue items in any
+  order
+- **THEN** playback MAY be `completed`
+- **AND** completion SHALL NOT require every queue item to be announced or an
+  ascending visitation history
+- **AND** any declared final cursor SHALL still match the final verified current
+  item.
 
 ### Requirement: Quality Incidents Do Not Require Model Diagnosis
 

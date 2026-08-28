@@ -30,6 +30,15 @@ are covered before open-ended discussion items.
 - **AND** `maybe` items SHALL be downgraded or deferred before `interested`
   items when available commute time is short.
 
+#### Scenario: Session navigation does not rewrite queue order
+
+- **WHEN** Brad begins detailed playback at an arbitrary queue item, skips
+  positions, returns backward, jumps forward, or repeats an item
+- **THEN** the queue's `items` array SHALL remain the canonical identity and
+  relative ordering
+- **AND** that order SHALL NOT require the session to visit every item or visit
+  items in ascending order.
+
 ### Requirement: Quick-Read And Discuss Sections
 
 The queue SHALL make quick-read awareness items distinct from discussion items.

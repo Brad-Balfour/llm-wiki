@@ -12,6 +12,9 @@ import {
 
 const fixturePath = path.resolve('tests/fixtures/commute-bundles/valid-partial-bundle.json');
 const validBundle = JSON.parse(readFileSync(fixturePath, 'utf8')) as Record<string, unknown>;
+const nonlinearFixturePath = path.resolve(
+  'tests/fixtures/commute-bundles/valid-nonlinear-navigation-bundle.json'
+);
 
 test('validates a self-contained partial session bundle and fingerprints its embedded queue', () => {
   const parsed = parseCommuteSessionBundleText(JSON.stringify(validBundle));
@@ -23,6 +26,17 @@ test('validates a self-contained partial session bundle and fingerprints its emb
     queueSnapshotFingerprint(parsed.queue_snapshot.queue),
     'sha256:30ad6f59e21d2ef996411c12a2c7d1fb0db006581c0ac4f99b442a600b49a2fc'
   );
+});
+
+test('fixture accepts item 5 as the first announcement and non-linear subset playback', () => {
+  const parsed = parseCommuteSessionBundleText(readFileSync(nonlinearFixturePath, 'utf8'));
+  const firstEvent = parsed.events[0];
+
+  assert.equal(firstEvent?.kind, 'item_announced');
+  if (firstEvent?.kind !== 'item_announced') assert.fail('fixture must start with an announcement');
+  assert.equal(firstEvent.item.source_item_id, 'tldr-demo-005');
+  assert.equal(parsed.playback.status, 'completed');
+  assert.equal(parsed.events.length, 9);
 });
 
 test('accepts a completed bundle that retains its final current item as a revisit cursor', () => {
@@ -338,6 +352,98 @@ test('accepts a direct jump without inventing intervening announcements', () => 
   assert.equal(parsed.playback.resume_source_item_id, 'tldr-demo-003');
 });
 
+test('accepts arbitrary and non-linear playback without requiring every queue item', () => {
+  const bundle = clone(validBundle);
+  const queueSnapshot = bundle.queue_snapshot as Record<string, unknown>;
+  queueSnapshot.queue = queueWithItemCount(8);
+  const item = (position: number) => ({
+    source_item_id: `tldr-demo-${String(position).padStart(3, '0')}`,
+    title: `Exact headline ${position}`,
+    url: `https://example.com/item-${position}`,
+  });
+  bundle.events = [
+    announcedEvent('event-start-at-five', 1, item(5)),
+    announcedEvent('event-missing-backward-jump', 2, item(2)),
+    announcedEvent('event-missing-forward-jump', 3, item(7)),
+    transitionEvent('event-repeat-seven', 4, 'repeat', item(7)),
+    announcedEvent('event-repeated-seven', 5, item(7)),
+    transitionEvent('event-previous-from-seven', 6, 'previous', item(7)),
+    announcedEvent('event-announced-six', 7, item(6)),
+    transitionEvent('event-jump-from-six', 8, 'jump', item(6)),
+    announcedEvent('event-announced-eight', 9, item(8)),
+  ];
+  bundle.playback = {
+    status: 'completed',
+    last_announced_source_item_id: 'tldr-demo-008',
+    resume_source_item_id: 'tldr-demo-008',
+  };
+  bundle.integrity = {
+    state: 'recovered',
+    incomplete_reason:
+      'Exporter evidence omitted the transitions before the item 2 and item 7 announcements.',
+    unresolved_event_ids: [],
+  };
+
+  const parsed = parseCommuteSessionBundleText(JSON.stringify(bundle));
+
+  assert.equal(parsed.playback.status, 'completed');
+  assert.equal(parsed.events[0]?.kind, 'item_announced');
+  assert.equal(parsed.events[0]?.item.source_item_id, 'tldr-demo-005');
+  assert.equal(parsed.playback.resume_source_item_id, 'tldr-demo-008');
+});
+
+test('accepts any exact first announcement even with complete event integrity', () => {
+  const bundle = clone(validBundle);
+  const queueSnapshot = bundle.queue_snapshot as Record<string, unknown>;
+  queueSnapshot.queue = queueWithItemCount(8);
+  const evidence = [
+    { source: 'durable_contemporaneous_record', reference: 'durable-session-events.jsonl' },
+  ];
+  bundle.events = [
+    {
+      event_id: 'event-start',
+      sequence: 1,
+      kind: 'session_boundary',
+      boundary: 'start',
+      evidence,
+    },
+    {
+      ...announcedEvent('event-announced-five', 2, {
+        source_item_id: 'tldr-demo-005',
+        title: 'Exact headline 5',
+        url: 'https://example.com/item-5',
+      }),
+      evidence,
+    },
+    {
+      event_id: 'event-end',
+      sequence: 3,
+      kind: 'session_boundary',
+      boundary: 'end',
+      evidence,
+    },
+  ];
+  bundle.playback = {
+    status: 'completed',
+    last_announced_source_item_id: 'tldr-demo-005',
+    resume_source_item_id: 'tldr-demo-005',
+  };
+  bundle.integrity = {
+    state: 'complete',
+    unresolved_event_ids: [],
+    durable_event_record: {
+      filename: 'durable-session-events.jsonl',
+      sha256: `sha256:${'0'.repeat(64)}`,
+      covered_event_ids: ['event-start', 'event-announced-five', 'event-end'],
+    },
+  };
+
+  const parsed = parseCommuteSessionBundleText(JSON.stringify(bundle));
+
+  assert.equal(parsed.events[1]?.kind, 'item_announced');
+  assert.equal(parsed.events[1]?.item.source_item_id, 'tldr-demo-005');
+});
+
 test('rejects a jump that re-announces the departing item', () => {
   const malformed = clone(validBundle);
   const events = malformed.events as Array<Record<string, unknown>>;
@@ -519,7 +625,7 @@ test('rejects a complete bundle whose previous transition never announces its de
   );
 });
 
-test('rejects an out-of-order queue announcement after a next transition', () => {
+test('rejects an impossible queue announcement after a next transition', () => {
   const malformed = clone(validBundle);
   const events = malformed.events as Array<Record<string, unknown>>;
   const announcement = events[3] as Record<string, unknown>;
@@ -531,7 +637,67 @@ test('rejects an out-of-order queue announcement after a next transition', () =>
 
   assert.throws(
     () => parseCommuteSessionBundleText(JSON.stringify(malformed)),
-    /does not match the expected queue position/
+    /impossible destination for the recorded relative transition/
+  );
+});
+
+test('rejects next from the final queue item', () => {
+  const malformed = clone(validBundle);
+  malformed.events = [
+    announcedEvent('event-announced-two', 1, {
+      source_item_id: 'tldr-demo-002',
+      title: 'Second exact headline',
+      url: 'https://example.com/second',
+    }),
+    transitionEvent('event-next-from-final', 2, 'next', {
+      source_item_id: 'tldr-demo-002',
+      title: 'Second exact headline',
+      url: 'https://example.com/second',
+    }),
+  ];
+
+  assert.throws(
+    () => parseCommuteSessionBundleText(JSON.stringify(malformed)),
+    /next transition cannot move beyond the final queue item/
+  );
+});
+
+test('rejects an unexplained later announcement in a complete event history', () => {
+  const malformed = clone(validBundle);
+  const evidence = [
+    { source: 'durable_contemporaneous_record', reference: 'durable-session-events.jsonl' },
+  ];
+  malformed.events = [
+    {
+      event_id: 'event-start',
+      sequence: 1,
+      kind: 'session_boundary',
+      boundary: 'start',
+      evidence,
+    },
+    { ...announcedEvent('event-announced-one', 2, queueIdentity(1)), evidence },
+    { ...announcedEvent('event-announced-two', 3, queueIdentity(2)), evidence },
+    {
+      event_id: 'event-end',
+      sequence: 4,
+      kind: 'session_boundary',
+      boundary: 'end',
+      evidence,
+    },
+  ];
+  malformed.integrity = {
+    state: 'complete',
+    unresolved_event_ids: [],
+    durable_event_record: {
+      filename: 'durable-session-events.jsonl',
+      sha256: `sha256:${'0'.repeat(64)}`,
+      covered_event_ids: ['event-start', 'event-announced-one', 'event-announced-two', 'event-end'],
+    },
+  };
+
+  assert.throws(
+    () => parseCommuteSessionBundleText(JSON.stringify(malformed)),
+    /item_announced must follow a valid next, previous, jump, or repeat transition/
   );
 });
 
@@ -578,8 +744,67 @@ test('accepts a redundant next transition after a skip action', () => {
   assert.equal(parsed.events.length, 5);
 });
 
+test('rejects an implicit skip destination beyond the immediate successor', () => {
+  const malformed = clone(validBundle);
+  const queueSnapshot = malformed.queue_snapshot as Record<string, unknown>;
+  queueSnapshot.queue = queueWithItemCount(8);
+  const events = malformed.events as Array<Record<string, unknown>>;
+  events.splice(
+    0,
+    events.length,
+    announcedEvent('event-announced-five', 1, {
+      source_item_id: 'tldr-demo-005',
+      title: 'Exact headline 5',
+      url: 'https://example.com/item-5',
+    }),
+    {
+      event_id: 'event-skip-five',
+      sequence: 2,
+      kind: 'item_action',
+      action: 'skip',
+      item: {
+        source_item_id: 'tldr-demo-005',
+        title: 'Exact headline 5',
+        url: 'https://example.com/item-5',
+      },
+      user_words: 'skip',
+      evidence: [{ source: 'explicit_user_capture', reference: 'Brad said: skip' }],
+    },
+    announcedEvent('event-announced-eight', 3, {
+      source_item_id: 'tldr-demo-008',
+      title: 'Exact headline 8',
+      url: 'https://example.com/item-8',
+    })
+  );
+  malformed.playback = {
+    status: 'partial',
+    last_announced_source_item_id: 'tldr-demo-008',
+    resume_source_item_id: 'tldr-demo-008',
+  };
+
+  assert.throws(
+    () => parseCommuteSessionBundleText(JSON.stringify(malformed)),
+    /impossible destination for the recorded relative transition/
+  );
+});
+
 test('accepts a recovered next transition whose exact departing item follows a missing announcement', () => {
   const bundle = clone(validBundle);
+  const queueSnapshot = bundle.queue_snapshot as Record<string, unknown>;
+  const queue = queueSnapshot.queue as Record<string, unknown>;
+  const items = queue.items as Array<Record<string, unknown>>;
+  const third = clone(items[1]!);
+  third.playback = { position: 3, total: 3, spoken: '3 of 3' };
+  third.source_item_id = 'tldr-demo-003';
+  third.title = 'Third exact headline';
+  third.summary = 'Third summary';
+  third.url = 'https://example.com/third';
+  items.push(third);
+  queue.total_items = 3;
+  (items[0]!.playback as Record<string, unknown>).total = 3;
+  (items[0]!.playback as Record<string, unknown>).spoken = '1 of 3';
+  (items[1]!.playback as Record<string, unknown>).total = 3;
+  (items[1]!.playback as Record<string, unknown>).spoken = '2 of 3';
   const events = bundle.events as Array<Record<string, unknown>>;
   events.splice(3, 0, {
     event_id: 'event-unresolved',
@@ -831,6 +1056,63 @@ function v2Queue(): {
         routed_at: '2026-07-20T07:45:00-04:00',
       },
     ],
+  };
+}
+
+function queueWithItemCount(count: number): ReturnType<typeof v2Queue> {
+  const queue = v2Queue();
+  const template = queue.items[0]!;
+  queue.total_items = count;
+  queue.items = Array.from({ length: count }, (_, index) => {
+    const position = index + 1;
+    return {
+      ...clone(template),
+      playback: { position, total: count, spoken: `${position} of ${count}` },
+      source_item_id: `tldr-demo-${String(position).padStart(3, '0')}`,
+      title: `Exact headline ${position}`,
+      summary: `Exact summary ${position}`,
+      url: `https://example.com/item-${position}`,
+    };
+  });
+  return queue;
+}
+
+function queueIdentity(position: number): Record<string, string> {
+  const words = ['First', 'Second'];
+  return {
+    source_item_id: `tldr-demo-${String(position).padStart(3, '0')}`,
+    title: `${words[position - 1]} exact headline`,
+    url: `https://example.com/${position === 1 ? 'first' : 'second'}`,
+  };
+}
+
+function announcedEvent(
+  eventId: string,
+  sequence: number,
+  item: Record<string, string>
+): Record<string, unknown> {
+  return {
+    event_id: eventId,
+    sequence,
+    kind: 'item_announced',
+    item,
+    evidence: [{ source: 'selected_queue_snapshot', reference: 'Exact embedded queue item.' }],
+  };
+}
+
+function transitionEvent(
+  eventId: string,
+  sequence: number,
+  transition: 'next' | 'previous' | 'jump' | 'repeat',
+  item: Record<string, string>
+): Record<string, unknown> {
+  return {
+    event_id: eventId,
+    sequence,
+    kind: 'playback_transition',
+    transition,
+    item,
+    evidence: [{ source: 'explicit_user_capture', reference: `Brad requested ${transition}.` }],
   };
 }
 
