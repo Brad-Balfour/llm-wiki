@@ -957,7 +957,19 @@ function validateLifecycle(
       const hasPendingTransition = expectedItemIndex !== undefined || isJumpDestination;
       const isFirstAnnouncement = !hasAnnouncedItem && !hasPendingTransition;
       const canRecoverMissingTransition =
-        integrityState !== 'complete' && hasAnnouncedItem && !hasPendingTransition;
+        integrityState !== 'complete' &&
+        hasAnnouncedItem &&
+        !hasPendingTransition &&
+        !skipAwaitingNavigation;
+      if (
+        skipAwaitingNavigation &&
+        currentItemIndex !== undefined &&
+        announcedIndex !== currentItemIndex + 1
+      ) {
+        throw new Error(
+          `events[${event.sequence - 1}] item_announced is an impossible destination for the recorded relative transition`
+        );
+      }
       if (
         !isFirstAnnouncement &&
         !hasPendingTransition &&

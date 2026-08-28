@@ -744,6 +744,50 @@ test('accepts a redundant next transition after a skip action', () => {
   assert.equal(parsed.events.length, 5);
 });
 
+test('rejects an implicit skip destination beyond the immediate successor', () => {
+  const malformed = clone(validBundle);
+  const queueSnapshot = malformed.queue_snapshot as Record<string, unknown>;
+  queueSnapshot.queue = queueWithItemCount(8);
+  const events = malformed.events as Array<Record<string, unknown>>;
+  events.splice(
+    0,
+    events.length,
+    announcedEvent('event-announced-five', 1, {
+      source_item_id: 'tldr-demo-005',
+      title: 'Exact headline 5',
+      url: 'https://example.com/item-5',
+    }),
+    {
+      event_id: 'event-skip-five',
+      sequence: 2,
+      kind: 'item_action',
+      action: 'skip',
+      item: {
+        source_item_id: 'tldr-demo-005',
+        title: 'Exact headline 5',
+        url: 'https://example.com/item-5',
+      },
+      user_words: 'skip',
+      evidence: [{ source: 'explicit_user_capture', reference: 'Brad said: skip' }],
+    },
+    announcedEvent('event-announced-eight', 3, {
+      source_item_id: 'tldr-demo-008',
+      title: 'Exact headline 8',
+      url: 'https://example.com/item-8',
+    })
+  );
+  malformed.playback = {
+    status: 'partial',
+    last_announced_source_item_id: 'tldr-demo-008',
+    resume_source_item_id: 'tldr-demo-008',
+  };
+
+  assert.throws(
+    () => parseCommuteSessionBundleText(JSON.stringify(malformed)),
+    /impossible destination for the recorded relative transition/
+  );
+});
+
 test('accepts a recovered next transition whose exact departing item follows a missing announcement', () => {
   const bundle = clone(validBundle);
   const queueSnapshot = bundle.queue_snapshot as Record<string, unknown>;
