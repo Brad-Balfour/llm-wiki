@@ -1,9 +1,12 @@
 # LLM-Wiki-Car Project Source Bundle
 
 > Status: `LLM-Wiki-Car` is the one live ChatGPT Project for both weekday queue
-> generation and Voice commute playback. Queue v2 is the only supported queue
-> contract. Git history preserves the retired prompts, ledgers, handoffs, and
-> approval workflow for debugging; do not keep them as live Project sources.
+> generation and Voice commute playback. Queue v3 is the candidate contract for
+> issue #106's coupled acceptance trial;
+> local validation and bundle import keep explicit queue-v2 compatibility for
+> already-downloaded artifacts.
+> Git history preserves the retired prompts, ledgers, handoffs, and approval
+> workflow for debugging; do not keep them as live Project sources.
 
 ## Project Instructions
 
@@ -11,12 +14,13 @@ Paste `chatgpt-project/CHATGPT_CAR_QUEUE_PROMPT.md` into the **Instructions**
 field of `LLM-Wiki-Car`. It supersedes the former commute prompt and the
 earlier separate-Project v2 Pilot.
 
-The repository file is Prompt Revision 3.4, prepared from the August 27 commute
-evidence and issue #105. The live Project Instructions were last confirmed at
-Prompt Revision 3.3 on August 12, 2026; Revision 3.4 still needs to be pasted
-after this change merges.
+The repository file is Prompt Revision 4.0, prepared for the queue-v3 experiment
+in issue #106. The live Project Instructions were last confirmed at Prompt
+Revision 3.3 on August 12, 2026; Revision 4.0 must not be pasted until the schema,
+generation instructions, and managed Task prompt are deployed together for the
+acceptance trial.
 
-The prompt heading carries two distinct versions. `Queue Contract v2` changes
+The prompt heading carries two distinct versions. `Queue Contract v3` changes
 only when the queue/schema contract changes. `Prompt Revision` increments for
 every behavior-changing Project-instruction edit, so the text pasted into
 ChatGPT can be identified independently of Git history.
@@ -25,9 +29,9 @@ ChatGPT can be identified independently of Git history.
 
 Upload exactly these files to `LLM-Wiki-Car`:
 
-- `schema/tldr-commute-queue-v2.schema.json`
+- `schema/tldr-commute-queue-v3.schema.json`
 - `schema/commute-session-bundle-v1.schema.json`
-- `chatgpt-project/queue-generation-v2.md`
+- `chatgpt-project/queue-generation-v3.md`
 - `schema/interest-profile.md`
 - `schema/classifier-instructions.md`
 - `schema/routing-rules.md`
@@ -48,8 +52,8 @@ rollback that restores a prompt while leaving another behavior-changing
 dependency behind.
 
 The scheduled **Weekday TLDR Queues** Task uses
-`chatgpt-project/WEEKDAY_TLDR_QUEUE_TASK_PROMPT_V2.md` as its managed prompt.
-The live body was verified as an exact match on July 26, 2026. The Task remains
+`chatgpt-project/WEEKDAY_TLDR_QUEUE_TASK_PROMPT_V3.md` as its candidate managed
+prompt. The live v2 body was verified as an exact match on July 26, 2026. The Task remains
 Monday–Friday at 11:00 AM and is active.
 
 Scheduled execution is currently unreliable at the artifact boundary. July
@@ -65,10 +69,10 @@ logic or claim success from the Task's `Last ran` status. See
 
 Voice may start a queue by an exact filename or an unambiguous date plus
 newsletter name, such as `July 16 TLDR Dev`. The Project normalizes that request
-to the dated v2 filename in its Library; it must not guess a nearby queue.
+to the dated v3 filename in its Library; it must not guess a nearby queue.
 
 Do not restore retired handoff, ledger, wiki-approval, or compiler artifacts
-from Git history as live Project sources. They conflict with the supported v2
+from Git history as live Project sources. They conflict with the supported v3
 single-queue/session-bundle path.
 
 The synonymous commute commands are "End commute" and "End the commute
@@ -109,9 +113,12 @@ npm run import:commute-session-bundles -- \
 
 The deliberately retired v1 queue prompt, schema, fixture, and separate-Project
 Pilot prompt are absent from this working tree. They are recoverable from Git
-history, but must not be uploaded alongside v2 sources.
+history, but must not be uploaded alongside v3 sources. Existing downloaded v2
+queues remain valid local input and are not rewritten: v2 uses `summary` and has
+no `playback_text`; newly generated v3 queues use `description` and require the
+deterministic `playback_text`.
 
-After downloading a v2 queue, the home-side deterministic preflight is:
+After downloading a v3 queue, the home-side deterministic preflight is:
 
 ```sh
 npm run validate:commute-queue -- /path/to/queue.txt

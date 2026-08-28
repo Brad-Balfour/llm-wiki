@@ -12,7 +12,7 @@ test('ChatGPT Project instructions fit the 8,000-character limit', async () => {
 test('ChatGPT Project instructions require a grounded headline sweep and URL handling', async () => {
   const prompt = await readFile('chatgpt-project/CHATGPT_CAR_QUEUE_PROMPT.md', 'utf8');
 
-  assert.match(prompt, /Prompt Revision 3\.4/);
+  assert.match(prompt, /Queue Contract v3 · Prompt Revision 4\.0/);
   assert.match(prompt, /one ordered headline sweep directly from the queue/);
   assert.match(prompt, /After headline `M`, pause without making an item current/);
   assert.match(prompt, /may begin\s+detailed playback at any verified queue item/);
@@ -20,16 +20,17 @@ test('ChatGPT Project instructions require a grounded headline sweep and URL han
   assert.match(prompt, /Do not begin any item's base playback before completing\s+the sweep/);
   assert.match(prompt, /Every valid queue item has a URL/);
   assert.match(prompt, /literal reading mode cannot be read/);
-  assert.match(prompt, /`headline_only`: read exact\s+`item\.title`; omit `item\.summary`/);
+  assert.match(prompt, /read the one literal `item\.playback_text`\s+string exactly/);
+  assert.match(prompt, /only item content field used for default playback/);
   assert.match(
     prompt,
-    /`in_depth`: read exact `item\.title`, then the\s+complete `item\.summary` exactly as written/
+    /Never independently assemble position, mode, title, description, byline, source/
   );
-  assert.match(prompt, /Never rewrite, shorten, expand,\s+combine, or select sentences/);
+  assert.match(prompt, /Never rewrite, shorten, expand, combine, or select sentences from it/);
   assert.doesNotMatch(prompt, /one brisk queue-summary sentence/);
   assert.doesNotMatch(prompt, /one or two short queue-summary sentences/);
-  assert.match(prompt, /Queue summary/);
-  assert.match(prompt, /read literal `item\.summary` for any mode/);
+  assert.match(prompt, /Queue description/);
+  assert.match(prompt, /read literal `item\.description` for any mode/);
   assert.match(prompt, /no search or\s+paraphrase/);
 });
 

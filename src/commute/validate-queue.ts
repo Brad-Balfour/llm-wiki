@@ -1,7 +1,7 @@
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 
-import { validateTldrCommuteQueueV2 } from './session-bundle.js';
+import { validateTldrCommuteQueue } from './session-bundle.js';
 
 async function main(): Promise<void> {
   const input = process.argv[2];
@@ -9,9 +9,12 @@ async function main(): Promise<void> {
     throw new Error('Usage: validate:commute-queue -- <queue.txt>');
   }
   const queue = JSON.parse(await readFile(input, 'utf8')) as unknown;
-  const validated = validateTldrCommuteQueueV2(queue);
+  const validated = validateTldrCommuteQueue(queue);
   const itemCount = (validated.items as unknown[]).length;
-  process.stdout.write(`Valid v2 commute queue: ${path.basename(input)} (${itemCount} item(s))\n`);
+  const version = String(validated.queue_version).replace('tldr-commute-queue.', '');
+  process.stdout.write(
+    `Valid ${version} commute queue: ${path.basename(input)} (${itemCount} item(s))\n`
+  );
 }
 
 await main();

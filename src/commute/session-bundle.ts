@@ -274,12 +274,15 @@ export function queueSnapshotFingerprint(queue: unknown): string {
 }
 
 /** Validate the single queue contract without requiring a session bundle. */
-export function validateTldrCommuteQueueV2(candidate: unknown): Record<string, unknown> {
+export function validateTldrCommuteQueue(candidate: unknown): Record<string, unknown> {
   const queue = requireRecord(candidate, 'queue');
   rejectSensitiveQueueFields(queue, 'queue');
   indexQueueItems(queue);
   return queue;
 }
+
+/** @deprecated Use validateTldrCommuteQueue. Kept for source compatibility. */
+export const validateTldrCommuteQueueV2 = validateTldrCommuteQueue;
 
 /** Hash an externally stored record byte-for-byte. Unlike a queue snapshot, a
  * durable record is not JSON-normalized before hashing. */
@@ -351,8 +354,10 @@ function indexQueueItems(record: Record<string, unknown>): QueueItemIndex {
   validateSourceEmail(record.source_email);
   const ordered =
     queueVersion === 'tldr-commute-queue.v2'
-      ? indexV2Queue(record)
-      : unsupportedQueueVersion(queueVersion);
+      ? indexQueue(record, 'v2')
+      : queueVersion === 'tldr-commute-queue.v3'
+        ? indexQueue(record, 'v3')
+        : unsupportedQueueVersion(queueVersion);
   const byId = new Map<string, QueueItemIdentity>();
   const urls = new Set<string>();
   for (const item of ordered) {
@@ -373,7 +378,7 @@ function indexQueueItems(record: Record<string, unknown>): QueueItemIndex {
   return { byId, ordered };
 }
 
-function indexV2Queue(record: Record<string, unknown>): QueueItemIdentity[] {
+function indexQueue(record: Record<string, unknown>, version: 'v2' | 'v3'): QueueItemIdentity[] {
   rejectUnknownKeys(
     record,
     ['queue_version', 'newsletter', 'edition_date', 'source_email', 'total_items', 'items'],
@@ -386,7 +391,7 @@ function indexV2Queue(record: Record<string, unknown>): QueueItemIdentity[] {
   }
   return values.map((candidate, index) => {
     const itemPath = `queue_snapshot.queue.items[${index}]`;
-    const item = validateQueueItem(candidate, itemPath);
+    const item = validateQueueItem(candidate, itemPath, version);
     const record = requireRecord(candidate, itemPath);
     const playback = requireRecord(record.playback, `${itemPath}.playback`);
     rejectUnknownKeys(playback, ['position', 'total', 'spoken'], `${itemPath}.playback`);
@@ -404,11 +409,26 @@ function indexV2Queue(record: Record<string, unknown>): QueueItemIdentity[] {
 
 function unsupportedQueueVersion(version: string): never {
   throw new Error(
-    `queue_snapshot.queue.queue_version must be tldr-commute-queue.v2, not ${version}`
+    `queue_snapshot.queue.queue_version must be tldr-commute-queue.v2 or tldr-commute-queue.v3, not ${version}`
   );
 }
 
-function validateQueueItem(candidate: unknown, itemPath: string): QueueItemIdentity {
+export function renderQueuePlaybackText(item: {
+  playback: { spoken: string };
+  consumption_depth: 'headline_only' | 'in_depth';
+  title: string;
+  description: string;
+}): string {
+  const mode = item.consumption_depth === 'headline_only' ? 'Headline only' : 'In depth';
+  const prefix = `${item.playback.spoken}. ${mode}. ${item.title}`;
+  return item.consumption_depth === 'headline_only' ? prefix : `${prefix}\n${item.description}`;
+}
+
+function validateQueueItem(
+  candidate: unknown,
+  itemPath: string,
+  version: 'v2' | 'v3'
+): QueueItemIdentity {
   const record = requireRecord(candidate, itemPath);
   rejectUnknownKeys(
     record,
@@ -416,7 +436,8 @@ function validateQueueItem(candidate: unknown, itemPath: string): QueueItemIdent
       'playback',
       'source_item_id',
       'title',
-      'summary',
+      version === 'v2' ? 'summary' : 'description',
+      ...(version === 'v3' ? ['playback_text'] : []),
       'url',
       'interest_level',
       'interest_score',
@@ -441,7 +462,26 @@ function validateQueueItem(candidate: unknown, itemPath: string): QueueItemIdent
   requirePositiveInteger(playback.position, `${itemPath}.playback.position`);
   requirePositiveInteger(playback.total, `${itemPath}.playback.total`);
   requireString(playback.spoken, `${itemPath}.playback.spoken`);
-  requireString(record.summary, `${itemPath}.summary`);
+  if (version === 'v2') {
+    requireString(record.summary, `${itemPath}.summary`);
+  } else {
+    const description = requireString(record.description, `${itemPath}.description`);
+    const playbackText = requireString(record.playback_text, `${itemPath}.playback_text`);
+    const consumptionDepth = requireEnum(
+      record.consumption_depth,
+      ['headline_only', 'in_depth'] as const,
+      `${itemPath}.consumption_depth`
+    );
+    const expected = renderQueuePlaybackText({
+      playback: { spoken: requireString(playback.spoken, `${itemPath}.playback.spoken`) },
+      consumption_depth: consumptionDepth,
+      title: requireString(record.title, `${itemPath}.title`),
+      description,
+    });
+    if (playbackText !== expected) {
+      throw new Error(`${itemPath}.playback_text must equal the deterministic rendered playback`);
+    }
+  }
   requireEnum(
     record.interest_level,
     ['interested', 'maybe', 'uninterested'] as const,

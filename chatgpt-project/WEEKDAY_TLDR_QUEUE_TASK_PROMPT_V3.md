@@ -1,4 +1,4 @@
-# Weekday TLDR Queue Task Prompt — v2 Live
+# Weekday TLDR Queue Task Prompt — v3 Candidate
 
 > Live configuration verified 2026-07-26. The managed body below exactly
 > matches the active **Weekday TLDR Queues** Task. The Task is scheduled Monday
@@ -9,21 +9,21 @@
 
 ```text
 Using the Gmail connector, find all TLDR newsletter emails delivered on the day
-this task runs. Using the LLM-Wiki-Car Project's v2 queue instructions and the
-attached tldr-commute-queue-v2.schema.json, create one real downloadable .txt
+this task runs. Using the LLM-Wiki-Car Project's v3 queue instructions and the
+attached tldr-commute-queue-v3.schema.json, create one real downloadable .txt
 classification queue per source email.
 
-Each file must be one valid tldr-commute-queue.v2 JSON object with one ordered
-items array and total_items. Every item must contain playback.position,
+Each file must be one valid tldr-commute-queue.v3 JSON object with one ordered
+items array and total_items. Every item must rename the source `summary` to `description`, contain deterministic `playback_text`, and contain playback.position,
 playback.total, and playback.spoken in literal contiguous form: 1 of M through
 M of M. Use consumption_depth only as the headline_only or in_depth reading
 style tag. Do not emit separate headline_only or in_depth arrays, source_order,
 any newsletter-position field, or a source-email subject. Preserve exact
-source_item_id, title, summary, final HTTP(S) URL, and all schema-required
+source_item_id, title, description, deterministic playback_text, final HTTP(S) URL, and all schema-required
 classifier and routing metadata.
 
-Apply the Project duplicate-resolution tie-breaker and perform this self-check:
-valid JSON, v2 schema shape, one source-email identity, items.length equals
+Render headline-only `playback_text` as `<N of M>. Headline only. <title>` and in-depth `playback_text` as `<N of M>. In depth. <title>\n<description>`. Do not add a byline, source, URL, or other text. Apply the Project duplicate-resolution tie-breaker and perform this self-check:
+valid JSON, v3 schema shape, one source-email identity, items.length equals
 total_items, contiguous playback values, unique item IDs and URLs, and no raw
 email bodies, credentials, cookies, private notes, or Range material. Filename
 dates use the source email's own America/New_York delivery date as YYYYMMDD,
@@ -40,7 +40,7 @@ schema-required classifier and routing fields for every real item.
 
 ```json
 {
-  "queue_version": "tldr-commute-queue.v2",
+  "queue_version": "tldr-commute-queue.v3",
   "newsletter": "TLDR",
   "edition_date": "2026-07-16",
   "source_email": {
@@ -54,7 +54,8 @@ schema-required classifier and routing fields for every real item.
       "playback": { "position": 1, "total": 2, "spoken": "1 of 2" },
       "source_item_id": "example-message-id-01",
       "title": "First exact article title",
-      "summary": "A concise queue summary.",
+      "description": "A concise newsletter description.",
+      "playback_text": "1 of 2. Headline only. First exact article title",
       "url": "https://example.com/first",
       "interest_level": "interested",
       "interest_score": 0.85,
@@ -76,7 +77,8 @@ schema-required classifier and routing fields for every real item.
       "playback": { "position": 2, "total": 2, "spoken": "2 of 2" },
       "source_item_id": "example-message-id-02",
       "title": "Second exact article title",
-      "summary": "A concise queue summary.",
+      "description": "A concise newsletter description.",
+      "playback_text": "2 of 2. In depth. Second exact article title\nA concise newsletter description.",
       "url": "https://example.com/second",
       "interest_level": "maybe",
       "interest_score": 0.67,

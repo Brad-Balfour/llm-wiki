@@ -8,6 +8,8 @@ import {
   fileSha256,
   parseCommuteSessionBundleText,
   queueSnapshotFingerprint,
+  renderQueuePlaybackText,
+  validateTldrCommuteQueue,
 } from '../src/commute/session-bundle.js';
 
 const fixturePath = path.resolve('tests/fixtures/commute-bundles/valid-partial-bundle.json');
@@ -1057,6 +1059,57 @@ function v2Queue(): {
       },
     ],
   };
+}
+
+test('validates queue v3 deterministic playback for headline-only and in-depth items', () => {
+  const queue = v3Queue();
+
+  const validated = validateTldrCommuteQueue(queue);
+
+  assert.equal(validated.queue_version, 'tldr-commute-queue.v3');
+  assert.equal(queue.items[0]?.playback_text, '1 of 2. Headline only. Headline: "quoted"');
+  assert.equal(
+    queue.items[1]?.playback_text,
+    '2 of 2. In depth. Title already punctuated!\nDescription with "quotes" and punctuation.'
+  );
+});
+
+test('rejects queue v3 playback text that drifts from canonical fields', () => {
+  const queue = v3Queue();
+  queue.items[1]!.playback_text = 'A generated paraphrase.';
+
+  assert.throws(
+    () => validateTldrCommuteQueue(queue),
+    /playback_text must equal the deterministic rendered playback/
+  );
+});
+
+test('queue v3 rejects the queue-v2 summary field instead of silently migrating it', () => {
+  const queue = v3Queue();
+  const first = queue.items[0]!;
+  first.summary = first.description;
+  delete first.description;
+
+  assert.throws(() => validateTldrCommuteQueue(queue), /unsupported fields: summary/);
+});
+
+function v3Queue(): ReturnType<typeof v2Queue> {
+  const queue = v2Queue();
+  queue.queue_version = 'tldr-commute-queue.v3';
+  queue.items[0]!.title = 'Headline: "quoted"';
+  queue.items[1]!.title = 'Title already punctuated!';
+  queue.items[1]!.summary = 'Description with "quotes" and punctuation.';
+  for (const item of queue.items) {
+    item.description = item.summary;
+    delete item.summary;
+    item.playback_text = renderQueuePlaybackText({
+      playback: item.playback as { spoken: string },
+      consumption_depth: item.consumption_depth as 'headline_only' | 'in_depth',
+      title: item.title as string,
+      description: item.description as string,
+    });
+  }
+  return queue;
 }
 
 function queueWithItemCount(count: number): ReturnType<typeof v2Queue> {
