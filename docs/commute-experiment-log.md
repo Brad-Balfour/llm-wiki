@@ -1192,6 +1192,62 @@ settled phrase into the accepted-command list. The rejected prompt-edit PR was
 closed at Brad's direction. No live Project instruction or listed source
 changed, so no Project synchronization is required for this run.
 
+### August 27 Acceptance, Playback, And Classifier-QA Result
+
+The bounded Library inventory found six August 27 session-bundle rows: three
+morning and three evening exports. Their declared queues were the August 26
+General, Dev, and AI editions plus the August 27 General and Fintech editions.
+All five exact queues passed queue-v2 validation, and every embedded snapshot
+canonically matched its separately downloaded queue. Four bundles passed strict
+lifecycle validation. The Fintech export begins from item five without the
+required preceding jump, and the evening General export announces several
+items without valid transitions. Supplied-queue recovery retained their
+supported quality evidence without manufacturing the missing lifecycle.
+
+The two Dev bundles are non-identical re-exports from one complete shared
+conversation. Both files remain in provenance because they contain distinct
+reconstructions, but their overlapping incidents and repeated pre-render
+proposal are one user session, not independent corroboration. This exposes an
+artifact-identity weakness: retrying a claimed-but-unusable export created a
+new session ID rather than a revision that local intake could recognize as the
+same commute.
+
+Six complete serialized chats contain 128 user-role messages. The private
+coverage ledger assigns 66 substantive entries to unsaved article discussion,
+classifier QA, playback and grounding incidents, export/recovery observations,
+or explicit workflow improvement. The other 62 are Project placeholder text,
+session boundaries, routine navigation, pauses, acknowledgments, and Voice
+recognition fragments. No message requested a wiki save, so no wiki page was
+created or changed. No exact URL or normalized-title duplicate appears across
+the five consumed queues.
+
+The AI conversation supplies one explicit classifier note for _Vocab Break_.
+Brad said the one-word title is useless as headline-only playback because it
+does not say what the item is, while allowing that the classification itself
+might still be right. The exact words therefore control over the bundle's
+unresolved feedback vocabulary: this is headline-informativeness and
+classifier-QA evidence, not a manufactured depth correction. It repeats the
+GlassBox, _fx_, Mole, and similar one-word-title boundary retained for issues
+#35 and #66.
+
+The accepted intake contains 17 raw quality-incident records. After collapsing
+the three duplicated Dev observations, they represent 14 bundle-retained
+incidents: corrupted or incomplete sweeps, wrong reading-mode projection,
+literal summaries replaced or extended with generated text, premature summary
+termination, and audits that claimed success without actually comparing the
+spoken item with the queue. The chats additionally preserve the initial
+General export that stopped before creating a file and the Dev export that was
+claimed ready but required reconstruction. Prompt Revision 3.3 already forbids
+all of these behaviors and requires a visible download.
+
+The Dev discussion proposes one testable mitigation: generate a single
+pre-rendered playback string per item and have Voice verbalize only that field,
+instead of extracting and concatenating several queue fields during playback.
+This is a substantive queue-schema and Project-prompt experiment, not a new
+spoken command. It belongs in issue #100's supported-mechanism boundary rather
+than an unreviewed same-run prompt change. No live Project instruction or
+listed source changed, so no Project synchronization is required for this run.
+
 ## What Worked
 
 - The weekday Task has produced real dated, parseable queues, including four
