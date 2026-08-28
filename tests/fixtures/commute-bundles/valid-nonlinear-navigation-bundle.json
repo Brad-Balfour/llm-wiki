@@ -1,0 +1,393 @@
+{
+  "schema_version": "commute-session-bundle.v1",
+  "session": {
+    "session_id": "2026-07-20-morning-tldr-dev",
+    "session_date": "2026-07-20",
+    "artifact_filename": "202607200745-morning-commute-session-bundle.txt",
+    "voice_surface": "chatgpt_standard"
+  },
+  "queue_snapshot": {
+    "filename": "20260720-tldr-dev.txt",
+    "queue": {
+      "queue_version": "tldr-commute-queue.v2",
+      "newsletter": "TLDR Dev",
+      "edition_date": "2026-07-20",
+      "source_email": {
+        "gmail_message_id": "demo-message",
+        "subject": "Demo TLDR Dev",
+        "sender": "TLDR Dev <dan@tldrnewsletter.com>",
+        "delivered_at": "2026-07-20T07:45:00-04:00"
+      },
+      "total_items": 8,
+      "items": [
+        {
+          "playback": {
+            "position": 1,
+            "total": 8,
+            "spoken": "1 of 8"
+          },
+          "source_item_id": "tldr-demo-001",
+          "title": "Exact headline 1",
+          "summary": "Exact summary 1",
+          "url": "https://example.com/item-1",
+          "interest_level": "interested",
+          "interest_score": 0.9,
+          "consumption_depth": "headline_only",
+          "depth_score": 0.2,
+          "commute_behavior": "brief",
+          "signals": ["fixture"],
+          "reason": "Fixture item.",
+          "profile_version": "fixture",
+          "prompt_version": "fixture",
+          "provider": "fixture",
+          "model": "fixture",
+          "parser_version": "fixture",
+          "route_version": "fixture",
+          "classified_at": "2026-07-20T07:45:00-04:00",
+          "routed_at": "2026-07-20T07:45:00-04:00"
+        },
+        {
+          "playback": {
+            "position": 2,
+            "total": 8,
+            "spoken": "2 of 8"
+          },
+          "source_item_id": "tldr-demo-002",
+          "title": "Exact headline 2",
+          "summary": "Exact summary 2",
+          "url": "https://example.com/item-2",
+          "interest_level": "interested",
+          "interest_score": 0.9,
+          "consumption_depth": "headline_only",
+          "depth_score": 0.2,
+          "commute_behavior": "brief",
+          "signals": ["fixture"],
+          "reason": "Fixture item.",
+          "profile_version": "fixture",
+          "prompt_version": "fixture",
+          "provider": "fixture",
+          "model": "fixture",
+          "parser_version": "fixture",
+          "route_version": "fixture",
+          "classified_at": "2026-07-20T07:45:00-04:00",
+          "routed_at": "2026-07-20T07:45:00-04:00"
+        },
+        {
+          "playback": {
+            "position": 3,
+            "total": 8,
+            "spoken": "3 of 8"
+          },
+          "source_item_id": "tldr-demo-003",
+          "title": "Exact headline 3",
+          "summary": "Exact summary 3",
+          "url": "https://example.com/item-3",
+          "interest_level": "interested",
+          "interest_score": 0.9,
+          "consumption_depth": "headline_only",
+          "depth_score": 0.2,
+          "commute_behavior": "brief",
+          "signals": ["fixture"],
+          "reason": "Fixture item.",
+          "profile_version": "fixture",
+          "prompt_version": "fixture",
+          "provider": "fixture",
+          "model": "fixture",
+          "parser_version": "fixture",
+          "route_version": "fixture",
+          "classified_at": "2026-07-20T07:45:00-04:00",
+          "routed_at": "2026-07-20T07:45:00-04:00"
+        },
+        {
+          "playback": {
+            "position": 4,
+            "total": 8,
+            "spoken": "4 of 8"
+          },
+          "source_item_id": "tldr-demo-004",
+          "title": "Exact headline 4",
+          "summary": "Exact summary 4",
+          "url": "https://example.com/item-4",
+          "interest_level": "interested",
+          "interest_score": 0.9,
+          "consumption_depth": "headline_only",
+          "depth_score": 0.2,
+          "commute_behavior": "brief",
+          "signals": ["fixture"],
+          "reason": "Fixture item.",
+          "profile_version": "fixture",
+          "prompt_version": "fixture",
+          "provider": "fixture",
+          "model": "fixture",
+          "parser_version": "fixture",
+          "route_version": "fixture",
+          "classified_at": "2026-07-20T07:45:00-04:00",
+          "routed_at": "2026-07-20T07:45:00-04:00"
+        },
+        {
+          "playback": {
+            "position": 5,
+            "total": 8,
+            "spoken": "5 of 8"
+          },
+          "source_item_id": "tldr-demo-005",
+          "title": "Exact headline 5",
+          "summary": "Exact summary 5",
+          "url": "https://example.com/item-5",
+          "interest_level": "interested",
+          "interest_score": 0.9,
+          "consumption_depth": "headline_only",
+          "depth_score": 0.2,
+          "commute_behavior": "brief",
+          "signals": ["fixture"],
+          "reason": "Fixture item.",
+          "profile_version": "fixture",
+          "prompt_version": "fixture",
+          "provider": "fixture",
+          "model": "fixture",
+          "parser_version": "fixture",
+          "route_version": "fixture",
+          "classified_at": "2026-07-20T07:45:00-04:00",
+          "routed_at": "2026-07-20T07:45:00-04:00"
+        },
+        {
+          "playback": {
+            "position": 6,
+            "total": 8,
+            "spoken": "6 of 8"
+          },
+          "source_item_id": "tldr-demo-006",
+          "title": "Exact headline 6",
+          "summary": "Exact summary 6",
+          "url": "https://example.com/item-6",
+          "interest_level": "interested",
+          "interest_score": 0.9,
+          "consumption_depth": "headline_only",
+          "depth_score": 0.2,
+          "commute_behavior": "brief",
+          "signals": ["fixture"],
+          "reason": "Fixture item.",
+          "profile_version": "fixture",
+          "prompt_version": "fixture",
+          "provider": "fixture",
+          "model": "fixture",
+          "parser_version": "fixture",
+          "route_version": "fixture",
+          "classified_at": "2026-07-20T07:45:00-04:00",
+          "routed_at": "2026-07-20T07:45:00-04:00"
+        },
+        {
+          "playback": {
+            "position": 7,
+            "total": 8,
+            "spoken": "7 of 8"
+          },
+          "source_item_id": "tldr-demo-007",
+          "title": "Exact headline 7",
+          "summary": "Exact summary 7",
+          "url": "https://example.com/item-7",
+          "interest_level": "interested",
+          "interest_score": 0.9,
+          "consumption_depth": "headline_only",
+          "depth_score": 0.2,
+          "commute_behavior": "brief",
+          "signals": ["fixture"],
+          "reason": "Fixture item.",
+          "profile_version": "fixture",
+          "prompt_version": "fixture",
+          "provider": "fixture",
+          "model": "fixture",
+          "parser_version": "fixture",
+          "route_version": "fixture",
+          "classified_at": "2026-07-20T07:45:00-04:00",
+          "routed_at": "2026-07-20T07:45:00-04:00"
+        },
+        {
+          "playback": {
+            "position": 8,
+            "total": 8,
+            "spoken": "8 of 8"
+          },
+          "source_item_id": "tldr-demo-008",
+          "title": "Exact headline 8",
+          "summary": "Exact summary 8",
+          "url": "https://example.com/item-8",
+          "interest_level": "interested",
+          "interest_score": 0.9,
+          "consumption_depth": "headline_only",
+          "depth_score": 0.2,
+          "commute_behavior": "brief",
+          "signals": ["fixture"],
+          "reason": "Fixture item.",
+          "profile_version": "fixture",
+          "prompt_version": "fixture",
+          "provider": "fixture",
+          "model": "fixture",
+          "parser_version": "fixture",
+          "route_version": "fixture",
+          "classified_at": "2026-07-20T07:45:00-04:00",
+          "routed_at": "2026-07-20T07:45:00-04:00"
+        }
+      ]
+    }
+  },
+  "playback": {
+    "status": "completed",
+    "last_announced_source_item_id": "tldr-demo-008",
+    "resume_source_item_id": "tldr-demo-008"
+  },
+  "integrity": {
+    "state": "recovered",
+    "incomplete_reason": "Exporter evidence omitted the transitions before the item 2 and item 7 announcements.",
+    "unresolved_event_ids": []
+  },
+  "events": [
+    {
+      "event_id": "event-start-at-five",
+      "sequence": 1,
+      "kind": "item_announced",
+      "item": {
+        "source_item_id": "tldr-demo-005",
+        "title": "Exact headline 5",
+        "url": "https://example.com/item-5"
+      },
+      "evidence": [
+        {
+          "source": "selected_queue_snapshot",
+          "reference": "Exact embedded queue item."
+        }
+      ]
+    },
+    {
+      "event_id": "event-missing-backward-jump",
+      "sequence": 2,
+      "kind": "item_announced",
+      "item": {
+        "source_item_id": "tldr-demo-002",
+        "title": "Exact headline 2",
+        "url": "https://example.com/item-2"
+      },
+      "evidence": [
+        {
+          "source": "selected_queue_snapshot",
+          "reference": "Exact embedded queue item."
+        }
+      ]
+    },
+    {
+      "event_id": "event-missing-forward-jump",
+      "sequence": 3,
+      "kind": "item_announced",
+      "item": {
+        "source_item_id": "tldr-demo-007",
+        "title": "Exact headline 7",
+        "url": "https://example.com/item-7"
+      },
+      "evidence": [
+        {
+          "source": "selected_queue_snapshot",
+          "reference": "Exact embedded queue item."
+        }
+      ]
+    },
+    {
+      "event_id": "event-repeat-seven",
+      "sequence": 4,
+      "kind": "playback_transition",
+      "transition": "repeat",
+      "item": {
+        "source_item_id": "tldr-demo-007",
+        "title": "Exact headline 7",
+        "url": "https://example.com/item-7"
+      },
+      "evidence": [
+        {
+          "source": "explicit_user_capture",
+          "reference": "Brad requested repeat."
+        }
+      ]
+    },
+    {
+      "event_id": "event-repeated-seven",
+      "sequence": 5,
+      "kind": "item_announced",
+      "item": {
+        "source_item_id": "tldr-demo-007",
+        "title": "Exact headline 7",
+        "url": "https://example.com/item-7"
+      },
+      "evidence": [
+        {
+          "source": "selected_queue_snapshot",
+          "reference": "Exact embedded queue item."
+        }
+      ]
+    },
+    {
+      "event_id": "event-previous-seven",
+      "sequence": 6,
+      "kind": "playback_transition",
+      "transition": "previous",
+      "item": {
+        "source_item_id": "tldr-demo-007",
+        "title": "Exact headline 7",
+        "url": "https://example.com/item-7"
+      },
+      "evidence": [
+        {
+          "source": "explicit_user_capture",
+          "reference": "Brad requested previous."
+        }
+      ]
+    },
+    {
+      "event_id": "event-announced-six",
+      "sequence": 7,
+      "kind": "item_announced",
+      "item": {
+        "source_item_id": "tldr-demo-006",
+        "title": "Exact headline 6",
+        "url": "https://example.com/item-6"
+      },
+      "evidence": [
+        {
+          "source": "selected_queue_snapshot",
+          "reference": "Exact embedded queue item."
+        }
+      ]
+    },
+    {
+      "event_id": "event-jump-six",
+      "sequence": 8,
+      "kind": "playback_transition",
+      "transition": "jump",
+      "item": {
+        "source_item_id": "tldr-demo-006",
+        "title": "Exact headline 6",
+        "url": "https://example.com/item-6"
+      },
+      "evidence": [
+        {
+          "source": "explicit_user_capture",
+          "reference": "Brad requested jump."
+        }
+      ]
+    },
+    {
+      "event_id": "event-announced-eight",
+      "sequence": 9,
+      "kind": "item_announced",
+      "item": {
+        "source_item_id": "tldr-demo-008",
+        "title": "Exact headline 8",
+        "url": "https://example.com/item-8"
+      },
+      "evidence": [
+        {
+          "source": "selected_queue_snapshot",
+          "reference": "Exact embedded queue item."
+        }
+      ]
+    }
+  ]
+}

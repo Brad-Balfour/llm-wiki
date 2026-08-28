@@ -938,9 +938,10 @@ function validateLifecycle(
   integrityState: IntegrityState
 ): string | undefined {
   let currentItemIndex: number | undefined;
-  let expectedItemIndex: number | undefined = 0;
+  let expectedItemIndex: number | undefined;
   let jumpDepartingItemIndex: number | undefined;
   let skipAwaitingNavigation = false;
+  let hasAnnouncedItem = false;
 
   for (const event of events) {
     if (event.kind === 'item_announced') {
@@ -953,9 +954,15 @@ function validateLifecycle(
         announcedIndex === currentItemIndex + 1;
       const isJumpDestination =
         jumpDepartingItemIndex !== undefined && currentItemIndex === undefined;
+      const hasPendingTransition = expectedItemIndex !== undefined || isJumpDestination;
+      const isFirstAnnouncement = !hasAnnouncedItem && !hasPendingTransition;
+      const canRecoverMissingTransition =
+        integrityState !== 'complete' && hasAnnouncedItem && !hasPendingTransition;
       if (
-        (currentItemIndex !== undefined && !isImplicitNavigationAfterSkip) ||
-        (expectedItemIndex === undefined && !isJumpDestination)
+        !isFirstAnnouncement &&
+        !hasPendingTransition &&
+        !isImplicitNavigationAfterSkip &&
+        !canRecoverMissingTransition
       ) {
         throw new Error(
           `events[${event.sequence - 1}] item_announced must follow a valid next, previous, jump, or repeat transition`
@@ -968,14 +975,21 @@ function validateLifecycle(
       }
       const expectedAnnouncementIndex =
         currentItemIndex === undefined ? expectedItemIndex : currentItemIndex + 1;
-      if (!isJumpDestination && announcedIndex !== expectedAnnouncementIndex) {
+      if (
+        !isFirstAnnouncement &&
+        !canRecoverMissingTransition &&
+        !isJumpDestination &&
+        announcedIndex !== expectedAnnouncementIndex
+      ) {
         throw new Error(
-          `events[${event.sequence - 1}] item_announced does not match the expected queue position`
+          `events[${event.sequence - 1}] item_announced is an impossible destination for the recorded relative transition`
         );
       }
       currentItemIndex = announcedIndex;
       jumpDepartingItemIndex = undefined;
+      expectedItemIndex = undefined;
       skipAwaitingNavigation = false;
+      hasAnnouncedItem = true;
       continue;
     }
     if (event.kind === 'item_action') {
@@ -1000,11 +1014,15 @@ function validateLifecycle(
     }
     if (event.kind === 'playback_transition') {
       if (currentItemIndex === undefined) {
+        const transitionItemIndex = queueItems.ordered.findIndex(
+          (item) => item.source_item_id === event.item.source_item_id
+        );
         const canRecoverMissingAnnouncement =
           integrityState !== 'complete' &&
-          event.transition === 'next' &&
-          expectedItemIndex !== undefined &&
-          event.item.source_item_id === queueItems.ordered[expectedItemIndex]?.source_item_id;
+          ((expectedItemIndex !== undefined && transitionItemIndex === expectedItemIndex) ||
+            (jumpDepartingItemIndex !== undefined &&
+              transitionItemIndex !== jumpDepartingItemIndex) ||
+            (expectedItemIndex === undefined && jumpDepartingItemIndex === undefined));
         if (!canRecoverMissingAnnouncement) {
           throw new Error(
             `events[${event.sequence - 1}] playback_transition has no current announced item`
@@ -1013,7 +1031,9 @@ function validateLifecycle(
         // A partial/recovered Voice reconstruction may omit the announcement
         // while preserving an exact departing item. Reconstruct only that
         // cursor state; it never turns an ambiguous action into a wiki target.
-        currentItemIndex = expectedItemIndex;
+        currentItemIndex = transitionItemIndex;
+        expectedItemIndex = undefined;
+        jumpDepartingItemIndex = undefined;
       }
       const announcedItemIndex: number | undefined = currentItemIndex;
       if (announcedItemIndex === undefined) {
@@ -1036,6 +1056,11 @@ function validateLifecycle(
         );
       }
       if (event.transition === 'next') {
+        if (announcedItemIndex === queueItems.ordered.length - 1) {
+          throw new Error(
+            `events[${event.sequence - 1}] next transition cannot move beyond the final queue item`
+          );
+        }
         expectedItemIndex = announcedItemIndex + 1;
         currentItemIndex = undefined;
         jumpDepartingItemIndex = undefined;

@@ -1,7 +1,8 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://brad-balfour.github.io/llm-wiki/schema/tldr-commute-queue-v2.schema.json",
-  "title": "TLDR commute queue — single playback order",
+  "title": "TLDR commute queue — canonical item identity and order",
+  "description": "The items array defines each item's canonical identity, position, and spoken N-of-M label. It does not require a Voice session to visit every item, start detailed playback at item 1, or visit items in ascending order.",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -28,6 +29,7 @@
       }
     },
     "items": {
+      "description": "Canonical queue identity and ordering. A session may begin detailed playback at any item and navigate non-linearly without changing this array.",
       "type": "array",
       "minItems": 1,
       "items": { "$ref": "#/$defs/item" }
