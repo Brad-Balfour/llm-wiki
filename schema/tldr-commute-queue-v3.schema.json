@@ -1,0 +1,223 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://brad-balfour.github.io/llm-wiki/schema/tldr-commute-queue-v3.schema.json",
+  "title": "TLDR commute queue \u2014 pre-rendered Voice playback",
+  "description": "The items array defines canonical identity, order, item playback, and one deterministic top-level headline sweep.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "queue_version",
+    "newsletter",
+    "edition_date",
+    "source_email",
+    "total_items",
+    "sweep_playback",
+    "items"
+  ],
+  "properties": {
+    "queue_version": {
+      "const": "tldr-commute-queue.v3"
+    },
+    "newsletter": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 100
+    },
+    "edition_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "total_items": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "source_email": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["gmail_message_id", "sender", "delivered_at"],
+      "properties": {
+        "gmail_message_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sender": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 300
+        },
+        "delivered_at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "sweep_playback": {
+      "type": "string",
+      "minLength": 1,
+      "description": "The complete deterministic headline sweep. One `<N of M>. <Headline only|In depth>. <title>` line per item, joined by newline characters."
+    },
+    "items": {
+      "description": "Canonical queue identity and ordering. A session may begin detailed playback at any item and navigate non-linearly without changing this array.",
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/item"
+      }
+    }
+  },
+  "$defs": {
+    "item": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "playback",
+        "source_item_id",
+        "title",
+        "description",
+        "author",
+        "publication",
+        "playback_text",
+        "url",
+        "interest_level",
+        "interest_score",
+        "consumption_depth",
+        "depth_score",
+        "commute_behavior",
+        "signals",
+        "reason",
+        "profile_version",
+        "prompt_version",
+        "provider",
+        "model",
+        "parser_version",
+        "route_version",
+        "classified_at",
+        "routed_at"
+      ],
+      "properties": {
+        "playback": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["position", "total", "spoken"],
+          "properties": {
+            "position": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "total": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "spoken": {
+              "type": "string",
+              "pattern": "^[1-9][0-9]* of [1-9][0-9]*$",
+              "description": "The literal voice progress phrase, for example `4 of 6`."
+            }
+          }
+        },
+        "source_item_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 500
+        },
+        "url": {
+          "type": "string",
+          "format": "uri",
+          "pattern": "^https?://"
+        },
+        "interest_level": {
+          "enum": ["interested", "maybe", "uninterested"]
+        },
+        "interest_score": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "consumption_depth": {
+          "enum": ["headline_only", "in_depth"]
+        },
+        "depth_score": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "commute_behavior": {
+          "type": "string",
+          "minLength": 1
+        },
+        "signals": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2000
+        },
+        "profile_version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "prompt_version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "provider": {
+          "type": "string",
+          "minLength": 1
+        },
+        "model": {
+          "type": "string",
+          "minLength": 1
+        },
+        "parser_version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "route_version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "classified_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "routed_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4000,
+          "description": "The literal newsletter-provided description formerly named summary in queue v2."
+        },
+        "author": {
+          "type": ["string", "null"],
+          "minLength": 1,
+          "maxLength": 300,
+          "description": "Exact article author when supplied by the newsletter or source metadata; otherwise null."
+        },
+        "publication": {
+          "type": ["string", "null"],
+          "minLength": 1,
+          "maxLength": 300,
+          "description": "Exact blog or publication title when supplied by the newsletter or source metadata; otherwise null."
+        },
+        "playback_text": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 5000,
+          "description": "Deterministically rendered default Voice output. Headline-only: `<N of M>. <Headline only>. <title>`. In-depth appends a newline and the exact description."
+        }
+      }
+    }
+  }
+}

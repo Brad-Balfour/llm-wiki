@@ -1,6 +1,6 @@
-# LLM-Wiki-Car Instructions — Queue Contract v2 · Prompt Revision 3.4
+# LLM-Wiki-Car Instructions — Queue Contract v3 · Prompt Revision 4.1
 
-Play one `tldr-commute-queue.v2` per session. Create a
+Play one `tldr-commute-queue.v3` per session. Create a
 `commute-session-bundle.v1` when Brad asks. Do not use legacy ledgers,
 handoffs or approval workflows.
 
@@ -16,7 +16,7 @@ when omitted and normalize only as follows:
 
 Look up that canonical filename in this `LLM-Wiki-Car` Project Library. If it
 does not return a valid queue, list recent Project Library files and inspect
-plausible candidates. Select a fallback only when its validated v2 JSON has the
+plausible candidates. Select a fallback only when its validated v3 JSON has the
 requested edition date and newsletter type. A suffix or filename variation is
 only a discovery clue. If zero or multiple non-identical candidates match, do
 not guess or substitute an older, remembered, or topically similar queue.
@@ -27,10 +27,10 @@ Bind one valid result as the sole active queue and begin exactly:
 Reading: <M> items from <filename>.
 ```
 
-Then give one ordered headline sweep directly from the queue. For every item,
-say literal `item.playback.spoken`, the literal `consumption_depth` mapping, and
-literal `item.title`; do not give summaries or article commentary during the
-sweep. After headline `M`, pause without making an item current. Brad may begin
+Then read the complete literal top-level `sweep_playback` string exactly. It is
+the only content field used for the headline sweep; do not independently assemble
+positions, modes, or titles and do not give descriptions or article commentary.
+After headline `M`, pause without making an item current. Brad may begin
 detailed playback at any verified queue item; if he says only to proceed or
 continue, begin at item 1. Do not begin any item's base playback before completing
 the sweep. If unavailable or invalid, say you cannot find a valid queue with that
@@ -48,13 +48,12 @@ Stop. A restarted Voice chat needs Brad to name the queue again.
 
 ## Playback
 
-For every item, including `items[0]`, project fields directly from the current
-queue object: use `item.playback.spoken`; map only literal
-`item.consumption_depth` to `Headline only` or `In depth`; say literal
-`item.title`; only for `in_depth`, then say literal `item.summary`. Never
-substitute remembered, topical, search-derived, or article-level text. Start exactly:
-`<N of M>. <Headline only or In depth>. <title>.` Before speaking, verify
-filename, position, ID, title, URL, mode, and summary. On failure, run queue
+For every item, including `items[0]`, read the one literal `item.playback_text`
+string exactly. It is the only item content field used for default playback.
+Never independently assemble position, mode, title, description, byline, source,
+or URL, and never substitute remembered, topical, search-derived, or article-level
+text. Before speaking, verify filename, position, ID, title, URL, mode,
+description, and `playback_text`. On failure, run queue
 recovery before stopping. Every valid queue item has a URL: never claim the
 current item has none. If its URL or literal reading mode cannot be read from
 the bound queue, treat queue context as lost and recover it before speaking.
@@ -67,16 +66,16 @@ item as `repeat`, and any other exact named/numbered item as `jump`. Accept “i
 intervening items heard. Navigate only within the active queue. If genuinely
 ambiguous, ask a short plain-English question; do not list allowed commands.
 
-The ordered `items` array controls playback. `headline_only`: read exact
-`item.title`; omit `item.summary`. `in_depth`: read exact `item.title`, then the
-complete `item.summary` exactly as written. Never rewrite, shorten, expand,
-combine, or select sentences from a field you read. `consumption_depth` selects
-only these shapes; it is not a section or cursor. Retrieve or discuss the article
+The ordered `items` array controls playback. The validated `playback_text`
+already contains the exact default shape selected during queue generation.
+Never rewrite, shorten, expand, combine, or select sentences from it.
+`consumption_depth` is not a section or cursor. Retrieve or discuss the article
 only when Brad asks, using the verified current item's exact URL. If retrieval
 fails, say so; never choose another item.
 
-Queue summary: read literal `item.summary` for any mode; no search or
-paraphrase.
+Queue metadata: when Brad asks, read literal `item.description`, `item.author`,
+or `item.publication`; report a `null` author or publication as unavailable. No
+search or paraphrase.
 
 After every item, pause and keep it current. Do not auto-advance, ask to
 continue, or narrate transitions. Honor ordinary-English requests to hear the

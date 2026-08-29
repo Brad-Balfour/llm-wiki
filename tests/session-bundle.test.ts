@@ -8,6 +8,9 @@ import {
   fileSha256,
   parseCommuteSessionBundleText,
   queueSnapshotFingerprint,
+  renderQueuePlaybackText,
+  renderQueueSweepPlayback,
+  validateTldrCommuteQueue,
 } from '../src/commute/session-bundle.js';
 
 const fixturePath = path.resolve('tests/fixtures/commute-bundles/valid-partial-bundle.json');
@@ -890,6 +893,16 @@ test('accepts a new v2 queue without a source-email subject', () => {
   assert.equal(parsed.queue_snapshot.queue.source_email !== undefined, true);
 });
 
+test('rejects a source-email subject from queue v3', () => {
+  const queue = v3Queue();
+  queue.source_email.subject = 'Not part of the queue-v3 contract';
+
+  assert.throws(
+    () => validateTldrCommuteQueue(queue),
+    /queue_snapshot\.queue\.source_email contains unsupported fields: subject/
+  );
+});
+
 test('rejects a v2 queue whose literal spoken position disagrees with its cursor', () => {
   const bundle = clone(validBundle);
   const queue = v2Queue();
@@ -1057,6 +1070,95 @@ function v2Queue(): {
       },
     ],
   };
+}
+
+test('validates queue v3 deterministic playback for headline-only and in-depth items', () => {
+  const queue = v3Queue();
+
+  const validated = validateTldrCommuteQueue(queue);
+
+  assert.equal(validated.queue_version, 'tldr-commute-queue.v3');
+  assert.equal(
+    queue.sweep_playback,
+    '1 of 2. Headline only. Headline: "quoted"\n2 of 2. In depth. Title already punctuated!'
+  );
+  assert.equal(queue.items[0]?.author, null);
+  assert.equal(queue.items[0]?.publication, null);
+  assert.equal(queue.items[1]?.author, 'Example Author');
+  assert.equal(queue.items[1]?.publication, 'Example Engineering Blog');
+  assert.equal(queue.items[0]?.playback_text, '1 of 2. Headline only. Headline: "quoted"');
+  assert.equal(
+    queue.items[1]?.playback_text,
+    '2 of 2. In depth. Title already punctuated!\nDescription with "quotes" and punctuation.'
+  );
+});
+
+test('rejects queue v3 sweep playback that drifts from the ordered items', () => {
+  const queue = v3Queue();
+  queue.sweep_playback = '1 of 2. Headline only. Invented headline';
+
+  assert.throws(
+    () => validateTldrCommuteQueue(queue),
+    /sweep_playback must equal the deterministic rendered sweep/
+  );
+});
+
+test('requires explicit nullable author and publication fields in queue v3', () => {
+  const queue = v3Queue();
+  delete queue.items[0]!.author;
+
+  assert.throws(
+    () => validateTldrCommuteQueue(queue),
+    /items\[0\]\.author must be a non-empty string/
+  );
+});
+
+test('rejects queue v3 playback text that drifts from canonical fields', () => {
+  const queue = v3Queue();
+  queue.items[1]!.playback_text = 'A generated paraphrase.';
+
+  assert.throws(
+    () => validateTldrCommuteQueue(queue),
+    /playback_text must equal the deterministic rendered playback/
+  );
+});
+
+test('queue v3 rejects the queue-v2 summary field instead of silently migrating it', () => {
+  const queue = v3Queue();
+  const first = queue.items[0]!;
+  first.summary = first.description;
+  delete first.description;
+
+  assert.throws(() => validateTldrCommuteQueue(queue), /unsupported fields: summary/);
+});
+
+function v3Queue(): ReturnType<typeof v2Queue> & { sweep_playback: string } {
+  const queue = v2Queue() as ReturnType<typeof v2Queue> & { sweep_playback: string };
+  queue.queue_version = 'tldr-commute-queue.v3';
+  delete queue.source_email.subject;
+  queue.items[0]!.title = 'Headline: "quoted"';
+  queue.items[1]!.title = 'Title already punctuated!';
+  queue.items[1]!.summary = 'Description with "quotes" and punctuation.';
+  for (const [index, item] of queue.items.entries()) {
+    item.description = item.summary;
+    delete item.summary;
+    item.author = index === 0 ? null : 'Example Author';
+    item.publication = index === 0 ? null : 'Example Engineering Blog';
+    item.playback_text = renderQueuePlaybackText({
+      playback: item.playback as { spoken: string },
+      consumption_depth: item.consumption_depth as 'headline_only' | 'in_depth',
+      title: item.title as string,
+      description: item.description as string,
+    });
+  }
+  queue.sweep_playback = renderQueueSweepPlayback(
+    queue.items.map((item) => ({
+      playback: item.playback as { spoken: string },
+      consumption_depth: item.consumption_depth as 'headline_only' | 'in_depth',
+      title: item.title as string,
+    }))
+  );
+  return queue;
 }
 
 function queueWithItemCount(count: number): ReturnType<typeof v2Queue> {
