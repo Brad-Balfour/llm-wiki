@@ -77,8 +77,9 @@ test('ChatGPT Project instructions require explicit classifier feedback', async 
 });
 
 test('managed Task prompt identifies v3 as the active canonical body', async () => {
-  const [readme, activeV3] = await Promise.all([
+  const [readme, retiredV2, activeV3] = await Promise.all([
     readFile('chatgpt-project/README.md', 'utf8'),
+    readFile('chatgpt-project/WEEKDAY_TLDR_QUEUE_TASK_PROMPT_V2.md', 'utf8'),
     readFile('chatgpt-project/WEEKDAY_TLDR_QUEUE_TASK_PROMPT_V3.md', 'utf8'),
   ]);
 
@@ -88,6 +89,11 @@ test('managed Task prompt identifies v3 as the active canonical body', async () 
     /active scheduled \*\*Weekday TLDR Queues\*\* Task uses\s+`chatgpt-project\/WEEKDAY_TLDR_QUEUE_TASK_PROMPT_V3\.md`/
   );
   assert.doesNotMatch(readme, /candidate contract/i);
+  assert.match(readme, /historical evidence, not the\s+current live configuration/);
+  assert.match(retiredV2, /Weekday TLDR Queue Task Prompt — v2 Retired/);
+  assert.match(retiredV2, /Do not use it for the\s+> active Task/);
+  assert.match(retiredV2, /use `WEEKDAY_TLDR_QUEUE_TASK_PROMPT_V3\.md` instead/);
+  assert.doesNotMatch(retiredV2, /v2 Live/);
   assert.match(activeV3, /Weekday TLDR Queue Task Prompt — v3 Live/);
   assert.match(activeV3, /canonical prompt for the active \*\*Weekday TLDR\s+> Queues\*\* Task/);
   assert.match(activeV3, /deployed queue-v3 contract/);
