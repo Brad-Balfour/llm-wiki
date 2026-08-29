@@ -49,7 +49,7 @@ Library.
 - **WHEN** Voice is about to announce an item
 - **THEN** it SHALL silently verify the selected filename, literal `N of M`
   phrase, source ID, title, URL, and reading mode against the selected queue
-- **AND** because every valid v2 item contains a URL, it SHALL treat an
+- **AND** because every valid v3 item contains a URL, it SHALL treat an
   unavailable URL or reading mode as lost queue context rather than claim the
   item has no URL or infer a mode from conversational memory
 - **AND** the current item SHALL be exactly `items[position - 1]`, with an
@@ -69,12 +69,12 @@ Brad expresses another intent.
 #### Scenario: Normal playback
 
 - **WHEN** Voice presents the verified current item
-- **THEN** Voice SHALL announce the item's literal `N of M` phrase, reading
-  mode, and exact queue headline before its summary or article commentary
-- **AND** for `headline_only` it SHALL stop after the exact queue headline and
-  SHALL NOT read `item.summary`
-- **AND** for `in_depth` it SHALL then read the complete TLDR summary exactly as
-  written
+- **THEN** Voice SHALL read only the current item's validated `playback_text`
+  for default playback
+- **AND** for `headline_only`, `playback_text` SHALL contain only the literal
+  `N of M` phrase, reading mode, and exact queue headline
+- **AND** for `in_depth`, `playback_text` SHALL also contain the complete TLDR
+  description exactly as written
 - **AND** it SHALL retrieve or discuss the linked article only after Brad
   requests more detail
 - **AND** it SHALL make an approximately five-second interruption-friendly gap
@@ -85,13 +85,12 @@ Brad expresses another intent.
 The five-second gap is a prompt-level target, not a claim that Standard Voice
 can provide a measured timer or capture every overlapping interruption.
 
-#### Scenario: Base playback projects queue text literally
+#### Scenario: Base playback uses pre-rendered queue text literally
 
 - **WHEN** Voice presents any verified queue item
-- **THEN** it SHALL read the queue headline from `item.title`
-- **AND** for `headline_only` it SHALL omit `item.summary`
-- **AND** for `in_depth` it SHALL read the complete `item.summary` exactly as
-  written
+- **THEN** it SHALL read `item.playback_text` exactly as written
+- **AND** it SHALL NOT assemble default playback from `item.title`,
+  `item.description`, or other item fields
 - **AND** it SHALL NOT paraphrase, truncate, expand, combine, or select only
   part of a field it reads
 - **AND** `consumption_depth` SHALL remain the literal switch between those two
@@ -102,8 +101,8 @@ can provide a measured timer or capture every overlapping interruption.
 - **WHEN** a verified `headline_only` item is current
 - **AND** Brad asks for the TLDR summary, queue summary, or summary directly
   from the queue
-- **THEN** Voice SHALL read that item's complete literal `item.summary`
-- **AND** it SHALL NOT paraphrase the summary, retrieve the article, or
+- **THEN** Voice SHALL read that item's complete literal `item.description`
+- **AND** it SHALL NOT paraphrase the description, retrieve the article, or
   substitute article text unless Brad separately requests article retrieval.
 
 #### Scenario: Brad navigates in ordinary English

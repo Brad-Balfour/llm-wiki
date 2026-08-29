@@ -13,15 +13,16 @@ queue artifact for every qualifying TLDR source email delivered that day.
 - **THEN** it SHALL produce one dated `.txt` queue file per source email
 - **AND** every produced file SHALL contain parseable queue content rather than
   a filename, placeholder, or reconstruction claim
-- **AND** every newly generated file SHALL conform to the versioned
-  `tldr-commute-queue.v2` contract, including one source-email identity and one
-  ordered `items` array whose literal playback phrases are contiguous from
-  `1 of M` through `M of M`
+- **AND** after the coupled queue-v3 trial deployment, every newly generated
+  file SHALL conform to the `tldr-commute-queue.v3` contract, including one
+  source-email identity, one ordered `items` array whose literal playback
+  phrases are contiguous from `1 of M` through `M of M`, and validated
+  `playback_text` and `sweep_playback`
 - **AND** the Task's managed no-external-storage prompt SHALL be stored in the
   repository so that a later prompt change is reviewable and reversible
 - **AND** the completion message SHALL link to each produced artifact.
 
-#### Scenario: v2 queue preserves two reading styles without two cursors
+#### Scenario: v3 queue preserves two reading styles without two cursors
 
 - **WHEN** the Task classifies a source email into headline-only and in-depth
   reading styles
@@ -29,16 +30,17 @@ queue artifact for every qualifying TLDR source email delivered that day.
 - **AND** each item SHALL carry the existing `consumption_depth` tag that
   determines its reading style
 - **AND** it SHALL NOT emit `headline_only`, `in_depth`, `source_order`, or a
-  newsletter-position field in a new v2 queue.
+  newsletter-position field in a new v3 queue.
 
-#### Scenario: deliberate v2 cutover
+#### Scenario: coupled v3 trial cutover
 
-- **WHEN** Brad replaces the managed Task prompt and uploads the v2 schema in
-  the queue-generation Project
-- **THEN** he SHALL regenerate the queues needed for subsequent commutes in v2
-  format
-- **AND** newly created or imported commute bundles SHALL accept only v2 queues
-  rather than supporting two queue contracts in parallel.
+- **WHEN** Brad replaces the managed Task prompt and uploads the v3 schema,
+  generation instructions, and Voice instructions together in
+  `LLM-Wiki-Car`
+- **THEN** newly generated queues and new Voice session bundles SHALL use v3
+- **AND** the local validator and session-bundle importer SHALL continue to
+  accept unchanged, already-downloaded v2 artifacts without treating v2 as a
+  live generation target.
 
 #### Scenario: Artifact creation fails
 

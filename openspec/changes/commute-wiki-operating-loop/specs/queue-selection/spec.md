@@ -4,8 +4,9 @@
 
 ### Requirement: Validated Project-Library Queue Startup
 
-Before playback begins, the Project SHALL bind the session to one
-unambiguously named `tldr-commute-queue.v2` file in the live Project Library.
+The Project SHALL, after the coupled queue-v3 trial deployment and before
+playback begins, bind the session to one unambiguously named
+`tldr-commute-queue.v3` file in the live Project Library.
 
 #### Scenario: Start a named queue
 
@@ -16,11 +17,11 @@ unambiguously named `tldr-commute-queue.v2` file in the live Project Library.
   Project Library
 - **AND** when that exact lookup fails, it SHALL list recent Project Library
   files and MAY inspect plausible queue candidates
-- **AND** it SHALL select a fallback only when validated v2 queue metadata
+- **AND** it SHALL select a fallback only when validated v3 queue metadata
   matches the requested edition date and newsletter type uniquely
 - **AND** it SHALL NOT select an older date, a different newsletter, or a merely
   similar title or filename
-- **AND** it SHALL validate that file as a v2 queue before playback
+- **AND** it SHALL validate that file as a v3 queue before playback
 - **AND** the `Reading: <M> items from <filename>.` envelope SHALL match that
   file's total item count and filename
 - **AND** the eventual bundle SHALL embed a literal queue snapshot
@@ -74,7 +75,7 @@ remembered filename or queue state from an earlier chat.
 The Project SHALL first recover the canonical filename already named for a
 still-active session or explicit bundle export. If the exact lookup fails, it
 SHALL list recent Project Library files and MAY select a candidate only after validating
-that its v2 metadata matches the requested date and newsletter type uniquely.
+that its v3 metadata matches the requested date and newsletter type uniquely.
 It SHALL NOT select a different date, newsletter, remembered queue, or article
 based on topical similarity.
 
