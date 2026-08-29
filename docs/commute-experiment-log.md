@@ -1248,6 +1248,67 @@ spoken command. It belongs in issue #100's supported-mechanism boundary rather
 than an unreviewed same-run prompt change. No live Project instruction or
 listed source changed, so no Project synchronization is required for this run.
 
+### August 28 Acceptance, Conversation Coverage, And Maintenance Result
+
+The bounded Library inventory found exactly four August 28 session-bundle
+rows in the `LLM-Wiki-Car` Project and no suffixed or otherwise plausible
+additional row. Their declared queues were the August 27 Dev and AI editions
+plus the August 28 General and Dev editions. All four exact queues passed
+queue-v2 validation. Every bundle passed strict lifecycle validation, its
+embedded snapshot canonically matched the separately downloaded queue, and its
+integrity record reported `recovered` with zero unresolved captures. The 45
+canonical queue items produced 13 bundle item actions, five explicit wiki
+saves, five quality-incident records, and one general capture.
+
+Eight supplied shared-chat URLs were preserved. Four are the complete canonical
+conversations and four are cumulative or fragmentary recovery representations
+of the same sessions; the latter remain provenance but are not independent
+corroboration. The four canonical chats contain 148 visible user-role messages.
+The private coverage ledger assigns 109 substantive turns to wiki content or
+synthesis, classifier evidence, playback quality, export recovery, a private
+product reminder, or a recorded no-public-action disposition. The remaining 39
+are Project placeholder text, session controls, routine navigation, pauses,
+acknowledgments, and Voice recognition fragments.
+
+Five exact classifier labels survive the conversation audit: promote the Sass
+migration, AcceptMarkdown, Claude Cowork, and Anthropic lab-hardware items to
+in-depth, and mark the DuckDB item uninteresting. Three other remarks do not
+become depth labels. _Muse_, _Experiential_, and _Cohere Parse_ were described
+as useless headline-only experiences because unfamiliar product names did not
+communicate what the items were, while Brad explicitly allowed that headline
+only might still be the right classification. This repeats the title-
+informativeness boundary tracked by issues #35 and #66.
+
+The chats expose at least 14 distinct playback or recovery observations in
+addition to the bundles' five structured incidents: failed initial sweeps,
+in-depth items that stopped at the headline, the prior item's summary being
+read for the current item, literal summaries replaced with invented or
+paraphrased text, and retries needed to finish exports. Several errors occurred
+immediately after a request to re-anchor against the verified queue. This is
+evidence for issues #100 and #106: Prompt 3.4 states the correct behavior, but
+Voice still needs a supported mechanism that binds one pre-rendered literal
+playback string to the verified current item.
+
+Five explicit saves were grounded in their primary sources and maintained into
+four concepts. _The Harness Is the Thing_ and _Harness Engineering_ extend the
+existing long-running-harness entry with multi-model role separation and
+progressive constraint hardening. _Audit your Agent files_ extends adaptive
+context engineering while distinguishing diagnostic commands from a semantic
+instruction audit. _Agent Swarms are a Distributed Systems Problem_ adds
+goodput and prefix-safe partial commits to multiagent systemic risk. _The
+load-bearing vocabulary of Claude_ becomes a new low-confidence authorship-
+signals concept that preserves the conversation's questions while correcting
+the living source's current growing-cluster figure to 39% and separating a
+style signal from proof of model authorship.
+
+The General session also asked the home-side maintainer to resurface Microduck
+product information for possible preorder. That reminder remains in private
+handoff evidence because no durable wiki save was requested and current product
+availability and price are time-sensitive. No live Project instruction or
+listed source changed in this run, so this PR creates no new Project deployment
+step. The previously recorded Revision 3.4 live-deployment state remains
+unchanged.
+
 ## What Worked
 
 - The weekday Task has produced real dated, parseable queues, including four
