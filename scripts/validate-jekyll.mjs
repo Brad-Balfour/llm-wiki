@@ -7,7 +7,13 @@ import { JSON_SCHEMA, load } from 'js-yaml';
 import { validatePublishedWikiDocuments } from '../dist/src/wiki/publication-safety.js';
 
 const markdownFiles = ['index.md', ...(await findMarkdownFiles('wiki'))];
-const skillFiles = await findSkillFiles('.codex/skills');
+const skillFiles = (
+  await Promise.all(
+    ['.codex/skills', '.claude/skills', '.github/skills'].map((directory) =>
+      findSkillFiles(directory)
+    )
+  )
+).flat();
 const yamlFiles = [
   '_config.yml',
   '.github/dependabot.yml',
