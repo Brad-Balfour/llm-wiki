@@ -1,8 +1,7 @@
 # LLM-Wiki-Car Project Source Bundle
 
 > Status: `LLM-Wiki-Car` is the one live ChatGPT Project for both weekday queue
-> generation and Voice commute playback. Queue v3 is the candidate contract for
-> issue #106's coupled acceptance trial;
+> generation and Voice commute playback. Queue v3 is the active contract;
 > local validation and bundle import keep explicit queue-v2 compatibility for
 > already-downloaded artifacts.
 > Git history preserves the retired prompts, ledgers, handoffs, and approval
@@ -14,11 +13,8 @@ Paste `chatgpt-project/CHATGPT_CAR_QUEUE_PROMPT.md` into the **Instructions**
 field of `LLM-Wiki-Car`. It supersedes the former commute prompt and the
 earlier separate-Project v2 Pilot.
 
-The repository file is Prompt Revision 4.1, prepared for the queue-v3 experiment
-in issue #106. The live Project Instructions were last confirmed at Prompt
-Revision 3.3 on August 12, 2026; Revision 4.1 must not be pasted until the schema,
-generation instructions, and managed Task prompt are deployed together for the
-acceptance trial.
+The repository file is Prompt Revision 4.1 and is the active source for the
+deployed queue-v3 configuration.
 
 The prompt heading carries two distinct versions. `Queue Contract v3` changes
 only when the queue/schema contract changes. `Prompt Revision` increments for
@@ -52,12 +48,9 @@ rollback that restores a prompt while leaving another behavior-changing
 dependency behind.
 
 The active scheduled **Weekday TLDR Queues** Task uses
-`chatgpt-project/WEEKDAY_TLDR_QUEUE_TASK_PROMPT_V2.md`. Its live body was verified
-as an exact match on July 26, 2026. The Task remains Monday–Friday at 11:00 AM
-and is active. `chatgpt-project/WEEKDAY_TLDR_QUEUE_TASK_PROMPT_V3.md` is only the
-candidate body for the coupled acceptance trial; do not paste it into the Task
-before the schema, generation source, and Project instructions are updated at
-the same time.
+`chatgpt-project/WEEKDAY_TLDR_QUEUE_TASK_PROMPT_V3.md`. The Task remains
+Monday–Friday at 11:00 AM and is active. The v2 prompt is retained only for
+history and compatibility with already-downloaded v2 artifacts.
 
 Scheduled execution is currently unreliable at the artifact boundary. July
 21-24 and July 28 runs found the expected Gmail messages, then every

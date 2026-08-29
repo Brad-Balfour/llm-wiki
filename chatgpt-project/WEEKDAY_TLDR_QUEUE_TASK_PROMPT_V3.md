@@ -1,9 +1,8 @@
-# Weekday TLDR Queue Task Prompt — v3 Candidate
+# Weekday TLDR Queue Task Prompt — v3 Live
 
-> Candidate body for issue #106's coupled queue-v3 acceptance trial. It does not
-> match the active **Weekday TLDR Queues** Task. Keep using
-> `WEEKDAY_TLDR_QUEUE_TASK_PROMPT_V2.md` until the v3 schema, generation source,
-> Project instructions, and Task prompt are deliberately deployed together.
+> The managed body below is the canonical prompt for the active **Weekday TLDR
+> Queues** Task and the deployed queue-v3 contract. The v2 prompt is retained
+> only for history and compatibility with already-downloaded v2 artifacts.
 
 ```text
 Using the Gmail connector, find all TLDR newsletter emails delivered on the day

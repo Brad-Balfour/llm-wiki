@@ -76,22 +76,24 @@ test('ChatGPT Project instructions require explicit classifier feedback', async 
   assert.match(prompt, /A summary request or\s+interrupted playback is not feedback/);
 });
 
-test('managed Task prompts distinguish the active v2 body from the v3 candidate', async () => {
-  const [readme, activeV2, candidateV3] = await Promise.all([
+test('managed Task prompt identifies v3 as the active canonical body', async () => {
+  const [readme, activeV3] = await Promise.all([
     readFile('chatgpt-project/README.md', 'utf8'),
-    readFile('chatgpt-project/WEEKDAY_TLDR_QUEUE_TASK_PROMPT_V2.md', 'utf8'),
     readFile('chatgpt-project/WEEKDAY_TLDR_QUEUE_TASK_PROMPT_V3.md', 'utf8'),
   ]);
 
+  assert.match(readme, /Queue v3 is the active contract/);
   assert.match(
     readme,
-    /active scheduled \*\*Weekday TLDR Queues\*\* Task uses\s+`chatgpt-project\/WEEKDAY_TLDR_QUEUE_TASK_PROMPT_V2\.md`/
+    /active scheduled \*\*Weekday TLDR Queues\*\* Task uses\s+`chatgpt-project\/WEEKDAY_TLDR_QUEUE_TASK_PROMPT_V3\.md`/
   );
-  assert.match(activeV2, /managed body below exactly/);
-  assert.match(activeV2, /matches the active \*\*Weekday TLDR Queues\*\* Task/);
-  assert.match(candidateV3, /Candidate body for issue #106/);
-  assert.match(candidateV3, /It does not/);
-  assert.match(candidateV3, /match the active \*\*Weekday TLDR Queues\*\* Task/);
+  assert.doesNotMatch(readme, /candidate contract/i);
+  assert.match(activeV3, /Weekday TLDR Queue Task Prompt — v3 Live/);
+  assert.match(activeV3, /canonical prompt for the active \*\*Weekday TLDR\s+> Queues\*\* Task/);
+  assert.match(activeV3, /deployed queue-v3 contract/);
+  assert.match(activeV3, /v2 prompt is retained\s+> only for history and compatibility/);
+  assert.doesNotMatch(activeV3, /candidate/i);
+  assert.doesNotMatch(activeV3, /issue #106/i);
 });
 
 test('daily commute completion cannot omit a required Project update', async () => {
