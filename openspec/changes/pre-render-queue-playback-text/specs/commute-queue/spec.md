@@ -40,3 +40,35 @@ Queue v3 SHALL name literal newsletter summary text `description` without changi
 - **THEN** it SHALL continue to validate the v2 `summary` contract
 - **AND** it SHALL NOT require `description` or `playback_text`
 - **AND** new generation SHALL NOT emit queue v2.
+
+### Requirement: Queue v3 Pre-renders The Headline Sweep
+
+Queue v3 SHALL contain one top-level deterministic string for the complete ordered headline sweep.
+
+#### Scenario: Render the sweep
+
+- **WHEN** queue generation has ordered all `M` items
+- **THEN** each sweep line SHALL equal `<N of M>. <Headline only|In depth>. <title>`
+- **AND** `sweep_playback` SHALL join those lines in item order with newline characters
+- **AND** the sweep SHALL omit descriptions, authors, publications, URLs, and commentary.
+
+#### Scenario: Reject sweep drift
+
+- **WHEN** deterministic validation reconstructs the sweep from the ordered items
+- **AND** the reconstruction differs from `sweep_playback`
+- **THEN** the queue SHALL be rejected.
+
+### Requirement: Queue v3 Carries Source Attribution
+
+Every queue-v3 item SHALL expose author and publication metadata without inventing unavailable values.
+
+#### Scenario: Source metadata is available
+
+- **WHEN** the newsletter or source metadata supplies an exact author or blog/publication title
+- **THEN** queue generation SHALL copy it to `author` or `publication` respectively.
+
+#### Scenario: Source metadata is unavailable
+
+- **WHEN** an exact author or publication is not supplied
+- **THEN** the corresponding required field SHALL be JSON `null`
+- **AND** queue generation SHALL NOT infer it from the sender, newsletter, URL domain, title, or general knowledge.

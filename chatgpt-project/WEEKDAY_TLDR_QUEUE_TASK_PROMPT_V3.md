@@ -14,17 +14,17 @@ attached tldr-commute-queue-v3.schema.json, create one real downloadable .txt
 classification queue per source email.
 
 Each file must be one valid tldr-commute-queue.v3 JSON object with one ordered
-items array and total_items. Every item must rename the source `summary` to `description`, contain deterministic `playback_text`, and contain playback.position,
+items array, total_items, and deterministic top-level sweep_playback. Every item must rename the source `summary` to `description`, contain author, publication, deterministic `playback_text`, and playback.position,
 playback.total, and playback.spoken in literal contiguous form: 1 of M through
 M of M. Use consumption_depth only as the headline_only or in_depth reading
 style tag. Do not emit separate headline_only or in_depth arrays, source_order,
 any newsletter-position field, or a source-email subject. Preserve exact
-source_item_id, title, description, deterministic playback_text, final HTTP(S) URL, and all schema-required
+source_item_id, title, description, author, publication, deterministic playback_text, final HTTP(S) URL, and all schema-required
 classifier and routing metadata.
 
-Render headline-only `playback_text` as `<N of M>. Headline only. <title>` and in-depth `playback_text` as `<N of M>. In depth. <title>\n<description>`. Do not add a byline, source, URL, or other text. Apply the Project duplicate-resolution tie-breaker and perform this self-check:
+Render headline-only `playback_text` as `<N of M>. Headline only. <title>` and in-depth `playback_text` as `<N of M>. In depth. <title>\n<description>`. Render each sweep line as `<N of M>. <Headline only|In depth>. <title>` and join all lines in item order with `\n` as sweep_playback. Copy exact author and blog/publication values only when supplied by the newsletter or source metadata; otherwise use JSON null without guessing. Do not add author, publication, URL, or other text to either playback string. Apply the Project duplicate-resolution tie-breaker and perform this self-check:
 valid JSON, v3 schema shape, one source-email identity, items.length equals
-total_items, contiguous playback values, unique item IDs and URLs, and no raw
+total_items, contiguous playback values, exact sweep_playback, unique item IDs and URLs, and no raw
 email bodies, credentials, cookies, private notes, or Range material. Filename
 dates use the source email's own America/New_York delivery date as YYYYMMDD,
 never the task execution date. Provide each queue as a real downloadable
@@ -49,12 +49,15 @@ schema-required classifier and routing fields for every real item.
     "delivered_at": "2026-07-16T07:05:43-04:00"
   },
   "total_items": 2,
+  "sweep_playback": "1 of 2. Headline only. First exact article title\n2 of 2. In depth. Second exact article title",
   "items": [
     {
       "playback": { "position": 1, "total": 2, "spoken": "1 of 2" },
       "source_item_id": "example-message-id-01",
       "title": "First exact article title",
       "description": "A concise newsletter description.",
+      "author": null,
+      "publication": "Example Publication",
       "playback_text": "1 of 2. Headline only. First exact article title",
       "url": "https://example.com/first",
       "interest_level": "interested",
@@ -78,6 +81,8 @@ schema-required classifier and routing fields for every real item.
       "source_item_id": "example-message-id-02",
       "title": "Second exact article title",
       "description": "A concise newsletter description.",
+      "author": "Example Author",
+      "publication": "Example Engineering Blog",
       "playback_text": "2 of 2. In depth. Second exact article title\nA concise newsletter description.",
       "url": "https://example.com/second",
       "interest_level": "maybe",

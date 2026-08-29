@@ -14,9 +14,9 @@ Paste `chatgpt-project/CHATGPT_CAR_QUEUE_PROMPT.md` into the **Instructions**
 field of `LLM-Wiki-Car`. It supersedes the former commute prompt and the
 earlier separate-Project v2 Pilot.
 
-The repository file is Prompt Revision 4.0, prepared for the queue-v3 experiment
+The repository file is Prompt Revision 4.1, prepared for the queue-v3 experiment
 in issue #106. The live Project Instructions were last confirmed at Prompt
-Revision 3.3 on August 12, 2026; Revision 4.0 must not be pasted until the schema,
+Revision 3.3 on August 12, 2026; Revision 4.1 must not be pasted until the schema,
 generation instructions, and managed Task prompt are deployed together for the
 acceptance trial.
 

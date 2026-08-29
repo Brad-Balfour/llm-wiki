@@ -12,8 +12,10 @@ test('ChatGPT Project instructions fit the 8,000-character limit', async () => {
 test('ChatGPT Project instructions require a grounded headline sweep and URL handling', async () => {
   const prompt = await readFile('chatgpt-project/CHATGPT_CAR_QUEUE_PROMPT.md', 'utf8');
 
-  assert.match(prompt, /Queue Contract v3 · Prompt Revision 4\.0/);
-  assert.match(prompt, /one ordered headline sweep directly from the queue/);
+  assert.match(prompt, /Queue Contract v3 · Prompt Revision 4\.1/);
+  assert.match(prompt, /read the complete literal top-level `sweep_playback` string exactly/);
+  assert.match(prompt, /only content field used for the headline sweep/);
+  assert.match(prompt, /do not independently assemble\s+positions, modes, or titles/);
   assert.match(prompt, /After headline `M`, pause without making an item current/);
   assert.match(prompt, /may begin\s+detailed playback at any verified queue item/);
   assert.match(prompt, /if he says only to proceed or\s+continue, begin at item 1/);
@@ -29,9 +31,13 @@ test('ChatGPT Project instructions require a grounded headline sweep and URL han
   assert.match(prompt, /Never rewrite, shorten, expand, combine, or select sentences from it/);
   assert.doesNotMatch(prompt, /one brisk queue-summary sentence/);
   assert.doesNotMatch(prompt, /one or two short queue-summary sentences/);
-  assert.match(prompt, /Queue description/);
-  assert.match(prompt, /read literal `item\.description` for any mode/);
-  assert.match(prompt, /no search or\s+paraphrase/);
+  assert.match(prompt, /Queue metadata/);
+  assert.match(
+    prompt,
+    /read literal `item\.description`, `item\.author`,\s+or `item\.publication`/
+  );
+  assert.match(prompt, /report a `null` author or publication as unavailable/);
+  assert.match(prompt, /no\s+search or paraphrase/i);
 });
 
 test('ChatGPT Project instructions preserve arbitrary navigation and incomplete evidence', async () => {

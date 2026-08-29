@@ -381,7 +381,15 @@ function indexQueueItems(record: Record<string, unknown>): QueueItemIndex {
 function indexQueue(record: Record<string, unknown>, version: 'v2' | 'v3'): QueueItemIdentity[] {
   rejectUnknownKeys(
     record,
-    ['queue_version', 'newsletter', 'edition_date', 'source_email', 'total_items', 'items'],
+    [
+      'queue_version',
+      'newsletter',
+      'edition_date',
+      'source_email',
+      'total_items',
+      ...(version === 'v3' ? ['sweep_playback'] : []),
+      'items',
+    ],
     'queue_snapshot.queue'
   );
   const totalItems = requirePositiveInteger(record.total_items, 'queue_snapshot.queue.total_items');
@@ -389,7 +397,7 @@ function indexQueue(record: Record<string, unknown>, version: 'v2' | 'v3'): Queu
   if (values.length !== totalItems) {
     throw new Error('queue_snapshot.queue.total_items must equal items.length');
   }
-  return values.map((candidate, index) => {
+  const ordered = values.map((candidate, index) => {
     const itemPath = `queue_snapshot.queue.items[${index}]`;
     const item = validateQueueItem(candidate, itemPath, version);
     const record = requireRecord(candidate, itemPath);
@@ -405,6 +413,30 @@ function indexQueue(record: Record<string, unknown>, version: 'v2' | 'v3'): Queu
     }
     return item;
   });
+  if (version === 'v3') {
+    const expected = renderQueueSweepPlayback(
+      values.map((candidate, index) => {
+        const itemPath = `queue_snapshot.queue.items[${index}]`;
+        const item = requireRecord(candidate, itemPath);
+        const playback = requireRecord(item.playback, `${itemPath}.playback`);
+        return {
+          playback: { spoken: requireString(playback.spoken, `${itemPath}.playback.spoken`) },
+          consumption_depth: requireEnum(
+            item.consumption_depth,
+            ['headline_only', 'in_depth'] as const,
+            `${itemPath}.consumption_depth`
+          ),
+          title: requireString(item.title, `${itemPath}.title`),
+        };
+      })
+    );
+    if (requireString(record.sweep_playback, 'queue_snapshot.queue.sweep_playback') !== expected) {
+      throw new Error(
+        'queue_snapshot.queue.sweep_playback must equal the deterministic rendered sweep'
+      );
+    }
+  }
+  return ordered;
 }
 
 function unsupportedQueueVersion(version: string): never {
@@ -424,6 +456,21 @@ export function renderQueuePlaybackText(item: {
   return item.consumption_depth === 'headline_only' ? prefix : `${prefix}\n${item.description}`;
 }
 
+export function renderQueueSweepPlayback(
+  items: Array<{
+    playback: { spoken: string };
+    consumption_depth: 'headline_only' | 'in_depth';
+    title: string;
+  }>
+): string {
+  return items
+    .map((item) => {
+      const mode = item.consumption_depth === 'headline_only' ? 'Headline only' : 'In depth';
+      return `${item.playback.spoken}. ${mode}. ${item.title}`;
+    })
+    .join('\n');
+}
+
 function validateQueueItem(
   candidate: unknown,
   itemPath: string,
@@ -437,7 +484,7 @@ function validateQueueItem(
       'source_item_id',
       'title',
       version === 'v2' ? 'summary' : 'description',
-      ...(version === 'v3' ? ['playback_text'] : []),
+      ...(version === 'v3' ? ['author', 'publication', 'playback_text'] : []),
       'url',
       'interest_level',
       'interest_score',
@@ -466,6 +513,8 @@ function validateQueueItem(
     requireString(record.summary, `${itemPath}.summary`);
   } else {
     const description = requireString(record.description, `${itemPath}.description`);
+    validateNullableString(record.author, `${itemPath}.author`);
+    validateNullableString(record.publication, `${itemPath}.publication`);
     const playbackText = requireString(record.playback_text, `${itemPath}.playback_text`);
     const consumptionDepth = requireEnum(
       record.consumption_depth,
@@ -510,6 +559,10 @@ function validateQueueItem(
     title: requireString(record.title, `${itemPath}.title`),
     url: requireHttpUrl(record.url, `${itemPath}.url`),
   };
+}
+
+function validateNullableString(candidate: unknown, field: string): void {
+  if (candidate !== null) requireString(candidate, field);
 }
 
 function validateSourceEmail(candidate: unknown): void {

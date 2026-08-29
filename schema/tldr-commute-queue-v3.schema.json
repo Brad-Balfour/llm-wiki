@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://brad-balfour.github.io/llm-wiki/schema/tldr-commute-queue-v3.schema.json",
   "title": "TLDR commute queue \u2014 pre-rendered Voice playback",
-  "description": "The items array defines canonical identity, order, and one deterministic literal playback string per item.",
+  "description": "The items array defines canonical identity, order, item playback, and one deterministic top-level headline sweep.",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -11,6 +11,7 @@
     "edition_date",
     "source_email",
     "total_items",
+    "sweep_playback",
     "items"
   ],
   "properties": {
@@ -50,6 +51,11 @@
         }
       }
     },
+    "sweep_playback": {
+      "type": "string",
+      "minLength": 1,
+      "description": "The complete deterministic headline sweep. One `<N of M>. <Headline only|In depth>. <title>` line per item, joined by newline characters."
+    },
     "items": {
       "description": "Canonical queue identity and ordering. A session may begin detailed playback at any item and navigate non-linearly without changing this array.",
       "type": "array",
@@ -68,6 +74,8 @@
         "source_item_id",
         "title",
         "description",
+        "author",
+        "publication",
         "playback_text",
         "url",
         "interest_level",
@@ -190,6 +198,18 @@
           "minLength": 1,
           "maxLength": 4000,
           "description": "The literal newsletter-provided description formerly named summary in queue v2."
+        },
+        "author": {
+          "type": ["string", "null"],
+          "minLength": 1,
+          "maxLength": 300,
+          "description": "Exact article author when supplied by the newsletter or source metadata; otherwise null."
+        },
+        "publication": {
+          "type": ["string", "null"],
+          "minLength": 1,
+          "maxLength": 300,
+          "description": "Exact blog or publication title when supplied by the newsletter or source metadata; otherwise null."
         },
         "playback_text": {
           "type": "string",
