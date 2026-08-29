@@ -1,12 +1,19 @@
 import assert from 'node:assert/strict';
 import { readdir, readFile } from 'node:fs/promises';
-import { extname, join } from 'node:path';
+import { basename, dirname, extname, join } from 'node:path';
 
 import { JSON_SCHEMA, load } from 'js-yaml';
 
 import { validatePublishedWikiDocuments } from '../dist/src/wiki/publication-safety.js';
 
 const markdownFiles = ['index.md', ...(await findMarkdownFiles('wiki'))];
+const skillFiles = (
+  await Promise.all(
+    ['.codex/skills', '.claude/skills', '.github/skills'].map((directory) =>
+      findSkillFiles(directory)
+    )
+  )
+).flat();
 const yamlFiles = [
   '_config.yml',
   '.github/dependabot.yml',
@@ -28,6 +35,47 @@ for (const path of markdownFiles) {
   if (path.startsWith('wiki/')) {
     publishedWikiDocuments.push({ path, markdown, frontmatter: parsed });
   }
+}
+
+for (const path of skillFiles) {
+  const markdown = await readFile(path, 'utf8');
+  const frontmatter = parseYaml(extractFrontmatter(markdown, path), `${path} frontmatter`);
+  assert.ok(isMapping(frontmatter), `${path} frontmatter must contain a YAML mapping`);
+  assert.equal(typeof frontmatter.name, 'string', `${path} frontmatter.name must be a string`);
+  assert.match(
+    frontmatter.name,
+    /^[a-z0-9]+(?:-[a-z0-9]+)*$/,
+    `${path} frontmatter.name must use lowercase hyphenated words`
+  );
+  assert.equal(
+    frontmatter.name,
+    basename(dirname(path)),
+    `${path} frontmatter.name must match its skill directory`
+  );
+  assert.ok(
+    frontmatter.name.length <= 64,
+    `${path} frontmatter.name must be at most 64 characters`
+  );
+  assert.equal(
+    typeof frontmatter.description,
+    'string',
+    `${path} frontmatter.description must be a string`
+  );
+  assert.ok(frontmatter.description.trim(), `${path} frontmatter.description must not be empty`);
+  assert.ok(
+    frontmatter.description.length <= 1024,
+    `${path} frontmatter.description must be at most 1024 characters`
+  );
+  assert.doesNotMatch(
+    frontmatter.description,
+    /[<>]|\[TODO:/i,
+    `${path} frontmatter.description contains unsupported markup or a placeholder`
+  );
+  assert.doesNotMatch(
+    markdown,
+    /^[ ]{0,3}\[TODO:[^\n]*\][ \t]*$/im,
+    `${path} contains an unfinished TODO placeholder`
+  );
 }
 validatePublishedWikiDocuments(publishedWikiDocuments);
 
@@ -55,7 +103,7 @@ for (const [index, item] of provenance.entries()) {
 }
 
 console.log(
-  `Validated ${yamlFiles.length} YAML files and ${markdownFiles.length} Jekyll Markdown files.`
+  `Validated ${yamlFiles.length} YAML files, ${markdownFiles.length} Jekyll Markdown files, and ${skillFiles.length} skill files.`
 );
 
 function parseYaml(source, label) {
@@ -87,6 +135,10 @@ async function findFiles(directory, include) {
 
 function findMarkdownFiles(directory) {
   return findFiles(directory, (name) => extname(name) === '.md');
+}
+
+function findSkillFiles(directory) {
+  return findFiles(directory, (name) => name === 'SKILL.md');
 }
 
 function isYaml(name) {
