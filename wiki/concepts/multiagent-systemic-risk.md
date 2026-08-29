@@ -2,15 +2,15 @@
 type: concept
 title: 'Multiagent Systemic Risk'
 # prettier-ignore
-aliases: ["Patterns and problems in emerging multiagent systems","How AI Agents Could Fail at Scale"]
+aliases: ["Patterns and problems in emerging multiagent systems","How AI Agents Could Fail at Scale","Agent Swarms are a Distributed Systems Problem"]
 # prettier-ignore
 tags: ["ai-agents","multi-agent-systems","coordination","systemic-risk","alignment","verification"]
 wiki_slug: multiagent-systemic-risk
 created: 2026-08-15
-updated: 2026-08-15
+updated: 2026-08-28
 confidence: medium
 # prettier-ignore
-provenance: [{"source_item_id":"1a00096e3b7b2e7f-05","url":"https://www.anthropic.com/research/multiagent-systems?utm_source=tldrai"}]
+provenance: [{"source_item_id":"1a00096e3b7b2e7f-05","url":"https://www.anthropic.com/research/multiagent-systems?utm_source=tldrai"},{"source_item_id":"1a0480e09f24878f-11","url":"https://www.trychroma.com/engineering/transactions"}]
 ---
 
 # Multiagent Systemic Risk
@@ -96,6 +96,23 @@ These are early experimental signals from particular models, prompts, and
 environments. They identify mechanism-design problems; they do not establish
 universal rates or prove that the observed behaviors will persist unchanged.
 
+## Shared-State Recovery Should Preserve Reasoning
+
+Chroma's Foundation system exposes a different swarm risk: conventional
+transaction rollback can discard minutes of expensive reasoning after agents
+discover overlapping read sets late. Its Fission protocol optimizes
+**goodput**—paid reasoning that survives contention—by committing completed
+pages early, using exclusive locks and wound-wait ordering, and letting a retry
+inspect the prefix of work that survived.
+
+The commute discussion connected this to a familiar distributed-systems rule:
+make partial progress safe before optimizing concurrency. Fission deliberately
+trades whole-task atomicity for per-page atomicity and prefix-safe progress. It
+is not CRDT-style eventual consistency, and the source says it runs over a
+linearizable store. The reasoning model remains responsible for logical
+consistency, so this mechanism reduces wasted work without proving the retained
+partial result is semantically correct.
+
 ## Source Notes
 
 ### [Patterns and problems in emerging multiagent systems](https://www.anthropic.com/research/multiagent-systems?utm_source=tldrai)
@@ -110,6 +127,14 @@ conflicting coding directives. The article argues that stronger individual
 models and individual alignment do not by themselves solve multiagent
 coordination. Its proposed research direction is deliberately open-ended rather
 than a finished control framework.
+
+### [Agent Swarms are a Distributed Systems Problem](https://www.trychroma.com/engineering/transactions)
+
+<!-- source-item-id: 1a0480e09f24878f-11 -->
+
+Robert Escriva, Chroma. Describes Foundation's shared wiki and Fission recovery
+protocol, which favors per-page atomicity and reusable partial progress over
+rolling back an agent's entire transaction after contention.
 
 ## Related
 
