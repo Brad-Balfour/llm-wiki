@@ -1,11 +1,9 @@
-# Weekday TLDR Queue Task Prompt — v2 Live
+# Weekday TLDR Queue Task Prompt — v2 Retired
 
-> Live configuration verified 2026-07-26. The managed body below exactly
-> matches the active **Weekday TLDR Queues** Task. The Task is scheduled Monday
-> through Friday at 11:00 AM. July 21-24 and July 28 runs found the expected
-> Gmail messages but failed at scheduled artifact generation; see
-> `docs/live-workflow-audit-2026-07-26.md` and
-> `docs/commute-experiment-log.md`.
+> Historical configuration verified 2026-07-26. This body matched the active
+> **Weekday TLDR Queues** Task at that time and is retained only for history and
+> compatibility with already-downloaded v2 artifacts. Do not use it for the
+> active Task; use `WEEKDAY_TLDR_QUEUE_TASK_PROMPT_V3.md` instead.
 
 ```text
 Using the Gmail connector, find all TLDR newsletter emails delivered on the day
