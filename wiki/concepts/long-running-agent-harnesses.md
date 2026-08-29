@@ -2,15 +2,15 @@
 type: concept
 title: 'Long-Running Agent Harnesses'
 # prettier-ignore
-aliases: ["The Coming Loop","Hidden Technical Debt of AI Systems: Agent Harness","Codex-maxxing for long-running work","Autoresearch","Software Factories, Light and Dark","The Continuous Thunderdome"]
+aliases: ["The Coming Loop","Hidden Technical Debt of AI Systems: Agent Harness","Codex-maxxing for long-running work","Autoresearch","Software Factories, Light and Dark","The Continuous Thunderdome","The Harness Is the Thing","Harness Engineering"]
 # prettier-ignore
 tags: ["ai-agents","agent-harnesses","long-running-agents","software-factories","verification","context-management","feedback-loops"]
 wiki_slug: long-running-agent-harnesses
 created: 2026-08-24
-updated: 2026-08-24
+updated: 2026-08-28
 confidence: medium
 # prettier-ignore
-provenance: [{"source_item_id":"url_1fbd37ebeb0805e9","url":"https://openai.com/index/codex-maxxing-long-running-work/"},{"source_item_id":"url_d3b96db102288163","url":"https://leehanchung.github.io/blogs/2026/05/08/hidden-technical-debt-agent-harness/"},{"source_item_id":"url_2eece697b1d063df","url":"https://lucumr.pocoo.org/2026/6/23/the-coming-loop/"},{"source_item_id":"url_7e29fd14ca16f2a8","url":"https://www.latent.space/p/autoresearch-introspection"},{"source_item_id":"url_6becd8bc303db51e","url":"https://yegge.ai/essays/the-shape-of-things-to-come/"},{"source_item_id":"url_050f975f8d6191b8","url":"https://addyo.substack.com/p/software-factories-light-and-dark"}]
+provenance: [{"source_item_id":"url_1fbd37ebeb0805e9","url":"https://openai.com/index/codex-maxxing-long-running-work/"},{"source_item_id":"url_d3b96db102288163","url":"https://leehanchung.github.io/blogs/2026/05/08/hidden-technical-debt-agent-harness/"},{"source_item_id":"url_2eece697b1d063df","url":"https://lucumr.pocoo.org/2026/6/23/the-coming-loop/"},{"source_item_id":"url_7e29fd14ca16f2a8","url":"https://www.latent.space/p/autoresearch-introspection"},{"source_item_id":"url_6becd8bc303db51e","url":"https://yegge.ai/essays/the-shape-of-things-to-come/"},{"source_item_id":"url_050f975f8d6191b8","url":"https://addyo.substack.com/p/software-factories-light-and-dark"},{"source_item_id":"1a042ecbb2412172-06","url":"https://scott-fryxell.github.io/blog/the-harness-is-the-thing/"},{"source_item_id":"1a0480e09f24878f-13","url":"https://habitat-thinking.github.io/ai-literacy-superpowers/plugins/ai-literacy-superpowers/explanation/harness-engineering/"}]
 ---
 
 # Long-Running Agent Harnesses
@@ -45,6 +45,37 @@ This creates two simultaneous requirements:
 Autoresearch extends the loop from doing work to improving the system that does the work. The proposed “agent recipe” records the harness, evaluators, judges, human feedback, failures, and model choices that produced a working configuration. That history matters because source code alone does not explain why a loop evolved into its current shape.
 
 The source is an interview about an emerging product category, not independent evidence that self-improving factories are broadly reliable. Its practical starting point is narrower: identify valuable feedback signals, control cost, retain human questions as first-class inputs, and use Git or another durable ledger as the audit trail.
+
+## A Personal Harness Can Abstract Across Models
+
+Scott Fryxell describes one lightweight harness shared across Cursor, Claude,
+and Pi rather than rebuilding the workflow around each model. It separates
+exploration, planning, implementation, criticism, and promotion into explicit
+roles and reserves frontier models for planning and difficult seams while using
+cheaper models for routine work. That is a practical model-routing pattern, not
+evidence that the particular role names are universal. His reported 75% drop
+in Fable usage is a personal measurement from one setup.
+
+The commute discussion sharpened the useful boundary: a harness can preserve
+one working method while the model underneath changes. The value is not a
+larger prompt. It is the inspectable division of labor, the retained state
+between roles, and an explicit point where reviewed work becomes accepted
+project state.
+
+## A Harness Is a Living Constraint System
+
+Habitat Thinking presents harness engineering as progressive hardening.
+Architectural rules can begin unverified, move to agent review when judgment is
+needed, and become deterministic checks when a stable mechanical oracle exists.
+A living `HARNESS.md`, periodic garbage-collection rules, and three enforcement
+loops separate fast advisory feedback, merge-blocking review, and scheduled
+investigation.
+
+This makes harness maintenance part of the product. Constraints acquire a
+half-life as the codebase and models change; checks should be promoted,
+rewritten, or removed based on observed failures. The source is documentation
+for one plugin and extends earlier harness ideas with its own loop model, so its
+taxonomy is a useful design example rather than an established standard.
 
 ## Automation Must Earn the Dark
 
@@ -91,6 +122,22 @@ Steve Yegge, 2026-08. A self-reported account of the bespoke Wheelhouse harness 
 <!-- source-item-id: url_050f975f8d6191b8 -->
 
 Addy Osmani, 2026-07-22. Connects loops, harnesses, factories, verification back-pressure, comprehension debt, and human ownership of the outer loop.
+
+### [The Harness Is the Thing](https://scott-fryxell.github.io/blog/the-harness-is-the-thing/)
+
+<!-- source-item-id: 1a042ecbb2412172-06 -->
+
+Scott Fryxell. A practitioner account of a personal multi-model harness with
+specialized roles, selective frontier-model use, and self-reported cost
+reduction.
+
+### [Harness Engineering](https://habitat-thinking.github.io/ai-literacy-superpowers/plugins/ai-literacy-superpowers/explanation/harness-engineering/)
+
+<!-- source-item-id: 1a0480e09f24878f-13 -->
+
+Habitat Thinking. Documents a living harness, progressive enforcement from
+agent judgment to deterministic checks, garbage collection, and inner, middle,
+and outer feedback loops.
 
 ## Related
 
