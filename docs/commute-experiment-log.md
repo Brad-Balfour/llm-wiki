@@ -1306,8 +1306,45 @@ product information for possible preorder. That reminder remains in private
 handoff evidence because no durable wiki save was requested and current product
 availability and price are time-sensitive. No live Project instruction or
 listed source changed in this run, so this PR creates no new Project deployment
-step. The previously recorded Revision 3.4 live-deployment state remains
-unchanged.
+step. The Project source README now records Prompt Revision 4.1 as the active
+deployed queue-v3 configuration.
+
+### August 29 Literal-Playback And Export-Label Result
+
+The bounded Library inventory found one August 29 session-bundle row in the
+`LLM-Wiki-Car` Project: `202608291330-morning-commute-session-bundle.txt`,
+displayed as modified at 1:30 PM. It declared the August 28 AI queue. The exact
+`20260828-tldr-ai.txt` queue downloaded from the main Library passed queue-v3
+validation, and its canonical content matched the bundle snapshot. Strict
+bundle validation rejected the artifact because a 13:30 New York export was
+labeled `morning`; supplied-queue recovery accepted the supported evidence and
+retained that filename defect as a warning. The recovered bundle contains 14
+item announcements, 13 transitions, four quality incidents, one general
+capture, and no wiki save or classifier-feedback event.
+
+The complete shared chat contains 35 user prompts. The private coverage ledger
+assigns 18 substantive entries to playback quality, explicit workflow
+feedback, or unsaved article discussion; one entry combines the two fragments
+of a single question. The remaining 16 prompts are session controls, routine
+navigation, acknowledgments, or social filler. No article was explicitly
+saved, so the discussion of AI revenue, clickbait headlines, test-time compute,
+and double-blind evaluation for domain-specific RAG testing does not create or
+change public wiki content. No exact classifier correction was made.
+
+Voice repeatedly departed from the queue's pre-rendered literal playback. It
+added an invented paragraph to headline-only item 1, initially gave only the
+headline for in-depth item 9, and replaced item 13's one-sentence playback with
+unsupported claims about test-time compute, token use, and Anthropic's public
+response. Brad explicitly asked that the item 1 failures be retained as
+commute-workflow feedback. The transcript also records two unplanned pauses,
+including a network/Voice glitch and a stop after item 7. These observations
+extend issue #100: Prompt Revision 4.1 and queue v3 already restrict default
+playback to one literal `playback_text` field, yet stock Voice still switched
+into generated-summary behavior. Another wording-only prompt edit is therefore
+not justified by this run.
+
+No live Project instruction or listed source changed, so no Project
+synchronization is required.
 
 ## What Worked
 
