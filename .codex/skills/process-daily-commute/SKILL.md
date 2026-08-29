@@ -153,7 +153,9 @@ only when the intended action or target genuinely cannot be determined.
    unresolved until Brad confirms it was applied. Then update the repository's
    live-version record in the active PR or a focused follow-up.
 3. Run focused tests while iterating, then run `npm run check`, strict validation
-   for every touched OpenSpec change, and `git diff --check`.
+   for every touched OpenSpec change, and `git diff --check`. The repository's
+   Node validation gate checks tracked skill frontmatter and structure as part
+   of `npm run check`; do not invoke the system Python `quick_validate.py`.
 4. Commit only the intended tracked files, push the branch to `origin`, and open
    or update the PR required by the repository's `AGENTS.md`. Use draft status
    only for a genuine unfinished item. Never stop at a local commit; use the PR
