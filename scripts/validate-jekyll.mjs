@@ -68,7 +68,7 @@ for (const path of skillFiles) {
   );
   assert.doesNotMatch(
     frontmatter.description,
-    /[<>]|^\[TODO:/i,
+    /[<>]|\[TODO:/i,
     `${path} frontmatter.description contains unsupported markup or a placeholder`
   );
   assert.doesNotMatch(
