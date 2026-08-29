@@ -12,25 +12,32 @@ test('ChatGPT Project instructions fit the 8,000-character limit', async () => {
 test('ChatGPT Project instructions require a grounded headline sweep and URL handling', async () => {
   const prompt = await readFile('chatgpt-project/CHATGPT_CAR_QUEUE_PROMPT.md', 'utf8');
 
-  assert.match(prompt, /Prompt Revision 3\.4/);
-  assert.match(prompt, /one ordered headline sweep directly from the queue/);
+  assert.match(prompt, /Queue Contract v3 · Prompt Revision 4\.1/);
+  assert.match(prompt, /read the complete literal top-level `sweep_playback` string exactly/);
+  assert.match(prompt, /only content field used for the headline sweep/);
+  assert.match(prompt, /do not independently assemble\s+positions, modes, or titles/);
   assert.match(prompt, /After headline `M`, pause without making an item current/);
   assert.match(prompt, /may begin\s+detailed playback at any verified queue item/);
   assert.match(prompt, /if he says only to proceed or\s+continue, begin at item 1/);
   assert.match(prompt, /Do not begin any item's base playback before completing\s+the sweep/);
   assert.match(prompt, /Every valid queue item has a URL/);
   assert.match(prompt, /literal reading mode cannot be read/);
-  assert.match(prompt, /`headline_only`: read exact\s+`item\.title`; omit `item\.summary`/);
+  assert.match(prompt, /read the one literal `item\.playback_text`\s+string exactly/);
+  assert.match(prompt, /only item content field used for default playback/);
   assert.match(
     prompt,
-    /`in_depth`: read exact `item\.title`, then the\s+complete `item\.summary` exactly as written/
+    /Never independently assemble position, mode, title, description, byline, source/
   );
-  assert.match(prompt, /Never rewrite, shorten, expand,\s+combine, or select sentences/);
+  assert.match(prompt, /Never rewrite, shorten, expand, combine, or select sentences from it/);
   assert.doesNotMatch(prompt, /one brisk queue-summary sentence/);
   assert.doesNotMatch(prompt, /one or two short queue-summary sentences/);
-  assert.match(prompt, /Queue summary/);
-  assert.match(prompt, /read literal `item\.summary` for any mode/);
-  assert.match(prompt, /no search or\s+paraphrase/);
+  assert.match(prompt, /Queue metadata/);
+  assert.match(
+    prompt,
+    /read literal `item\.description`, `item\.author`,\s+or `item\.publication`/
+  );
+  assert.match(prompt, /report a `null` author or publication as unavailable/);
+  assert.match(prompt, /no\s+search or paraphrase/i);
 });
 
 test('ChatGPT Project instructions preserve arbitrary navigation and incomplete evidence', async () => {
@@ -67,6 +74,24 @@ test('ChatGPT Project instructions require explicit classifier feedback', async 
 
   assert.match(prompt, /Only record classifier feedback when Brad explicitly asks/);
   assert.match(prompt, /A summary request or\s+interrupted playback is not feedback/);
+});
+
+test('managed Task prompts distinguish the active v2 body from the v3 candidate', async () => {
+  const [readme, activeV2, candidateV3] = await Promise.all([
+    readFile('chatgpt-project/README.md', 'utf8'),
+    readFile('chatgpt-project/WEEKDAY_TLDR_QUEUE_TASK_PROMPT_V2.md', 'utf8'),
+    readFile('chatgpt-project/WEEKDAY_TLDR_QUEUE_TASK_PROMPT_V3.md', 'utf8'),
+  ]);
+
+  assert.match(
+    readme,
+    /active scheduled \*\*Weekday TLDR Queues\*\* Task uses\s+`chatgpt-project\/WEEKDAY_TLDR_QUEUE_TASK_PROMPT_V2\.md`/
+  );
+  assert.match(activeV2, /managed body below exactly/);
+  assert.match(activeV2, /matches the active \*\*Weekday TLDR Queues\*\* Task/);
+  assert.match(candidateV3, /Candidate body for issue #106/);
+  assert.match(candidateV3, /It does not/);
+  assert.match(candidateV3, /match the active \*\*Weekday TLDR Queues\*\* Task/);
 });
 
 test('daily commute completion cannot omit a required Project update', async () => {

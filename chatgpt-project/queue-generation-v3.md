@@ -1,0 +1,65 @@
+# TLDR Queue Generation Instructions — Single Playback Queue v3
+
+Use these instructions only after the queue-generation Project has the attached
+`tldr-commute-queue-v3.schema.json` file. They supersede the v1 two-array
+format for newly created queues; they do not rewrite historical v1 queues.
+
+Create one UTF-8 JSON `.txt` queue per source newsletter email. Each output
+must be exactly one `tldr-commute-queue.v3` object. Its leading filename date is
+the source email's delivery date in `America/New_York`, never the task-run date.
+
+## One Playback Order
+
+The queue has one `items` array, in the exact order Voice will play it. It has
+one root `total_items` value and one root `sweep_playback` string. For item
+number `N` in a queue of `M`, emit:
+
+```json
+"playback": { "position": N, "total": M, "spoken": "N of M" }
+```
+
+The array order, `position`, `total`, and literal `spoken` value must agree for
+every item: first item is `1 of M`; last item is `M of M`. Do not make Voice
+derive a position or total.
+
+Render each sweep line as `<playback.spoken>. <Headline only|In depth>. <title>`
+and join the lines in item order with `\n`. Store that complete string as
+`sweep_playback`. Do not add descriptions, authors, publications, URLs, or other
+text. Voice must not assemble the sweep from the item fields.
+
+Every item retains `consumption_depth` as its reading-style tag:
+`headline_only` or `in_depth`. Put all headline-only items first, followed by
+all in-depth items, unless Brad explicitly asks for a different playback order.
+These are reading modes inside one queue, not sections or separate cursors. Rename the parser/classifier `summary` value to `description` at this queue boundary. Do not emit `summary`. Render `playback_text` exactly as follows: for `headline_only`, `<playback.spoken>. Headline only. <title>`; for `in_depth`, `<playback.spoken>. In depth. <title>\n<description>`. Do not add author, publication, URL, or punctuation beyond this template.
+
+Every item must include `author` and `publication`. Copy an exact author and
+blog or publication title when the newsletter or source metadata supplies it;
+otherwise use JSON `null`. Do not infer either value from the email sender,
+newsletter name, URL domain, article title, or general knowledge.
+
+Do not emit `headline_only`, `in_depth`, `source_order`,
+`newsletter_position`, or any other second ordering field. Preserve the exact
+source item ID, final HTTP(S) URL, description, author, publication,
+deterministic `playback_text`, classifier facts, and routing
+metadata required by the schema.
+
+`source_email` identifies the source message only with its Gmail message ID,
+sender, and delivery time. Do not emit its subject: it is not playback identity
+and must never be used to choose or retrieve a commute article.
+
+## Preflight
+
+Before creating a download, verify valid JSON, the v3 schema shape, one source
+email identity, `items.length == total_items`, unique item IDs and final URLs,
+contiguous literal playback values, and exact `sweep_playback`. Apply duplicate resolution inside one
+source email using item ID, then normalized URL, then normalized title; retain
+the higher interest score, then higher depth score. Never include raw email
+bodies, credentials, cookies, private notes, or Range material.
+
+## Reusable Manual Request
+
+```text
+Generate TLDR v3 commute queues for emails delivered on [DATE OR DATE RANGE].
+Use the attached tldr-commute-queue-v3.schema.json and the Project's v3 queue
+instructions. Create real downloadable files only.
+```
