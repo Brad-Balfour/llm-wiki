@@ -1093,6 +1093,28 @@ test('validates queue v3 deterministic playback for headline-only and in-depth i
   );
 });
 
+test('accepts a session bundle with a complete queue v3 snapshot', () => {
+  const bundle = clone(validBundle);
+  const queue = v3Queue();
+  const queueSnapshot = bundle.queue_snapshot as Record<string, unknown>;
+  queueSnapshot.queue = queue;
+
+  const itemsById = new Map(queue.items.map((item) => [item.source_item_id, item]));
+  for (const event of bundle.events as Array<Record<string, unknown>>) {
+    const eventItem = event.item as Record<string, unknown> | undefined;
+    if (!eventItem) continue;
+    const queueItem = itemsById.get(eventItem.source_item_id);
+    if (!queueItem) continue;
+    eventItem.title = queueItem.title;
+    eventItem.url = queueItem.url;
+  }
+
+  const parsed = parseCommuteSessionBundleText(JSON.stringify(bundle));
+
+  assert.equal(parsed.queue_snapshot.queue.queue_version, 'tldr-commute-queue.v3');
+  assert.equal(parsed.queue_snapshot.queue.sweep_playback, queue.sweep_playback);
+});
+
 test('rejects queue v3 sweep playback that drifts from the ordered items', () => {
   const queue = v3Queue();
   queue.sweep_playback = '1 of 2. Headline only. Invented headline';
