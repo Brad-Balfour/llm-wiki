@@ -27,7 +27,8 @@
       "items": { "$ref": "#/$defs/intervention" }
     },
     "review": { "$ref": "#/$defs/review" },
-    "quality": { "$ref": "#/$defs/quality" }
+    "quality": { "$ref": "#/$defs/quality" },
+    "workload": { "$ref": "#/$defs/workload" }
   },
   "allOf": [
     {
@@ -73,6 +74,9 @@
         "assigned_reasoning_effort": { "$ref": "#/$defs/reasoning_effort" },
         "actual_model": { "type": "string", "minLength": 1 },
         "actual_reasoning_effort": { "$ref": "#/$defs/reasoning_effort" },
+        "actual_reasoning_effort_label": {
+          "enum": ["Light", "Low", "Medium", "High", "Extra High", "Max", "Ultra"]
+        },
         "escalated": { "type": "boolean" },
         "escalation_reason": { "type": "string", "minLength": 1 },
         "representative": { "type": "boolean" },
@@ -93,6 +97,40 @@
     },
     "reasoning_effort": {
       "enum": ["low", "medium", "high", "xhigh", "max", "ultra"]
+    },
+    "workload": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "queue_items",
+        "substantive_conversation_entries",
+        "bundles",
+        "queues",
+        "shared_chats",
+        "issue_comments",
+        "wiki_entries_created",
+        "wiki_entries_updated",
+        "behavior_files_changed",
+        "cleanup_artifacts",
+        "pr_files",
+        "pr_additions",
+        "pr_deletions"
+      ],
+      "properties": {
+        "queue_items": { "$ref": "#/$defs/non_negative_integer" },
+        "substantive_conversation_entries": { "$ref": "#/$defs/non_negative_integer" },
+        "bundles": { "$ref": "#/$defs/non_negative_integer" },
+        "queues": { "$ref": "#/$defs/non_negative_integer" },
+        "shared_chats": { "$ref": "#/$defs/non_negative_integer" },
+        "issue_comments": { "$ref": "#/$defs/non_negative_integer" },
+        "wiki_entries_created": { "$ref": "#/$defs/non_negative_integer" },
+        "wiki_entries_updated": { "$ref": "#/$defs/non_negative_integer" },
+        "behavior_files_changed": { "$ref": "#/$defs/non_negative_integer" },
+        "cleanup_artifacts": { "$ref": "#/$defs/non_negative_integer" },
+        "pr_files": { "$ref": "#/$defs/non_negative_integer" },
+        "pr_additions": { "$ref": "#/$defs/non_negative_integer" },
+        "pr_deletions": { "$ref": "#/$defs/non_negative_integer" }
+      }
     },
     "publication": {
       "oneOf": [

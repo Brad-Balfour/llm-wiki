@@ -19,6 +19,7 @@ function validInput() {
       assigned_reasoning_effort: 'medium',
       actual_model: 'gpt-5.6-sol',
       actual_reasoning_effort: 'medium',
+      actual_reasoning_effort_label: 'Medium',
       escalated: false,
       representative: true,
     },
@@ -48,6 +49,21 @@ function validInput() {
       incorrect_durable_claims: 0,
       unresolved_items: 0,
       manual_corrections: 0,
+    },
+    workload: {
+      queue_items: 21,
+      substantive_conversation_entries: 28,
+      bundles: 2,
+      queues: 2,
+      shared_chats: 5,
+      issue_comments: 4,
+      wiki_entries_created: 0,
+      wiki_entries_updated: 0,
+      behavior_files_changed: 0,
+      cleanup_artifacts: 8,
+      pr_files: 1,
+      pr_additions: 47,
+      pr_deletions: 0,
     },
   };
 }
@@ -163,7 +179,23 @@ test('finalizer derives metrics and verifies publication in one GitHub call', as
   assert.equal(result.durations_seconds.agent_orchestration, 600);
   assert.equal(result.activity.required_intervention_count, 1);
   assert.equal(result.activity.user_attention_seconds, 40);
+  assert.equal(result.workload?.queue_items, 21);
   assert.match(await readFile(paths.outputPath, 'utf8'), /commute-performance-run\.v1/);
+});
+
+test('desktop Light label maps only to low reasoning effort', async () => {
+  const input = validInput();
+  input.experiment.actual_reasoning_effort_label = 'Light';
+  await assert.rejects(
+    finalize(await setup(input)),
+    /actual_reasoning_effort_label Light maps to low, not medium/
+  );
+
+  input.experiment.assigned_reasoning_effort = 'low';
+  input.experiment.actual_reasoning_effort = 'low';
+  const result = await finalize(await setup(input));
+  assert.equal(result.experiment.actual_reasoning_effort, 'low');
+  assert.equal(result.experiment.actual_reasoning_effort_label, 'Light');
 });
 
 test('finalizer captures its clock once and rejects future terminal lifecycle phases', async () => {

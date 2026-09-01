@@ -48,6 +48,20 @@ user response during processing; mark whether it was genuinely required and
 estimate only the user's active response time. Merge authorization is expected
 to be one required intervention unless it was already supplied.
 
+Before finalizing, read the selected reasoning label from the active Codex UI
+or runtime evidence and record it as `experiment.actual_reasoning_effort_label`.
+Do not infer it from the planned experiment arm or a previous run. The desktop
+app's `Light` label maps to the canonical `low` telemetry value; the CLI may
+display that same value as `Low`. The finalizer rejects a supplied label whose
+canonical mapping disagrees with `actual_reasoning_effort`.
+
+Record a `workload` vector for every new run so timing can be normalized against
+output and evidence volume: queue items, substantive conversation entries,
+bundles, queues, shared chats, issue comments, wiki entries created and updated,
+behavior files changed, cleanup artifacts, and the PR's changed-file, addition,
+and deletion counts. Use the final GitHub diff for PR counts and the private
+coverage/retrieval records for evidence counts; do not estimate missing history.
+
 Record `tool_execution_seconds` as non-overlapping elapsed wall-clock time, not
 the sum of individual tool durations. When tools run in parallel, measure the
 wall-clock interval occupied by the group once. This keeps tool execution less

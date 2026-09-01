@@ -32,7 +32,8 @@
     "activity": { "$ref": "#/$defs/activity" },
     "review": { "$ref": "commute-performance-input-v1.schema.json#/$defs/review" },
     "quality": { "$ref": "commute-performance-input-v1.schema.json#/$defs/quality" },
-    "orchestration": { "$ref": "#/$defs/orchestration" }
+    "orchestration": { "$ref": "#/$defs/orchestration" },
+    "workload": { "$ref": "commute-performance-input-v1.schema.json#/$defs/workload" }
   },
   "allOf": [
     {

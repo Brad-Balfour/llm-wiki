@@ -22,12 +22,37 @@ const INPUT_VERSION = 'commute-performance-input.v1';
 const OUTPUT_VERSION = 'commute-performance-run.v1';
 const RUN_ID_PATTERN = /^[a-z0-9][a-z0-9_-]{0,127}$/;
 const EFFORTS = ['low', 'medium', 'high', 'xhigh', 'max', 'ultra'] as const;
+const EFFORT_LABELS = ['Light', 'Low', 'Medium', 'High', 'Extra High', 'Max', 'Ultra'] as const;
+const EFFORT_BY_LABEL: Record<(typeof EFFORT_LABELS)[number], (typeof EFFORTS)[number]> = {
+  Light: 'low',
+  Low: 'low',
+  Medium: 'medium',
+  High: 'high',
+  'Extra High': 'xhigh',
+  Max: 'max',
+  Ultra: 'ultra',
+};
 const REVIEW_KEYS = ['findings', 'fix_commits', 'failed_checks', 'rereview_cycles'] as const;
 const QUALITY_KEYS = [
   'evidence_coverage_misses',
   'incorrect_durable_claims',
   'unresolved_items',
   'manual_corrections',
+] as const;
+const WORKLOAD_KEYS = [
+  'queue_items',
+  'substantive_conversation_entries',
+  'bundles',
+  'queues',
+  'shared_chats',
+  'issue_comments',
+  'wiki_entries_created',
+  'wiki_entries_updated',
+  'behavior_files_changed',
+  'cleanup_artifacts',
+  'pr_files',
+  'pr_additions',
+  'pr_deletions',
 ] as const;
 
 interface Experiment {
@@ -36,6 +61,7 @@ interface Experiment {
   assigned_reasoning_effort: string;
   actual_model: string;
   actual_reasoning_effort: string;
+  actual_reasoning_effort_label?: string;
   escalated: boolean;
   escalation_reason?: string;
   representative: boolean;
@@ -88,6 +114,7 @@ interface PerformanceInput {
   interventions: Intervention[];
   review: Record<(typeof REVIEW_KEYS)[number], number>;
   quality: Record<(typeof QUALITY_KEYS)[number], number>;
+  workload?: Record<(typeof WORKLOAD_KEYS)[number], number>;
 }
 
 interface FinalizeOptions {
@@ -161,6 +188,7 @@ export async function finalizeCommutePerformance(
     },
     review: input.review,
     quality: input.quality,
+    ...(input.workload === undefined ? {} : { workload: input.workload }),
     orchestration: {
       schema_version: commuteRun.schema_version,
       source_path: path.relative('.', options.commuteRun),
@@ -186,6 +214,7 @@ function validatePerformanceInput(value: unknown): PerformanceInput {
       'interventions',
       'review',
       'quality',
+      'workload',
     ],
     'input'
   );
@@ -204,6 +233,15 @@ function validatePerformanceInput(value: unknown): PerformanceInput {
     ),
     review: countRecord(requireRecord(input.review, 'review'), 'review', REVIEW_KEYS),
     quality: countRecord(requireRecord(input.quality, 'quality'), 'quality', QUALITY_KEYS),
+    ...(input.workload === undefined
+      ? {}
+      : {
+          workload: countRecord(
+            requireRecord(input.workload, 'workload'),
+            'workload',
+            WORKLOAD_KEYS
+          ),
+        }),
   };
 }
 
@@ -217,6 +255,7 @@ function validateExperiment(value: unknown): Experiment {
       'assigned_reasoning_effort',
       'actual_model',
       'actual_reasoning_effort',
+      'actual_reasoning_effort_label',
       'escalated',
       'escalation_reason',
       'representative',
@@ -244,6 +283,18 @@ function validateExperiment(value: unknown): Experiment {
     EFFORTS,
     'experiment.actual_reasoning_effort'
   );
+  const actualEffortLabel =
+    record.actual_reasoning_effort_label === undefined
+      ? undefined
+      : requireEnum(
+          record.actual_reasoning_effort_label,
+          EFFORT_LABELS,
+          'experiment.actual_reasoning_effort_label'
+        );
+  if (actualEffortLabel !== undefined && EFFORT_BY_LABEL[actualEffortLabel] !== actualEffort)
+    throw new Error(
+      `experiment.actual_reasoning_effort_label ${actualEffortLabel} maps to ${EFFORT_BY_LABEL[actualEffortLabel]}, not ${actualEffort}`
+    );
   if ((assignedModel !== actualModel || assignedEffort !== actualEffort) && !escalated)
     throw new Error('experiment model or effort mismatch requires escalated=true and a reason');
   return {
@@ -252,6 +303,9 @@ function validateExperiment(value: unknown): Experiment {
     assigned_reasoning_effort: assignedEffort,
     actual_model: actualModel,
     actual_reasoning_effort: actualEffort,
+    ...(actualEffortLabel === undefined
+      ? {}
+      : { actual_reasoning_effort_label: actualEffortLabel }),
     escalated,
     ...(escalationReason === undefined ? {} : { escalation_reason: escalationReason }),
     representative,
