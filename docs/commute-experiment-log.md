@@ -61,6 +61,9 @@ found a queue as proof.
   copies of one recovered session.
 - The August 24 AI and Fintech queues, the August 25 General, Dev, and AI
   queues, five August 26 session bundles, and five complete shared chats.
+- The August 31 General and Dev queues, their two recovered evening bundles,
+  and five supplied shared-chat representations covering the General session,
+  the Dev session and continuations, and the final successful Dev re-export.
 - The live `Weekday TLDR Queues` Task conversation/configuration, the July
   21-24 Task Update emails, the July 24 manual queue-generation control, and
   the live Project settings/sources inspected on July 26.
@@ -1345,6 +1348,50 @@ not justified by this run.
 
 No live Project instruction or listed source changed, so no Project
 synchronization is required.
+
+### August 31 Literal-Playback, Duplicate, And Export-Recovery Result
+
+The bounded Library inventory found two August 31 rows in the `LLM-Wiki-Car`
+folder: `202608311815-evening-commute-session-bundle.txt`, displayed as modified
+at 6:20 PM, and `202608311839-evening-commute-session-bundle.txt`, displayed as
+modified at 6:40 PM. They declared `20260831-tldr.txt` and
+`20260831-tldr-dev.txt`. Both exact queues downloaded from the main Library
+passed queue-v3 validation. Both bundles passed strict validation as recovered
+sessions, and each embedded snapshot canonically matched its separately
+downloaded queue. Deterministic intake accepted both sessions with no wiki
+candidate, item action, or unresolved capture.
+
+Five supplied shared-chat representations preserve 36 General prompts, the Dev
+conversation and its continuation fragments, and the final one-prompt Dev
+re-export. The conversation audit found no surviving wiki save. Brad briefly
+asked to save _I accidentally turned LLM memory into program analysis_, then
+immediately established that Voice had conflated it with a different system and
+explicitly said not to save it. The rescission controls, so the article did not
+become public wiki content or a maintenance candidate.
+
+The Dev conversation supplied two classifier-adjacent observations without a
+score-bearing correction. _Bug blindness_ was identified as an exact
+cross-newsletter duplicate whose Dev presentation included more useful author
+and description context than General. A separate opaque-headline observation
+was retained as classifier and queue-presentation QA. The duplicate is a
+day-level product signal for issue #36; neither observation changes an interest
+or depth label.
+
+Voice again departed from queue v3's single literal `playback_text` field. It
+read unrelated material for Dev items 10 and 11 even after consulting the queue
+to diagnose item 10, and Brad explicitly recorded the first substitution as a
+workflow failure. The General session repeatedly failed to export until Brad
+pasted the canonical queue. The Dev session likewise failed its first export
+and then reported that exact Project Library recovery could not find the queue;
+a later chat with the queue uploaded produced the downloaded bundle. These are
+grounding and export/recovery incidents, not classifier evidence.
+
+Prompt Revision 4.1 already makes `playback_text` the only default-playback
+field and requires bounded Library recovery plus a visible download. The run
+therefore adds evidence to the existing supported-mechanism and export issues
+instead of making another wording-only prompt change. No live Project
+instruction or listed source changed, so no Project synchronization is
+required.
 
 ## What Worked
 
