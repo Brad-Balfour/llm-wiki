@@ -796,7 +796,7 @@ async function privateRoot(): Promise<string> {
   return physical;
 }
 
-async function assertPrivateInputPath(filename: string, flag: string): Promise<void> {
+export async function assertPrivateInputPath(filename: string, flag: string): Promise<void> {
   const root = await privateRoot();
   const lexical = path.resolve(filename);
   if (!isWithin(root, lexical))
@@ -806,7 +806,7 @@ async function assertPrivateInputPath(filename: string, flag: string): Promise<v
     throw new Error(`${flag} must not resolve outside the gitignored .private directory`);
 }
 
-async function assertPrivateOutputPath(
+export async function assertPrivateOutputPath(
   filename: string,
   flag: string,
   createParent = false

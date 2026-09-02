@@ -10,6 +10,70 @@ file review. Read the `Recurring daily commute processing` section of
 `AGENTS.md` first; it is the authoritative policy. Use this skill for execution
 order and completion checks.
 
+## Five-phase performance profile (#119)
+
+For the next 3–5 representative #85 runs, capture the actual task invocation
+time before any action and start `acquisition` then. Use existing task/tool
+timestamps and elapsed results, without asking Brad for checkpoints. Maintain
+one private draft with `schema_version: "commute-phase-profile.v1"`, the same
+`run_id` as the performance record, actual `model`, canonical `reasoning_effort`
+(Light is `low`), and a `phases` array. Start/finish these five phases:
+
+| Phase                      | Work included                                                                                                          |
+| -------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| `acquisition`              | Library queues/bundles, shared chats, downloads, initial hashing                                                       |
+| `evidence_processing`      | Decode, normalize, validate, compare queues, audit coverage, reconcile, decide classifier evidence and durable actions |
+| `repository_work`          | Source research, wiki/log synthesis, tracked edits, local review                                                       |
+| `verification_publication` | Tests, lint, format, site, OpenSpec, diff checks, commit/push/PR, issue routing, CI, review/rework                     |
+| `cleanup_finalization`     | Pull merged main, cleanup/verification, performance finalization preparation and handoff preparation                   |
+
+For each phase record `phase`, RFC3339 `started_at`/`completed_at`, numeric
+`active_seconds`, `tool_execution_seconds`, `tool_call_count`, `retry_seconds`,
+`work_units`, and `note` (normally null). Use first/last activity timestamps if
+a phase is revisited; assign each active interval and tool call to exactly one
+phase. Use the same strict agent-active intervals as the run-level record.
+Pause accounting for human/merge authorization waiting and inactive gaps;
+never use the entire phase envelope as active time. Tool time is non-overlapping
+wall time: parallel calls count once, including groups spanning phase changes.
+The recorder accepts aggregates, not raw tool spans. Retry time is only failed,
+repeated, or avoidable tool work and cannot exceed tool time. Do not estimate
+from tokens or call the active-minus-tool residual “LLM inference time.”
+
+Set `work_units` to the finalized workload's independently processed bundle/
+session count for every active phase, even when discovered later. Require all
+five phases, including no-change runs; a skipped phase has zero measurements
+and a short reason. Notes (at most 160 characters) describe only unusual work
+that affects comparison. Store no prompts, chats, commands/output, URLs,
+secrets, or personal content in this profile.
+
+After terminal cleanup and preparing the handoff, use one common measurement
+cutoff for phase totals and the run-level `terminal_completed_at`. As with the
+existing immutable finalizer, the final writes and delivery after that cutoff
+are outside the measured snapshot; do not invent their elapsed time. Finalize
+the run exactly once per `docs/commute-performance-experiment.md`, then record:
+
+```sh
+node dist/src/commute/phase-profile.js record \
+  .private/commute-performance/<run_id>-phase-input.json \
+  .private/commute-performance/<run_id>.json
+```
+
+This validates and exclusively creates `<run_id>-phase-profile.json` in that
+same private directory and prints the per-phase comparison table with totals.
+Report the table with the final handoff. Active/tool totals must each reconcile
+within two seconds of rounding; call counts must match exactly. Investigate
+mismatches from timing evidence rather than adjusting totals to make them pass.
+Use `summary` instead of `record` with the saved profile to print it again.
+An interrupted/unmerged run keeps its draft; never fabricate completed phases.
+
+After 3–5 runs, update #85 with median/P90 active time, median tool/residual
+shares, cumulative retry waste, seconds/bundle, phases ranked by total time and
+variance, one optimization with expected seconds saved, and the updated
+workload-adjusted Light-versus-Medium estimate. Retain the seven-run descriptive
+baseline `active_seconds ≈ 540 + 219 × bundles − 257 × Light` (R² 0.993,
+residual standard error about 48 seconds). Historical phase times remain
+unknown; never allocate historical aggregate time across these phases.
+
 ## Publication scope and communication
 
 Follow the risk-tiered publication policy in `AGENTS.md`. Content- and
