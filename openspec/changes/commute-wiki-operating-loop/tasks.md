@@ -126,9 +126,17 @@ combine unrelated conversations or queues into one queue.
       item-specific interest, depth, or routing corrections. Do not include
       playback defects, presentation preferences, duplicate/prior-awareness
       observations, general car bugs, or assistant synthesis.
+- [x] 5.2a Extract the available July 20-24 bundle evidence into three validated
+      private labels and commit a privacy-safe inventory with canonical paths,
+      checksums, exclusions, and recovery requirements in
+      `docs/classifier-feedback-backfill-2026-07-26.md`.
 - [ ] 5.3 Add a measured review/report that identifies repeated classifier
       misses and high-harm false skips before changing the profile or classifier
-      instructions.
+      instructions. The report must load and verify the canonical July
+      backfill, combine it with later validated labels by immutable label ID,
+      group outcomes by correction type, score distance, profile/prompt/model
+      version, and explicitly state whether the evidence is sufficient for a
+      change. Missing private input is a blocked report, not an empty dataset.
 
 ### 5C. Operator Documentation And Retirement
 

@@ -58,6 +58,10 @@ mutating the canonical profile immediately.
 
 - **WHEN** the next day's classifier context is prepared from recent
   non-sensitive feedback labels
+- **THEN** the preparation SHALL verify each required private backfill against
+  its committed inventory, checksum, schema, and immutable label identifiers
+- **AND** a missing or invalid required backfill SHALL fail observably instead
+  of being treated as an empty correction set
 - **THEN** selected corrections SHALL be available as examples or lightweight
   routing overrides
 - **AND** the underlying labels SHALL remain preserved for audit and profile

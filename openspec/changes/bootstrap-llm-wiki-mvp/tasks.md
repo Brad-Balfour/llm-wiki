@@ -47,8 +47,12 @@ generation failures, queue discovery, or other product-quality incidents.
 
 - [ ] 4.1 Decide whether a local provider-neutral classifier is still needed
       after comparing the working Project classifier with the scheduled-task
-      failure evidence. If accepted, implement adapter interfaces with model
-      ids, provider choice, and classifier batch size supplied by config.
+      failure evidence and the measured private correction backfill inventoried
+      in `docs/classifier-feedback-backfill-2026-07-26.md`. If accepted,
+      implement adapter interfaces with model ids, provider choice, and
+      classifier batch size supplied by config. Do not treat the three-label
+      backfill alone as evidence that the working Project path should be
+      replaced.
 - [ ] 4.2 If task 4.1 is accepted, implement batch-capable model execution with
       one score-first classification record per item and structured-output
       validation. Existing batch validation alone does not satisfy this task.
@@ -107,13 +111,25 @@ other dedicated records, not classifier labels.
 
 - [x] 6.1 Create JSONL feedback label storage with source item id, correction type, original scores/labels, corrected interest, corrected depth, corrected route, reason, timestamp, profile version, prompt version, provider, and model.
 - [x] 6.2 Add a command or documented file workflow for recording manual feedback.
-- [ ] 6.3 Load recent correction labels into the next day's classifier context as examples or lightweight routing overrides where appropriate.
+- [x] 6.2a Preserve the July 20-24 backfill as an immutable private snapshot and
+      commit its privacy-safe inventory, checksums, exclusions, and canonical
+      location in `docs/classifier-feedback-backfill-2026-07-26.md`.
+- [ ] 6.2b Create and verify an off-machine private backup of the canonical
+      backfill archive and label snapshot before using them for calibration.
+- [ ] 6.3 After operating-loop task 5.3 measures the accumulated labels, define
+      and implement an explicit policy for loading selected corrections into
+      future classifier context as examples or lightweight routing overrides.
+      The implementation must require the canonical July backfill input,
+      preserve immutable label IDs, and fail observably if the required private
+      data is missing or fails checksum/schema validation.
 - [x] 6.4 Keep canonical profile updates on a cadence from repeated or high-harm patterns, not from every one-off correction.
 - [x] 6.5a Add fixture tests for feedback parsing, exact item identity, private
       append-only persistence, duplicates, and non-classifier exclusions.
 - [ ] 6.5b Add feedback-derived routing behavior tests when task 6.3 introduces
-      an explicit label-consumption policy; recording labels alone must not
-      affect live routing.
+      an explicit label-consumption policy. Include the privacy-safe July
+      backfill aggregates as acceptance evidence, compare candidate behavior
+      with the working Project classifier, and prove that recording labels
+      alone does not affect live routing.
 
 ## 7. Wiki Compilation
 
