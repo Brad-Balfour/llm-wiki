@@ -88,9 +88,9 @@ export function validatePhaseProfile(value: unknown, finalized: unknown) {
       throw new Error('Phase duration must fit its timestamps and finalized lifecycle');
     if (tool > active || retry > tool || (calls === 0 && tool > 0))
       throw new Error('Require retry <= tool <= active, with calls for tool time');
-    if (active === 0 && (note === null || tool !== 0 || calls !== 0 || retry !== 0 || units !== 0))
+    if (active === 0 && calls === 0 && (note === null || tool !== 0 || retry !== 0 || units !== 0))
       throw new Error('Skipped phase requires zero values and a reason');
-    if (active > 0 && units !== bundles)
+    if ((active > 0 || calls > 0) && units !== bundles)
       throw new Error('work_units must equal finalized workload.bundles');
     return {
       phase,
@@ -166,6 +166,30 @@ export function summarizePhaseProfile(profile: ReturnType<typeof validatePhasePr
   ].join('\n');
 }
 
+export function includeFinalization(value: unknown, finalized: unknown) {
+  const run = requireRecord(finalized, 'finalized run');
+  if (run.finalization === undefined) return validatePhaseProfile(value, run);
+  const measurement = requireRecord(run.finalization, 'finalization');
+  const elapsed = number(measurement.tool_execution_seconds, 'finalization.tool_execution_seconds');
+  const baseline = structuredClone(run);
+  const durations = requireRecord(baseline.durations_seconds, 'durations_seconds');
+  durations.strict_agent_active =
+    number(durations.strict_agent_active, 'strict_agent_active') - elapsed;
+  durations.tool_execution = number(durations.tool_execution, 'tool_execution') - elapsed;
+  const activity = requireRecord(baseline.activity, 'activity');
+  activity.tool_call_count = number(activity.tool_call_count, 'tool_call_count', true) - 1;
+  requireRecord(baseline.phases, 'phases').terminal_completed_at =
+    measurement.input_terminal_completed_at;
+  const profile = validatePhaseProfile(value, baseline);
+  const cleanup = profile.phases.find(({ phase }) => phase === 'cleanup_finalization')!;
+  cleanup.completed_at = requireDateTime(measurement.completed_at, 'finalization.completed_at');
+  cleanup.active_seconds += elapsed;
+  cleanup.tool_execution_seconds += elapsed;
+  cleanup.tool_call_count += 1;
+  cleanup.work_units = number(requireRecord(run.workload, 'workload').bundles, 'bundles', true);
+  return validatePhaseProfile(profile, run);
+}
+
 export async function phaseProfileFile(
   mode: 'record' | 'summary',
   input: string,
@@ -179,7 +203,10 @@ export async function phaseProfileFile(
     readFile(input, 'utf8'),
     readFile(finalized, 'utf8'),
   ]);
-  const profile = validatePhaseProfile(JSON.parse(profileText), JSON.parse(runText));
+  const profile = (mode === 'record' ? includeFinalization : validatePhaseProfile)(
+    JSON.parse(profileText),
+    JSON.parse(runText)
+  );
   if (
     path.resolve(finalized) !==
     path.resolve('.private/commute-performance', `${profile.run_id}.json`)

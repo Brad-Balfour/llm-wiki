@@ -1,0 +1,83 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://brad-balfour.github.io/llm-wiki/schema/commute-phase-profile-v1.schema.json",
+  "title": "Commute Phase Profile v1",
+  "description": "Private aggregate phase measurements. The runtime also validates timestamp ordering, retry <= tool <= active, and identity/workload/totals against the finalized run.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "run_id", "model", "reasoning_effort", "phases"],
+  "properties": {
+    "schema_version": { "const": "commute-phase-profile.v1" },
+    "run_id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9_-]{0,127}$" },
+    "model": { "type": "string", "pattern": "\\S" },
+    "reasoning_effort": { "enum": ["low", "medium", "high", "xhigh", "max", "ultra"] },
+    "phases": {
+      "type": "array",
+      "minItems": 5,
+      "maxItems": 5,
+      "items": { "$ref": "#/$defs/phase" },
+      "allOf": [
+        { "contains": { "properties": { "phase": { "const": "acquisition" } } } },
+        { "contains": { "properties": { "phase": { "const": "evidence_processing" } } } },
+        { "contains": { "properties": { "phase": { "const": "repository_work" } } } },
+        { "contains": { "properties": { "phase": { "const": "verification_publication" } } } },
+        { "contains": { "properties": { "phase": { "const": "cleanup_finalization" } } } }
+      ]
+    }
+  },
+  "$defs": {
+    "seconds": { "type": "number", "minimum": 0 },
+    "count": { "type": "integer", "minimum": 0, "maximum": 9007199254740991 },
+    "phase": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "phase",
+        "started_at",
+        "completed_at",
+        "active_seconds",
+        "tool_execution_seconds",
+        "tool_call_count",
+        "retry_seconds",
+        "work_units",
+        "note"
+      ],
+      "properties": {
+        "phase": {
+          "enum": [
+            "acquisition",
+            "evidence_processing",
+            "repository_work",
+            "verification_publication",
+            "cleanup_finalization"
+          ]
+        },
+        "started_at": { "type": "string", "format": "date-time" },
+        "completed_at": { "type": "string", "format": "date-time" },
+        "active_seconds": { "$ref": "#/$defs/seconds" },
+        "tool_execution_seconds": { "$ref": "#/$defs/seconds" },
+        "tool_call_count": { "$ref": "#/$defs/count" },
+        "retry_seconds": { "$ref": "#/$defs/seconds" },
+        "work_units": { "$ref": "#/$defs/count" },
+        "note": {
+          "oneOf": [{ "type": "null" }, { "type": "string", "pattern": "\\S", "maxLength": 160 }]
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": { "active_seconds": { "const": 0 }, "tool_call_count": { "const": 0 } }
+          },
+          "then": {
+            "properties": {
+              "tool_execution_seconds": { "const": 0 },
+              "retry_seconds": { "const": 0 },
+              "work_units": { "const": 0 },
+              "note": { "type": "string" }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

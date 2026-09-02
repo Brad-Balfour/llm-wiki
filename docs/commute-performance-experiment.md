@@ -75,19 +75,115 @@ one bounded GitHub state call verifies the PR URL, head SHA, merged state, and
 creation and merge timestamps without asking Brad for input. Merge
 authorization after task invocation requires a required intervention record;
 equality with task invocation is the preauthorized exception. The finalizer
-captures its finalization clock once and rejects any lifecycle phase later than
-that instant. It derives gross, busy-adjusted, pre-PR, PR-to-merge, post-merge,
+captures its start clock and rejects input lifecycle phases later than
+that instant. It measures its own execution through payload persistence, then
+adds that duration and one tool call to the finalized totals. The interval
+between the input cutoff and finalizer start is excluded from busy-adjusted
+time; it is not assumed to be agent activity. It derives gross, busy-adjusted, pre-PR, PR-to-merge, post-merge,
 authorization-wait, tool-execution, agent-orchestration, and user-attention
 measurements and refuses to overwrite an existing result. Both inputs and
 outputs must remain in the gitignored `.private/` tree, and symbolic links may
 not escape it. The tracked contracts are
-`schema/commute-performance-input-v1.schema.json` and
-`schema/commute-performance-run-v1.schema.json`.
+`schema/commute-performance-input-v1.schema.json`,
+`schema/commute-performance-run-v1.schema.json`, and
+`schema/commute-phase-profile-v1.schema.json`.
 
 `run_id` uses only lowercase letters, digits, underscores, and hyphens. Its one
 canonical finalized destination is
 `.private/commute-performance/<run_id>.json`; aliases are rejected and the
 existing no-overwrite rule remains in force.
+
+## Five-phase profiling (#119)
+
+For the next 3–5 representative commutes, start and finish phases using existing
+task timestamps and tool elapsed results, without checkpoint prompts. Keep a
+private draft at `.private/commute-performance/<run_id>-phase-input.json`.
+The versioned contract is
+[`commute-phase-profile.v1`](../schema/commute-phase-profile-v1.schema.json).
+Its top-level fields are `schema_version`, the performance record's `run_id`,
+actual `model`, canonical `reasoning_effort` (Light maps to `low`), and `phases`.
+
+| Phase                      | Work included                                                                                                          |
+| -------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| `acquisition`              | Library queues/bundles, shared chats, downloads, initial hashing                                                       |
+| `evidence_processing`      | Decode, normalize, validate, compare queues, audit coverage, reconcile, decide classifier evidence and durable actions |
+| `repository_work`          | Source research, wiki/log synthesis, tracked edits, local review                                                       |
+| `verification_publication` | Tests, lint, format, site, OpenSpec, diff checks, commit/push/PR, issue routing, CI, review/rework                     |
+| `cleanup_finalization`     | Pull merged main, cleanup/verification, finalization, handoff preparation                                              |
+
+Every phase object requires `phase`, RFC3339 `started_at` and `completed_at`,
+`active_seconds`, `tool_execution_seconds`, integer `tool_call_count`,
+`retry_seconds`, integer `work_units`, and `note` (normally null). All five phases
+are required, including no-change runs. A skipped phase uses zero measurements
+and a short reason. Calls completing within timestamp resolution may have zero
+seconds with a positive call count; those are not skipped work.
+
+Use first/last timestamps when revisiting a phase, but count each active interval
+and call in exactly one phase. Phase envelopes can include inactive gaps; do not
+mistake envelope duration for strict agent-active time. Exclude all human/merge
+waiting. Tool time is non-overlapping wall time: parallel calls count once,
+including groups crossing phase boundaries. This recorder accepts aggregates,
+not raw intervals. Retry time covers only failed, repeated or avoidable tool
+work. Require `retry <= tool <= active`; derive orchestration residual as active
+minus tool, never as estimated “LLM inference time.” Do not estimate from tokens.
+
+Set `work_units` to the finalized workload's independently processed bundle/
+session count for each active phase. Notes are at most 160 characters and only
+explain unusual comparison-relevant work. Store no prompts, chat content,
+commands/output, URLs, secrets or personal details in the profile.
+
+Prepare the handoff and freeze the draft and performance input at the same
+cutoff before invoking `npm run finalize:commute-performance` exactly once as
+shown above. Do not pre-count the finalizer call or guess its duration. The
+finalizer measures its validation, GitHub verification and payload write/sync,
+then includes those seconds in run active/tool totals and one call in its count.
+An optional `finalization` object records the input cutoff, start/completion
+clocks and included tool duration/count; historical records omit this object.
+
+The payload is written privately first. After measuring it, the finalizer writes
+its timing fields and publishes the complete file with an exclusive hard link;
+existing results cannot be overwritten. Only the trailing timing-field write,
+publication/cleanup of the staging file, and subsequent report delivery are
+outside the measurement. A record cannot include the elapsed time of writing
+its own final timestamp; no duration is invented for that tail. Finalization
+errors publish no partial canonical JSON. Build/bootstrap before the finalizer
+starts is also outside its self-measurement; perform substantial build work
+before freezing the input.
+
+Then record the profile:
+
+```sh
+node dist/src/commute/phase-profile.js record \
+  .private/commute-performance/<run_id>-phase-input.json \
+  .private/commute-performance/<run_id>.json
+```
+
+`record` validates the draft against pre-finalizer totals, automatically adds
+measured finalization to `cleanup_finalization` exactly once, and validates the
+result against finalized totals. It exclusively creates
+`.private/commute-performance/<run_id>-phase-profile.json` and prints a Markdown
+table of active/tool/residual/retry seconds and seconds per bundle, with totals.
+No bundle denominator is reported as `n/a`. Totals must reconcile within two
+seconds of rounding for active/tool time and exactly for call counts. Resolve
+mismatches from timing evidence instead of adjusting figures to pass validation.
+Both input paths and the output must remain in `.private/`, including symlinks.
+The finalized-run input must use its canonical `<run_id>.json` path.
+
+Reprint an existing profile without changing it or adding finalization again:
+
+```sh
+node dist/src/commute/phase-profile.js summary \
+  .private/commute-performance/<run_id>-phase-profile.json \
+  .private/commute-performance/<run_id>.json
+```
+
+After 3–5 runs, update #85 with median/P90 active time, median tool/residual
+shares, cumulative retry waste, seconds/bundle, phases ranked by total time and
+variance, one optimization with expected seconds saved, and the updated
+workload-adjusted Light-versus-Medium estimate. Preserve the seven-run baseline
+`active_seconds ≈ 540 + 219 × bundles − 257 × Light` (R² 0.993; residual standard
+error about 48 seconds). Historical phase timing remains unknown; never allocate
+historical aggregate time across phases.
 
 ## Decision boundary
 

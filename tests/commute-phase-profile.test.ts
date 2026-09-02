@@ -44,6 +44,24 @@ function fixture() {
   return { profile, run };
 }
 
+test('published profile schema covers the runtime taxonomy and requires every phase', async () => {
+  const schema = JSON.parse(await readFile('schema/commute-phase-profile-v1.schema.json', 'utf8'));
+  assert.equal(schema.properties.schema_version.const, fixture().profile.schema_version);
+  assert.equal(schema.additionalProperties, false);
+  assert.equal(schema.$defs.phase.additionalProperties, false);
+  assert.deepEqual(schema.$defs.phase.properties.phase.enum, [...PHASES]);
+  assert.equal(schema.properties.phases.minItems, PHASES.length);
+  assert.equal(schema.properties.phases.maxItems, PHASES.length);
+  assert.deepEqual(
+    schema.properties.phases.allOf.map(
+      (rule: { contains: { properties: { phase: { const: string } } } }) =>
+        rule.contains.properties.phase.const
+    ),
+    [...PHASES]
+  );
+  assert.deepEqual(schema.$defs.phase.required, Object.keys(fixture().profile.phases[0]!));
+});
+
 test('five-phase summary reconciles totals, residuals and seconds per bundle', () => {
   const { profile, run } = fixture();
   profile.phases.reverse();
