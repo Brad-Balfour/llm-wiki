@@ -64,6 +64,10 @@ found a queue as proof.
 - The August 31 General and Dev queues, their two recovered evening bundles,
   and five supplied shared-chat representations covering the General session,
   the Dev session and continuations, and the final successful Dev re-export.
+- The August 31 AI and Fintech queues, the September 1 General and Dev queues,
+  four September 1 session bundles, and eight unique supplied shared-chat URLs.
+  Two URL pairs are alternate shared representations of the same AI and Dev
+  sessions, and one submitted URL was repeated exactly.
 - The live `Weekday TLDR Queues` Task conversation/configuration, the July
   21-24 Task Update emails, the July 24 manual queue-generation control, and
   the live Project settings/sources inspected on July 26.
@@ -1392,6 +1396,56 @@ therefore adds evidence to the existing supported-mechanism and export issues
 instead of making another wording-only prompt change. No live Project
 instruction or listed source changed, so no Project synchronization is
 required.
+
+### September 1 Literal-Playback, Wiki, And Four-Queue Result
+
+The bounded Library inventory found four September 1 bundle rows in the
+`LLM-Wiki-Car` folder: one morning AI session and three evening sessions for
+Fintech, General, and Dev. Their declared queues were the August 31 AI and
+Fintech editions and the September 1 General and Dev editions. All four exact
+main-Library queues passed queue-v3 validation.
+
+The General and Dev bundles passed strict validation as partial and recovered
+sessions, and their embedded snapshots canonically matched the separately
+downloaded queues. The morning AI bundle failed lifecycle validation because
+its WikiSkill save was attached while a different item was current. The
+Fintech bundle failed before canonical comparison because its embedded
+`sweep_playback` was not the deterministic rendering of its embedded items.
+The complete shared chats retain bounded evidence for both sessions without
+turning either malformed artifact into a strict-valid bundle.
+
+Eight unique supplied shared-chat URLs include alternate serialized and
+audio-transcription representations of the same AI and Dev sessions; one AI
+URL was also submitted twice. The conversation audit preserves two exact wiki
+saves. _WikiSkill_ is recorded with the discussion about validation-gated skill
+updates, persistent knowledge, deterministic text-level commute tests, and GPT
+Live as the remaining manual acceptance boundary. _How Matic got robots into
+10,000 homes_ updates the physical-AI page with task-driven form factor,
+software-versus-hardware complexity, reliability, deployment data,
+manufacturing feedback, and incremental adoption. Commute-specific comparisons
+on both pages are labeled as synthesis.
+
+The Matic discussion also contains exact classifier corrections: change the
+item from `maybe` to `interested` and promote it from `headline_only` to
+`in_depth`. Brad explicitly reinforced his strong interest in robotics. That
+preference is retained as profile evidence rather than silently rewriting
+unrelated items.
+
+Playback again violated Prompt Revision 4.1's literal-field boundary. AI began
+detailed playback before the sweep, appended generated text to headline-only
+and in-depth items, and initially asserted that generated text came from the
+queue. General substituted an unrelated voice-system description for OpenClaw.
+Dev added author, publication, and URL material to default playback, paraphrased
+items six and seven, and began item eight with “The author argues”; switching
+GPT Live from thinking to instant did not stop the substitutions. Several first
+export attempts also claimed or began bundle creation without a visible file.
+
+The prompt already requires the ordered sweep, single literal `playback_text`,
+bounded queue recovery, and a visible download. Prompt length is a plausible
+hypothesis raised during the AI session, not an established cause. This run
+therefore routes the repeated behavior to existing product issues and does not
+make another wording-only Project instruction change. No live Project prompt
+or listed Project source changed, so no Project synchronization is required.
 
 ## What Worked
 
