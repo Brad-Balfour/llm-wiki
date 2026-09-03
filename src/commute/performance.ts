@@ -1,5 +1,5 @@
-import { createHash } from 'node:crypto';
-import { lstat, mkdir, readFile, realpath, writeFile } from 'node:fs/promises';
+import { createHash, randomUUID } from 'node:crypto';
+import { link, lstat, mkdir, open, readFile, realpath, unlink } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -171,21 +171,11 @@ export async function finalizeCommutePerformance(
     );
   }
 
-  const result = {
+  const payload = {
     schema_version: OUTPUT_VERSION,
-    finalized_at: finalizedAt,
     run_id: input.run_id,
     experiment: input.experiment,
     publication: input.publication,
-    phases: input.phases,
-    durations_seconds: durations,
-    activity: {
-      tool_call_count: input.activity.tool_call_count,
-      interventions: input.interventions,
-      intervention_count: input.interventions.length,
-      required_intervention_count: input.interventions.filter(({ required }) => required).length,
-      user_attention_seconds: userAttentionSeconds,
-    },
     review: input.review,
     quality: input.quality,
     ...(input.workload === undefined ? {} : { workload: input.workload }),
@@ -196,8 +186,54 @@ export async function finalizeCommutePerformance(
     },
   };
   await assertPrivateOutputPath(options.output, '--output', true);
-  await writeFile(options.output, `${JSON.stringify(result, null, 2)}\n`, { flag: 'wx' });
-  return { ...result, output: options.output };
+  const temporary = `${options.output}.${randomUUID()}.tmp`;
+  const file = await open(temporary, 'wx');
+  try {
+    // Persist the payload before sampling elapsed time. Publish only complete JSON.
+    await file.writeFile(`${JSON.stringify(payload, null, 2).slice(0, -2)},\n`);
+    await file.sync();
+    const completedAt = dependencies.now().toISOString();
+    const elapsed = secondsBetween(Date.parse(finalizedAt), Date.parse(completedAt));
+    if (elapsed < 0) throw new Error('finalization clock must not move backwards');
+    const inputTerminal = input.phases.terminal_completed_at;
+    input.activity.busy_adjusted_excluded_seconds += secondsBetween(
+      Date.parse(inputTerminal),
+      Date.parse(finalizedAt)
+    );
+    input.activity.strict_agent_active_seconds += elapsed;
+    input.activity.tool_execution_seconds += elapsed;
+    input.activity.tool_call_count += 1;
+    input.phases.terminal_completed_at = completedAt;
+    if ('post_merge_completed_at' in input.phases)
+      input.phases.post_merge_completed_at = completedAt;
+    const timing = {
+      finalized_at: completedAt,
+      phases: input.phases,
+      durations_seconds: deriveDurations(input),
+      activity: {
+        tool_call_count: input.activity.tool_call_count,
+        interventions: input.interventions,
+        intervention_count: input.interventions.length,
+        required_intervention_count: input.interventions.filter(({ required }) => required).length,
+        user_attention_seconds: userAttentionSeconds,
+      },
+      finalization: {
+        input_terminal_completed_at: inputTerminal,
+        started_at: finalizedAt,
+        completed_at: completedAt,
+        tool_execution_seconds: elapsed,
+        tool_call_count: 1,
+      },
+    };
+    await file.writeFile(`${JSON.stringify(timing, null, 2).slice(2)}\n`);
+    await file.close();
+    // link is exclusive: an existing canonical result is never replaced.
+    await link(temporary, options.output);
+    return { ...payload, ...timing, output: options.output };
+  } finally {
+    await file.close();
+    await unlink(temporary);
+  }
 }
 
 function validatePerformanceInput(value: unknown): PerformanceInput {
@@ -796,7 +832,7 @@ async function privateRoot(): Promise<string> {
   return physical;
 }
 
-async function assertPrivateInputPath(filename: string, flag: string): Promise<void> {
+export async function assertPrivateInputPath(filename: string, flag: string): Promise<void> {
   const root = await privateRoot();
   const lexical = path.resolve(filename);
   if (!isWithin(root, lexical))
@@ -806,7 +842,7 @@ async function assertPrivateInputPath(filename: string, flag: string): Promise<v
     throw new Error(`${flag} must not resolve outside the gitignored .private directory`);
 }
 
-async function assertPrivateOutputPath(
+export async function assertPrivateOutputPath(
   filename: string,
   flag: string,
   createParent = false

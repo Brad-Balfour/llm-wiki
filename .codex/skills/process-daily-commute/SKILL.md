@@ -10,6 +10,32 @@ file review. Read the `Recurring daily commute processing` section of
 `AGENTS.md` first; it is the authoritative policy. Use this skill for execution
 order and completion checks.
 
+## Five-phase performance profile (#119)
+
+For the next 3–5 representative #85 runs, read the phase-profile contract and
+commands in `docs/commute-performance-experiment.md` before any action. Capture
+actual invocation time and start `acquisition` then, without asking Brad for
+checkpoints. Start/finish exactly these phases as the work moves between them:
+
+- `acquisition`: Library/shared-chat retrieval, downloads and initial hashing.
+- `evidence_processing`: decoding, validation, queue comparison, coverage,
+  reconciliation and durable-action decisions.
+- `repository_work`: source research, synthesis, tracked edits and local review.
+- `verification_publication`: checks, commit/push/PR, issue routing, review/rework.
+- `cleanup_finalization`: merged-main pull, artifact cleanup, finalization and
+  handoff preparation.
+
+Keep the private draft updated from task/tool timestamps. Assign each active
+interval and tool call once, count parallel tool wall time once, and exclude
+human/merge waiting. Follow the operator guide's finalization accounting: the
+recorder adds measured finalizer execution to cleanup automatically. Never add
+it manually or count it twice. Prepare the handoff before finalizing and report
+the resulting comparison table with the final handoff.
+
+After 3–5 runs, post the guide's comparison and optimization recommendation to
+#85. Historical phase timing remains unknown. An interrupted/unmerged run keeps
+its draft; never fabricate completed phases.
+
 ## Publication scope and communication
 
 Follow the risk-tiered publication policy in `AGENTS.md`. Content- and

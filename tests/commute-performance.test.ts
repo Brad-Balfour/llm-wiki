@@ -1,9 +1,16 @@
 import assert from 'node:assert/strict';
+import { readdirSync, readFileSync } from 'node:fs';
 import { mkdir, mkdtemp, readFile, symlink, writeFile } from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 
+import {
+  includeFinalization,
+  PHASES,
+  phaseProfileFile,
+  validatePhaseProfile,
+} from '../src/commute/phase-profile.js';
 import { finalizeCommutePerformance, parsePerformanceOptions } from '../src/commute/performance.js';
 
 const SHA = '0123456789abcdef0123456789abcdef01234567';
@@ -157,7 +164,7 @@ async function finalize(
 ) {
   return finalizeCommutePerformance(
     { input: paths.inputPath, commuteRun: paths.commuteRunPath, output: paths.outputPath },
-    { githubState, now: () => new Date('2026-08-24T01:00:00.000Z') }
+    { githubState, now: () => new Date('2026-08-24T00:24:00.000Z') }
   );
 }
 
@@ -170,7 +177,7 @@ test('finalizer derives metrics and verifies publication in one GitHub call', as
   });
   assert.deepEqual(calls, [['Brad-Balfour/llm-wiki', 100]]);
   assert.equal(result.schema_version, 'commute-performance-run.v1');
-  assert.equal(result.finalized_at, '2026-08-24T01:00:00.000Z');
+  assert.equal(result.finalized_at, '2026-08-24T00:24:00.000Z');
   assert.equal(result.durations_seconds.gross_lifecycle, 1_440);
   assert.equal(result.durations_seconds.busy_adjusted_lifecycle, 1_320);
   assert.equal(result.durations_seconds.pre_pr, 720);
@@ -181,6 +188,104 @@ test('finalizer derives metrics and verifies publication in one GitHub call', as
   assert.equal(result.activity.user_attention_seconds, 40);
   assert.equal(result.workload?.queue_items, 21);
   assert.match(await readFile(paths.outputPath, 'utf8'), /commute-performance-run\.v1/);
+});
+
+test('finalization includes validation and payload persistence once without charging the preceding wait', async () => {
+  const paths = await setup();
+  const input = JSON.parse(await readFile(paths.inputPath, 'utf8')) as ReturnType<
+    typeof validInput
+  >;
+  let clockCalls = 0;
+  const result = await finalizeCommutePerformance(
+    { input: paths.inputPath, commuteRun: paths.commuteRunPath, output: paths.outputPath },
+    {
+      githubState: async () => authoritativeState(),
+      now: () => {
+        clockCalls += 1;
+        if (clockCalls === 2) {
+          const staged = readdirSync(path.dirname(paths.outputPath)).find(
+            (name) => name.startsWith(`${input.run_id}.json.`) && name.endsWith('.tmp')
+          );
+          assert.ok(staged, 'payload must be written before the completion clock is read');
+          assert.match(
+            readFileSync(path.join(path.dirname(paths.outputPath), staged), 'utf8'),
+            /"orchestration"/
+          );
+        }
+        return new Date(clockCalls === 1 ? '2026-08-24T00:25:00Z' : '2026-08-24T00:25:05Z');
+      },
+    }
+  );
+  assert.equal(clockCalls, 2);
+  assert.equal(result.finalization.tool_execution_seconds, 5);
+  assert.equal(result.durations_seconds.strict_agent_active, 905);
+  assert.equal(result.durations_seconds.tool_execution, 305);
+  assert.equal(result.durations_seconds.agent_orchestration, 600);
+  assert.equal(result.durations_seconds.gross_lifecycle, 1505);
+  assert.equal(result.durations_seconds.busy_adjusted_lifecycle, 1325);
+  assert.equal(result.activity.tool_call_count, 73);
+  const saved = JSON.parse(await readFile(paths.outputPath, 'utf8'));
+  assert.deepEqual({ ...saved, output: paths.outputPath }, result);
+  const draft = {
+    schema_version: 'commute-phase-profile.v1',
+    run_id: input.run_id,
+    model: input.experiment.actual_model,
+    reasoning_effort: input.experiment.actual_reasoning_effort,
+    phases: PHASES.map((phase, index) => ({
+      phase,
+      started_at: new Date(Date.parse(input.phases.task_invoked_at) + index * 288000).toISOString(),
+      completed_at: new Date(
+        Date.parse(input.phases.task_invoked_at) + (index + 1) * 288000
+      ).toISOString(),
+      active_seconds: 180,
+      tool_execution_seconds: 60,
+      tool_call_count: index === 4 ? 16 : 14,
+      retry_seconds: 0,
+      work_units: 2,
+      note: null,
+    })),
+  };
+  const profile = includeFinalization(draft, saved);
+  assert.equal(profile.phases[4]!.active_seconds, 185);
+  assert.equal(profile.phases[4]!.tool_execution_seconds, 65);
+  assert.equal(profile.phases[4]!.tool_call_count, 17);
+  assert.equal(profile.phases[4]!.completed_at, result.finalized_at);
+  validatePhaseProfile(profile, saved);
+  assert.throws(() => includeFinalization(profile, saved), /duration|reconcile/);
+  const draftPath = path.join(paths.directory, 'phase-input.json');
+  await writeFile(draftPath, JSON.stringify(draft));
+  const table = await phaseProfileFile('record', draftPath, paths.outputPath);
+  assert.match(table, /cleanup_finalization \| 185.00 \| 65.00/);
+  const profilePath = paths.outputPath.replace(/\.json$/, '-phase-profile.json');
+  assert.equal(await phaseProfileFile('summary', profilePath, paths.outputPath), table);
+  assert.equal(
+    readdirSync(path.dirname(paths.outputPath)).filter((name) =>
+      name.startsWith(`${input.run_id}.json.`)
+    ).length,
+    0
+  );
+});
+
+test('a failure after payload persistence leaves no canonical record or staging file', async () => {
+  const paths = await setup();
+  let clocks = 0;
+  await assert.rejects(
+    finalizeCommutePerformance(
+      { input: paths.inputPath, commuteRun: paths.commuteRunPath, output: paths.outputPath },
+      {
+        githubState: async () => authoritativeState(),
+        now: () => new Date(++clocks === 1 ? '2026-08-24T01:00:00Z' : '2026-08-24T00:59:59Z'),
+      }
+    ),
+    /clock must not move backwards/
+  );
+  await assert.rejects(readFile(paths.outputPath), { code: 'ENOENT' });
+  assert.equal(
+    readdirSync(path.dirname(paths.outputPath)).filter((name) =>
+      name.startsWith(path.basename(paths.outputPath))
+    ).length,
+    0
+  );
 });
 
 test('desktop Light label maps only to low reasoning effort', async () => {
