@@ -68,6 +68,9 @@ found a queue as proof.
   four September 1 session bundles, and eight unique supplied shared-chat URLs.
   Two URL pairs are alternate shared representations of the same AI and Dev
   sessions, and one submitted URL was repeated exactly.
+- The September 1 AI and September 2 General, Dev, and AI queues, four
+  September 2 recovered session bundles, and nine unique shared-chat URLs.
+  Five SRT representations overlap the four complete spoken conversations.
 - The live `Weekday TLDR Queues` Task conversation/configuration, the July
   21-24 Task Update emails, the July 24 manual queue-generation control, and
   the live Project settings/sources inspected on July 26.
@@ -1446,6 +1449,105 @@ hypothesis raised during the AI session, not an established cause. This run
 therefore routes the repeated behavior to existing product issues and does not
 make another wording-only Project instruction change. No live Project prompt
 or listed Project source changed, so no Project synchronization is required.
+
+### September 2 Valid Bundles, Playback Substitution, And Classifier Feedback Result
+
+The bounded Library inventory found four September 2 bundle rows:
+`202609020647-morning-commute-session-bundle.txt`,
+`202609021732-evening-commute-session-bundle.txt`,
+`202609021751-evening-commute-session-bundle.txt`, and
+`202609021807-evening-commute-session-bundle.txt`. Their declared queues were
+`20260901-tldr-ai.txt`, `20260902-tldr.txt`, `20260902-tldr-dev.txt`, and
+`20260902-tldr-ai.txt`, respectively. The four original bundles and four exact
+queues were downloaded through Library row actions and preserved privately
+with hashes and displayed modification values. All four queues passed v3
+validation, all four bundles passed strict validation with recovered integrity,
+and every embedded snapshot canonically matched its separately downloaded
+queue. The queues contained 38 items in total: 9, 7, 11, and 11.
+
+Nine distinct shared URLs cover four sessions, with five overlapping SRT
+representations. The private audit traversed every prompt and retained stable
+turn identities, including repeated navigation utterances. It accounts for
+110 distinct user turns: 76 substantive entries and 34 routine navigation,
+session commands, or speech fragments. All 104 user utterances extracted from
+the SRT representations matched those primary conversations. No conversation
+contained an explicit wiki save, consistent with zero importer maintenance
+candidates. Requests for source highlights, descriptions, and explanations
+were not silently converted into saves.
+
+The General session contains two exact classifier corrections for item 3,
+_Waymo goes on offense ahead of Tesla's Cybercab launch_
+(`1a061e573aaaa2f7-07`). The original queue classified it as `maybe` at 0.63
+interest and `headline_only` at 0.44 depth. The user explicitly identified
+automotive self-driving, including Tesla, as a major interest and said this
+item should have been in depth. Two private, queue-bound labels preserve the
+independent corrections to `interested` and `in_depth`, original scores, and
+producer versions. The broader preference is calibration evidence for #35,
+#66, and #68; this run does not change the production profile or routing.
+
+The Dev complaint about _Wigolo_ is a different signal. The canonical item is
+already `interested/headline_only`; the user objected that a single unfamiliar
+product name conveys no useful information, then requested its description.
+The item is exact, but no replacement interest or depth value was requested.
+The complaint remains presentation-usefulness evidence for #35, #66, #68, and
+#120 rather than a fabricated depth label. The other exported unresolved
+capture asks to retain the morning session's playback errors and is resolved
+as workflow feedback. The original importer record still reports its two
+unresolved captures; a separate private disposition record explains both
+without rewriting source artifacts or inventing enum values.
+
+The bundles retain 14 quality incidents, but strict validity does not prove
+that their canonical announcements are what the user heard. Morning AI
+expanded headline-only Muse Code, falsely reported its nonempty description
+as empty, substituted unrelated Microsoft ZCode material, and paraphrased
+later playback. General expanded headline-only item 1 and incorrectly assured
+the user that it had read the literal field, substituted text for items 4 and
+7, and initially read only item 5's headline despite its in-depth mode. Its
+first export explicitly failed; the user requested a queue reload and the
+second attempt produced the downloaded bundle. The false empty-description
+claim, General item 5, and General's failed first export supplement the
+bundle's narrower incident inventory.
+
+Dev omitted the initial sweep until prompted, substituted generated prose
+for several items, and gave another generated summary for item 10 without an
+immediate user challenge. The first attempted correction for item 11 still
+omitted its description, requiring a second correction. Evening AI's initial
+sweep and early playback used foreign titles for canonical items 2 and 3,
+among others. The resulting Databricks discussion is evidence of that
+substitution, not a discussion of canonical item 2, _Atlas: A World Model for
+Spatial Intelligence_. Even after recovery, item 7 was announced as a
+Microsoft-model story instead of _Manus Resumes Independent Operations_, and
+item 8 was announced with its headline alone. A later correct list does not
+retroactively establish correct earlier playback. These observations and the
+repeated per-turn requests to reload the queue belong to #100 and #120.
+
+Two discussion preferences also survive outside the bundles. When attribution
+fields are null, the user wants the exact article URL consulted when asking
+who wrote it and where it appeared. Any retrieved attribution must remain
+distinct from literal queue metadata; this is a prompt-design input for #120.
+The General agentic-testing and Dev autonomous-loop discussions ask for
+practical, source-grounded actions rather than generic takeaways. The Dev
+discussion specifically challenges whether an automated harness can drive
+and observe the actual iPhone GPT Live experience, whether mirroring or a
+simulator can carry the required audio, and whether tests could run faster
+than real time. These are operating constraints and open feasibility
+questions, not independently verified platform limitations. They inform
+#100, #120, and the synthesis-quality expectations in #26. There was no wiki
+save for either article. Other requested explanations remain private with an
+explicit no-durable-action disposition.
+
+The processing lesson is to retain stable turn IDs while traversing shared
+chats: repeated utterance text and identically titled SRT navigation buttons
+cannot safely identify a turn. The first text-only capture was replaced with
+a complete identity-based audit before any durable claims were written.
+Library downloads also required waiting for the actual download event before
+checking local files. Both are acquisition observations, not defects in the
+commute artifacts. The existing complete-conversation and original-download
+requirements remain the guard; the private retrieval record documents their
+execution. The four valid bundles provide a useful control for #120's future
+prompt experiment, but neither their validity nor today's playback failures
+establishes prompt length as the cause. No live Project prompt or listed
+Project source changed, so no Project update is required for this publication.
 
 ## What Worked
 
