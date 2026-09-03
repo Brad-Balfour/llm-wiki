@@ -1,205 +1,156 @@
-# Issue 120: Minimal Commute Prompt Refactor Plan
+# Issue 120: Shorter Car Prompt
 
-Status: planning handoff only; no prompt, schema, or live Project changes.
-Recorded September 2, 2026, America/New_York, for resumption tomorrow night.
-Issue: [#120](https://github.com/Brad-Balfour/llm-wiki/issues/120).
-Branch: `agent/issue-120-prompt-plan`.
-Worktree: `repo/worktrees/issue-120-prompt-plan`.
+Status: Prompt 4.2 is implemented in the repository. It is not live in the
+ChatGPT Project.
 
-## Objective and hypothesis
+- Issue: [#120](https://github.com/Brad-Balfour/llm-wiki/issues/120)
+- Branch: `agent/issue-120-prompt-plan`
+- Worktree: `repo/worktrees/issue-120-prompt-plan`
+- Planning began September 2, 2026, America/New_York.
+- Implementation began September 3, 2026.
 
-Reduce the `LLM-Wiki-Car` Project instructions to the unusual requirements of
-reading a queue to Brad. Move capture/export instructions into an attached
-`session-export.md` in the same Project. Do not design a miniature Codex agent
-inside an ordinary iPhone Voice conversation.
+## Goal
 
-Brad's hypothesis is that the large Project prompt causes GPT-Live to forget
-instructions almost immediately. The current revision 4.1 is approximately
-1,161 words / 7,947 bytes. Prompt size and competing instructions are plausible
-contributors, not established causes. Repeated instructions, per-command queue
-reloads, and v3's pre-rendered playback field have not eliminated substitutions.
-September 2's four strict-valid recovered bundles still accompanied incorrect
-live playback. Bundle validity does not prove what the driver heard.
+Make the `LLM-Wiki-Car` Project instructions short and easy for Voice to
+follow. Keep queue reading in the main instructions. Put note-taking and bundle
+creation in a separate Project source named `session-export.md`.
 
-This is a substantive reduction experiment, not another accumulation of wording
-for every historical failure. There is no agreed minimum word count; the
-assistant's earlier 400–600-word target was dropped.
+Brad's working theory is that Prompt 4.1 was too long and made GPT-Live lose
+important directions. Prompt 4.1 was about 1,161 words and 7,947 bytes. The size
+may have contributed, but the available evidence does not prove that it caused
+the playback errors.
 
-## Agreed design
+## Evidence reviewed
 
-### Main Project instructions
+The implementation followed a review of:
 
-Keep only concise, task-specific guidance:
+- the complete `docs/commute-experiment-log.md`;
+- issue #120 and all its comments;
+- issues #100 and #106 about queue grounding and literal playback;
+- issues #35, #66, and #68 about upstream classification and queue content;
+- the Queue v3 and session-bundle JSON schemas;
+- the existing Project instructions and prompt tests; and
+- both active OpenSpec changes.
 
-- Select the requested canonical queue from the existing Project Library.
-- Read its complete literal `sweep_playback` before detailed playback.
-- Read the selected item's literal `playback_text` for queue playback.
-- When navigating or returning to playback after discussion, re-read the active
-  queue JSON file from the Project Library, then read the selected item's
-  literal `playback_text`. This is Brad's explicit addition, not merely an
-  instruction to recall previously loaded text. Do not silently switch queues.
-- Keep only essential playback behavior such as waiting after an item; do not
-  teach ordinary conversation, enumerate navigation synonyms, or script article
-  discussion. If a source-grounding sentence is necessary, name the current
-  item's exact URL without permission/approval language.
-- Use one tiny reference sentence for captures and ending, provisionally:
-  `For commute captures and end-of-commute export, follow session-export.md.`
+The July through September commutes repeatedly produced wrong spoken text even
+when the queue and bundle files were valid. Queue v3's prewritten
+`playback_text` helped define the correct output but did not force Voice to read
+it. Asking Voice to reopen the queue before moving to another article sometimes
+helped, but it did not always prevent substitutions. Issue #120 is therefore an
+experiment, not a proven fix.
 
-Do not retain the main-prompt warning about never claiming success without a
-download. Brad already checks the chat for a real link and reprompts. Do not
-add a special case for the isolated August 24 interpretation of “finish.”
-Deduplicate rules instead of preserving every historical example or exception.
+Official OpenAI documentation says Project chats can use the same instructions
+and uploaded sources. The current Voice page describes desktop Voice and iOS
+use paired with a desktop host. It does not promise that standalone iPhone Voice
+will open a Project source or reread a file on every turn:
 
-Re-reading the file is the requested behavior, not a claim that a prompt can
-force a retrieval on every turn. Keep any necessary grounding-failure response
-short. Reconcile existing specification conflicts before implementation rather
-than hiding them under the label of a wording-only change.
+- [Projects and chats](https://learn.chatgpt.com/docs/projects)
+- [ChatGPT Voice](https://learn.chatgpt.com/docs/features/voice)
 
-### Attached session-export.md
+## What stays in the main instructions
 
-Move capture interpretation and export mechanics here: supported saves and
-corrections, user wording, queue/item association, JSON structure, canonical
-snapshot, filename/time requirements, integrity, unresolved evidence, event
-reconstruction, and artifact creation. Reference the existing bundle schema
-instead of duplicating it unnecessarily. Do not change the bundle contract just
-to shorten the main prompt.
+The main instructions now tell Voice to:
 
-The conversation is the available evidence until export. “Wiki this” and its
-surrounding context can support a later bundle; an acknowledgment is not a
-durable write. There is no demonstrated separate append-only event store or
-filesystem being updated during this iPhone Voice workflow. Do not resurrect
-the failed ledger, promise silent persistence, or imply that “remember exact
-events” supplies a storage mechanism.
+1. Open the queue file Brad requested.
+2. Use the Queue v3 fields `sweep_playback` and `items[].playback_text`.
+3. Read the complete `sweep_playback` value exactly.
+4. Reopen the same queue file whenever Brad asks for an article and after an
+   article discussion.
+5. Find the requested object in `items` and read its `playback_text` exactly.
+6. Pause after each article and announce when the final article has been read.
+7. Use the selected article's exact URL when Brad asks about the source.
+8. Follow `session-export.md` for saves, corrections, and the final bundle.
 
-At export, use available conversation evidence and the canonical queue.
-Missing context remains missing; do not fabricate item binding, user intent,
-visits, or a complete event history. Move the necessary evidence rules out of
-the main prompt rather than claiming they must remain there for live writes.
-The reference file must be usable without having been loaded at session start.
+The prompt does not explain normal conversation, list navigation phrases, or
+repeat the bundle schema.
 
-### Platform boundary
+## What moved to session-export.md
 
-Keep the existing standalone iPhone ChatGPT Project workflow. Treat the attached
-Markdown as a Project reference, not an installed skill. Assume no native
-Codex/Work-style skill mechanism in this workflow unless direct evidence proves
-otherwise. Do not add skill installation, filesystem writes, tools, hooks, or a
-custom Voice client to this issue.
+The new Project source explains how to:
 
-The official [Voice documentation](https://learn.chatgpt.com/docs/features/voice)
-describes desktop Voice and desktop-host-paired iOS access; it does not establish
-the same capabilities for Brad's standalone iPhone Project conversation. The
-earlier [Realtime guidance](https://developers.openai.com/api/docs/guides/realtime-models-prompting)
-is useful design background, not proof of the model or controls exposed here.
-“Project files are only RAG” is not a verified description of internal context
-handling. Reliable retrieval and following of `session-export.md` remain an
-explicit live acceptance question.
+- recognize wiki saves, interest and depth corrections, product problems, and
+  general notes;
+- copy article identity from the current queue object;
+- preserve Brad's exact words;
+- leave unclear requests unresolved instead of guessing;
+- reopen the original queue and include its full JSON in the bundle;
+- record only article visits and moves supported by the chat;
+- choose `partial`, `recovered`, or `complete` accurately;
+- use the required New York date, time, and filename; and
+- create a real downloadable `.txt` file before reporting success.
 
-## Excluded changes and rejected proposals
+The chat is the only event record available before export. A spoken
+acknowledgment does not write a file. The new source does not revive the failed
+live-ledger design or promise silent storage.
 
-- Opaque/product-name-only headlines such as Wigolo, GlassBox, and Mole belong
-  to classifier and queue-JSON generation work, not #120. Brad agrees these are
-  upstream concerns. Do not add Voice-side explanatory text to literal playback.
-- Missing author/publication attribution should be fixed upstream in queue
-  generation. Brad prefers populated metadata to a Voice-side null fallback.
-  Source-grounded values, not invented non-null placeholders, are required;
-  unresolved-source handling belongs to that separate work.
-- No new permission model for conversation or article retrieval.
-- No extensive navigation grammar, simulated live ledger, special “finish”
-  disambiguation rule, or main-prompt download-success warning.
-- No classifier/profile/routing changes, schema migration, historical cleanup,
-  queue regeneration, artifact deletion, or automated phone harness here.
-- No immediate A/B exercise or repeated manual prompt swaps. No reminder or
-  scheduled task was requested.
+## OpenSpec correction
 
-## Required evidence review when resuming
+The old Voice requirement said Voice must not search the Project Library after
+reading began. That contradicted Brad's request to reopen the same queue before
+reading another article.
 
-This document preserves the decisions from the conversation. The complete
-cross-issue evidence review is still pending; do not represent it as finished.
-Yes, rereading the log and all relevant issue evidence is part of planning,
-before drafting the implementation—not an optional afterthought.
+The updated requirement allows Voice to reopen only the queue file already in
+use. It still forbids switching to another queue or rebuilding the current
+position from memory. If Voice starts a new chat, Brad must make a new queue
+request.
 
-1. Read `AGENTS.md` and inspect the branch/worktree status. Resume in this
-   worktree with Brad's request; leave the primary checkout and other worktrees
-   alone. Check whether main has advanced before deciding how to update this
-   branch.
-2. Read the complete `docs/commute-experiment-log.md`, including the failed
-   ledger/capture history and the July–September progression. Distinguish
-   contemporary evidence from superseded prompts and validator behavior.
-3. Re-read #120's body and every comment. Follow all directly related issue
-   evidence, including closed issues and linked PRs where they establish an
-   experiment or design decision. Start with #100 and #106 for grounding/literal
-   playback, then discover the exact capture, ledger, export, and Library issues
-   from the log and their cross-links. Read #35/#66/#68 for the upstream boundary
-   without expanding this issue into classifier work. Do not assume this seed
-   list exhausts the relevant issues.
-4. Read `chatgpt-project/CHATGPT_CAR_QUEUE_PROMPT.md`, its source README, both
-   queue/bundle schemas, and `tests/project-prompt.test.ts`. Inspect relevant
-   generation and bundle tests to understand contracts, not to broaden scope.
-5. Read both active OpenSpec changes, especially the operating-loop compatibility
-   map and queue-selection, voice-session, and session-bundle requirements.
-   The operating-loop change governs conflicts with the bootstrap change.
-   Inspect the discrepancy between older terminal/no-retrieval requirements and
-   the active prompt's recovery behavior before adding explicit file rereads.
-6. Consult official prompting guidance for this exact surface where available.
-   Do not substitute Realtime API, desktop Work, or Codex capabilities for
-   standalone iPhone Voice. Keep any uncertainty explicit.
-7. Add a compact evidence-to-decision summary here: what moves, what is deleted,
-   what remains, and any genuine conflict requiring Brad's decision. Do not
-   translate every incident into a new instruction.
+## Changes outside this issue
 
-If GitHub access/authentication fails inside the sandbox, retry with host
-escalation before reporting invalid authentication.
+This issue does not change:
 
-## Implementation sequence after the evidence review
+- the Queue v3 or session-bundle JSON structures;
+- classification, routing, or the interest profile;
+- generated queue content;
+- old queue or bundle files;
+- file-retention rules;
+- scheduled queue creation;
+- the iPhone app or Voice client; or
+- the live ChatGPT Project until Brad installs Prompt 4.2.
 
-1. Draft the minimal main prompt and `chatgpt-project/session-export.md` together.
-   Review against the agreed scope above, particularly literal playback after
-   an actual queue-file reread and the absence of a fictional live event store.
-2. Update focused prompt tests to check the new split and essential contract.
-   Remove obsolete assertions that force export wording into the main prompt;
-   do not delete substantive evidence safeguards from the exporter contract.
-3. Align any touched OpenSpec requirements and update the Project source README
-   with the exact new upload and candidate prompt revision. Preserve the current
-   deployed revision until Brad confirms the actual manual change.
-4. Run focused tests, then `npm run check` and strict OpenSpec validation for
-   touched changes as required by `AGENTS.md`. Deterministic tests can establish
-   schema/text/reference correctness, not actual Voice adherence.
-5. Commit the implementation, publish a focused PR when requested, and obtain
-   the one latest-complete-head review required for behavior changes. Do not
-   merge or deploy without authorization.
-6. Supply the exact copyable Project instructions and name the exact file to
-   upload: `chatgpt-project/session-export.md` into `LLM-Wiki-Car`. Both remain
-   in that same Project. Include rollback instructions and do not claim the
-   change is live until Brad confirms the paste/upload.
+Unclear product-name headlines and missing author or publication fields remain
+queue-generation problems. Voice may look up missing attribution from the exact
+article URL when Brad asks, but it must say that the answer came from the
+article rather than the queue.
 
-## Testing and time constraints
+## Repository checks
 
-Tonight is plan-only because Brad reported roughly 9% usage remaining. Resume
-planning/implementation tomorrow night; defer controlled phone testing until
-Brad has time over the three-day weekend. Do not make an immediate test session
-a prerequisite for saving this plan or preparing the implementation.
+Before handoff, run:
 
-Prompt versions must be manually swapped in the Project. Previously consumed
-Library queues have been deleted through the completed-commute cleanup process;
-do not assume they remain available for replay. Before later testing, inventory
-any retained private canonical evidence and agree on a small reusable queue or
-newly generated fixture. Never assume an exported reconstruction is an original
-queue, publish private artifacts, restore uploads, or change retention policy
-without an appropriate request.
+```sh
+npm run check
+openspec validate bootstrap-llm-wiki-mvp --strict
+openspec validate commute-wiki-operating-loop --strict
+git diff --check
+```
 
-For a later controlled test, hold queue, device, and spoken sequence constant
-where practical. Cover the opening sweep, normal reading, a discussion followed
-by navigation/file reread, captures, an interruption, and export-reference use.
-Score literal fidelity, queue identity, sweep completion, capture correctness,
-and first-attempt export separately. Observe actual iPhone Voice; a text-only
-test or valid recovered bundle is not an audio acceptance result. No claim of
-automated mirroring, simulator audio, or faster-than-real-time tests is supported.
+These checks can prove that the text, references, and schemas agree. They cannot
+prove what Voice will say on an iPhone.
 
-Ordinary use after a single deployment may provide useful observations without
-manual version swapping, but cannot establish prompt length as the cause.
+## Install Prompt 4.2
 
-## Resume handoff
+In the `LLM-Wiki-Car` Project:
 
-Next action: complete the evidence review above, then draft the two-file split.
-This planning commit changes only this document. It does not close #120, change
-the live Project, or require a Project upload tonight.
+1. Replace the Instructions with the complete contents of
+   `chatgpt-project/CHATGPT_CAR_QUEUE_PROMPT.md`.
+2. Upload `chatgpt-project/session-export.md` to Sources.
+3. Leave both files in the same Project.
+4. Confirm both changes before recording Prompt 4.2 as live.
+
+To undo the change, restore Prompt 4.1 from Git commit `6a505b9` and remove only
+`session-export.md` from Project Sources.
+
+## Later iPhone test
+
+Use one small queue and keep the device and spoken requests the same throughout
+the test. Check these separately:
+
+- the opening headline list;
+- exact `playback_text` reading;
+- returning to the queue after an article discussion;
+- moving backward, forward, and directly to a named article;
+- saves and corrections;
+- interruptions; and
+- creation of the bundle on the first request.
+
+Compare the actual iPhone audio with the queue file. A valid bundle or a text
+chat does not prove that the spoken audio was correct.

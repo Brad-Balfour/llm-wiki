@@ -9,28 +9,46 @@
 
 ## Project Instructions
 
-Paste `chatgpt-project/CHATGPT_CAR_QUEUE_PROMPT.md` into the **Instructions**
-field of `LLM-Wiki-Car`. It supersedes the former commute prompt and the
-earlier separate-Project v2 Pilot.
+Prompt 4.2 is ready in this repository but is not live in ChatGPT. To install
+it in `LLM-Wiki-Car`:
 
-The repository file is Prompt Revision 4.1 and is the active source for the
-deployed queue-v3 configuration.
+1. Paste all of `chatgpt-project/CHATGPT_CAR_QUEUE_PROMPT.md` into the Project's
+   **Instructions** field.
+2. Upload `chatgpt-project/session-export.md` to the Project's **Sources**.
 
-The prompt heading carries two distinct versions. `Queue Contract v3` changes
-only when the queue/schema contract changes. `Prompt Revision` increments for
-every behavior-changing Project-instruction edit, so the text pasted into
-ChatGPT can be identified independently of Git history.
+Keep `schema/commute-session-bundle-v1.schema.json` in the Project. The new file
+uses that schema; it does not replace it.
 
-## Live Project Sources
+The live Project remains on Prompt 4.1 until Brad confirms both steps. Committing
+or opening a pull request does not change the Project.
 
-Upload exactly these files to `LLM-Wiki-Car`:
+`Queue v3` in the prompt title names the JSON structure. `Prompt 4.2` names this
+version of the instructions.
+
+## Files for Prompt 4.2
+
+After installing Prompt 4.2, `LLM-Wiki-Car` should have these source files:
 
 - `schema/tldr-commute-queue-v3.schema.json`
 - `schema/commute-session-bundle-v1.schema.json`
+- `chatgpt-project/session-export.md`
 - `chatgpt-project/queue-generation-v3.md`
 - `schema/interest-profile.md`
 - `schema/classifier-instructions.md`
 - `schema/routing-rules.md`
+
+Until Brad confirms the two installation steps, the live Project has the same
+files except for `chatgpt-project/session-export.md`.
+
+The Instructions tell Voice how to read a queue. `session-export.md` tells it
+how to save notes and create the final bundle. It is a normal Project source,
+not a skill. We still need to test whether standalone iPhone Voice reads this
+source and reopens the queue file when instructed.
+
+To undo Prompt 4.2, copy Prompt 4.1 from Git commit `6a505b9` back into the
+Project's Instructions and remove only `session-export.md` from Sources. Leave
+the Queue v3 schema, bundle schema, queue-generation file, classifier files,
+and scheduled Task prompt unchanged.
 
 ## Rollback-Aware Versioning
 

@@ -90,3 +90,29 @@ based on topical similarity.
   requested date and newsletter type
 - **AND** it SHALL use the recovered validated queue snapshot if it is valid
 - **AND** it SHALL mark reconstruction as recovered rather than complete.
+
+### Requirement: Reopen the Queue Before Reading Another Item
+
+In the same Voice chat, the Project SHALL reopen the queue file already in use
+before reading another item and before returning to the queue after discussing
+an article. This instruction does not prove that Voice can reopen a file on
+every turn.
+
+#### Scenario: Brad asks for another item
+
+- **WHEN** Brad asks to move to, repeat, or select an item after the headline
+  list
+- **THEN** the Project SHALL reopen the same queue JSON file in the Project
+  Library
+- **AND** it SHALL find the requested object in that file's `items` array
+- **AND** it SHALL read that object's `playback_text` exactly
+- **AND** it SHALL NOT open a queue for another filename, date, or newsletter.
+
+#### Scenario: Brad returns to the queue after a discussion
+
+- **WHEN** Brad finishes discussing an article and asks to hear an item from the
+  queue
+- **THEN** the Project SHALL reopen the same queue JSON file before reading the
+  requested object's `playback_text`
+- **AND** if it cannot reopen that file or find the object, it SHALL say so and
+  stop rather than use text remembered from the conversation.

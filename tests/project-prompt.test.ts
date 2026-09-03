@@ -9,71 +9,68 @@ test('ChatGPT Project instructions fit the 8,000-character limit', async () => {
   assert.ok(characterCount <= 8_000, `Project prompt has ${characterCount} characters`);
 });
 
-test('ChatGPT Project instructions require a grounded headline sweep and URL handling', async () => {
+test('ChatGPT Project instructions say exactly how to read the queue JSON', async () => {
   const prompt = await readFile('chatgpt-project/CHATGPT_CAR_QUEUE_PROMPT.md', 'utf8');
 
-  assert.match(prompt, /Queue Contract v3 · Prompt Revision 4\.1/);
-  assert.match(prompt, /read the complete literal top-level `sweep_playback` string exactly/);
-  assert.match(prompt, /only content field used for the headline sweep/);
-  assert.match(prompt, /do not independently assemble\s+positions, modes, or titles/);
-  assert.match(prompt, /After headline `M`, pause without making an item current/);
-  assert.match(prompt, /may begin\s+detailed playback at any verified queue item/);
-  assert.match(prompt, /if he says only to proceed or\s+continue, begin at item 1/);
-  assert.match(prompt, /Do not begin any item's base playback before completing\s+the sweep/);
-  assert.match(prompt, /Every valid queue item has a URL/);
-  assert.match(prompt, /literal reading mode cannot be read/);
-  assert.match(prompt, /read the one literal `item\.playback_text`\s+string exactly/);
-  assert.match(prompt, /only item content field used for default playback/);
+  assert.match(prompt, /Prompt 4\.2 for Queue v3/);
+  assert.match(prompt, /The file will contain/);
+  assert.match(prompt, /a top-level `sweep_playback` string/);
+  assert.match(prompt, /an `items` array whose objects each contain a `playback_text` string/);
+  assert.match(prompt, /read the complete\s+value of `sweep_playback` exactly as written/);
   assert.match(
     prompt,
-    /Never independently assemble position, mode, title, description, byline, source/
+    /Find the requested object in the `items` array and read the value of\s+its `playback_text` field out loud exactly as written/
   );
-  assert.match(prompt, /Never rewrite, shorten, expand, combine, or select sentences from it/);
-  assert.doesNotMatch(prompt, /one brisk queue-summary sentence/);
-  assert.doesNotMatch(prompt, /one or two short queue-summary sentences/);
-  assert.match(prompt, /Queue metadata/);
+  assert.match(prompt, /Do not add, remove, rewrite, explain, or summarize any of the text/);
+  assert.match(prompt, /After reading an item, pause and wait/);
+  assert.match(prompt, /After reading the final item, say\s+`Finished <filename>\.`/);
+  assert.match(prompt, /use the URL from the selected item/);
+  assert.match(prompt, /say that the answer came from the article/);
+});
+
+test('ChatGPT Project instructions reopen the same queue before every item', async () => {
+  const prompt = await readFile('chatgpt-project/CHATGPT_CAR_QUEUE_PROMPT.md', 'utf8');
+
+  assert.match(prompt, /When Brad asks you to read an item, reopen the same queue file/);
+  assert.match(prompt, /Do this every time Brad\s+asks for another item/);
+  assert.match(prompt, /whenever he returns to the queue after discussing an\s+article/);
+  assert.match(prompt, /Do\s+not switch to another queue file/);
+});
+
+test('session-export contains the note and bundle instructions removed from the main prompt', async () => {
+  const [prompt, sessionExport, schema] = await Promise.all([
+    readFile('chatgpt-project/CHATGPT_CAR_QUEUE_PROMPT.md', 'utf8'),
+    readFile('chatgpt-project/session-export.md', 'utf8'),
+    readFile('schema/commute-session-bundle-v1.schema.json', 'utf8'),
+  ]);
+
   assert.match(
     prompt,
-    /read literal `item\.description`, `item\.author`,\s+or `item\.publication`/
+    /For commute captures and end-of-commute export, follow `session-export\.md`/
   );
-  assert.match(prompt, /report a `null` author or publication as unavailable/);
-  assert.match(prompt, /no\s+search or paraphrase/i);
-});
 
-test('ChatGPT Project instructions preserve arbitrary navigation and incomplete evidence', async () => {
-  const prompt = await readFile('chatgpt-project/CHATGPT_CAR_QUEUE_PROMPT.md', 'utf8');
-
-  assert.match(prompt, /first\s+post-sweep\s+`item_announced` may name any verified queue item/);
-  assert.match(prompt, /`items` is canonical\s+identity\/order, not required visit order/);
-  assert.match(prompt, /later exact announcement when visible\s+evidence lacks its transition/);
-  assert.match(prompt, /use `partial` or `recovered`/);
-  assert.match(prompt, /`completed` means the commute ended, not every item was visited/);
-  assert.match(prompt, /relative destinations, and final\s+cursor/);
-});
-
-test('ChatGPT Project instructions treat natural language as intent rather than a CLI', async () => {
-  const prompt = await readFile('chatgpt-project/CHATGPT_CAR_QUEUE_PROMPT.md', 'utf8');
-
-  assert.match(prompt, /Interpret Brad's ordinary English by intent, not exact wording/);
-  assert.match(prompt, /examples are illustrative,\s+not exhaustive/i);
-  assert.match(prompt, /Never require\s+command labels, schema terms/);
-  assert.match(prompt, /Normalize forward\/skip as `next`, back one as `previous`/);
-  assert.match(prompt, /any other exact named\/numbered item as `jump`/);
-  assert.match(prompt, /“item\s+6,” “6 of 14,” or an unambiguous headline/);
-  assert.match(prompt, /A jump neither announces nor marks\s+intervening items heard/);
-  assert.match(prompt, /do not list allowed commands/);
-  assert.match(prompt, /ask a short plain-English question/);
-  assert.doesNotMatch(prompt, /question about which item he wants/);
-  assert.match(prompt, /What would you like me to do\?/);
-  assert.doesNotMatch(prompt, /Which item do you want\?/);
-  assert.doesNotMatch(prompt, /Please say next, pause, or end commute/);
-});
-
-test('ChatGPT Project instructions require explicit classifier feedback', async () => {
-  const prompt = await readFile('chatgpt-project/CHATGPT_CAR_QUEUE_PROMPT.md', 'utf8');
-
-  assert.match(prompt, /Only record classifier feedback when Brad explicitly asks/);
-  assert.match(prompt, /A summary request or\s+interrupted playback is not feedback/);
+  assert.match(sessionExport, /commute-session-bundle-v1\.schema\.json/);
+  assert.match(schema, /"const": "commute-session-bundle\.v1"/);
+  assert.match(sessionExport, /The chat is the only record available until you create the bundle/);
+  assert.match(sessionExport, /Do not claim that you maintain\s+a separate ledger/);
+  assert.match(sessionExport, /`action` is `wiki_this`/);
+  assert.match(sessionExport, /`mark_interested`, `mark_uninterested`, or\s+`promote_to_in_depth`/);
+  assert.match(sessionExport, /Skipping an\s+article is not classifier feedback/);
+  assert.match(sessionExport, /reports a playback or product problem, record a `quality_incident`/);
+  assert.match(sessionExport, /copy `source_item_id`, `title`, and `url`/i);
+  assert.match(sessionExport, /Copy Brad's exact words into `user_words`/);
+  assert.match(sessionExport, /create an `unresolved_capture`/);
+  assert.match(
+    sessionExport,
+    /Put the full JSON object from that file in\s+`queue_snapshot\.queue`/
+  );
+  assert.match(sessionExport, /Record only articles that were actually read/);
+  assert.match(sessionExport, /Do not invent missing moves,\s+announcements, or articles/);
+  assert.match(sessionExport, /Normally set `integrity\.state` to `partial`/);
+  assert.match(sessionExport, /Use `recovered` if you had to find the queue again/);
+  assert.match(sessionExport, /Use the actual time in America\/New_York/);
+  assert.match(sessionExport, /YYYYMMDDHHmm-morning-commute-session-bundle\.txt/);
+  assert.match(sessionExport, /Create a downloadable `\.txt` file containing the JSON/);
 });
 
 test('managed Task prompt identifies v3 as the active canonical body', async () => {
