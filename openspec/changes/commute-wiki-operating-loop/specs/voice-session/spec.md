@@ -22,14 +22,15 @@ Library.
 - **AND** an unqualified request to proceed or continue SHALL start at item 1
 - **AND** it SHALL NOT begin any item's base playback before completing the sweep
 - **AND** it SHALL NOT insert items from another queue
-- **AND** the resulting canonical-filename lookup SHALL occur only for session
-  start, not as a fallback after another queue has become active.
+- **AND** it SHALL first open the named file when the session starts
+- **AND** whenever Brad later asks to hear an item, it SHALL reopen only that
+  same file.
 
 #### Scenario: Finish the selected queue
 
 - **WHEN** Voice completes item `M of M` in the selected queue
-- **THEN** it SHALL keep that final item current through the same approximately
-  five-second interruption-friendly gap used after every other item
+- **THEN** it SHALL pause and keep that final item current, as it does after
+  every other item
 - **AND** any clear ordinary-English intent to save, explore, repeat, or pause
   during that gap, or after the finished announcement, SHALL apply to the final item
   rather than begin export
@@ -44,22 +45,24 @@ Library.
 - **AND** if bundle creation fails, it SHALL report that failure and SHALL NOT
   begin another queue.
 
-#### Scenario: Verify before speaking
+#### Scenario: Reopen the queue before reading another item
 
-- **WHEN** Voice is about to announce an item
-- **THEN** it SHALL silently verify the selected filename, literal `N of M`
-  phrase, source ID, title, URL, and reading mode against the selected queue
+- **WHEN** Brad asks Voice to read another item or returns to the queue after an
+  article discussion
+- **THEN** Voice SHALL reopen the same queue JSON file in the Project Library
+- **AND** it SHALL find the requested object in the file's `items` array
+- **AND** it SHALL check the object's filename, `N of M` text, source ID, title,
+  URL, and reading mode before speaking
 - **AND** because every valid v3 item contains a URL, it SHALL treat an
   unavailable URL or reading mode as lost queue context rather than claim the
   item has no URL or infer a mode from conversational memory
 - **AND** the current item SHALL be exactly `items[position - 1]`, with an
   automatic advance moving only to the immediately next position
-- **AND** if the selected queue is lost, a new/restarted chat lacks a fresh
-  date/newsletter or exact-filename request, or an identified item conflicts
-  with it, it SHALL say `Queue context lost. End this Voice session and start
-a new queue.` and stop playback
-- **AND** after reading starts it SHALL NOT search Library, switch
-  queues, or repair the cursor from conversational recollection.
+- **AND** if it cannot reopen the file, cannot find the object, or starts a new
+  chat without a new queue request, it SHALL say that it cannot read the queue
+  and stop
+- **AND** it SHALL NOT switch queue files or rebuild the current position from
+  conversational memory.
 
 ### Requirement: Literal, Interruption-Friendly Playback Is the Default
 
@@ -77,13 +80,9 @@ Brad expresses another intent.
   description exactly as written
 - **AND** it SHALL retrieve or discuss the linked article only after Brad
   requests more detail
-- **AND** it SHALL make an approximately five-second interruption-friendly gap
-  and keep the item current
+- **AND** it SHALL pause, wait, and keep the item current
 - **AND** it SHALL NOT auto-advance, ask whether Brad wants to continue, or
   narrate a routine transition.
-
-The five-second gap is a prompt-level target, not a claim that Standard Voice
-can provide a measured timer or capture every overlapping interruption.
 
 #### Scenario: Base playback uses pre-rendered queue text literally
 
