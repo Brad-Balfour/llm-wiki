@@ -7,10 +7,10 @@ aliases: ["Understanding is the new bottleneck","Code explainers","Literate diff
 tags: ["ai-agents","software-engineering","code-comprehension","code-review","developer-workflow","human-oversight","collaboration"]
 wiki_slug: human-understanding-in-agentic-coding
 created: 2026-08-16
-updated: 2026-08-16
+updated: 2026-09-03
 confidence: medium
 # prettier-ignore
-provenance: [{"source_item_id":"1a00013ac9bf7ecf-03","url":"https://www.geoffreylitt.com/2026/07/02/understanding-is-the-new-bottleneck?utm_source=tldrdev"}]
+provenance: [{"source_item_id":"1a00013ac9bf7ecf-03","url":"https://www.geoffreylitt.com/2026/07/02/understanding-is-the-new-bottleneck?utm_source=tldrdev"},{"source_item_id":"1a066fbd74e24644-05","url":"https://martinfowler.com/rachels-ramblings/code-review.html?utm_source=tldrdev"}]
 ---
 
 # Human Understanding in Agentic Coding
@@ -87,6 +87,28 @@ mechanism, while a team also needs durable artifacts, vocabulary, and a place
 to challenge the model together. Neither should be mistaken for proof that the
 generated system is correct.
 
+## Shift Judgment Left, Review by Exception
+
+Rachel Laycock argues that teams have overloaded pull-request review with
+quality control, security, architectural alignment, mentoring, knowledge
+sharing, and ownership. As agent output grows, waiting until a finished diff to
+perform all of that work creates a human queue rather than a scalable system.
+
+Her alternative moves feedback closer to the decisions it informs: explore
+designs before implementation, pair or work as a group for knowledge transfer,
+encode architectural constraints as fitness functions, and automate formatting,
+testing, static analysis, and known security checks. Human review remains
+appropriate by exception for high-blast-radius, security-sensitive,
+architectural, unfamiliar, or low-confidence changes.
+
+The saved commute discussion challenged the safety claim. The article explains
+why universal diff review does not scale and offers earlier safeguards, but it
+does not demonstrate that selective review is equally safe. Its strongest case
+is therefore organizational and architectural: understand systems rather than
+depending on every engineer to inspect every generated diff. That approach
+still requires explicit risk criteria, observable tests, shared design work,
+and escalation when confidence is low.
+
 ## Source Notes
 
 ### [Understanding is the new bottleneck](https://www.geoffreylitt.com/2026/07/02/understanding-is-the-new-bottleneck?utm_source=tldrdev)
@@ -100,9 +122,20 @@ micro-world examples, and shared-space extension. The solo-versus-team framing
 and explicit evidence qualification preserve the saved commute discussion as
 synthesis rather than attributing a controlled result to the talk.
 
+### [Maybe We Shouldn't Be Reviewing All This Code](https://martinfowler.com/rachels-ramblings/code-review.html?utm_source=tldrdev)
+
+<!-- source-item-id: 1a066fbd74e24644-05 -->
+
+Rachel Laycock, 2026-09-02. The article argues for moving feedback and shared
+reasoning earlier, automating deterministic checks, and reserving human review
+for exceptional risk. The qualification that this is a scalability argument
+rather than proof of equal safety preserves Brad's commute skepticism and the
+requested back-and-forth discussion.
+
 ## Related
 
 - {% include wiki-related-link.md slug="ai-native-software-engineering" %}
 - {% include wiki-related-link.md slug="review-driven-software-factories" %}
 - {% include wiki-related-link.md slug="deterministic-agent-workflows" %}
 - {% include wiki-related-link.md slug="agent-context-handoff" %}
+- {% include wiki-related-link.md slug="workslop-and-effort-symmetry" %}

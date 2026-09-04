@@ -63,6 +63,7 @@ Liyan Tang, Cyrus Rashtchian, Chun-Sung Ferng, Andrew Tomkins, Da-Cheng Juan, an
 
 ## Related
 
+- {% include wiki-related-link.md slug="organizational-second-brain" %}
 - {% include wiki-related-link.md slug="review-driven-software-factories" %}
 - {% include wiki-related-link.md slug="physical-ai-industrialization" %}
 - {% include wiki-related-link.md slug="agent-context-handoff" %}
