@@ -71,6 +71,9 @@ found a queue as proof.
 - The September 1 AI and September 2 General, Dev, and AI queues, four
   September 2 recovered session bundles, and nine unique shared-chat URLs.
   Five SRT representations overlap the four complete spoken conversations.
+- The four September 3 General, Dev, AI, and Fintech queues, four recovered
+  evening session bundles, and seven shared-chat URLs. Three URLs are SRT
+  representations paired with the General, Dev, and AI Voice conversations.
 - The live `Weekday TLDR Queues` Task conversation/configuration, the July
   21-24 Task Update emails, the July 24 manual queue-generation control, and
   the live Project settings/sources inspected on July 26.
@@ -1548,6 +1551,74 @@ execution. The four valid bundles provide a useful control for #120's future
 prompt experiment, but neither their validity nor today's playback failures
 establishes prompt length as the cause. No live Project prompt or listed
 Project source changed, so no Project update is required for this publication.
+
+### September 3 Wiki Saves, Literal-Playback Failures, And Lifecycle Mismatch Result
+
+The bounded Library inventory found four September 3 evening bundles:
+`202609031806-evening-commute-session-bundle.txt`,
+`202609031818-evening-commute-session-bundle.txt`,
+`202609031833-evening-commute-session-bundle.txt`, and
+`202609031835-evening-commute-session-bundle.txt`. Their declared queues were
+the September 3 General, Dev, AI, and Fintech queues. All eight originals were
+downloaded through their Library row actions and retained privately with hashes
+and displayed modification values. The nearby `session-export.md` row was also
+inspected and downloaded because its generic name and later modification time
+made it a plausible export. Its bytes exactly match the tracked Project source,
+so it is not a session bundle and is excluded from commute cleanup.
+
+All four queues passed v3 validation and contain 31 items in total: 7 General,
+8 Dev, 11 AI, and 5 Fintech. The General, AI, and Fintech bundles passed strict
+validation and their embedded queue snapshots canonically matched the separately
+downloaded queues. The Dev snapshot also matches its canonical queue, but strict
+validation rejects the event lifecycle: event 16 announces item 8 before event
+17 records a save for item 7. The exact saved article, user words, and detailed
+discussion are independently present in the shared conversation, so the wiki
+save is retained while the bundle-order defect remains unresolved evidence.
+
+Seven shared URLs cover the four sessions, including SRT representations of the
+General, Dev, and AI conversations. The private serialized-message audit retains
+100 source user-message records and resolves their overlap into 49 distinct user
+utterances. It dispositions all 49: 3 explicit wiki saves, 7 surrounding wiki-
+synthesis turns, 1 classifier correction, 16 playback or recovery incidents,
+4 other substantive context turns, 2 informational discussions with no durable
+action, and 16 routine session or navigation commands. No discussion was turned
+into a save without an explicit request.
+
+The three saves produce two new concepts and one existing-page update. _How to
+protect yourself from workslop_ preserves the commute's practical response
+ladder and distinguishes AI style from effort-asymmetric communication. _Maybe
+We Shouldn't Be Reviewing All This Code_ extends the human-understanding concept
+with Brad's skepticism: the source makes a scalability case for review by
+exception, not proof that selective review is equally safe. _An Organizational
+Second Brain_ records Meta's separation of structured knowledge from recipes
+and its diagnose, compile, replay, regress, and review improvement loop. Source
+claims were checked against the three original public articles; commute-derived
+qualifications remain labeled as discussion or synthesis.
+
+The General session contains one exact depth correction for _Robotaxis Try Their
+Luck on London's Medieval Roads_ (`1a066f9367db508e-04`): the queue classified
+it as `maybe/headline_only`, and Brad explicitly said the robotaxi article should
+be in depth. The queue-bound correction remains private calibration evidence for
+#35, #66, and #68; this run does not infer an interest-label change or modify the
+production profile.
+
+Playback again diverged from the verified queue. Fintech began item 1 before the
+required sweep. Dev initially reported 14 items for an eight-item queue, omitted
+the sweep until corrected, and repeatedly read only the headline of in-depth
+items. AI lost and recovered queue context, restarted the sweep unnecessarily,
+and required repeated re-anchoring to literal `playback_text` for items 7 through 11. General substituted unrelated text for its final items, including a foreign
+ContextPilot story for canonical item 7, _Exo_. These observations reinforce
+#100. The lifecycle mismatch and the importer’s explicit recovery treatment are
+also evidence for #95. The prompt already requires exact sweep and playback
+fields, so this daily run does not add another wording-only prompt change.
+
+The processing pass preserved the original-download rule after discovering that
+an unobserved download click did not establish a local artifact; subsequent
+downloads waited for the browser's actual download event and recorded the path.
+The complete serialized conversation was decoded from every shared page before
+the reverse audit. Existing instructions already require both safeguards, so no
+new workflow text is justified. No live Project prompt or listed source changed,
+and no Project synchronization is required for this publication.
 
 ## What Worked
 

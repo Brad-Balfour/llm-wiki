@@ -120,6 +120,7 @@ a complete collision-resolution protocol.
 
 ## Related
 
+- {% include wiki-related-link.md slug="organizational-second-brain" %}
 - {% include wiki-related-link.md slug="orchestrator-working-memory" %}
 - {% include wiki-related-link.md slug="adaptive-context-engineering" %}
 - {% include wiki-related-link.md slug="agent-context-handoff" %}
