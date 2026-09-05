@@ -70,6 +70,33 @@ const KNOWN_SECTION_HEADINGS = new Set([
   'Research & Innovation',
 ]);
 
+/**
+ * Email-client wrapper lines. These are structural and stable.
+ */
+const WRAPPER_LINE_PREFIXES = [
+  '---------- forwarded message',
+  'begin forwarded message',
+  'from:',
+  'sent:',
+  'to:',
+  'subject:',
+] as const;
+
+/**
+ * Sponsor copy that reads like editorial text. Unlike the wrapper prefixes,
+ * these change whenever TLDR changes advertisers, so they are data to be
+ * edited rather than logic to be rewritten. Add new sponsors here.
+ */
+const SPONSOR_LINE_PREFIXES = [
+  '> built for',
+  '> frontier models',
+  '> reliable at scale',
+  'why teams run',
+  'coding agents only move',
+] as const;
+
+const SPONSOR_LINE_FRAGMENTS = ['friendli', 'advertise with us', 'track your referrals'] as const;
+
 const BODY_CONFIRMATION_MARKERS = [
   { label: 'standalone TLDR masthead', pattern: /^TLDR$/m },
   { label: 'sponsor preheader marker', pattern: /^Together With$/m },
@@ -490,57 +517,83 @@ function unwrapTldrTrackingUrl(rawUrl: string): string {
   }
 }
 
+/**
+ * A candidate linked block with every field already lowercased, so the skip
+ * rules below can compare without each repeating `.toLowerCase()`.
+ *
+ * Distinct from `LinkBlock` above, which is the parsed Markdown link itself.
+ */
+interface LowercasedLinkedBlock {
+  rawTitle: string;
+  normalizedTitle: string;
+  rawUrl: string;
+  url: string;
+}
+
+/**
+ * Reasons a linked block is not an editorial item. Each carries a label so a
+ * caller can report why a block was skipped rather than only that it was.
+ */
+const SKIP_REASONS = [
+  {
+    reason: 'sponsor',
+    matches: (block: LowercasedLinkedBlock) =>
+      block.rawTitle.includes('(sponsor)') || block.url.includes('sponsorship'),
+  },
+  {
+    reason: 'mailto',
+    matches: (block: LowercasedLinkedBlock) => block.rawUrl.startsWith('mailto:'),
+  },
+  {
+    reason: 'tldr_hiring',
+    matches: (block: LowercasedLinkedBlock) => block.normalizedTitle.includes('tldr is hiring'),
+  },
+  {
+    reason: 'referral_or_unsubscribe',
+    matches: (block: LowercasedLinkedBlock) =>
+      block.url.includes('refer.tldr.tech') || block.url.includes('/unsubscribe'),
+  },
+  {
+    reason: 'tldr_house_page',
+    matches: (block: LowercasedLinkedBlock) =>
+      block.url.includes('tldr.tech') && /advertis|jobs|manage/.test(block.url),
+  },
+] as const;
+
+/** The reason labels, derived from the table so the two cannot drift. */
+export type LinkedBlockSkipReason = (typeof SKIP_REASONS)[number]['reason'];
+
+export function linkedBlockSkipReason(
+  rawTitle: string,
+  normalizedTitle: string,
+  rawUrl: string,
+  normalizedUrl: string | null
+): LinkedBlockSkipReason | null {
+  const block: LowercasedLinkedBlock = {
+    rawTitle: rawTitle.toLowerCase(),
+    normalizedTitle: normalizedTitle.toLowerCase(),
+    rawUrl: rawUrl.toLowerCase(),
+    url: (normalizedUrl ?? rawUrl).toLowerCase(),
+  };
+  return SKIP_REASONS.find((candidate) => candidate.matches(block))?.reason ?? null;
+}
+
 function shouldSkipLinkedBlock(
   rawTitle: string,
   normalizedTitle: string,
   rawUrl: string,
   normalizedUrl: string | null
 ): boolean {
-  const normalizedTitleLower = normalizedTitle.toLowerCase();
-  const rawTitleLower = rawTitle.toLowerCase();
-  const urlLower = (normalizedUrl ?? rawUrl).toLowerCase();
-
-  if (rawTitleLower.includes('(sponsor)') || urlLower.includes('sponsorship')) {
-    return true;
-  }
-
-  if (rawUrl.toLowerCase().startsWith('mailto:')) {
-    return true;
-  }
-
-  if (normalizedTitleLower.includes('tldr is hiring')) {
-    return true;
-  }
-
-  if (urlLower.includes('refer.tldr.tech') || urlLower.includes('/unsubscribe')) {
-    return true;
-  }
-
-  if (urlLower.includes('tldr.tech') && /advertis|jobs|manage/.test(urlLower)) {
-    return true;
-  }
-
-  return false;
+  return linkedBlockSkipReason(rawTitle, normalizedTitle, rawUrl, normalizedUrl) !== null;
 }
 
-function isKnownWrapperOrAdLine(line: string): boolean {
+export function isKnownWrapperOrAdLine(line: string): boolean {
   const lower = line.toLowerCase();
 
   return (
-    lower.startsWith('---------- forwarded message') ||
-    lower.startsWith('begin forwarded message') ||
-    lower.startsWith('from:') ||
-    lower.startsWith('sent:') ||
-    lower.startsWith('to:') ||
-    lower.startsWith('subject:') ||
-    lower.startsWith('> built for') ||
-    lower.startsWith('> frontier models') ||
-    lower.startsWith('> reliable at scale') ||
-    lower.startsWith('why teams run') ||
-    lower.startsWith('coding agents only move') ||
-    lower.includes('friendli') ||
-    lower.includes('advertise with us') ||
-    lower.includes('track your referrals')
+    WRAPPER_LINE_PREFIXES.some((prefix) => lower.startsWith(prefix)) ||
+    SPONSOR_LINE_PREFIXES.some((prefix) => lower.startsWith(prefix)) ||
+    SPONSOR_LINE_FRAGMENTS.some((fragment) => lower.includes(fragment))
   );
 }
 
