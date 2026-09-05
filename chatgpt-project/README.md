@@ -37,7 +37,7 @@ After installing Prompt 4.2, `LLM-Wiki-Car` should have these source files:
 - `schema/classifier-instructions.md`
 - `schema/routing-rules.md`
 
-The live Project has the complete source set listed below.
+The live Project has the complete source set listed above.
 
 The Instructions tell Voice how to read a queue. `session-export.md` tells it
 how to save notes and create the final bundle. It is a normal Project source,

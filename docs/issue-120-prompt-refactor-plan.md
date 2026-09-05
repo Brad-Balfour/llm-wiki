@@ -1,7 +1,7 @@
 # Issue 120: Shorter Car Prompt
 
-Status: Prompt 4.2 is implemented in the repository. It is not live in the
-ChatGPT Project.
+Status: Prompt 4.2 is implemented in the repository and live in the ChatGPT
+Project. The September 4, 2026 commute-processing pass verified the deployment.
 
 - Issue: [#120](https://github.com/Brad-Balfour/llm-wiki/issues/120)
 - Branch: `agent/issue-120-prompt-plan`
@@ -105,7 +105,9 @@ This issue does not change:
 - file-retention rules;
 - scheduled queue creation;
 - the iPhone app or Voice client; or
-- the live ChatGPT Project until Brad installs Prompt 4.2.
+- the live ChatGPT Project beyond the Prompt 4.2 deployment, including its
+  required `session-export.md` source (completed and verified September 4,
+  2026).
 
 Unclear product-name headlines and missing author or publication fields remain
 queue-generation problems. Voice may look up missing attribution from the exact
@@ -126,7 +128,9 @@ git diff --check
 These checks can prove that the text, references, and schemas agree. They cannot
 prove what Voice will say on an iPhone.
 
-## Install Prompt 4.2
+## Prompt 4.2 deployment procedure
+
+The following deployment was completed and verified September 4, 2026.
 
 In the `LLM-Wiki-Car` Project:
 
