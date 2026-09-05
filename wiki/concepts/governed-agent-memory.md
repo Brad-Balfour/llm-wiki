@@ -7,10 +7,10 @@ aliases: ["Agent Memory as a Moat","Memory-augmented generation","Multi-writer a
 tags: ["ai-agents","context-management","memory","governance","multi-agent-systems","provenance"]
 wiki_slug: governed-agent-memory
 created: 2026-08-20
-updated: 2026-08-20
+updated: 2026-09-04
 confidence: medium
 # prettier-ignore
-provenance: [{"source_item_id":"1a01ef1e822ce589-02","url":"https://redis.io/blog/compounding-context-memory-as-the-moat/?utm_source=tldrdev"}]
+provenance: [{"source_item_id":"1a01ef1e822ce589-02","url":"https://redis.io/blog/compounding-context-memory-as-the-moat/?utm_source=tldrdev"},{"source_item_id":"1a06c9fbf7abaa9b-10","url":"https://huggingface.co/blog/funes?utm_source=tldrai"}]
 ---
 
 # Governed Agent Memory
@@ -34,6 +34,9 @@ token indefinitely.
   can survive one turn and influence later work.
 - Multi-writer systems need explicit conflict handling and provenance; a shared
   scratchpad with last-write-wins semantics is not a memory policy.
+- Agent traces can be useful memory without exposing hidden chain-of-thought:
+  searchable harness events, tool use, errors, decisions, and ordinary message
+  text are enough to preserve evidence about how work unfolded.
 
 ## From Retrieval to Managed Learning
 
@@ -100,6 +103,56 @@ long-term memory in the background. Its throughput, latency, cost, and task-
 completion figures are vendor-reported measurements from particular systems;
 they motivate evaluation but are not universal performance guarantees.
 
+## Trace-Backed Memory Without Hidden Reasoning
+
+Funes takes a deliberately evidence-preserving approach to coding-agent
+memory. It parses the session traces already written by supported agent
+harnesses, normalizes them into turns and blocks, and incrementally indexes
+them in a local Lance dataset. Retrieval combines vector and keyword search,
+reranking, recency weighting, and neighboring context. Results return original
+text with agent, time, session, and turn provenance instead of replacing the
+record with a write-time summary.
+
+This differs from systems that try to extract a model's private reasoning.
+Funes operates on what the surrounding agent runtime records: messages, tool
+activity, errors, searches, and changes of direction. A provider API or MCP
+connection does not thereby expose hidden thinking tokens. The useful unit is
+the observable harness trace, not an undocumented internal model state.
+
+The source also separates memory ownership from a hosted memory service. Local
+embedding and reranking are the default. A user can optionally publish the
+Lance dataset to a private-by-default Hugging Face dataset, after indexing-time
+redaction and a second pre-publish secret scan, then reuse it across agents and
+machines. These controls reduce exposure but do not make arbitrary session logs
+safe to publish without reviewing the documented scanner boundary.
+
+## Implications for Conversation-Only Workflows
+
+The following is synthesis from the commute discussion.
+
+A visible shared-chat transcript is a useful but narrower trace. It can preserve
+the user's instructions and the assistant's visible answers, which is enough
+for source-grounded wiki synthesis, but it may omit tool calls, retrieval
+attempts, execution errors, and other harness evidence needed to diagnose why
+a workflow repeatedly violated its instructions. Automatically importing the
+same visible transcript would improve convenience, not close that diagnostic
+gap.
+
+Trace-backed memory therefore works best where an agent runtime owns durable,
+queryable logs, such as a coding agent on a workstation or hosted development
+environment. A phone app's private storage is not automatically available to a
+separate indexing process. Mobile support would require a supported export,
+sync, or server-side trace boundary; filesystem access cannot be assumed.
+
+For LLM-Wiki-Car, the practical distinction is:
+
+- the existing shared-chat intake already captures discussion for durable wiki
+  maintenance;
+- additional execution traces could help explain recurring queue-reload and
+  literal-playback failures; and
+- neither source establishes that stock ChatGPT Voice exposes those traces or
+  permits Funes to index them.
+
 ## Source Notes
 
 ### [Agent memory as a moat: how context compounds](https://redis.io/blog/compounding-context-memory-as-the-moat/?utm_source=tldrdev)
@@ -117,6 +170,23 @@ performance claims should be evaluated in that context.
 The multi-writer conflict model above is discussion-derived synthesis. The
 article does not define append-only candidate memories, a semantic arbiter, or
 a complete collision-resolution protocol.
+
+### [Give Your Coding Agents a Memory You Own](https://huggingface.co/blog/funes?utm_source=tldrai)
+
+<!-- source-item-id: 1a06c9fbf7abaa9b-10 -->
+
+TLDR AI, 2026-09-04.
+
+David Corvoysier describes Funes, an open-source memory layer for Claude Code,
+Codex, pi, and Hermes. It incrementally indexes existing local session traces,
+keeps raw evidence and provenance, provides agent-facing recall tools, and can
+optionally synchronize a private-by-default Lance dataset through Hugging Face.
+The article reports a two-task handoff-versus-recall benchmark; its token-cost
+results are project-authored measurements, not a general reliability claim.
+
+The distinctions above between observable harness traces, hidden model
+reasoning, phone-app availability, and the current LLM-Wiki-Car transcript path
+are discussion-derived synthesis rather than claims made by the article.
 
 ## Related
 

@@ -9,18 +9,18 @@
 
 ## Project Instructions
 
-Prompt 4.2 is ready in this repository but is not live in ChatGPT. To install
-it in `LLM-Wiki-Car`:
+Prompt 4.2 is live in ChatGPT. The September 4, 2026 commute-processing pass
+verified both required deployment steps directly in `LLM-Wiki-Car`:
 
-1. Paste all of `chatgpt-project/CHATGPT_CAR_QUEUE_PROMPT.md` into the Project's
-   **Instructions** field.
-2. Upload `chatgpt-project/session-export.md` to the Project's **Sources**.
+1. The Project's **Instructions** field begins `LLM-Wiki-Car Instructions —
+Prompt 4.2 for Queue v3` and matches the tracked prompt.
+2. `session-export.md` appears in the Project's **Sources**.
 
 Keep `schema/commute-session-bundle-v1.schema.json` in the Project. The new file
 uses that schema; it does not replace it.
 
-The live Project remains on Prompt 4.1 until Brad confirms both steps. Committing
-or opening a pull request does not change the Project.
+No Project update is pending for Prompt 4.2. Future repository edits still do
+not change the live Project automatically.
 
 `Queue v3` in the prompt title names the JSON structure. `Prompt 4.2` names this
 version of the instructions.
@@ -37,8 +37,7 @@ After installing Prompt 4.2, `LLM-Wiki-Car` should have these source files:
 - `schema/classifier-instructions.md`
 - `schema/routing-rules.md`
 
-Until Brad confirms the two installation steps, the live Project has the same
-files except for `chatgpt-project/session-export.md`.
+The live Project has the complete source set listed below.
 
 The Instructions tell Voice how to read a queue. `session-export.md` tells it
 how to save notes and create the final bundle. It is a normal Project source,

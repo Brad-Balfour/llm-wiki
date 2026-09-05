@@ -1620,6 +1620,61 @@ the reverse audit. Existing instructions already require both safeguards, so no
 new workflow text is justified. No live Project prompt or listed source changed,
 and no Project synchronization is required for this publication.
 
+### September 4 Literal-Playback, Export-Recovery, And Trace-Memory Result
+
+The bounded Library inventory found three September 4 evening bundles:
+`202609041704-evening-commute-session-bundle.txt`,
+`202609041715-evening-commute-session-bundle.txt`, and
+`202609041818-evening-commute-session-bundle.txt`. They declare the same-day
+General, Dev, and AI queues. All six originals were downloaded through their
+Library row actions and preserved privately with their displayed modification
+times and hashes.
+
+The three queues passed v3 validation and contain 25 items in total: 6 General,
+9 Dev, and 10 AI. All three recovered bundles passed strict validation, and
+each embedded snapshot canonically matched its separately downloaded queue.
+The complete serialized shared chats contain 80 actual user messages after
+excluding three non-conversation custom-instruction placeholders. The private
+coverage ledger dispositions every message, including routine session and
+navigation commands, source questions, discussion, corrections, export
+recovery, one exact wiki save, and two explicit general captures.
+
+The AI save for _Give Your Coding Agents a Memory You Own_ updates _Governed
+Agent Memory_ rather than creating a disconnected page. The source-grounded
+addition explains Funes's local incremental trace indexing, original-text
+provenance, hybrid retrieval, cross-agent memory, optional private-by-default
+dataset synchronization, and documented secret-scanning boundary. It preserves
+the commute discussion's central distinction: observable agent-harness traces
+can support memory and diagnosis without exposing hidden chain-of-thought.
+Visible shared transcripts already support the current manual wiki intake, but
+they may omit tool and execution evidence that could explain repeated playback
+failures. Phone support would require an explicit export, sync, or server-side
+trace boundary; neither the article nor the commute establishes that stock
+ChatGPT Voice exposes one.
+
+No classifier correction was given. The importer retains 12 quality incidents:
+all three sessions departed from the required sweep or literal
+`playback_text`; General and AI falsely reported that a still-available queue
+could not be reopened; and Dev and AI required export recovery before producing
+the visible bundle. The shared chats add the AI sweep stopping twice and
+several end-of-commute retries. These are workflow and product incidents, not
+interest or depth labels.
+
+Brad also proposed separating a minimal playback queue from the larger
+reference object. Queue v3 already isolates `sweep_playback` and one
+`playback_text` string per item, yet Voice still reads other fields or generated
+prose. A physically separate playback artifact remains a testable prompt-size
+and field-salience experiment for #120, but this run does not establish prompt
+length as the cause or justify another wording-only edit. The repeated literal
+failures remain supported-mechanism evidence for #100.
+
+The processing run confirmed that Library downloads must await the actual
+download event and that complete shared-chat evidence can be decoded once from
+the serialized `linear_conversation` payload. Existing instructions already
+require both safeguards, so no new workflow behavior file is justified. No
+live Project prompt or listed Project source changed, and no Project
+synchronization is required for this publication.
+
 ## What Worked
 
 - The weekday Task has produced real dated, parseable queues, including four
