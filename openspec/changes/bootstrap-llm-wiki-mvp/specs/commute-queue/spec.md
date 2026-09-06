@@ -17,6 +17,20 @@ matching complete reference file while local readers retain v2/v3 support.
 - **AND** reference entries SHALL match main entries by position
 - **AND** a missing, stale, swapped, or reordered reference SHALL be rejected.
 
+### Requirement: Queue V4 Preserves Daily Coverage Provenance
+
+Queue v4 reference files SHALL make every repeated-coverage decision auditable
+across one daily generation pass.
+
+#### Scenario: Validate a daily set of pairs
+
+- **WHEN** a daily set contains retained, removed, updated, or uncertain coverage
+- **THEN** every pair SHALL share one delivery date and daily generation identity
+- **AND** every retained item SHALL name its selected source occurrence
+- **AND** its title, description, URL, and source item identity SHALL match that occurrence
+- **AND** every coverage decision SHALL resolve to an existing retained file and item
+- **AND** the decision occurrence SHALL be stored on exactly that retained item.
+
 ### Requirement: Prepared Commute Queue
 
 The system SHALL generate a prepared commute queue from routed TLDR items before

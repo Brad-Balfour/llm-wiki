@@ -1,9 +1,11 @@
 # TLDR Queue Generation Instructions — Playback/Reference Pair v4
 
 Use these instructions with `tldr-commute-playback-v4.schema.json` and
-`tldr-commute-reference-v4.schema.json`. Generate both UTF-8 JSON `.txt` files
-for every source newsletter in one run. The date comes from the source email's
-America/New_York delivery date.
+`tldr-commute-reference-v4.schema.json`. Retrieve all qualifying General, Dev,
+AI, and Fintech editions for the requested delivery date before rendering any
+file. Generate both UTF-8 JSON `.txt` files for every source newsletter in one
+daily pass. The date comes from the source email's America/New_York delivery
+date. Give every reference in the pass the same stable `daily_generation_id`.
 
 For a main file such as `20260907-tldr-dev.txt`, create the sibling
 `20260907-tldr-dev-reference.txt`. Never overwrite a pair already used by a
@@ -42,6 +44,38 @@ Pass verified author/publication data into classification. Pass `author: null`
 with `attribution_status: no_authors_listed` or `lookup_failed` for the two
 status values so they cannot become author-preference signals. A lookup failure
 does not change interest or depth.
+
+## Repeated daily coverage and useful updates
+
+Remove tracking parameters conservatively while resolving links. Preserve
+different article paths and meaningful query parameters. Group identical final
+URLs and classify each distinct URL once, reusing its attribution and result.
+Keep every newsletter occurrence, resolved article URL, literal title, and literal
+description in `source_occurrences`; select the occurrence with the most useful
+literal title and description. Use attribution completeness and then source
+order only as tie breakers. The retained item's identity and source text must
+exactly match `selected_source_occurrence_id`.
+
+After classification, compare different URLs only when their titles and
+descriptions appear to cover the same event or announcement. Sharing a topic or
+company is not enough. Consult the sources when needed:
+
+- remove coverage that adds no useful facts and record `removed_same_story`;
+- keep material new information as `useful_update`, with the related retained
+  item and a concise `update_note` prepared now for later playback;
+- retain uncertain relationships as `uncertain` and flag them for review;
+- leave unrelated articles as `original`.
+
+Record every removal or kept relationship in `coverage_decisions`, including
+the source occurrence, retained file/item, reason, and new information when an
+update is kept. A fully removed edition still gets a valid empty pair whose
+decisions point to the retained items in other files. Recalculate positions,
+totals, hashes, and sweeps after all daily decisions.
+
+In the generation result, include a private review table with one row per
+removed, updated, or uncertain occurrence: source newsletter/item, outcome,
+retained filename/item, reason, and new information. Also report editions with
+no repeated coverage and empty editions. Do not put this table in queue files.
 
 ## Main playback file
 
@@ -113,9 +147,69 @@ for index, (played, item) in enumerate(zip(main["items"], reference["items"]), 1
     lines.append(prefix)
 assert main["sweep_playback"] == "\n".join(lines), "sweep"
 assert reference["main_filename"] == main_filename, "main filename"
+assert reference["daily_generation_id"] == daily_generation_id, "daily generation"
+seen_occurrences = set()
+for item in reference["items"]:
+    assert item["source_occurrences"], "source occurrences"
+    ids = [occurrence["occurrence_id"] for occurrence in item["source_occurrences"]]
+    assert len(ids) == len(set(ids)), "occurrence ids"
+    assert item["selected_source_occurrence_id"] in ids, "selected occurrence"
+    selected = next(o for o in item["source_occurrences"] if o["occurrence_id"] == item["selected_source_occurrence_id"])
+    assert [item[k] for k in ("source_item_id", "title", "description", "url")] == [selected[k] for k in ("source_item_id", "title", "description", "url")], "selected source text"
+    coverage = item["coverage"]
+    if coverage["status"] in ("original", "deduplicated"):
+        assert coverage["related_retained_item"] is None and coverage["update_note"] is None, "plain coverage fields"
+    elif coverage["status"] == "useful_update":
+        assert coverage["related_retained_item"] and coverage["update_note"], "useful update fields"
+    else:
+        assert coverage["related_retained_item"] and coverage["update_note"] is None, "uncertain coverage fields"
+    seen_occurrences.update(ids)
 canonical_main = json.dumps(main, ensure_ascii=False, separators=(",", ":"))
 digest = "sha256:" + hashlib.sha256(canonical_main.encode("utf-8")).hexdigest()
 assert reference["main_sha256"] == digest, "main hash"
+```
+
+After every pair passes, run this over `daily_pairs`, a list of
+`(main_filename, main, reference)` tuples for the complete day:
+
+```python
+assert len({r["edition_date"] for _, _, r in daily_pairs}) == 1, "daily date"
+assert len({r["daily_generation_id"] for _, _, r in daily_pairs}) == 1, "daily generation"
+targets, owners, urls, required, decisions = {}, {}, {}, {}, {}
+for filename, _, ref in daily_pairs:
+    assert filename == ref["main_filename"] and filename not in targets, "daily filename"
+    targets[filename] = {item["source_item_id"] for item in ref["items"]}
+    for item in ref["items"]:
+        owner = (filename, item["source_item_id"])
+        assert item["url"] not in urls or urls[item["url"]] == owner, "one retained item per URL"
+        urls[item["url"]] = owner
+        selected = item["selected_source_occurrence_id"]
+        for occurrence in item["source_occurrences"]:
+            oid = occurrence["occurrence_id"]
+            assert oid not in owners or owners[oid] == owner, "one retained item per occurrence"
+            owners[oid] = owner
+            if oid != selected:
+                required[oid] = (owner, {"removed_exact_url", "removed_same_story"})
+        status = item["coverage"]["status"]
+        if status in ("useful_update", "uncertain"):
+            required[selected] = (owner, {"kept_update" if status == "useful_update" else "kept_uncertain"})
+    for decision in ref["coverage_decisions"]:
+        oid = decision["source_occurrence_id"]
+        assert oid not in decisions, "one daily decision per occurrence"
+        if decision["outcome"] == "kept_update":
+            assert decision["new_information"], "kept update information"
+        else:
+            assert decision["new_information"] is None, "non-update information"
+        decisions[oid] = decision
+for oid, (owner, outcomes) in required.items():
+    decision = decisions[oid]
+    target = decision["retained_item"]
+    assert (target["main_filename"], target["source_item_id"]) == owner, "decision target"
+    assert decision["outcome"] in outcomes and owners[oid] == owner, "decision relationship"
+assert set(decisions) == set(required), "complete decision audit"
+for decision in decisions.values():
+    target = decision["retained_item"]
+    assert target["source_item_id"] in targets[target["main_filename"]], "existing retained item"
 ```
 
 Validate each object against its attached v4 schema. Create both real Project
@@ -125,8 +219,9 @@ files explicitly; a promised name or Task status is not a created file.
 ## Reusable manual request
 
 ```text
-Generate TLDR v4 commute queue pairs for emails delivered on [DATE OR DATE RANGE].
+Generate TLDR v4 commute queue pairs for all qualifying editions delivered on [DATE OR DATE RANGE].
 Use the Project's v4 generation instructions and both attached v4 schemas.
 Create both real downloadable files for each newsletter. If a filename already
-exists, use the requested revision suffix and do not overwrite it.
+exists, use the requested revision suffix and do not overwrite it. Report the
+complete article inventory and the private repeated-coverage review table.
 ```

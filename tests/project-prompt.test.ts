@@ -123,6 +123,30 @@ test('v4 candidate resolves and records attribution before classification', asyn
   assert.match(schema, /"publication_source"/);
 });
 
+test('v4 candidate reconciles repeated coverage across all daily editions', async () => {
+  const [generation, task, schema] = await Promise.all([
+    readFile('chatgpt-project/queue-generation-v4.md', 'utf8'),
+    readFile('chatgpt-project/WEEKDAY_TLDR_QUEUE_TASK_PROMPT_V4.md', 'utf8'),
+    readFile('schema/tldr-commute-reference-v4.schema.json', 'utf8'),
+  ]);
+
+  assert.match(generation, /Retrieve all qualifying General, Dev,\s+AI, and Fintech editions/);
+  assert.match(generation, /Sharing a topic or\s+company is not enough/);
+  assert.match(generation, /most useful\s+literal title and description/);
+  assert.match(generation, /fully removed edition still gets a valid empty pair/);
+  assert.match(generation, /private review table/);
+  assert.match(generation, /one retained item per URL/);
+  assert.match(generation, /complete decision audit/);
+  assert.match(task, /Retrieve and extract all editions before rendering/);
+  assert.match(task, /classify each distinct URL\s+once/);
+  assert.match(task, /retain and flag uncertain relationships/);
+  assert.match(schema, /"coverage_decisions"/);
+  assert.match(schema, /"selected_source_occurrence_id"/);
+  assert.match(schema, /"kept_update"/);
+  assert.match(schema, /"allOf"/);
+  assert.match(schema, /"const": "useful_update"/);
+});
+
 test('daily commute completion cannot omit a required Project update', async () => {
   const [skill, agents] = await Promise.all([
     readFile('.codex/skills/process-daily-commute/SKILL.md', 'utf8'),

@@ -1,13 +1,36 @@
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 
-import { createQueueV4Snapshot, validateTldrCommuteQueue } from './session-bundle.js';
+import {
+  createQueueV4Snapshot,
+  validateTldrCommuteDailyPairs,
+  validateTldrCommuteQueue,
+} from './session-bundle.js';
+
+interface PairPath {
+  input: string;
+  reference: string;
+}
 
 async function main(): Promise<void> {
-  const { input, reference } = parseOptions(process.argv.slice(2));
+  const { input, reference, additionalPairs } = parseOptions(process.argv.slice(2));
   const candidate = JSON.parse(await readFile(input, 'utf8')) as unknown;
   if (reference !== undefined) {
     const referenceCandidate = JSON.parse(await readFile(reference, 'utf8')) as unknown;
+    if (additionalPairs.length > 0) {
+      const candidates = [{ input, reference }, ...additionalPairs];
+      const loaded = await Promise.all(
+        candidates.map(async (pair) => ({
+          mainFilename: path.basename(pair.input),
+          referenceFilename: path.basename(pair.reference),
+          playbackFile: JSON.parse(await readFile(pair.input, 'utf8')) as unknown,
+          referenceFile: JSON.parse(await readFile(pair.reference, 'utf8')) as unknown,
+        }))
+      );
+      const validated = validateTldrCommuteDailyPairs(loaded);
+      process.stdout.write(`Valid daily v4 commute queue set: ${validated.length} pair(s)\n`);
+      return;
+    }
     const validated = createQueueV4Snapshot(
       candidate,
       referenceCandidate,
@@ -28,16 +51,37 @@ async function main(): Promise<void> {
   );
 }
 
-function parseOptions(args: string[]): { input: string; reference?: string } {
+function parseOptions(args: string[]): {
+  input: string;
+  reference?: string;
+  additionalPairs: PairPath[];
+} {
   const input = args[0];
   if (!input) {
-    throw new Error('Usage: validate:commute-queue -- <queue.txt> [--reference <reference.txt>]');
+    throw new Error(usage());
   }
-  if (args.length === 1) return { input };
-  if (args.length === 3 && args[1] === '--reference' && args[2]) {
-    return { input, reference: args[2] };
+  if (args.length === 1) return { input, additionalPairs: [] };
+  if (args[1] !== '--reference' || !args[2]) throw new Error(usage());
+  const reference = args[2];
+  const additionalPairs: PairPath[] = [];
+  for (let index = 3; index < args.length; index += 4) {
+    const pairInput = args[index + 1];
+    const pairReference = args[index + 3];
+    if (
+      args[index] !== '--pair' ||
+      !pairInput ||
+      args[index + 2] !== '--reference' ||
+      !pairReference
+    ) {
+      throw new Error(usage());
+    }
+    additionalPairs.push({ input: pairInput, reference: pairReference });
   }
-  throw new Error('Usage: validate:commute-queue -- <queue.txt> [--reference <reference.txt>]');
+  return { input, reference, additionalPairs };
+}
+
+function usage(): string {
+  return 'Usage: validate:commute-queue -- <queue.txt> [--reference <reference.txt> [--pair <queue.txt> --reference <reference.txt>]...]';
 }
 
 await main();

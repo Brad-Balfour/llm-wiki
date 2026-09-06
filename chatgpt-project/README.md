@@ -156,6 +156,18 @@ After downloading a v3 queue, the home-side deterministic preflight is:
 npm run validate:commute-queue -- /path/to/queue.txt
 ```
 
+For a candidate v4 day, validate every pair together so cross-edition links and
+duplicate decisions are checked:
+
+```sh
+npm run validate:commute-queue -- /path/to/20260907-tldr.txt \
+  --reference /path/to/20260907-tldr-reference.txt \
+  --pair /path/to/20260907-tldr-dev.txt \
+  --reference /path/to/20260907-tldr-dev-reference.txt
+```
+
+Repeat `--pair <main> --reference <reference>` for AI and Fintech when present.
+
 ## Post-Commute Bundle Intake
 
 The supported user workflow is chat-mediated: supply the original downloaded
