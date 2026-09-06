@@ -670,6 +670,7 @@ function validateQueueV4ReferenceItem(
       'description',
       'author',
       'publication',
+      'attribution',
       'url',
       'interest_level',
       'interest_score',
@@ -688,8 +689,15 @@ function validateQueueV4ReferenceItem(
   }
   const title = requireString(record.title, `${itemPath}.title`);
   const description = requireString(record.description, `${itemPath}.description`);
-  validateNullableString(record.author, `${itemPath}.author`);
-  validateNullableString(record.publication, `${itemPath}.publication`);
+  const author = requireString(record.author, `${itemPath}.author`);
+  const publication = requireString(record.publication, `${itemPath}.publication`);
+  validateAttribution(
+    record.attribution,
+    itemPath,
+    author,
+    publication,
+    identityUrl(record.url, itemPath)
+  );
   requireEnum(
     record.interest_level,
     ['interested', 'maybe', 'uninterested'] as const,
@@ -713,6 +721,58 @@ function validateQueueV4ReferenceItem(
     url: requireHttpUrl(record.url, `${itemPath}.url`),
   };
   return { identity, title, description, consumptionDepth };
+}
+
+function identityUrl(candidate: unknown, itemPath: string): string {
+  return requireHttpUrl(candidate, `${itemPath}.url`);
+}
+
+function validateAttribution(
+  candidate: unknown,
+  itemPath: string,
+  author: string,
+  publication: string,
+  url: string
+): void {
+  const field = `${itemPath}.attribution`;
+  const record = requireRecord(candidate, field);
+  rejectUnknownKeys(
+    record,
+    ['resolved_url', 'author_source', 'publication_source', 'lookup_attempts'],
+    field
+  );
+  const resolvedUrl = requireHttpUrl(record.resolved_url, `${field}.resolved_url`);
+  if (resolvedUrl !== url) throw new Error(`${field}.resolved_url must equal the item URL`);
+  const authorSource = requireEnum(
+    record.author_source,
+    ['newsletter', 'article_page', 'no_authors_listed', 'lookup_failed'] as const,
+    `${field}.author_source`
+  );
+  const publicationSource = requireEnum(
+    record.publication_source,
+    ['newsletter', 'article_page', 'hostname_fallback'] as const,
+    `${field}.publication_source`
+  );
+  const attempts = requireNonNegativeInteger(record.lookup_attempts, `${field}.lookup_attempts`);
+  if (attempts > 2) throw new Error(`${field}.lookup_attempts must be no more than 2`);
+  if (authorSource === 'no_authors_listed' && author !== 'No authors listed') {
+    throw new Error(`${itemPath}.author must be No authors listed for absent-byline status`);
+  }
+  if (authorSource === 'lookup_failed' && author !== 'Author lookup failed') {
+    throw new Error(`${itemPath}.author must be Author lookup failed for failed lookup status`);
+  }
+  if (
+    (authorSource === 'newsletter' || authorSource === 'article_page') &&
+    (author === 'No authors listed' || author === 'Author lookup failed')
+  ) {
+    throw new Error(`${itemPath}.author status strings are not verified author names`);
+  }
+  if (publicationSource === 'hostname_fallback') {
+    const expected = new URL(url).hostname.replace(/^www\./, '');
+    if (publication !== expected) {
+      throw new Error(`${itemPath}.publication must equal ${expected} for hostname fallback`);
+    }
+  }
 }
 
 function renderV4PlaybackPrefix(

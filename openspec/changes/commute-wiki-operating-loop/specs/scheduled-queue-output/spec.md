@@ -16,6 +16,14 @@ create both files for each qualifying source email directly in Project Library.
 - **AND** empty editions SHALL produce valid empty pairs
 - **AND** the Task SHALL report any missing or failed file explicitly.
 
+#### Scenario: Fill attribution before scoring
+
+- **WHEN** a distinct resolved article URL has missing newsletter attribution
+- **THEN** the existing Project generation chat SHALL look up its page before
+  classification
+- **AND** it SHALL reuse that result for duplicate URL occurrences
+- **AND** one inaccessible source SHALL not block other articles or editions.
+
 ### Requirement: Observable Queue Artifact Output
 
 The scheduled queue-generation workflow SHALL create one real downloadable

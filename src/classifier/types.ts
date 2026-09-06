@@ -15,6 +15,9 @@ export interface ClassifierInputItem {
   title: string;
   summary: string;
   url: string;
+  author: string | null;
+  publication: string;
+  attribution_status: 'verified' | 'no_authors_listed' | 'lookup_failed';
 }
 
 export interface ClassificationRecord {

@@ -93,3 +93,18 @@ Every queue-v3 item SHALL expose author and publication metadata without inventi
 - **WHEN** an exact author or publication is not supplied
 - **THEN** the corresponding required field SHALL be JSON `null`
 - **AND** queue generation SHALL NOT infer it from the sender, newsletter, URL domain, title, or general knowledge.
+
+### Requirement: Queue V4 Fills Attribution Before Classification
+
+New v4 reference entries SHALL contain nonempty author/publication values and
+explicit lookup provenance.
+
+#### Scenario: Newsletter attribution is missing
+
+- **WHEN** a resolved article URL lacks newsletter attribution
+- **THEN** generation SHALL inspect page metadata and the visible byline
+- **AND** it SHALL retry an access failure once
+- **AND** a readable page without a byline SHALL use `No authors listed`
+- **AND** an unreadable page after retry SHALL use `Author lookup failed`
+- **AND** a missing publication name SHALL fall back to the resolved hostname
+- **AND** the failure values SHALL not become classifier preference signals.

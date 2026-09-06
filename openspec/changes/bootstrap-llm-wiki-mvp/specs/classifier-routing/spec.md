@@ -2,6 +2,18 @@
 
 ## ADDED Requirements
 
+### Requirement: Classifier Accepts Verified Attribution
+
+The classifier input SHALL include verified author/publication metadata without
+treating lookup outcomes as preference evidence.
+
+#### Scenario: Attribution lookup is absent or fails
+
+- **WHEN** generation records `no_authors_listed` or `lookup_failed`
+- **THEN** the classifier input SHALL use a null author plus the explicit status
+- **AND** the status or error text SHALL NOT change interest or depth
+- **AND** classifier output SHALL remain source-neutral.
+
 ### Requirement: Split Production Profile Files
 
 The MVP SHALL separate interest content, classifier mechanics, and routing rules

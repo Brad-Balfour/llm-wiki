@@ -11,6 +11,11 @@ Project's v4 queue-generation instructions and the attached playback and
 reference schemas. Create one matching playback/reference pair per source
 newsletter and place both real .txt files directly in this Project Library.
 
+Resolve each distinct original article URL and fill attribution before
+classification, following the Project's retry, no-byline, failure, and hostname
+fallback rules. Reuse the lookup across duplicate URL occurrences and continue
+other articles when one lookup fails.
+
 Use the source email's America/New_York delivery date in each filename. The main
 file keeps the normal YYYYMMDD-tldr[-edition].txt name and contains only
 sweep_playback and items[].item_playback. The sibling inserts -reference before

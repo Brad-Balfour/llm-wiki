@@ -10,6 +10,39 @@ For a main file such as `20260907-tldr-dev.txt`, create the sibling
 session. For an explicit rerun, add the same revision before `.txt` in both
 names, for example `-v2-trial.txt` and `-v2-trial-reference.txt`.
 
+## Attribution before classification
+
+Resolve every tracking link to the original article URL before lookup or
+classification. Reuse one attribution result for every occurrence of the same
+resolved URL.
+
+Use exact newsletter attribution when it is present. Otherwise open the
+resolved article URL with the generation chat's browsing tools and inspect page
+metadata plus the visible byline and publication/site name. Never infer an
+author from a person mentioned in the title or article. If access fails, retry
+once, then continue with other articles and editions.
+
+Each reference item has nonempty `author` and `publication` strings plus:
+
+- `attribution.resolved_url`: the same final URL stored in `url`;
+- `author_source`: `newsletter`, `article_page`, `no_authors_listed`, or
+  `lookup_failed`;
+- `publication_source`: `newsletter`, `article_page`, or `hostname_fallback`;
+- `lookup_attempts`: 0 when newsletter attribution was sufficient, otherwise
+  the number of article-page attempts, at most 2.
+
+Use the published names, including multiple authors or an organizational byline
+when that is what the page lists. If the page is readable but has no byline, set
+`author` to `No authors listed`. After two failed access attempts, set it to
+`Author lookup failed`; never use that failure as evidence that the page has no
+byline. If no publication name is available, use the resolved URL hostname
+without leading `www.` and record `hostname_fallback`.
+
+Pass verified author/publication data into classification. Pass `author: null`
+with `attribution_status: no_authors_listed` or `lookup_failed` for the two
+status values so they cannot become author-preference signals. A lookup failure
+does not change interest or depth.
+
 ## Main playback file
 
 The main object has exactly two keys in this order: `sweep_playback`, then

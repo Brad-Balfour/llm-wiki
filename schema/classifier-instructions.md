@@ -21,6 +21,14 @@ The classifier receives sanitized item metadata only:
 - `title`
 - `summary`
 - `url`
+- verified `author` when available, otherwise `null`
+- verified `publication`
+- `attribution_status`: `verified`, `no_authors_listed`, or `lookup_failed`
+
+Use a verified author or publication as a preference signal when the interest
+profile names it. `No authors listed`, `Author lookup failed`, and other lookup
+status/error text are not authors and must not affect either score. A failed
+lookup is not evidence that an article is uninteresting or shallow.
 
 Do not rely on raw Gmail bodies, subject-only identification, forwarding wrapper
 text, ads, subscription text, private notes, or credentials.
@@ -138,7 +146,8 @@ automatic surfacing.
 
 ## Classification Procedure
 
-1. Read the title and summary against `schema/interest-profile.md`.
+1. Read the title, summary, and verified attribution against
+   `schema/interest-profile.md`.
 2. Assign `interest_score` from `0.0` to `1.0`.
 3. Set `interest_level` from the configured interest score band.
 4. Assign `depth_score` independently from `0.0` to `1.0`.

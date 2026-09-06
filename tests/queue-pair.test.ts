@@ -28,6 +28,12 @@ function pair(itemCount = 2) {
         author: `Author ${position}`,
         publication: 'Example Publication',
         url: `https://example.com/${position}`,
+        attribution: {
+          resolved_url: `https://example.com/${position}`,
+          author_source: 'newsletter',
+          publication_source: 'newsletter',
+          lookup_attempts: 0,
+        },
         interest_level: 'interested',
         interest_score: 0.9,
         consumption_depth: consumptionDepth,
@@ -208,4 +214,83 @@ test('bundle validator rejects a missing --reference value as usage error', () =
   );
   assert.notEqual(result.status, 0);
   assert.match(result.stderr, /--reference requires a filename/);
+});
+
+test('validates all generation-time attribution outcomes', () => {
+  const cases = [
+    {
+      author: 'Newsletter Author',
+      publication: 'Newsletter Publication',
+      author_source: 'newsletter',
+      publication_source: 'newsletter',
+      lookup_attempts: 0,
+    },
+    {
+      author: 'Page Author',
+      publication: 'Page Publication',
+      author_source: 'article_page',
+      publication_source: 'article_page',
+      lookup_attempts: 1,
+    },
+    {
+      author: 'First Author and Second Author',
+      publication: 'Multi-author Journal',
+      author_source: 'article_page',
+      publication_source: 'article_page',
+      lookup_attempts: 1,
+    },
+    {
+      author: 'No authors listed',
+      publication: 'example.com',
+      author_source: 'no_authors_listed',
+      publication_source: 'hostname_fallback',
+      lookup_attempts: 1,
+    },
+    {
+      author: 'Author lookup failed',
+      publication: 'example.com',
+      author_source: 'lookup_failed',
+      publication_source: 'hostname_fallback',
+      lookup_attempts: 2,
+    },
+  ];
+
+  for (const attributionCase of cases) {
+    const { main, reference } = pair(1);
+    const item = reference.items[0]!;
+    item.author = attributionCase.author;
+    item.publication = attributionCase.publication;
+    item.attribution = {
+      resolved_url: item.url,
+      author_source: attributionCase.author_source,
+      publication_source: attributionCase.publication_source,
+      lookup_attempts: attributionCase.lookup_attempts,
+    };
+    assert.doesNotThrow(() => validateTldrCommuteQueuePair(main, reference));
+  }
+});
+
+test('rejects null attribution and status strings presented as verified authors', () => {
+  const { main, reference } = pair(1);
+  reference.items[0]!.author = null as unknown as string;
+  assert.throws(
+    () => validateTldrCommuteQueuePair(main, reference),
+    /author must be a non-empty string/
+  );
+
+  const second = pair(1);
+  second.reference.items[0]!.author = 'Author lookup failed';
+  second.reference.items[0]!.attribution.author_source = 'article_page';
+  assert.throws(
+    () => validateTldrCommuteQueuePair(second.main, second.reference),
+    /status strings are not verified author names/
+  );
+
+  const fallback = pair(1);
+  fallback.reference.items[0]!.publication = 'Wrong Site';
+  fallback.reference.items[0]!.attribution.publication_source = 'hostname_fallback';
+  assert.throws(
+    () => validateTldrCommuteQueuePair(fallback.main, fallback.reference),
+    /publication must equal example\.com/
+  );
 });

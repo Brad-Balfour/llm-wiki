@@ -98,6 +98,28 @@ test('managed Task prompt identifies v3 as the active canonical body', async () 
   assert.doesNotMatch(activeV3, /issue #106/i);
 });
 
+test('v4 candidate resolves and records attribution before classification', async () => {
+  const [generation, task, classifier, schema] = await Promise.all([
+    readFile('chatgpt-project/queue-generation-v4.md', 'utf8'),
+    readFile('chatgpt-project/WEEKDAY_TLDR_QUEUE_TASK_PROMPT_V4.md', 'utf8'),
+    readFile('schema/classifier-instructions.md', 'utf8'),
+    readFile('schema/tldr-commute-reference-v4.schema.json', 'utf8'),
+  ]);
+
+  assert.match(generation, /retry\s+once/);
+  assert.match(
+    generation,
+    /one attribution result for every occurrence of the same\s+resolved URL/
+  );
+  assert.match(generation, /`No authors listed`/);
+  assert.match(generation, /`Author lookup failed`/);
+  assert.match(generation, /hostname\s+without leading `www\.`/);
+  assert.match(task, /fill attribution before\s+classification/);
+  assert.match(classifier, /status\/error text are not authors/);
+  assert.match(schema, /"author_source"/);
+  assert.match(schema, /"publication_source"/);
+});
+
 test('daily commute completion cannot omit a required Project update', async () => {
   const [skill, agents] = await Promise.all([
     readFile('.codex/skills/process-daily-commute/SKILL.md', 'utf8'),
