@@ -25,6 +25,13 @@ most useful literal source text. Preserve every occurrence and removal decision
 in the references, rebuild queue positions and sweeps, and include the required
 private repeated-coverage review table in the run result.
 
+For each headline-only item whose title is not self-explanatory, append the
+shortest complete literal opening excerpt that explains it and record its source
+occurrence. Keep clear titles short and in-depth descriptions unchanged. Keep
+classification labels unchanged by this presentation step. Store any useful-
+update prefix separately from quoted source context and flag unusually long
+excerpts for review.
+
 Use the source email's America/New_York delivery date in each filename. The main
 file keeps the normal YYYYMMDD-tldr[-edition].txt name and contains only
 sweep_playback and items[].item_playback. The sibling inserts -reference before

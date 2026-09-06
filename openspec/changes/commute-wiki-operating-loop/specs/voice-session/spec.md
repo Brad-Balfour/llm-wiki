@@ -15,6 +15,12 @@ Voice SHALL use the v4 main file as the exclusive default speech source.
 - **AND** an original-description request SHALL read the full literal
   reference `description`.
 
+#### Scenario: Read prepared context without reclassification
+
+- **WHEN** an `item_playback` string contains a prepared context excerpt or update prefix
+- **THEN** Voice SHALL read the complete string exactly as stored
+- **AND** it SHALL NOT rewrite the context or change the announced depth label.
+
 ### Requirement: One Active Queue Per Voice Session
 
 A Voice session SHALL consume only the queue selected by an exact filename or

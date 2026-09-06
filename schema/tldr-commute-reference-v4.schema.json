@@ -72,6 +72,7 @@
         "source_occurrences",
         "selected_source_occurrence_id",
         "coverage",
+        "playback_context",
         "interest_level",
         "interest_score",
         "consumption_depth",
@@ -163,6 +164,28 @@
               }
             }
           ]
+        },
+        "playback_context": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "headline_context",
+            "excerpt_source_occurrence_id",
+            "unusually_long_excerpt",
+            "update_prefix"
+          ],
+          "properties": {
+            "headline_context": {
+              "anyOf": [{ "type": "string", "minLength": 1, "maxLength": 1000 }, { "type": "null" }]
+            },
+            "excerpt_source_occurrence_id": {
+              "anyOf": [{ "type": "string", "minLength": 1 }, { "type": "null" }]
+            },
+            "unusually_long_excerpt": { "type": "boolean" },
+            "update_prefix": {
+              "anyOf": [{ "type": "string", "minLength": 1, "maxLength": 1000 }, { "type": "null" }]
+            }
+          }
         },
         "interest_level": { "enum": ["interested", "maybe", "uninterested"] },
         "interest_score": { "type": "number", "minimum": 0, "maximum": 1 },

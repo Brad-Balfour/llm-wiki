@@ -31,6 +31,19 @@ across one daily generation pass.
 - **AND** every coverage decision SHALL resolve to an existing retained file and item
 - **AND** the decision occurrence SHALL be stored on exactly that retained item.
 
+### Requirement: Queue V4 Validates Prepared Headline Context
+
+Queue v4 validation SHALL distinguish literal source excerpts from generated
+update prefixes while preserving the classifier's depth decision.
+
+#### Scenario: Validate prepared context
+
+- **WHEN** a headline-only item includes added context
+- **THEN** its excerpt SHALL be an exact opening substring of the named source occurrence
+- **AND** an in-depth item SHALL reject headline-only context
+- **AND** a useful-update prefix SHALL equal its separately recorded update note
+- **AND** the same prefix SHALL NOT be represented as quoted source text.
+
 ### Requirement: Prepared Commute Queue
 
 The system SHALL generate a prepared commute queue from routed TLDR items before

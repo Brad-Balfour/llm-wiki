@@ -59,6 +59,12 @@ function pair(itemCount = 2) {
           decision_reason: 'No repeated daily coverage found.',
           update_note: null as string | null,
         },
+        playback_context: {
+          headline_context: null as string | null,
+          excerpt_source_occurrence_id: null as string | null,
+          unusually_long_excerpt: false,
+          update_prefix: null as string | null,
+        },
         interest_level: 'interested',
         interest_score: 0.9,
         consumption_depth: consumptionDepth,
@@ -431,6 +437,9 @@ test('keeps a meaningful update and unrelated coverage while preserving daily li
     decision_reason: 'This report adds the announced price and launch date.',
     update_note: 'Update: this report adds the announced price and launch date.',
   };
+  updateItem.playback_context.update_prefix = updateItem.coverage.update_note;
+  update.main.items[0]!.item_playback = `${update.main.items[0]!.item_playback}\n${updateItem.coverage.update_note}`;
+  update.reference.main_sha256 = playbackFileFingerprint(update.main);
   update.reference.coverage_decisions.push({
     source_occurrence_id: updateItem.source_occurrences[0]!.occurrence_id,
     outcome: 'kept_update',
@@ -567,6 +576,9 @@ test('requires audit decisions for removed and related occurrences', () => {
     decision_reason: 'Adds a material detail.',
     update_note: 'Update: adds a material detail.',
   };
+  update.reference.items[0]!.playback_context.update_prefix = 'Update: adds a material detail.';
+  update.main.items[0]!.item_playback += '\nUpdate: adds a material detail.';
+  update.reference.main_sha256 = playbackFileFingerprint(update.main);
   assert.throws(
     () =>
       validateTldrCommuteDailyPairs([
@@ -615,4 +627,44 @@ test('daily queue CLI invokes cross-pair validation', async () => {
   );
   assert.notEqual(result.status, 0);
   assert.match(result.stderr, /Resolved URL .* retained by multiple daily items/);
+});
+
+test('adds literal source context only to unclear headline-only playback', () => {
+  for (const titleKind of ['unfamiliar product name', 'clickbait'] as const) {
+    const candidate = pair(1);
+    const item = candidate.reference.items[0]!;
+    const excerpt = item.description;
+    item.playback_context.headline_context = excerpt;
+    item.playback_context.excerpt_source_occurrence_id = item.selected_source_occurrence_id;
+    item.playback_context.unusually_long_excerpt = titleKind === 'clickbait';
+    candidate.main.items[0]!.item_playback += `\n${excerpt}`;
+    candidate.reference.main_sha256 = playbackFileFingerprint(candidate.main);
+    assert.doesNotThrow(() => validateTldrCommuteQueuePair(candidate.main, candidate.reference));
+  }
+
+  const clearAndInDepth = pair(2);
+  assert.doesNotThrow(() =>
+    validateTldrCommuteQueuePair(clearAndInDepth.main, clearAndInDepth.reference)
+  );
+});
+
+test('rejects invented headline context and context on in-depth items', () => {
+  const invented = pair(1);
+  invented.reference.items[0]!.playback_context.headline_context = 'Invented explanation.';
+  invented.reference.items[0]!.playback_context.excerpt_source_occurrence_id =
+    invented.reference.items[0]!.selected_source_occurrence_id;
+  assert.throws(
+    () => validateTldrCommuteQueuePair(invented.main, invented.reference),
+    /literal opening source excerpt/
+  );
+
+  const inDepth = pair(2);
+  inDepth.reference.items[1]!.playback_context.headline_context =
+    inDepth.reference.items[1]!.description;
+  inDepth.reference.items[1]!.playback_context.excerpt_source_occurrence_id =
+    inDepth.reference.items[1]!.selected_source_occurrence_id;
+  assert.throws(
+    () => validateTldrCommuteQueuePair(inDepth.main, inDepth.reference),
+    /must not add headline context to an in-depth item/
+  );
 });

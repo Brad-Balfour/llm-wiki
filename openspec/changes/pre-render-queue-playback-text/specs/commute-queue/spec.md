@@ -31,6 +31,27 @@ story decisions have been applied across the day's editions.
 - **AND** its sweep and item playback SHALL be regenerated from those final positions
 - **AND** a queue with no retained items SHALL use an empty sweep and item array.
 
+### Requirement: Queue V4 Adds Literal Context To Unclear Headlines
+
+Queue v4 SHALL give unclear headline-only items enough literal source context
+without changing classification or expanding clear headlines.
+
+#### Scenario: Prepare an unclear headline
+
+- **WHEN** a headline-only title is an unexplained name or is otherwise not self-contained
+- **THEN** playback SHALL append the shortest complete opening source sentence or sentences that explain it
+- **AND** the reference SHALL record the exact excerpt and its source occurrence
+- **AND** unusually long minimum excerpts SHALL be flagged for sample review
+- **AND** the sweep SHALL remain title-and-mode only.
+
+#### Scenario: Preserve clear and in-depth playback
+
+- **WHEN** a headline-only title is self-contained or an item is already in-depth
+- **THEN** a clear headline-only item SHALL append no context
+- **AND** an in-depth item SHALL retain its full literal description
+- **AND** presentation context SHALL NOT change either classifier score or depth label
+- **AND** a generated update prefix SHALL remain distinct from quoted source text.
+
 #### Scenario: Read historical playback
 
 - **WHEN** local tools receive a valid v2 or v3 queue or bundle

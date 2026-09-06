@@ -106,6 +106,12 @@ test('binds v4 corrections using producer versions from the reference root', asy
           decision_reason: 'No repeated daily coverage found.',
           update_note: null,
         },
+        playback_context: {
+          headline_context: null,
+          excerpt_source_occurrence_id: null,
+          unusually_long_excerpt: false,
+          update_prefix: null,
+        },
         interest_level: input.original.interest_level,
         interest_score: input.original.interest_score,
         consumption_depth: input.original.consumption_depth,

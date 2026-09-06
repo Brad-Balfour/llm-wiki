@@ -77,6 +77,22 @@ removed, updated, or uncertain occurrence: source newsletter/item, outcome,
 retained filename/item, reason, and new information. Also report editions with
 no repeated coverage and empty editions. Do not put this table in queue files.
 
+## Context for unclear headlines
+
+For a headline-only title that is an unexplained product/name or otherwise does
+not say what the item is about, append the shortest complete opening sentence
+or sentences from the selected occurrence's literal description that explain
+it. Do not truncate a sentence, rewrite it, or manufacture an explanation.
+Record the exact text and its occurrence in `playback_context`. Set
+`unusually_long_excerpt` when the shortest adequate complete excerpt is
+unusually long so it appears in sample review.
+
+Keep a self-contained headline short with null context. Never add headline
+context to an in-depth item or change either classification score or depth label
+to obtain more playback. For a useful update, copy the prepared
+`coverage.update_note` to the separate `playback_context.update_prefix`; it is
+generated text, not a quoted excerpt.
+
 ## Main playback file
 
 The main object has exactly two keys in this order: `sweep_playback`, then
@@ -85,9 +101,11 @@ scores, URLs, descriptions, titles, versions, or other metadata.
 
 Order all headline-only items before in-depth items. For item N of M, the sweep
 line is `<N> of <M>. <Headline only|In depth>. <title>`. Join sweep lines with
-newlines. A headline-only `item_playback` is that line. An in-depth
-`item_playback` is that line, a newline, and the full literal newsletter
-description. An empty queue is `{ "sweep_playback": "", "items": [] }`.
+newlines. Start `item_playback` with that line. Append a prepared update prefix
+on its own line when present. Then append the literal headline-context excerpt
+for an unclear headline-only item, or the full literal newsletter description
+for every in-depth item. A clear headline-only item has no appended text. An
+empty queue is `{ "sweep_playback": "", "items": [] }`.
 
 ## Reference file
 
@@ -127,7 +145,19 @@ for index, (played, item) in enumerate(zip(main["items"], reference["items"]), 1
     assert list(played) == ["item_playback"], f"main item {index} shape"
     mode = "Headline only" if item["consumption_depth"] == "headline_only" else "In depth"
     prefix = f'{index} of {reference["total_items"]}. {mode}. {item["title"]}'
-    expected = prefix if item["consumption_depth"] == "headline_only" else prefix + "\n" + item["description"]
+    context = item["playback_context"]
+    lines = [prefix]
+    if context["update_prefix"] is not None:
+        assert context["update_prefix"] == item["coverage"]["update_note"], f"update prefix {index}"
+        lines.append(context["update_prefix"])
+    if item["consumption_depth"] == "in_depth":
+        assert context["headline_context"] is None, f"in-depth context {index}"
+        lines.append(item["description"])
+    elif context["headline_context"] is not None:
+        occurrence = next(o for o in item["source_occurrences"] if o["occurrence_id"] == context["excerpt_source_occurrence_id"])
+        assert occurrence["description"].startswith(context["headline_context"]), f"literal opening excerpt {index}"
+        lines.append(context["headline_context"])
+    expected = "\n".join(lines)
     assert played["item_playback"] == expected, f"item playback {index}"
     attribution = item["attribution"]
     assert attribution["resolved_url"] == item["url"], f"resolved URL {index}"

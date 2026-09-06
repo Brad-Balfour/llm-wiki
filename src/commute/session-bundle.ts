@@ -402,8 +402,7 @@ export function validateTldrCommuteQueuePair(
       `playback_file.items[${index}].item_playback`
     );
     const prefix = renderV4PlaybackPrefix(index + 1, totalItems, item.consumptionDepth, item.title);
-    const expected =
-      item.consumptionDepth === 'headline_only' ? prefix : `${prefix}\n${item.description}`;
+    const expected = [prefix, ...item.playbackLines].join('\n');
     if (actualPlayback !== expected) {
       throw new Error(
         `playback_file.items[${index}].item_playback must equal the deterministic v4 playback`
@@ -826,6 +825,7 @@ function validateQueueV4ReferenceItem(
   title: string;
   description: string;
   consumptionDepth: 'headline_only' | 'in_depth';
+  playbackLines: string[];
 } {
   const record = requireRecord(candidate, itemPath);
   rejectUnknownKeys(
@@ -842,6 +842,7 @@ function validateQueueV4ReferenceItem(
       'source_occurrences',
       'selected_source_occurrence_id',
       'coverage',
+      'playback_context',
       'interest_level',
       'interest_score',
       'consumption_depth',
@@ -893,7 +894,7 @@ function validateQueueV4ReferenceItem(
   ) {
     throw new Error(`${itemPath} must copy identity and source text from its selected occurrence`);
   }
-  validateItemCoverage(record.coverage, `${itemPath}.coverage`);
+  const coverage = validateItemCoverage(record.coverage, `${itemPath}.coverage`);
   requireEnum(
     record.interest_level,
     ['interested', 'maybe', 'uninterested'] as const,
@@ -904,6 +905,14 @@ function validateQueueV4ReferenceItem(
     record.consumption_depth,
     ['headline_only', 'in_depth'] as const,
     `${itemPath}.consumption_depth`
+  );
+  const playbackLines = validatePlaybackContext(
+    record.playback_context,
+    `${itemPath}.playback_context`,
+    consumptionDepth,
+    description,
+    occurrences,
+    coverage
   );
   requireScore(record.depth_score, `${itemPath}.depth_score`);
   requireString(record.commute_behavior, `${itemPath}.commute_behavior`);
@@ -916,7 +925,7 @@ function validateQueueV4ReferenceItem(
     title,
     url,
   };
-  return { identity, title, description, consumptionDepth };
+  return { identity, title, description, consumptionDepth, playbackLines };
 }
 
 interface ValidatedSourceOccurrence {
@@ -973,7 +982,13 @@ function validateNullableText(candidate: unknown, field: string): string | null 
   return requireString(candidate, field);
 }
 
-function validateItemCoverage(candidate: unknown, field: string): void {
+function validateItemCoverage(
+  candidate: unknown,
+  field: string
+): {
+  status: 'original' | 'deduplicated' | 'useful_update' | 'uncertain';
+  updateNote: string | null;
+} {
   const record = requireRecord(candidate, field);
   rejectUnknownKeys(
     record,
@@ -1006,6 +1021,73 @@ function validateItemCoverage(candidate: unknown, field: string): void {
   if (status !== 'useful_update' && updateNote !== null) {
     throw new Error(`${field} update_note is only allowed for useful updates`);
   }
+  return { status, updateNote };
+}
+
+function validatePlaybackContext(
+  candidate: unknown,
+  field: string,
+  consumptionDepth: 'headline_only' | 'in_depth',
+  selectedDescription: string,
+  occurrences: ValidatedSourceOccurrence[],
+  coverage: {
+    status: 'original' | 'deduplicated' | 'useful_update' | 'uncertain';
+    updateNote: string | null;
+  }
+): string[] {
+  const record = requireRecord(candidate, field);
+  rejectUnknownKeys(
+    record,
+    ['headline_context', 'excerpt_source_occurrence_id', 'unusually_long_excerpt', 'update_prefix'],
+    field
+  );
+  const headlineContext = validateNullableText(
+    record.headline_context,
+    `${field}.headline_context`
+  );
+  const occurrenceId = validateNullableText(
+    record.excerpt_source_occurrence_id,
+    `${field}.excerpt_source_occurrence_id`
+  );
+  if (typeof record.unusually_long_excerpt !== 'boolean') {
+    throw new Error(`${field}.unusually_long_excerpt must be a boolean`);
+  }
+  const unusuallyLong = record.unusually_long_excerpt;
+  const updatePrefix = validateNullableText(record.update_prefix, `${field}.update_prefix`);
+
+  if (consumptionDepth === 'in_depth' && (headlineContext !== null || occurrenceId !== null)) {
+    throw new Error(`${field} must not add headline context to an in-depth item`);
+  }
+  if ((headlineContext === null) !== (occurrenceId === null)) {
+    throw new Error(`${field} must provide headline context and its occurrence together`);
+  }
+  if (headlineContext === null && unusuallyLong) {
+    throw new Error(`${field} cannot flag a missing excerpt as unusually long`);
+  }
+  if (headlineContext !== null && occurrenceId !== null) {
+    const occurrence = occurrences.find((value) => value.occurrenceId === occurrenceId);
+    if (occurrence === undefined) {
+      throw new Error(`${field}.excerpt_source_occurrence_id must name a source occurrence`);
+    }
+    if (!occurrence.description.startsWith(headlineContext)) {
+      throw new Error(`${field}.headline_context must be a literal opening source excerpt`);
+    }
+  }
+  if (coverage.status === 'useful_update' && updatePrefix !== coverage.updateNote) {
+    throw new Error(`${field}.update_prefix must equal the prepared useful-update note`);
+  }
+  if (coverage.status !== 'useful_update' && updatePrefix !== null) {
+    throw new Error(`${field}.update_prefix is only allowed for useful updates`);
+  }
+
+  const lines: string[] = [];
+  if (updatePrefix !== null) lines.push(updatePrefix);
+  if (consumptionDepth === 'in_depth') {
+    lines.push(selectedDescription);
+  } else if (headlineContext !== null) {
+    lines.push(headlineContext);
+  }
+  return lines;
 }
 
 function validateCoverageDecision(
