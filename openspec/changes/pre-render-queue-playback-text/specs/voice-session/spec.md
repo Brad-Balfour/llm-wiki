@@ -2,6 +2,19 @@
 
 ## MODIFIED Requirements
 
+### Requirement: Queue V4 Playback File Is The Default Voice Source
+
+Voice SHALL read only pre-rendered strings from the selected v4 main file for
+the sweep and ordinary item playback.
+
+#### Scenario: Return to playback after reference use
+
+- **WHEN** Brad requests details and then asks to continue
+- **THEN** Voice SHALL reopen the same main file
+- **AND** it SHALL read the requested `item_playback` exactly
+- **AND** it SHALL not reuse reference or conversational text as default
+  playback.
+
 ### Requirement: Literal, Interruption-Friendly Playback Is the Default
 
 Voice SHALL read only the verified current item's pre-rendered string during default playback.

@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://brad-balfour.github.io/llm-wiki/schema/tldr-commute-playback-v4.schema.json",
+  "title": "TLDR commute playback file v4",
+  "description": "The complete default Voice payload. Reference metadata is stored in the matching reference file.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["sweep_playback", "items"],
+  "properties": {
+    "sweep_playback": { "type": "string" },
+    "items": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["item_playback"],
+        "properties": {
+          "item_playback": { "type": "string", "minLength": 1, "maxLength": 5000 }
+        }
+      }
+    }
+  }
+}

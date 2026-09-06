@@ -2,6 +2,27 @@
 
 ## ADDED Requirements
 
+### Requirement: Queue V4 Moves Prepared Playback Into A Minimal Main File
+
+Queue v4 SHALL preserve deterministic v3 playback semantics while separating
+the strings spoken by default from reference metadata.
+
+#### Scenario: Render a v4 pair
+
+- **WHEN** generation renders an ordered v4 queue
+- **THEN** the main SHALL contain only the complete `sweep_playback` and one
+  `item_playback` per position
+- **AND** in-depth playback SHALL append the exact reference description
+- **AND** the reference SHALL retain all item identity and classifier data
+- **AND** validation SHALL recompute the sweep, item strings, positions, counts,
+  filename, and canonical main hash.
+
+#### Scenario: Read historical playback
+
+- **WHEN** local tools receive a valid v2 or v3 queue or bundle
+- **THEN** they SHALL retain the existing version-specific behavior without
+  converting the artifact in place.
+
 ### Requirement: Queue v3 Pre-renders Default Playback
 
 Every newly generated queue item SHALL contain one deterministic literal string for default Voice playback.

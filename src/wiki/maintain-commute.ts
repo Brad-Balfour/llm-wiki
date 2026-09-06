@@ -28,7 +28,7 @@ export type Options =
   | { kind: 'diagnose_launcher' }
   | {
       kind: 'maintain';
-      inputs: Array<{ bundle: string; recoveryQueue?: string }>;
+      inputs: Array<{ bundle: string; recoveryQueue?: string; recoveryReference?: string }>;
       outputDir: string;
       priorIntake?: string;
     };
@@ -133,6 +133,14 @@ async function main(): Promise<void> {
             recoveryQueue: {
               filename: path.basename(input.recoveryQueue),
               text: await readFile(input.recoveryQueue, 'utf8'),
+              ...(input.recoveryReference === undefined
+                ? {}
+                : {
+                    reference: {
+                      filename: path.basename(input.recoveryReference),
+                      text: await readFile(input.recoveryReference, 'utf8'),
+                    },
+                  }),
             },
           }),
     }))
@@ -513,7 +521,7 @@ function optionalHttpUrl(candidate: unknown, field: string): string | undefined 
 }
 
 export function parseOptions(args: string[]): Options {
-  const inputs: Array<{ bundle: string; recoveryQueue?: string }> = [];
+  const inputs: Array<{ bundle: string; recoveryQueue?: string; recoveryReference?: string }> = [];
   let outputDir: string | undefined;
   let priorIntake: string | undefined;
   let diagnoseLauncher = false;
@@ -535,6 +543,16 @@ export function parseOptions(args: string[]): Options {
       if (prior.recoveryQueue)
         throw new Error('Each --input accepts at most one --recover-with queue');
       prior.recoveryQueue = queue;
+      index += 1;
+    } else if (arg === '--reference') {
+      const reference = args[index + 1];
+      const prior = inputs.at(-1);
+      if (!reference || reference.startsWith('--') || !prior?.recoveryQueue) {
+        throw new Error('--reference requires a preceding --input and --recover-with queue');
+      }
+      if (prior.recoveryReference)
+        throw new Error('Each --input accepts at most one --reference file');
+      prior.recoveryReference = reference;
       index += 1;
     } else if (arg === '--output-dir') {
       const output = args[index + 1];
@@ -558,7 +576,7 @@ export function parseOptions(args: string[]): Options {
   }
   if (inputs.length === 0 || !outputDir) {
     throw new Error(
-      'Usage: maintain:commute -- --input <bundle.txt> [--recover-with <queue.txt>] [--input <bundle.txt> ...] --output-dir <private-directory> [--prior-intake <private-intake.json>], or --diagnose-launcher'
+      'Usage: maintain:commute -- --input <bundle.txt> [--recover-with <queue.txt> [--reference <reference.txt>]] [--input <bundle.txt> ...] --output-dir <private-directory> [--prior-intake <private-intake.json>], or --diagnose-launcher'
     );
   }
   return {

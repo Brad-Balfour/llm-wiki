@@ -1,3 +1,8 @@
+## Classifier v2 queue compatibility
+
+- [x] Add the queue-v4 playback/reference schemas and local pair validation
+- [x] Preserve exact v4 identities in session export, recovery, feedback, and import
+
 ## Current Implementation Priority (reconciled 2026-07-26)
 
 The working product path is now ChatGPT Project + Gmail + downloadable v2 queue

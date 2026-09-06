@@ -1,3 +1,9 @@
+## Classifier v2 queue compatibility
+
+Queue v4 stores default speech in a minimal main file and all identity and
+source data in a hashed sibling reference. Session bundle v1 embeds both in a
+`tldr-commute-queue.v4` wrapper. Existing v2/v3 parsing remains unchanged.
+
 ## Context
 
 The implementation repo is the public project surface. A separate local exploration archive remains private and is not part of this repository.

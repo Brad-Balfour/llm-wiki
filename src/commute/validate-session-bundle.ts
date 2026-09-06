@@ -3,6 +3,7 @@ import path from 'node:path';
 
 import {
   bundleArtifactFilenameMatches,
+  createQueueV4Snapshot,
   fileSha256,
   parseCommuteSessionBundleText,
   queueSnapshotFingerprint,
@@ -11,6 +12,7 @@ import {
 interface Options {
   input: string;
   queue: string;
+  reference?: string;
   durableEventRecord?: string;
 }
 
@@ -29,8 +31,17 @@ async function main(): Promise<void> {
   if (path.basename(options.queue) !== bundle.queue_snapshot.filename) {
     throw new Error('Embedded queue filename does not match --queue filename');
   }
+  const selectedSnapshot =
+    options.reference === undefined
+      ? selectedQueue
+      : createQueueV4Snapshot(
+          selectedQueue,
+          JSON.parse(await readFile(options.reference, 'utf8')) as unknown,
+          path.basename(options.queue),
+          path.basename(options.reference)
+        );
   if (
-    queueSnapshotFingerprint(selectedQueue) !==
+    queueSnapshotFingerprint(selectedSnapshot) !==
     queueSnapshotFingerprint(bundle.queue_snapshot.queue)
   ) {
     throw new Error('Embedded queue snapshot does not canonically match --queue JSON');
@@ -73,17 +84,21 @@ function parseOptions(args: string[]): Options {
   let input: string | undefined;
   let queue: string | undefined;
   let durableEventRecord: string | undefined;
+  let reference: string | undefined;
 
   for (let index = 0; index < args.length; index += 1) {
     const arg = args[index];
     if (arg === '--input') {
-      input = args[index + 1];
+      input = requireOptionValue(args, index, arg);
       index += 1;
     } else if (arg === '--queue') {
-      queue = args[index + 1];
+      queue = requireOptionValue(args, index, arg);
       index += 1;
     } else if (arg === '--durable-event-record') {
-      durableEventRecord = args[index + 1];
+      durableEventRecord = requireOptionValue(args, index, arg);
+      index += 1;
+    } else if (arg === '--reference') {
+      reference = requireOptionValue(args, index, arg);
       index += 1;
     } else {
       throw new Error(`Unknown argument: ${arg ?? ''}`);
@@ -92,11 +107,22 @@ function parseOptions(args: string[]): Options {
 
   if (!input || !queue) {
     throw new Error(
-      'Usage: validate:commute-session-bundle -- --input <bundle.txt> --queue <queue.txt> [--durable-event-record <record.txt>]'
+      'Usage: validate:commute-session-bundle -- --input <bundle.txt> --queue <queue.txt> [--reference <reference.txt>] [--durable-event-record <record.txt>]'
     );
   }
 
-  return { input, queue, ...(durableEventRecord === undefined ? {} : { durableEventRecord }) };
+  return {
+    input,
+    queue,
+    ...(reference === undefined ? {} : { reference }),
+    ...(durableEventRecord === undefined ? {} : { durableEventRecord }),
+  };
+}
+
+function requireOptionValue(args: string[], index: number, option: string): string {
+  const value = args[index + 1];
+  if (!value || value.startsWith('--')) throw new Error(`${option} requires a filename`);
+  return value;
 }
 
 await main();

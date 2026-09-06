@@ -1,5 +1,11 @@
 # Design: Deterministic Queue-v3 Playback
 
+## Queue v4 extension
+
+Queue v4 keeps the prepared speech introduced by v3 but moves it into a
+strictly minimal main file. A position-matched reference file carries the
+metadata and authenticates `JSON.stringify(parsedMain)` with SHA-256.
+
 ## Decisions
 
 ### Render one exact string

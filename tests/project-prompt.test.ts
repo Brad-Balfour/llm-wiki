@@ -12,26 +12,26 @@ test('ChatGPT Project instructions fit the 8,000-character limit', async () => {
 test('ChatGPT Project instructions say exactly how to read the queue JSON', async () => {
   const prompt = await readFile('chatgpt-project/CHATGPT_CAR_QUEUE_PROMPT.md', 'utf8');
 
-  assert.match(prompt, /Prompt 4\.2 for Queue v3/);
-  assert.match(prompt, /The file will contain/);
+  assert.match(prompt, /Prompt 5\.0 Candidate for Queue v4/);
+  assert.match(prompt, /The main file will contain/);
   assert.match(prompt, /a top-level `sweep_playback` string/);
-  assert.match(prompt, /an `items` array whose objects each contain a `playback_text` string/);
+  assert.match(prompt, /an `items` array whose objects each contain an `item_playback` string/);
   assert.match(prompt, /read the complete\s+value of `sweep_playback` exactly as written/);
   assert.match(
     prompt,
-    /Find the requested object in the `items` array and read the value of\s+its `playback_text` field out loud exactly as written/
+    /Find the requested object in the `items` array and read the value of\s+its `item_playback` field out loud exactly as written/
   );
   assert.match(prompt, /Do not add, remove, rewrite, explain, or summarize any of the text/);
   assert.match(prompt, /After reading an item, pause and wait/);
   assert.match(prompt, /After reading the final item, say\s+`Finished <filename>\.`/);
-  assert.match(prompt, /use the URL from the selected item/);
-  assert.match(prompt, /say that the answer came from the article/);
+  assert.match(prompt, /open the matching `-reference\.txt` file/);
+  assert.match(prompt, /original-description request reads the complete\s+literal `description`/);
 });
 
 test('ChatGPT Project instructions reopen the same queue before every item', async () => {
   const prompt = await readFile('chatgpt-project/CHATGPT_CAR_QUEUE_PROMPT.md', 'utf8');
 
-  assert.match(prompt, /When Brad asks you to read an item, reopen the same queue file/);
+  assert.match(prompt, /When Brad asks you to read an item, reopen the same main queue file/);
   assert.match(prompt, /Do this every time Brad\s+asks for another item/);
   assert.match(prompt, /whenever he returns to the queue after discussing an\s+article/);
   assert.match(prompt, /Do\s+not switch to another queue file/);
@@ -60,10 +60,9 @@ test('session-export contains the note and bundle instructions removed from the 
   assert.match(sessionExport, /copy `source_item_id`, `title`, and `url`/i);
   assert.match(sessionExport, /Copy Brad's exact words into `user_words`/);
   assert.match(sessionExport, /create an `unresolved_capture`/);
-  assert.match(
-    sessionExport,
-    /Put the full JSON object from that file in\s+`queue_snapshot\.queue`/
-  );
+  assert.match(sessionExport, /Put both complete objects in `queue_snapshot\.queue`/);
+  assert.match(sessionExport, /"playback_file": <main>/);
+  assert.match(sessionExport, /"reference_file": <reference>/);
   assert.match(sessionExport, /Record only articles that were actually read/);
   assert.match(sessionExport, /Do not invent missing moves,\s+announcements, or articles/);
   assert.match(sessionExport, /Normally set `integrity\.state` to `partial`/);

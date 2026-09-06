@@ -22,6 +22,22 @@ uses that schema; it does not replace it.
 No Project update is pending for Prompt 4.2. Future repository edits still do
 not change the live Project automatically.
 
+## Classifier v2 candidate (not installed)
+
+The review stack prepares Queue v4 and Prompt 5.0 without changing the live
+Project. After the full stack is approved, replace the Project Instructions
+with `CHATGPT_CAR_QUEUE_PROMPT.md`; replace `queue-generation-v3.md` and the v3
+queue schema with `queue-generation-v4.md`,
+`tldr-commute-playback-v4.schema.json`, and
+`tldr-commute-reference-v4.schema.json`; replace `session-export.md` and
+`commute-session-bundle-v1.schema.json`; and replace the existing weekday Task
+body with `WEEKDAY_TLDR_QUEUE_TASK_PROMPT_V4.md`. Later PRs in the stack name
+the candidate classifier/profile replacements. Keep the Task's weekday 11 a.m.
+America/New_York schedule and all unrelated working Project sources.
+
+Until Brad confirms those replacements, Queue v3, Prompt 4.2, profile 1.4,
+classifier instructions v1, and the v3 Task body remain the live versions.
+
 `Queue v3` in the prompt title names the JSON structure. `Prompt 4.2` names this
 version of the instructions.
 

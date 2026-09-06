@@ -2,6 +2,21 @@
 
 ## ADDED Requirements
 
+### Requirement: Queue V4 Separates Playback From Reference Data
+
+New Project generation SHALL create a strictly minimal playback file and a
+matching complete reference file while local readers retain v2/v3 support.
+
+#### Scenario: Generate and validate a v4 pair
+
+- **WHEN** generation produces a queue-v4 result
+- **THEN** the main file SHALL contain only `sweep_playback` and
+  `items[].item_playback`
+- **AND** the reference SHALL identify the main filename and its SHA-256 over
+  `JSON.stringify(parsedMain)`
+- **AND** reference entries SHALL match main entries by position
+- **AND** a missing, stale, swapped, or reordered reference SHALL be rejected.
+
 ### Requirement: Prepared Commute Queue
 
 The system SHALL generate a prepared commute queue from routed TLDR items before

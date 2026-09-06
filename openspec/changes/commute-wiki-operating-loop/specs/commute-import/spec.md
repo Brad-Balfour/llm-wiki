@@ -2,6 +2,19 @@
 
 ## ADDED Requirements
 
+### Requirement: Import Preserves V4 Pair Identity
+
+Local validation, recovery, feedback extraction, and maintenance import SHALL
+resolve v4 items from the embedded reference while retaining v2/v3 readers.
+
+#### Scenario: Validate supplied v4 files
+
+- **WHEN** local intake receives a v4 main file with `--reference`
+- **THEN** it SHALL validate the pair and compare its complete wrapper with the
+  bundle snapshot
+- **AND** a mismatched filename, hash, position, count, or identity SHALL fail
+  before item-specific evidence is used.
+
 ### Requirement: Multi-Bundle Single Import
 
 The local commute import command SHALL accept one or more session bundles in a

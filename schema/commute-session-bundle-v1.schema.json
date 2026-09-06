@@ -25,7 +25,7 @@
       }
     },
     "queue_snapshot": {
-      "description": "The complete selected tldr-commute-queue.v3 JSON object for new sessions, or an unchanged historical tldr-commute-queue.v2 JSON object during local import. The local validator enforces the selected version's fields, ordering, and privacy boundary; its canonical JSON is compared with the selected downloaded queue.",
+      "description": "A complete v4 wrapper containing playback_file and reference_file for new sessions, or an unchanged historical v2/v3 queue during local import. queue_snapshot.filename remains the selected main filename.",
       "type": "object",
       "additionalProperties": false,
       "required": ["filename", "queue"],

@@ -4,6 +4,7 @@ import path from 'node:path';
 
 import { reconcileSessionBundles } from './import-session-bundles.js';
 import {
+  createQueueV4Snapshot,
   parseCommuteSessionBundleText,
   parseCommuteSessionBundleTextWithRelaxedArtifactFilename,
   queueSnapshotFingerprint,
@@ -15,6 +16,7 @@ const SCHEMA_VERSION = 'commute-preflight.v1';
 export interface PreflightInput {
   bundle: string;
   recoveryQueue?: string;
+  recoveryReference?: string;
 }
 export interface PreflightOptions {
   inputs: PreflightInput[];
@@ -33,12 +35,29 @@ export async function runPreflight(
       const bundleText = await readFile(input.bundle, 'utf8');
       const queueText =
         input.recoveryQueue === undefined ? undefined : await readFile(input.recoveryQueue, 'utf8');
+      const referenceText =
+        input.recoveryReference === undefined
+          ? undefined
+          : await readFile(input.recoveryReference, 'utf8');
       return {
         filename: path.basename(input.bundle),
         text: bundleText,
         ...(input.recoveryQueue === undefined
           ? {}
-          : { recoveryQueue: { filename: path.basename(input.recoveryQueue), text: queueText! } }),
+          : {
+              recoveryQueue: {
+                filename: path.basename(input.recoveryQueue),
+                text: queueText!,
+                ...(input.recoveryReference === undefined
+                  ? {}
+                  : {
+                      reference: {
+                        filename: path.basename(input.recoveryReference),
+                        text: referenceText!,
+                      },
+                    }),
+              },
+            }),
       };
     })
   );
@@ -114,7 +133,11 @@ function sha256(value: string): string {
 function compareRecoveryQueue(input: {
   filename: string;
   text: string;
-  recoveryQueue: { filename: string; text: string };
+  recoveryQueue: {
+    filename: string;
+    text: string;
+    reference?: { filename: string; text: string };
+  };
 }) {
   try {
     let bundle;
@@ -126,7 +149,16 @@ function compareRecoveryQueue(input: {
         input.filename
       ).bundle;
     }
-    const supplied = validateTldrCommuteQueueV2(JSON.parse(input.recoveryQueue.text) as unknown);
+    const supplied = validateTldrCommuteQueueV2(
+      input.recoveryQueue.reference === undefined
+        ? (JSON.parse(input.recoveryQueue.text) as unknown)
+        : createQueueV4Snapshot(
+            JSON.parse(input.recoveryQueue.text) as unknown,
+            JSON.parse(input.recoveryQueue.reference.text) as unknown,
+            input.recoveryQueue.filename,
+            input.recoveryQueue.reference.filename
+          )
+    );
     const suppliedFingerprint = queueSnapshotFingerprint(supplied);
     const embeddedFingerprint = queueSnapshotFingerprint(bundle.queue_snapshot.queue);
     const matches =
@@ -165,6 +197,11 @@ export function parsePreflightOptions(args: string[]): PreflightOptions {
         throw new Error('--recover-with may appear only once for each --input');
       inputs.at(-1)!.recoveryQueue = value;
       index += 1;
+    } else if (arg === '--reference' && value && inputs.at(-1)?.recoveryQueue) {
+      if (inputs.at(-1)!.recoveryReference !== undefined)
+        throw new Error('--reference may appear only once for each --input');
+      inputs.at(-1)!.recoveryReference = value;
+      index += 1;
     } else if (arg === '--shared-chat' && value) {
       sharedChats.push(value);
       index += 1;
@@ -175,7 +212,7 @@ export function parsePreflightOptions(args: string[]): PreflightOptions {
   }
   if (inputs.length === 0 || !output)
     throw new Error(
-      'Usage: commute:run -- --input <bundle> [--recover-with <queue>] [--shared-chat <url>] --output <private-result.json>'
+      'Usage: commute:run -- --input <bundle> [--recover-with <queue> [--reference <reference>]] [--shared-chat <url>] --output <private-result.json>'
     );
   if (!path.resolve(output).startsWith(`${path.resolve('.private')}${path.sep}`))
     throw new Error('--output must be inside the gitignored .private directory');
