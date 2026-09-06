@@ -1,395 +1,432 @@
-# Classifier v2 implementation and validation plan
+# Classifier v2 implementation runbook
 
-Status: proposed; this PR contains planning only. The
-[requirements](requirements.md) define R1–R10 and the
-[evidence inventory](evidence-inventory.md) accounts for every open issue.
-No model experiment, live Project edit, mailbox change, or use of a new implementation
-has happened as part of this plan.
+Status: ready for review as a plan. The implementation described below does not
+yet exist. This runbook is for Sol to execute and Brad to review without needing
+to reconstruct the planning conversation.
 
-## Scope of the build
+Build the five improvements in [R1–R5](requirements.md#part-1--new-improvements).
+Keep daily generation in the existing ChatGPT Project and weekday task. Prepare
+five small, stacked implementation PRs before Brad’s review window; perform one
+combined historical simulation before release. Code review increments do not
+require five deployments or five full commute tests.
 
-There are four proposed improvements: the two-file queue, daily duplicate
-removal, better classification validated against Brad’s answers, and a separate
-trial of context for unclear headlines. R5/R6/R7 supply records and verified
-feedback for those improvements. R8/R9 and the preservation rules describe what
-must keep working; R10 describes review and measurement practices.
+## Timing and responsibilities
 
-The PR table breaks that work into reviewable steps, not twelve required new
-features. Reuse existing validators, routing and import behavior. Build only the
-missing collection, comparison and output tools. P5’s local model integration
-and P11’s later experiments are optional. The four-week scoring trial does not
-block the two-file or duplicate-removal trials once their own prerequisites and
-checks are met.
+| Phase                   | Target                                                    | Sol’s responsibility                                                                                                        | Brad’s responsibility                                                               | Completion                                                                      |
+| ----------------------- | --------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
+| 0 — Prepare             | First implementation block on Sunday, September 6         | Inspect current files; recover available historical inputs; prepare blind labels and baseline; reserve final-check material | Supply missing labels when available                                                | Inputs and examples ready; coding can continue without answers                  |
+| 1–5 — Build             | Sunday’s uninterrupted implementation block               | Prepare all five PRs, tests, examples and installation list; finish independent work before waiting                         | No action needed while busy                                                         | Reviewable stack; scoring results clearly marked pending if answers are missing |
+| 6 — Review and simulate | Sunday afternoon, continuing Monday if needed             | Address review changes, check combined files and assist the simulated commute                                               | Review/tweak/approve PRs, finish labels, replace candidate Project files and listen | Brad accepts the combined experience as no worse than today                     |
+| 7 — Generate and use    | Monday, September 7; first listen Tuesday AM, September 8 | Verify Monday output, use established phone recovery if the write fails, finish handoff                                     | Confirm Project updates and any final fixes; listen Tuesday                         | Monday files present in the Project Library and ready for Tuesday               |
 
-## Recommended sequence
+These are targets, not measured coding estimates. If a blocker threatens the
+review window, report the unfinished PR and actual remaining work. Continue the
+other PRs. Do not wait for PR 1 to merge before coding PRs 2–5. The only required
+waits are for unavailable source access, Brad’s answers where results depend on
+them, and approval for merges/live installation.
 
-First inventory available newsletters across dates and editions, existing labels
-and recorded corrections. Add only the missing tools for collecting, replaying
-and comparing that evidence. Keep Monday’s existing queue generator available.
-Develop scoring changes on historical data and validate them on separate unused
-data. Add the two-file output, daily exact duplicate removal and
-short-playback improvements as separately reviewable product changes. Retain
-the existing iPhone Voice app. Whether it reads the queue correctly needs a separate test.
+## Current system and implementation choices
 
-This makes the system more useful before the four-week scoring experiment ends:
-missing-item explanations, accurate records of the versions used, reusable labeled data,
-repeatable queue checks, and eventually fewer duplicate announcements. Brad can review and approve each improvement separately.
+**Current:** queue v3, Voice Prompt 4.2, profile 1.4, classifier instructions v1,
+routing rules v1 and session bundle v1. `chatgpt-project/README.md` records the
+installed Project sources. Confirm that record against available live evidence;
+do not claim a new file is installed merely because it is committed.
 
-## Monday, September 7, 2026
+**This release:** queue v4 uses a playback/reference pair; Voice Prompt 5.0 reads
+it; the candidate classifier instructions are v2 and the calibrated profile is
+2.0. Routing thresholds remain unchanged. Keep session bundle v1’s outer fields
+and accept a v4 snapshot as described below. Retain old v2/v3 readers and files.
+These are planned version labels, not claims about the current Project.
 
-The first priority is a usable commute, not declaring a newly trained v2 ready.
-The current Task is recorded as weekdays at 11:00 AM America/New_York. This is
-an afternoon-queue path; it cannot promise Monday morning's new editions.
-
-1. Before Monday, preserve available historical article titles, summaries and URLs with private email details removed and
-   record the current files and settings. Do not wait four weeks while messages
-   remain in Trash. Search results already establish available candidate IDs;
-   body confirmation and extraction are the next implementation steps.
-2. Keep current profile 1.4, classifier instructions v1, routing v1, queue v3,
-   Voice Prompt 4.2 and export source in the live Project. Do not introduce a
-   partially updated file format before a drive.
-3. On Monday after delivery, inspect actual editions and downloads. Do not
-   presume Fintech publishes, that every edition has arrived by 11 AM, or that a
-   weekday Task notification means success. If no fresh edition arrives, report
-   that and offer an explicitly dated existing queue; never rename old data as
-   September 7.
-4. If scheduled output fails, use the documented manual request in the **same**
-   `LLM-Wiki-Car` Project, accessible from the phone:
-
-   ```text
-   Generate TLDR v3 commute queues for emails delivered on September 7, 2026.
-   Use the attached tldr-commute-queue-v3.schema.json and the Project's v3 queue
-   instructions. Create real downloadable files only.
-   ```
-
-5. Check real downloads, edition coverage and identity. When the local tools are available, the agent checks files with the existing command:
-
-   ```sh
-   npm run validate:commute-queue -- /absolute/path/20260907-tldr.txt
-   ```
-
-   Repeat for each supplied edition. These checks do not currently run automatically on the phone. A failed file must be regenerated with the
-   same files used by the current version; do not silently patch its scores, label source and version information or
-   date to make it pass. Keep any valid editions independently usable and report
-   the missing/failed ones. A sparse queue triggers all-article inspection,
-   not an invented minimum item count.
-
-6. If the PR that adds a diagnostic file has already passed review and a manual comparison run,
-   collect its private inventory alongside the current queue output. Otherwise retain the
-   Monday input as a named replay run once that tool exists. **Neither blocks
-   the commute.** Do not attach experimental candidate queues under the live
-   filenames or silently feed Monday corrections into the profile.
-7. Capture exact corrections and separate playback incidents after the commute.
-   Articles heard on Monday can be used for development or weekly review, not an untouched final
-   holdout. If Monday is chosen as a reserved test, save predictions first and collect Brad’s labels without showing those predictions; default to later unseen dates
-   for the final test so the commute is not delayed.
-
-This document plans Monday’s fallback; it does not schedule a run or change the existing Task. Those actions follow review of the relevant PR.
-
-## How the parts fit together
+The production sequence is:
 
 ```text
-Current daily workflow:
-Gmail -> existing ChatGPT Project -> dated queue-v3 files -> iPhone Voice
-  -> session bundles -> proposed wiki changes in a PR
-
-Proposed local comparison:
-confirmed email text -> extract articles and list exclusions -> clean article URLs
-  -> record every article -> save classifier inputs without private email details
-  -> score articles -> validate results -> apply routing rules in code
-  -> optionally remove exact daily duplicates -> generate queue-v3 files
-  -> validate files and report results
-
-Learning from feedback:
-original queue + Brad’s words -> verify corrections -> private reference labels
-  -> separate development, weekly and final-test datasets
-  -> compare current and proposed versions -> review the adoption decision
+11 a.m. weekday ChatGPT task in LLM-Wiki-Car
+  -> retrieve all qualifying newsletters for the delivery date
+  -> extract editorial articles and resolve original URLs
+  -> group identical URLs and fill missing attribution from article pages
+  -> classify each distinct article using title, description and attribution
+  -> identify repeated stories and useful updates across different URLs
+  -> choose retained source text and prepare headline context
+  -> render and check both files per newsletter using the Project’s tools
+  -> create actual downloads directly in the Project Library
 ```
 
-The Project remains the program producing daily queues until an end-to-end replacement
-has demonstrated that it can deliver usable files to the phone. Initially import fixed Project predictions into the
-comparison program; this enables checks of article completeness, routing and queue text without building
-provider integrations or paying for calls. A local scoring integration is a separate
-experiment that needs a separate decision, as required by #68.
+A new phone chat in the same Project can repeat this process or finish a failed
+write. Nothing in this daily path requires the Mac. Local commands below check
+files or support Brad’s scoring round; they do not become a second producer.
 
-Proposed private files. These formats still need review; there are no commands for creating them yet:
+### Pair and export representation to implement in PR 1
 
-| File format                           | What it records                                                                                                                     |
-| ------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
-| `source-inventory.v1`                 | Confirmed editions, message and article-block IDs, expected article/exclusion counts; no raw email body                             |
-| `classifier-candidate-manifest.v1`    | Every article, its final outcome, each processing attempt, and recorded versus verified versions                                    |
-| `classifier-evidence-adjudication.v1` | Corrections and verification results added without changing earlier entries; source-file hashes and whether the old policy is known |
-| `classifier-evaluation-split.v1`      | Dataset hashes and fixed assignments; related-article groups; prior use in training or discussions; random sampling seed            |
-| `classifier-evaluation-run.v1`        | Saved inputs and predictions, actual model settings or unknown values, prompt/profile hashes, repeat-run IDs, results and timing    |
-| `tldr-day-manifest.v1`                | Every edition and source occurrence, matching-URL groups, retained/removed queue occurrences, queue hashes and generation version   |
+The main JSON has only `sweep_playback` and `items[].item_playback`, exactly as
+[R1](requirements.md#r1--produce-separate-playback-and-reference-files) specifies.
+Use the usual filenames: `YYYYMMDD-tldr.txt`, `-tldr-dev.txt`, `-tldr-ai.txt`,
+`-tldr-fintech.txt`, each with its sibling `-reference.txt`.
 
-Use the existing feedback-label.v1 store for compatible exact labels. Preserve
-historical corrections with unknown routing versions in a separate verification file. Do not add route names to v1 without knowing what they meant. A report may compare their verified interest and depth corrections while marking the historical original route unverified.
+The reference schema records `queue_version: tldr-commute-queue.v4`,
+`main_filename`, `main_sha256` (the canonical-JSON hash specified in R1), newsletter, edition date, source email identity,
+total items and the existing producer/profile/routing versions. Each reference
+item retains the existing item metadata and adds its matching array position,
+attribution status and source records needed by PRs 2–3. Keep the literal
+original descriptions; headline excerpts do not replace them. PR 1 defines the
+exact fields in JSON Schema and TypeScript; PRs 2–3 add their narrowly scoped
+fields in their own diffs. Do not copy playback strings into default Voice
+instructions or require loading reference metadata to start.
 
-For new runs, compute metadata outside model output when a local program runs the classifier. Project-side declared versions must be checked against the exact uploaded files; unsupported model/effort details remain unknown, not invented. Record a fresh run of the current Project separately from a run that applies the repository’s rules.
+For a v4 session, keep the existing `queue_snapshot.filename` as the main
+filename. Its `queue` value is a versioned wrapper:
 
-Queue v3 has strict fields. Keep the source and version details needed for duplicate removal in a companion file first;
-if replay/reference access needs file reader changes, design and test the file-reader update before adopting the feature. Do not add fields that v3 does not allow. The two-file design in R1 needs a new format: the main file contains only `sweep_playback` and an array of `item_playback` strings wrapped in one-field objects; all other data goes into the matching `-reference` file. Record the format version in the reference file and generator settings. Keep v2/v3 support in file readers and session bundles. An altered headline-only template is a separate R4 experiment.
-
-## Reviewable PR sequence
-
-These are proposed PR identifiers, not already-open GitHub PR numbers. Default
-branches below use `agent/classifier-v2-*`; select final names at implementation.
-Keep each PR focused on one behavior, usually a few production files plus focused
-test cases. Split a row further if schema, runtime and integration changes become
-hard to inspect together. Build each PR on the earlier changes it actually needs.
-
-| PR                                                | Builds on                                                 | What Brad reviews                                                                                                                                                                                                                                      | Required result and how to undo the change                                                                                                                                                                                                                                                                                                     |
-| ------------------------------------------------- | --------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| P0 — this plan                                    | `main`                                                    | Requirements, issue findings, test plan and proposed PR order in `docs/classifier-v2/`                                                                                                                                                                 | Agreement on the plan; no live change to undo                                                                                                                                                                                                                                                                                                  |
-| P1 — explain omissions and errors                 | `main` after P0                                           | Source and article inventory formats, validators, parser records in `src/tldr/`, invented omission/exclusion test cases, and optional Project instructions for diagnostic output                                                                       | R5/R6: complete private inventories across multiple dates and editions; every article accounted for and source counts matched. Stop collecting the extra file to undo; scoring stays unchanged                                                                                                                                                 |
-| P2 — verify historical feedback and versions      | P1                                                        | Verification file format and import/report tools beside `src/classifier/feedback-label.ts`; all recorded corrections, withdrawals and version mismatches                                                                                               | R6/R7: preserve originals; repeated imports add no duplicates; never guess unknown policies; no use of feedback in live scoring. Stop the importer and keep the saved records                                                                                                                                                                  |
-| P3 — blind labeling and comparison report         | P2                                                        | Dataset assignments, private labeling page, result comparison, import of older labels without guessing missing depth, and separately saved Project predictions                                                                                         | R3: multi-date development labels, known-problem tests and a separate reserved final test set, report distinguishing the five original processing steps: parsing, classification, validation, routing and queue inclusion, tests for exposed predictions and articles shared between datasets. Stop the experiment; current scoring stays live |
-| P4 — generate queue-v3 files in code              | P1, or `main` after P1 merges                             | Queue generation in `src/commute/`, using existing validation and routing; no model calls; expected output from known inputs; accurate version records                                                                                                 | R1/R8: exact playback strings, score thresholds, order, unknown author/publication values, missing-result failures, and queue-to-bundle checks. Keep generated files for local tests only                                                                                                                                                      |
-| P5 — optional local classifier                    | P3 and P4 merged; separate approval to test local scoring | One interface for model providers, one provider implementation, limits on batch sizes/timeouts/retries, private saved predictions and proposed commands                                                                                                | R3/R8/R9: same saved inputs, actual provider/model records, invalid results excluded with reasons, cost/time and comparison with Project predictions. Return to saved Project predictions; no change to daily queue generation                                                                                                                 |
-| P6 — four-week scoring experiment                 | P3; P5 optional                                           | Saved experiment settings; 2–4 proposed profiles/prompts per selected error group, outside the live schema files; weekly reports with private details removed                                                                                          | R3: four weekly blind reports and a final test-set decision. Live scoring stays unchanged; keeping the current rules is a valid result                                                                                                                                                                                                         |
-| P7 — adopt a measured scoring improvement         | P6                                                        | OpenSpec requirements for the selected profile, prompt, thresholds or use of feedback; replacement of old holdout instructions where P3 has not already done so; regression tests and related version records                                          | R3/R7/R8/R9: agreed limits, Brad’s approval, manual comparison, then one real edition before the others. Restore the previous source files and recorded versions if the trial fails                                                                                                                                                            |
-| P8a — remove exact daily duplicates in code       | P4 merged                                                 | URL cleanup, daily inventory and duplicate-removal code; rules for choosing source text and retaining every source; empty-queue and late-delivery tests                                                                                                | R2: no repeated exact URLs, no unrelated article removed from the reviewed test groups, stable IDs on repeat runs. Disable duplicate removal to undo                                                                                                                                                                                           |
-| P8b — try daily duplicate removal in the Project  | P8a                                                       | OpenSpec and Project instructions: find all editions first, classify each matching-URL group once, generate the queues together, and specify exact files to install                                                                                    | R2/R9: manual comparison on identical inputs, phone access and replay, then a scheduled trial. Restore the current per-edition generator if needed. This can proceed while P6 tests scoring                                                                                                                                                    |
-| P9 — test more useful short playback              | P4 merged; independent of scoring                         | New queue template and schema version if needed; generator, validator and bundle-reader updates; short excerpts copied exactly from the newsletter; matching Project files                                                                             | R1/R4: no inferred depth changes, blind usefulness/playback-time comparison and iPhone test. Restore v3 generation and Project files; retain support for older files                                                                                                                                                                           |
-| P10 — generate and test the two-file queue        | P4 merged; independent of P9 and scoring changes          | R1’s exact main-file shape (`sweep_playback`, `items[].item_playback`); all other data in `-reference`; pair checks; prompt that opens only the main file at start and the reference only for requested article details; existing export compatibility | R1: identical-text comparison on iPhone, including default playback after a details request; correct item matching; complete exports with and without reference questions. Restore single-file v3 if needed                                                                                                                                    |
-| P11 — related-story notes or replacement delivery | Separate decisions based on test results                  | Two separate follow-ups: mark similar stories after exact duplicate removal; or test unattended Gmail/cloud processing with working mobile delivery                                                                                                    | R2/R9: do not automatically remove similar stories without measuring mistaken matches; do not switch the daily generator until the whole process works through the phone. Neither is needed for initial v2 adoption                                                                                                                            |
-
-P1 can add diagnostic records to the local parser and an optional request for a diagnostic file from the Project. Local parser changes do not change a scheduled Project Task; record which program produced each inventory. P3’s dataset plan must
-update the relevant OpenSpec holdout clauses before dataset tuning starts; P7 then
-adds only changes to live behavior. Keep #66 open until its real dataset and
-results for the current version are complete.
-
-PR dependencies:
-
-```text
-P0 -> P1 -> P2 -> P3 -> P6 -> P7
-       |           |     ^
-       +-> P4 -----+-> P5 (optional)
-            +-> P8a -> P8b
-            +-> P9 (short-description trial)
-            +-> P10 (two-file queue trial)
-P11 follows the relevant measured decision, not the calendar.
+```json
+{
+  "queue_version": "tldr-commute-queue.v4",
+  "playback_file": {
+    "sweep_playback": "",
+    "items": []
+  },
+  "reference_file": {}
+}
 ```
 
-In practice, keep at most two or three unmerged dependent PRs. A child PR targets
-its immediate parent branch so Brad sees only the new changes. Once a parent merges,
-rebase the child onto updated `main` and retarget it; verify the diff contains no
-parent commits. Shared dependencies on two stacks should merge before opening the
-integration PR. Each description names requirements, parent PR, one before/after
-example, repeatable checks, private experiment evidence and live deployment
-steps. Review code/schema/prompt behavior once at the latest complete commit;
-merge only after Brad approves. Approving this plan does not approve live changes.
+This illustrates the wrapper only; `reference_file` must contain the complete
+valid reference, not an empty object. Export includes both full objects. Resolve
+saved item identities from their recorded positions and the matching reference
+at export time, without requiring a reference read at session start. Reject
+unsupported or mismatched identities rather than reconstructing from topic memory.
 
-### Additions from the detailed commute log review
+Extend queue/snapshot validation and the narrow item-access helpers used by
+import and recovery to read this wrapper. Do not change the event model or
+redesign session retry behavior. An exported wrapper is a self-contained copy;
+the two generated input files remain separate in the Project Library.
 
-The [log review](commute-log-review.md) records the evidence and scope decisions.
-Keep these additions in the existing small PRs:
+## Exact files changed and when
 
-- **P1/P4:** check extraction of explicitly supplied author/publication values;
-  distinguish missing source data from a parser miss and preserve `null` when unknown.
-- **P2:** verify corrections against full recorded conversations and original
-  downloads, including retrospective corrections. Count repeated representations
-  once. This improves dataset collection without changing Voice’s export process.
-- **P3/P6:** include Addy Osmani’s author preference and self-driving interest
-  including Tesla. Test author-aware rules against topic-only rules, missing
-  attribution and other authors; do not turn an author preference into a depth label.
-- **P9:** compare unchanged playback, context for every short item, and context
-  only for unclear titles. Include clear headlines as a comparison group.
-- **P10:** produce the main and `-reference` files together with a shared prefix.
-  Preserve already-working access to the original description on request. Keep
-  export compatibility limited to what the new file format requires.
+Paths below are repository-relative. “New” files are implementation targets,
+not files already delivered by this planning PR. Every PR must replace this list
+with its actual changed-file list in its description if implementation finds a
+necessary additional file.
 
-Siri/phone-call settings, export retry handling and other commute workflow fixes
-are not added to the classifier PR sequence.
+| PR              | Project files and schemas                                                                                                                                                                                                                                                                                                                    | Repository code and tests                                                                                                                                                                                                                                                                                                                                                                                          | When it affects daily use                                                  |
+| --------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------- |
+| 1 — Pair        | New `chatgpt-project/queue-generation-v4.md`, `chatgpt-project/WEEKDAY_TLDR_QUEUE_TASK_PROMPT_V4.md`, `schema/tldr-commute-playback-v4.schema.json`, `schema/tldr-commute-reference-v4.schema.json`; edit `chatgpt-project/CHATGPT_CAR_QUEUE_PROMPT.md`, `chatgpt-project/session-export.md`, `schema/commute-session-bundle-v1.schema.json` | Edit `src/commute/session-bundle.ts`, `src/commute/validate-queue.ts`, `src/commute/validate-session-bundle.ts` and affected access points in `recover-session-bundle.ts`, `import-session-bundles.ts`, `run.ts` and `src/classifier/feedback-label.ts`; new `tests/queue-pair.test.ts`; extend `tests/session-bundle.test.ts`, `tests/import-session-bundles.test.ts`, `tests/project-prompt.test.ts` as affected | After combined candidate installation in Phase 6                           |
+| 2 — Attribution | Edit v4 generation instructions and reference schema; edit `schema/classifier-instructions.md` to accept verified author/publication metadata                                                                                                                                                                                                | Extend matching input types in `src/classifier/types.ts` only where needed; reference validation in `src/commute/session-bundle.ts`; attribution cases in pair/prompt/classifier tests                                                                                                                                                                                                                             | Same installation; lookup runs in the Project before classification        |
+| 3 — Duplicates  | Edit v4 generation/task instructions and reference schema for source occurrences, retained-item links and update notes                                                                                                                                                                                                                       | Pair validation checks source links, order and totals; add duplicate examples to `tests/queue-pair.test.ts` and Project instruction checks                                                                                                                                                                                                                                                                         | Same installation; compare all editions before rendering                   |
+| 4 — Context     | Edit v4 generation instructions, playback/reference validation rules and Voice instructions only as needed to accept the prepared text                                                                                                                                                                                                       | Extend pair and prompt tests for literal excerpts and generated update prefixes; keep old v3 templates unchanged                                                                                                                                                                                                                                                                                                   | Same installation; only unclear headline-only items get extra default text |
+| 5 — Calibration | Edit `schema/interest-profile.md`, `schema/classifier-instructions.md`; update candidate version labels in v4 instructions                                                                                                                                                                                                                   | New `scripts/classifier-v2-review.mjs`, focused `tests/classifier-v2-review.test.ts`; change `src/classifier/feedback-label.ts` only if necessary to read verified labels without discarding unknown historical metadata                                                                                                                                                                                           | Candidate profile installed after Brad’s review and final comparison       |
 
-## Rerunning old newsletters and collecting Brad’s answers
+All five PRs maintain `chatgpt-project/README.md`’s candidate installation list;
+keep its live-status statements unchanged until deployment is confirmed. PR 5
+adds a concise report under `docs/classifier-v2/validation-results.md` only after
+results exist. Keep private inputs and per-article results outside Git.
 
-### Build three datasets with different purposes
+OpenSpec records the chosen behavior, not another approval process. Update the
+relevant existing files within the PR that changes the behavior:
 
-| Dataset             | Sources and selection                                                                                                                                                                                         | What it establishes                                                                                                      |
-| ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
-| Development         | Recoverable newsletters across dates and General, Dev, AI and Fintech editions; existing labels and verified corrections. Include ordinary complete editions, random samples and targeted examples of errors. | Helps revise the profile and instructions. Results on these articles do not establish improvement on unseen material.    |
-| Known-problem tests | Exact, verified examples from the feedback logs: omissions, wrong scores, duplicates and unclear headlines. May reuse development material; report these results separately.                                  | Checks that specific reported problems are fixed without treating a collection of complaints as a representative sample. |
-| Final test          | Complete, previously unused delivery dates spanning multiple dates and editions, selected before inspecting labels or outcomes. Keep related stories out of development data.                                 | Compares current and proposed classifiers on identical inputs they were not tuned against.                               |
+- PR 1: bootstrap `specs/commute-queue/spec.md`; operating-loop
+  `specs/queue-selection/spec.md`, `specs/session-bundle/spec.md`,
+  `specs/voice-session/spec.md`, `specs/commute-import/spec.md` and
+  `specs/scheduled-queue-output/spec.md`; the affected design/task statements;
+  and pre-render-queue-playback-text’s queue/Voice clauses where they mandate v3.
+- PRs 2–4: only the attribution, duplicate and literal-playback clauses changed
+  by those PRs, including their matching examples.
+- PR 5: bootstrap `specs/classifier-routing/spec.md` and
+  `specs/feedback-labels/spec.md`; replace the obsolete date-based holdout clause
+  with explicit development/final-check assignments. Update affected task text.
 
-July 28 supplies one possible omission test because its queues were unusually
-sparse. If the original newsletters are recoverable, investigate where those
-articles were lost. It is not a required labeling batch, the foundation of the
-datasets, or a prerequisite for the output-format and duplicate-removal PRs.
-If it cannot be recovered, record that limitation and use other source-backed
-omission examples. Do not reconstruct missing emails from incomplete queues.
+These paths are under `openspec/changes/bootstrap-llm-wiki-mvp/`,
+`openspec/changes/commute-wiki-operating-loop/` and
+`openspec/changes/pre-render-queue-playback-text/`. Preserve unchanged behavior;
+no separate specification-only PR or external research phase is required.
 
-### Collect available newsletters across dates and editions
+## Phase 0 — Prepare data and examples without delaying coding
 
-The [read-only search inventory](evidence-inventory.md#gmail-feasibility-check)
-records message candidates, not a verified dataset. Paginate search results and
-confirm sender, newsletter body markers, delivery date and edition. Record the
-available date range and edition coverage before selecting development and test
-data. Retrieve ordinary newsletters as well as known failures; do not restrict
-collection to a single date or to articles included in past queues.
+### Sol’s tasks
 
-For reruns, extract article data from confirmed newsletters without saving raw
-email bodies. Keep records with private email details removed under
-`.private/classifier-v2/`, together with source identities and exclusion reasons.
-Do not restore, relabel or delete mail. A Gmail API path must explicitly include
-Trash; a connector must demonstrate that its query returns the targeted messages.
-Collect recoverable inputs promptly because messages are deleted after 30 days
-in Trash. [Google deletion policy](https://support.google.com/mail/answer/7401),
-[API listing option](https://developers.google.com/workspace/gmail/api/reference/rest/v1/users.messages/list).
+1. Read `AGENTS.md`, these requirements, the live-source list, current generation
+   and task prompts, and the affected schemas/readers. Check branch and worktree
+   state before editing. Use an isolated implementation worktree.
+2. Collect recoverable newsletters from two or three days in the preceding week,
+   covering all four editions when available. Confirm actual dates and sources;
+   keep only private article extracts, not raw email bodies. Use already collected
+   inputs where possible. If those dates are unavailable, use other available
+   dates and explain the substitution. No July 28 dependency exists.
+3. Prepare full article inventories, existing outputs and recorded corrections.
+   Include omitted articles. Do not relabel routing-version mismatches as scoring
+   mistakes; retain Brad’s explicit corrected labels independently.
+4. Save the current Project sources and actual version identifiers as the baseline.
+   Reuse original queues where available. Where predictions are missing, request
+   a baseline scoring run using the current instructions in the existing Project
+   and save its results privately. Use a dedicated text chat with the exact
+   baseline/candidate profile, instructions and private article inputs selected
+   explicitly for that run. Save predictions as review data, not live commute
+   filenames. This does not replace the installed Project sources. Do not create
+   a local model adapter.
+5. Assemble a development batch using existing verified labels plus up to **20
+   new articles** needing Brad’s answers. Reserve a separate **20-article final
+   check** across dates/editions where possible before tuning. These are starting
+   batch sizes, not claims of statistical certainty or compulsory additional work.
+6. Keep related articles together and out of both sides of the split. If no unused
+   historical material remains, reserve Monday’s incoming articles for the final
+   check before using their labels. The current profile stays available until the
+   candidate passes review; Tuesday is the first listen to Monday’s material.
+7. Give Brad the blind review when ready, then continue all independent coding.
+   Answers and predictions must not be embedded in the same labeling page, even
+   in hidden fields. Do not inspect final answers while tuning.
 
-Inventory previously collected queues, bundles, labels and complete recorded
-conversations without rewriting them. Heard or discussed articles can support
-development and known-problem tests. They cannot be presented as untouched final
-test material. If too little unused historical material remains, reserve later
-newsletters for the final test while keeping the current commute workflow usable.
+### Output / Brad’s step
 
-### Fix the datasets before testing and collect answers independently
+A private input folder, the baseline files, a short inventory of dates/editions
+and a blind labeling batch. Brad supplies interest/depth answers when free; the
+implementation stack does not stop while waiting. Reuse labels instead of asking
+him to repeat them. A missing depth answer stays missing.
 
-1. Inventory original 262 training, 41 June 30 and 98 July 1–2 records. They are
-   known development/calibration history now. Preserve legacy labels as legacy;
-   an old single-axis `down` cannot supply an unobserved depth label.
-2. Select complete development editions across multiple dates and all four
-   newsletter types when available, before inspecting their classification
-   results. Ask Brad for interest and depth independently, with title,
-   description and link visible but predictions hidden. Include every editorial
-   item in those selected editions, including articles omitted from old queues.
-   Add verified historical corrections without inventing missing labels. Record
-   what the data covers and any gaps; no one delivery date is mandatory.
-3. Form development and weekly review pools from known history and new articles Brad has labeled. Keep ordinary complete-edition results separate from targeted error samples so the latter do not distort overall accuracy. Include every exact correction, every candidate from unusually
-   sparse days, a seeded random skip sample, close-to-threshold samples (interest
-   0.55–0.65 and 0.75–0.85; depth 0.55–0.65), and a comparison sample of predictions that have been verified and are far from the thresholds.
-4. Choose final holdout by entire unseen delivery dates, with all copies of the same article and related stories assigned to the same split. Preserve
-   distinct newsletter instances inside their split. Exclude groups already
-   present in training, prompts, wiki discussions, issue examples or reviewed
-   development outputs. If the historical pool is contaminated, collect later
-   fresh dates; lack of clean material delays adoption, not the commute.
-5. Proposed planning target: at least 100 final-holdout editorial instances from
-   at least three delivery dates covering all four newsletters when available.
-   Aim for at least 20 interested items and 20 in-depth items, according to Brad’s answers, before drawing conclusions; rare topics are reported as insufficient evidence.
-   These proposed minimums do not guarantee enough data to detect a real improvement.
-   Choose the test dates before seeing labels. If too few examples remain in a category, report the result as inconclusive and plan another test rather than choosing dates that favor the result.
-6. Save the current and proposed versions’ predictions in files that will not be changed
-   **before** Brad labels each blind batch. The labeling page must not receive prediction values, even in hidden page data. Collect independent interest and depth,
-   optional reason and an explicit unsure/missing response. Do not force numeric
-   scores from Brad. Save progress/resume without exposing earlier predictions.
-7. When generating predictions, provide only the allowed profile, prompts and article inputs with private details removed. Use fresh model sessions with no issue feedback, saved answers or this research conversation. The scoring model can read final-test articles to predict their labels. The person or agent revising the rules must not inspect those articles, answers or error reports before final scoring.
-8. Record hashes of the label files, then compare. A final holdout whose errors are inspected
-   becomes development data for the next revision. Do not tune and report a
-   second run on it as fresh validation.
+## Phase 1 / PR 1 — Playback/reference pair
 
-Combine the separate Matic and Waymo interest/depth corrections into one reference answer per article, retaining both feedback sources. Two corrected scores for one article do not count as two tested articles. If Brad corrects depth only, do not count the original interest prediction as a confirmed answer. For each measurement, state how many articles have the required labels.
+### Build
 
-### Compare one change at a time over four weeks
+1. Add the two schemas and v4 generation/task documents. Preserve weekday 11 a.m.
+   execution and the same-Project manual request. Include executable rendering
+   and preflight snippets in the generation document for the Project’s code tool,
+   covering canonical hashing, counts and pair checks; prose alone is insufficient.
+   Update Voice to load the main
+   file only and return to it after requested details.
+2. Implement pair checking in the existing validator, with a new optional
+   `--reference /path/to/reference.txt` argument. Existing single-file invocations
+   for v2/v3 keep working. A standalone v4 playback file requires its reference
+   for full validation. The Project’s own preflight checks the same conditions
+   using its code tools; the Mac checker is for development/intake only.
+3. Implement the v4 snapshot wrapper and narrow reader changes. Extend existing
+   `--queue` bundle validation with a matching `--reference` option. Ensure
+   import, recovery, feedback and wiki-source extraction still find exact items.
+4. Define empty-queue behavior, pair hashes and explicit revision filenames in
+   generation instructions. Never overwrite an input already used by a session.
 
-Compare (A) observed current Project version, (B) replay using the repository’s rules with the same
-fixed predictions, and optionally (C) one fixed local scoring configuration.
-A versus B isolates validation/routing/rendering differences; A versus C is a
-producer/model comparison, not proof that a profile alone improved. Save all
-configurations and actual observed metadata. Unknown Project runtime details
-limit reproducibility and must be stated in the report.
+### PR result and checks
 
-Choose the groups of errors that caused the most problems first. For each compare 2–4
-alternatives: rule tied to named examples, a general rule that explains Brad’s preference, overly
-broad rule, and unchanged/threshold-only comparison where useful. Keep interest rules unchanged while evaluating depth rules and vice versa where feasible. Do not
-change provider, thresholds, duplicate removal and playback policy in the same scoring
-comparison. #68 calls this the “weakest valid revision” experiment: prefer a rule that works across more topics without adding errors, needs fewer exceptions, and still makes sense when company and product names are removed. The research behind that idea does not prove it will work for newsletters, and shorter wording alone is not the goal.
+Show one invented pair and its exported bundle. Check missing/swapped/reordered
+references, extra main-file fields, empty queues and correct save/correction
+identities. Run existing v2/v3 cases as well as new v4 tests. Use populated
+invented attribution in these examples; PR 2 completes real attribution lookup
+before installing the combined candidate.
 
-Once P3's dataset is ready, run four weekly blind reviews. If ready September 7,
-provisional weeks are September 7–13, 14–20, 21–27, and September 28–October 4;
-otherwise shift the entire window. Proposed weekly review size is 20–30 items
-plus exact corrections and sparse-day coverage, with Brad's measured labeling
-burden reported. Weekly feedback may refine development candidates under the test plan, while leaving the live classifier unchanged. Choose and save the final candidates before opening final test
-predictions/labels. Do not repeatedly tune against the reserved final holdout.
+Brad reviews the file shape and examples. Actual phone validation is part of
+Phase 6; a successful text test does not establish what Voice says.
 
-Repeat model scoring three times on a fixed set of difficult development examples to expose
-instability; retain every run rather than selecting the best run. For the
-final comparison, use the method for repeating and combining results agreed before testing (recommended:
-three independent runs, report mean and range plus each run's failures). Replaying saved predictions must give the same output each time. Asking the model to score articles again can give different results.
+## Phase 2 / PR 2 — Attribution before classification
 
-### Measurements and proposed requirements for adoption
+### Build
 
-These proposed limits need agreement in P3 **before** predictions are evaluated.
-They are not previously approved user preferences. Keep the requirements for complete, accurate records
-regardless of tuning; if thresholds prove too strict, amend a future test plan
-before testing on new holdout data, not after seeing the desired result.
+1. Add the R2 lookup instructions to the Project generation document: use available
+   newsletter attribution, otherwise read the resolved article URL using the
+   generation LLM’s tools. Reuse the result across copies of that URL.
+2. Require nonempty author/publication strings and explicit source/status metadata.
+   Distinguish `No authors listed` from `Author lookup failed`; use a hostname
+   fallback for publication. Retry an access failure once, then continue other
+   articles. Never call a failed lookup evidence of an absent byline.
+3. Extend classifier inputs to accept verified attribution and ignore failure/status
+   strings as preference signals. Keep model output source-neutral. The reference
+   stores the result; no extra attribution is spoken by default.
 
-| Measurement                      | Definition and proposed requirement                                                                                                                                                                                                                                                                                                                                  |
-| -------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Article completeness             | Compare articles listed independently from the email with parser output. No unexplained omissions in reviewed test cases or complete final-test editions                                                                                                                                                                                                             |
-| Accurate records and valid files | Accept no invalid file, guessed source/version claim, silently missing ID, or leaked private/final-test data. Any such failure stops adoption                                                                                                                                                                                                                        |
-| False skips                      | Brad labeled the article interested or maybe, but the model labeled it uninterested. Report counts and rates among articles Brad wanted, separated by his interest label and the prediction’s distance from the threshold. No increase over the current version and no new skip scored below 0.50 for an article Brad labeled interested                             |
-| Missed depth                     | Brad labeled an article in-depth but the model chose headline-only. Measure only where Brad supplied a depth label. Report both errors among included articles and total missed in-depth articles, including skipped ones. No increase over the current version                                                                                                      |
-| Unwanted discussion              | The queue includes an article as in-depth, but Brad labeled it uninterested or headline-only. Keep this separate from interested-versus-maybe disagreements. Allow at most one additional case per 100 labeled articles                                                                                                                                              |
-| Weighted error score             | Assign 5 points for skipping an interested article, 3 for skipping a maybe article, 2 for unwanted discussion, and 1 for missing depth on an included article. Count only the highest applicable penalty per article. Agree on these weights before testing. New scoring rules must lower the mean penalty on the final test set; keeping the current rules is valid |
-| Score agreement                  | For interest and depth separately, show a table of predicted versus Brad’s labels, score distributions and errors near each threshold. Exclude missing depth answers from the depth calculation. Do not treat the model’s scores as calibrated probabilities; any reliability chart is descriptive                                                                   |
-| Playback time                    | Estimate reading time at 150 words/minute. Show the opening sweep and default article text separately from possible discussion time (for example, 2 or 5 minutes per in-depth article). Proposed added default-reading limit: 10% or two minutes per day, whichever is larger. Measure actual discussion time separately                                             |
-| Duplicate removal                | Remove no unrelated articles and retain every source in the manually reviewed test groups. Report classification results both per newsletter occurrence and per unique article so repetition does not make the evidence look stronger                                                                                                                                |
-| Performance on other topics      | Show results by newsletter, date and preference category; test rules with company/product names removed; list exceptions and changed predictions. Mark small groups as uncertain. When estimating uncertainty by resampling, keep related dates/stories together                                                                                                     |
-| Time and cost                    | Report time per edition/article, retries, failures, measured model usage/API cost when available, and human review time. Set a budget from the current version’s results before the trial. Do not invent prices or infer model computation time from total task time                                                                                                 |
-| Delivery                         | A manual run in the same Project must create valid files usable from the phone. Keep the manual fallback unless scheduled generation works on three consecutive qualifying weekdays                                                                                                                                                                                  |
-| Voice playback                   | Test actual iPhone Voice in a long session and report text mismatches and export failures separately. Better scores do not close #100. Claim improved playback reliability only after a trial with no unrelated additions or missing default text                                                                                                                    |
+### PR result and checks
 
-Report counts and paired changes alongside percentages; do not hide hard failures
-in averages or claim statistical certainty from a small holdout. A candidate
-must meet the requirements for accurate records, acceptable errors and playback time before preference for broader
-coverage or lower cost matters. Record the numeric acceptance limits and file hashes
-in the test plan PR. Stop a proposed classifier’s trial immediately if it repeatedly causes a serious new missed-article problem. Do not automatically change the global thresholds in response.
+Show the five attribution cases in R2, the URLs consulted and expected reference
+fields. Test validation and input handling locally; actually exercise the lookup
+on historical sources in the Project during Phase 6. Brad checks a few resulting
+bylines and sites. This PR needs no separate model integration or phone deployment.
 
-## Trying the changes and checking the results
+## Phase 3 / PR 3 — Daily repeated coverage and updates
 
-Use data suited to each change. Scoring uses development data, known-problem
-tests and a separate final test. Duplicate removal uses several complete daily
-sets with and without duplicates, including different descriptions for the same
-article and similar but distinct URLs. Headline context uses unclear and clear
-titles across dates and editions. Two-file playback uses short and long queues
-from multiple dates, with identical content in each single-file/pair comparison.
-None of the four changes depends on one historical newsletter set.
+### Build
 
-For each PR that changes code with fixed, repeatable results, run its focused tests, then `npm run check`, `git diff --check`, and strict OpenSpec validation for the requirements it changes. P1/P3 and changes to the commute workflow (J1–J6) must validate both existing OpenSpec changes and the new one. CI uses invented test cases, not Gmail or paid model calls. Keep private rerun results private. Commit only reports with private details removed and regression examples from datasets allowed for development.
+1. Make one Project generation pass collect all editions before rendering.
+   Resolve URLs; remove tracking parameters conservatively; classify each exact
+   article once with attribution already available.
+2. Add the same-story comparison after classification. Remove redundant coverage,
+   preserve useful new information as an update, and retain uncertain matches.
+   Choose the useful source description rather than always the first occurrence.
+3. Store source occurrences, retained-item references, decision reasons and update
+   notes in the reference files. Rebuild positions and sweeps. For a fully removed
+   edition, its empty reference still identifies where its articles were retained.
+4. Produce a private review table for the historical run: each removed occurrence,
+   the retained file/item, reason and any new information kept. This can be a
+   simple table from the generation run; do not build a new reporting framework.
 
-After Brad approves new scoring rules, check a manual rerun in the same Project,
-try it on one real edition, then all editions, then assess scheduled operation.
-Record exact live files installed and verified content/version hashes; merging a PR does not update the files in the live Project. For each release, record how to restore the previous profile, prompt, thresholds, routing rules, queue schema, generator and model settings together. Do not overwrite or relabel old generated
-queues. Restore the previous version if records become unreliable, substantially more articles go missing, or delivery gets worse. Retain the failed run for investigation.
+### PR result and checks
 
-Headline context, duplicate removal and two-file queue trials keep scoring unchanged.
-P10 can begin after P4; it does not wait for P9 or the four-week scoring experiment.
-Use the exact JSON shape and filename pair in [R1](requirements.md#r1--separate-the-playback-text-from-article-details-and-test-it-in-voice-p1-100-120).
-Build it in two reviewable steps, splitting into dependent PRs if needed:
+Provide exact-URL, different-URL same-story, meaningful-update, unrelated-story,
+empty-edition and no-duplicate examples. Automated checks establish correct file
+links and counts; Brad inspects the semantic decisions across the historical days.
+Listening alone cannot validate removed content. Correct questionable removals
+before the combined release.
 
-1. Add pair generation and validation, plus the minimal compatibility changes
-   needed to preserve complete queue data in the existing session export. Check
-   that the main file contains no fields beyond the sweep
-   and per-item playback strings. Keep version, position-matching and hash data
-   in the reference file. Preserve old v2/v3 readers. Generate both files from
-   one queue in the same run, with a shared filename prefix, and confirm both
-   downloads work in the same Project on the phone.
-2. Update the Voice and export instructions, then run the iPhone trial. The Voice
-   prompt opens only the main file at start, reads the sweep and item strings
-   exactly, and opens `-reference` only for requested article details. The export
-   compatibility test checks that complete queue data, saves and corrections
-   survive the file-format change. It does not redesign session exports or retries.
+## Phase 4 / PR 4 — Context for unclear headlines
 
-Compare single-file v3 and the pair using **identical scores, order and spoken
-text** within each comparison. Use multiple dates and editions, including short
-and long queues. Each comparison changes the format only; several comparisons
-check whether the result holds beyond one queue. Include a long sequence of ordinary advances, a details request, and
-several more advances to check whether Voice returns to reading only the main
-file. Test next/back/jump, missing or mismatched reference files,
-and exports both with and without a prior details request. Record wrong text,
-paraphrases, missing text and failed exports. If actual file loading cannot be
-observed, report that limit rather than claiming the prompt enforced it.
+### Build
 
-Keep the R4 short-description change out of this comparison. Restore the previous
-generator and Project instructions if the pair fails. Do not build an autonomous
-iPhone test program until actual audio control and observation are demonstrated;
-manual iPhone testing remains part of the plan.
+1. Add R4’s selection and excerpt instructions to v4 generation. Keep clear
+   headlines short and preserve the full original description in the reference.
+2. Check that the selected excerpt is literal source text. Record its source
+   occurrence when duplicate removal chooses a different newsletter’s wording.
+   Generate any update prefix separately; do not claim that prefix is quoted text.
+3. Keep the sweep free of descriptions and keep depth labels unchanged. Extend the
+   v4 checker/template without loosening the old v3 literal checks.
 
-## Decisions for review
+### PR result and checks
 
-The recommended defaults are: queue generation in the Project with a manual fallback for Monday; rerunning saved historical inputs first; no automatic scoring changes after feedback; interest and depth still scored separately;
-new clean holdout and four weekly cycles before adoption of new scoring rules; exact daily
-URL duplicate removal before automatically removing stories judged similar; separate short-description and two-file queue trials. The two-file trial uses a playback-only main file and a `-reference` file opened for requested details, and can proceed independently of scoring changes. The proposed sample sizes, error weights and playback-time limit
-need agreement in the test plan PR. Decide where classification will run only after measuring its value and confirming that files reach the phone. No paid provider choice or hosting
-commitment is required to approve the initial work on omission and error reporting.
+Show before/after playback for a small mix of clear titles, unfamiliar names and
+clickbait. Include an already-in-depth item as an unchanged comparison. Brad
+reviews the examples and judges the extra reading during Phase 6. Adjust from
+that feedback; do not schedule another large test just for this change.
+
+## Phase 5 / PR 5 — Calibrate and compare
+
+### Build while Brad is busy
+
+1. Prepare candidate profile 2.0 and classifier instructions v2 using verified
+   historical corrections and explicit preferences. Keep current score thresholds.
+   Preserve the input additions from PR 2.
+2. Add the small review script named in the file table. It consumes saved private
+   article/label/prediction files, produces a standalone HTML labeling page with
+   no prediction data and a local JSON answer export, and reports baseline/candidate
+   comparisons. Document its commands and file examples in the PR. It makes
+   no model calls and performs no production generation. Use a simple documented
+   private JSON layout, not a family of new persisted formats.
+3. Test that labels are not exposed to the predictor, predictions are not exposed
+   to Brad’s labeling view, duplicate article copies do not inflate counts, and
+   missing labels are not treated as correct answers.
+4. Prepare this PR’s code and profile diff before earlier PRs merge. Mark the
+   experiment results pending rather than claiming success or blocking other PRs.
+
+### Finish when answers arrive
+
+1. Use development answers to correct the profile/instructions. Request a candidate
+   rerun in the Project and save the predictions, exact source files and versions.
+2. Fix the candidate before evaluating the reserved batch. Run baseline and candidate
+   on identical final inputs in separate fresh generation chats without answer
+   files or tuning discussions. Brad labels without seeing predictions.
+3. Report counts of false skips, missed depth, unwanted in-depth items and changed
+   labels; show missing answers and excluded articles explicitly. Keep ordinary
+   samples separate from tests selected because they previously failed.
+4. Ask Brad whether the comparison is sufficient and no worse. If an important
+   category is missing or a result is unclear, request a small targeted extension,
+   not another full labeling exercise. If a serious miss causes a revision, use
+   fresh final examples for the changed rule instead of claiming the reused test
+   proves general improvement.
+
+### PR result / completion
+
+A reviewable profile/instruction diff, reusable lightweight review tool and actual
+comparison results. No numeric improvement claim before results exist. Brad’s
+acceptance completes this phase; continued feedback collection does not delay
+release for a fixed number of weeks.
+
+## Phase 6 — Review the stack and validate the combined experience
+
+### Review and merge sequence
+
+Use branches `agent/classifier-v2-pair`, `-attribution`, `-duplicates`, `-context`
+and `-calibration`. The first implementation PR targets main after this planning
+PR is approved/merged; while it is still open, the first may target this plan’s
+branch. Each later PR targets the preceding branch. Sol builds through the stack
+without waiting for merges. Keep each child diff limited to its own feature.
+
+Every PR description includes: requirement IDs, parent PR, exact changed files,
+one before/after example, checks run, remaining human validation and the live
+files affected. After Brad approves a parent, merge it, rebase/retarget the child
+onto updated main and check its diff. Address review changes through affected
+children in one pass rather than restarting the work.
+
+For each behavior PR run focused tests, then `npm run check`, `git diff --check`
+and strict validation of affected OpenSpec changes. Follow the existing repository
+review policy once for the complete behavior change; do not add extra review
+rounds for unchanged code. Automated tests use invented data and no paid calls.
+
+### Install the combined candidate
+
+Merging and installation are separate steps. After approval, Sol gives Brad the
+exact candidate files in the table below, with copyable prompts and absolute local
+links. Brad replaces the Project sources/Instructions and Task body, then confirms.
+Record the installed versions in `chatgpt-project/README.md`. Do not replace old
+artifact files or unrelated Project sources.
+
+| Destination                | Exact replacement                                                                                                            |
+| -------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| Project Instructions field | Contents of `chatgpt-project/CHATGPT_CAR_QUEUE_PROMPT.md` for Prompt 5.0                                                     |
+| Project Sources            | Replace `queue-generation-v3.md` with `queue-generation-v4.md`; replace the active queue-v3 schema with both v4 schema files |
+| Project Sources            | Replace `session-export.md` and `commute-session-bundle-v1.schema.json` with the compatible versions from PR 1               |
+| Project Sources            | Replace `classifier-instructions.md` and `interest-profile.md` with the accepted candidate versions                          |
+| Existing weekday Task body | Contents of `chatgpt-project/WEEKDAY_TLDR_QUEUE_TASK_PROMPT_V4.md`; retain weekdays at 11 a.m. America/New_York              |
+| Project Sources retained   | `routing-rules.md` and unrelated working sources                                                                             |
+
+Before replacement, identify the Git commit containing each currently installed
+file and note any live differences. Restoring a previous version means copying
+those files back, including the Task body and Project Instructions, and confirming
+installation. Use this established procedure; no additional rollback service is
+needed. Old artifacts remain supported by local readers.
+
+### Generate historical pairs and simulate
+
+In a new chat in the same Project, use the candidate’s copyable manual request to
+process the two or three selected historical dates. It must retrieve the actual
+newsletters, run all five changes and create real matching files. Preserve the
+baseline locally; if the historical filename already exists, use an explicit
+`-v2-trial` suffix before `.txt` and its matching `-reference` sibling rather than
+silently replacing it. Ensure Voice selects the trial main file explicitly.
+
+Sol checks every generated pair and the complete article inventory, then shows
+Brad attribution examples, omissions and duplicate removals. With the implemented
+CLI, the pair check is:
+
+```sh
+npm run validate:commute-queue -- /absolute/path/20260904-tldr-dev-v2-trial.txt \
+  --reference /absolute/path/20260904-tldr-dev-v2-trial-reference.txt
+```
+
+This `--reference` option is to be added in PR 1; it does not exist in the current
+release. Corresponding bundle validation must accept the same reference alongside
+its existing `--queue` argument.
+
+Brad runs a simulated commute in the actual phone GPT Live environment. Across
+short and long queues, check:
+
+1. The complete opening sweep, then ordinary next/back/jump playback.
+2. Useful context for unclear headlines and absence of repeated coverage.
+3. A requested original description, author/publication and source discussion,
+   followed by several ordinary advances reading the main strings again.
+4. An explicit save and correction tied to the correct item.
+5. A real exported bundle, including a second session that never requested details.
+
+Sol compares the export to the pair and checks that local intake still works.
+Record actual speech problems, not merely a model’s assurance or a valid file.
+There is no need to prove which individual change caused the combined result.
+
+### Release decision
+
+Brad’s bar is that the result is no worse than the current approach and useful
+enough to use. Serious new omissions, incorrect duplicate removals, unusable
+playback or lost saves must be fixed before acceptance or trigger restoration of
+the prior Project files. For smaller issues, agree on a concrete fix and iterate.
+State remaining problems without inventing a numerical release threshold.
+
+Record the actual dates tested, accepted commit/files, brief results, Brad’s
+acceptance and any remaining fix in `validation-results.md`. Keep detailed private
+answers and chats under `.private/`. Do not mark this phase complete while the
+candidate is uninstalled or the required manual checks are pending.
+
+## Phase 7 — Monday generation and Tuesday handoff
+
+1. If the accepted candidate is installed before Monday’s 11 a.m. task, let the
+   existing task generate the new newsletters. Verify actual paired downloads
+   and edition coverage in the Project Library.
+2. If installation finishes later, generate Monday’s newsletters in a new Project
+   chat on the phone using the same v4 manual request. There is no need to wait
+   for another scheduled day. If the scheduled run only failed at final writing,
+   use the established manual completion request first.
+3. If Monday provides the reserved final scoring material, finish the blind check
+   before Tuesday listening and accept or fix the candidate. Labeling and raw
+   predictions remain separate from the ordinary commute files.
+4. Correct or regenerate failed pairs. Do not report a scheduled status or a link
+   label as proof of usable output. Keep usable editions available independently.
+5. Hand Brad a concise result: merged PRs, accepted versions, confirmed Project/Task
+   updates, available Monday filenames and any unresolved issue. Tuesday morning
+   is the first real listen. Restore the prior version if the candidate remains
+   unusable; do not substitute a new Mac workflow.

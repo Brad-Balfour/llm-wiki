@@ -1,476 +1,267 @@
-# Article classifier v2 requirements
+# Classifier v2 requirements
 
-Status: proposed for Brad’s review; no live behavior changes. Evidence covers
-all 16 open issues, their 74 comments, and commute feedback through September 4, 2026. See the [evidence inventory](evidence-inventory.md),
-[detailed log review](commute-log-review.md) and
-[implementation and evaluation plan](implementation-plan.md).
+Status: agreed direction, written for implementation review. This PR changes the
+plan only. The purpose is to make Brad’s 90-minute daily commute a useful way to
+keep up with developments in his industry, with less repetition and fewer errors.
 
-R1–R4 describe the four proposed improvements. R5–R7 supply the records and
-verified feedback needed to test them. Part 2 contains the behavior to preserve
-and review rules (R8–R10).
+There are five improvements, R1–R5. R6–R8 preserve the working product. The
+[implementation runbook](implementation-plan.md) names the PRs, files, checks and
+live installation steps. The [evidence inventory](evidence-inventory.md) and
+[commute findings](commute-log-review.md) link the feedback behind these requirements.
 
-## Part 1 — New improvements and the work needed to test them
+## Part 1 — New improvements
 
-| Improvement                          | What changes                                                                                                                          | Requirement / proposed PRs |
-| ------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------- | -------------------------- |
-| Two-file queue                       | Produce a lean playback file and a matching `-reference` file together. Voice loads the reference only for requested article details. | R1 / P10                   |
-| Daily duplicate removal              | Identify the same article across all newsletters, classify it once and play it once while retaining every source.                     | R2 / P8a–P8b               |
-| Better classification                | Revise interest/depth rules using verified feedback and compare results with Brad’s blind answers and a separate final test set.      | R3 / P3, P6–P7             |
-| Useful context for unclear headlines | Test a short literal excerpt for titles that do not explain what an article is about, without changing depth labels.                  | R4 / P9                    |
+### R1 — Produce separate playback and reference files
 
-The fourth is a separate presentation experiment; it need not delay the other
-three. Reading the original description on request already works and is not a
-new feature.
+For each newsletter, produce both JSON `.txt` files in the same generation run
+with the same filename prefix:
 
-There is also supporting work: explain missing articles, collect usable historical
-feedback, and save enough information to rerun and compare results (R5/R6/R7;
-P1–P2). Those tools are not all implemented today. The local queue generator in
-P4 supports repeatable tests and the new output formats; it is not a commitment
-to replace the daily Project workflow. A local model integration or replacement
-delivery service remains optional.
+- `20260907-tldr-dev.txt`
+- `20260907-tldr-dev-reference.txt`
 
-This is a focused set of changes to the existing pipeline. The coding scope is
-smaller than the earlier ten-item list suggested, but preparing reliable labels,
-validating scoring changes and testing actual Voice playback still require work.
-The four-week scoring experiment does not block an independently approved
-file-format or duplicate-removal change.
-
-Priority levels: P0 establishes usable evidence and keeps commutes working;
-P1 adds measured improvements; P2 denotes a separate experiment. These priorities
-are distinct from the P0–P11 PR identifiers in the implementation plan.
-
-### R1 — Separate the playback text from article details and test it in Voice (P1; #100, #120)
-
-Produce both JSON files together from the same queue, using the same filename
-prefix. They remain separate files. The main file is deliberately small:
-it contains only the opening sweep and the exact text to read for each item.
-Move all other data into a matching file with `-reference` immediately before the
-extension. For example:
-
-- Main: `20260907-tldr-dev.txt`
-- Reference: `20260907-tldr-dev-reference.txt`
-
-Both files contain JSON; `.txt` preserves the current download convention. The
-main file has exactly this shape, with `sweep_playback` written first and an
-`items` array containing N entries:
+The main file has exactly these fields, with `sweep_playback` first:
 
 ```json
 {
   "sweep_playback": "1 of 2. Headline only. Example one\n2 of 2. In depth. Example two",
   "items": [
-    {
-      "item_playback": "1 of 2. Headline only. Example one"
-    },
-    {
-      "item_playback": "2 of 2. In depth. Example two\nThe exact newsletter description for example two."
-    }
+    { "item_playback": "1 of 2. Headline only. Example one" },
+    { "item_playback": "2 of 2. In depth. Example two\nThe original newsletter description." }
   ]
 }
 ```
 
-There are no other fields in the main file or its item entries. In particular,
-do not add IDs, scores, separate titles, depth labels, descriptions, URLs, author,
-publication, version fields or hashes. Titles and reading modes can occur within
-the prepared spoken strings, as they do today. `item_playback` is the name for
-this new format; generate its value from the existing `playback_text` without
-changing the spoken text in the first trial.
+No scores, IDs, URLs, descriptions, schema versions or other metadata go in the
+main file. Item numbers and modes are already written into the playback strings.
+All other queue data goes in the reference file, including descriptions, titles,
+author/publication, URLs, scores, source identities, versions and duplicate
+relationships. Reference entries match the main array by position. Record the
+main filename and a SHA-256 hash of its canonical JSON in the reference file so a
+checker can detect a swapped or stale pair. Hash the UTF-8 bytes of
+`JSON.stringify(parsedMain)` with keys in the required order. This also lets an
+exported snapshot be checked without depending on indentation. Generate the hash
+with the Project’s code tool, not by asking the model to invent it.
 
-The reference file retains all the information needed for article questions,
-feedback and export: source and item IDs, titles, URLs, descriptions, interest and
-depth scores and labels, routing, author/publication, source details and versions.
-It also records the main filename, a hash of the main file, and the item positions
-that link its records to the main array. All extra matching and validation data
-belongs here, so the main file stays small. Generate and check both files together;
-never silently replace one file from a pair already used in a session.
+Voice opens only the main file to start, reads the complete sweep, and reads the
+stored item string on each advance. It opens the matching reference only for
+requested article details, then returns to the main file for ordinary playback.
+Next, back and jump retain their current meaning. An original-description request
+reads the full literal description from the reference; this behavior already exists.
 
-Change the Voice prompt to make these instructions explicit:
+At session export, read the matching reference if necessary to preserve exact
+article identities, saves and feedback in the existing self-contained bundle.
+That export step is not a reason to preload the reference for ordinary playback.
+The runbook defines the snapshot representation and reader changes. Keep old v2/v3
+queues and their exports readable.
 
-1. At the start, open only the main file. Read `sweep_playback` exactly.
-2. On each next-item advance, read only that entry’s `item_playback` exactly.
-   Keep the current array position for next, back and jump commands. Do not
-   assemble text from other fields, summarize it, or add an explanation.
-3. Open the matching `-reference` file only when Brad asks for additional article
-   details. Match the current position to its reference record; use its URL if
-   the question requires reading the source article. If the reference is missing
-   or does not match, say so rather than guessing.
-4. After answering, return to the main file for default playback. Having opened
-   the reference file is not permission to use it instead of `item_playback` on
-   later advances. Do not preload it for the sweep or ordinary navigation.
+Acceptance: check the pair’s shape, counts, positions, hash and complete exported
+data. Reject a mismatched pair. Simulate short and long historical queues on
+GPT Live, including a details request followed by ordinary advances and an
+export with no prior details request. Compare actual speech with the prepared
+strings. Brad judges whether the result is no worse than the current experience.
 
-The format PR must also show that the existing session export can retain the
-complete queue and exact item identities from the pair. Specify and test that
-compatibility change in the format PR; do not assume an export representation
-here or require loading the reference at session start. Producing the two queue
-files together is distinct from creating the later session export. Preserve
-existing saves and corrections; redesigning export retries is outside this plan.
+### R2 — Fill author and publication during generation
 
-This is the concrete experiment suggested in
-[#120’s September 4 comment](https://github.com/Brad-Balfour/llm-wiki/issues/120#issuecomment-5548380533)
-and clarified by Brad during review of this plan. The hypothesis is that fewer
-fields available during default playback will reduce invented or summarized text.
-It is not established that this will fix Voice’s behavior. Prompt 4.2 and a
-single v3 file still had failures on September 4.
+Before classification, use attribution in the newsletter when available. For
+missing information, the generation LLM uses its browsing tools to read the
+original, unwrapped article URL. It can read page metadata and the visible
+byline; it must not guess an author from a person mentioned in the article.
+Perform one lookup per distinct article URL, reusing it for duplicate copies.
 
-Acceptance:
+New reference entries contain nonempty author and publication strings:
 
-- Generate the exact two-field main object and one-field item objects above.
-  Check item counts, order, literal strings, reference positions and the main
-  file hash in the reference file. Reject extra fields in the main file.
-- Test missing, swapped, stale, reordered and mismatched reference files. Opening
-  a reference must not change which article is current. Check that both files
-  are available in the same Project from the phone.
-- Compare the current single file against the two-file version with identical
-  scores, article order, sweep and item text. Repeat across multiple dates and
-  editions, including short and long queues; no single queue establishes the
-  result. Keep the short-description trial
-  in R4 separate so a result can be attributed to the file split.
-- Test actual iPhone Voice through a long session: opening sweep, next/back/jump,
-  a details request that opens the reference, and a return to
-  several ordinary advances. Check that the main file supplies default playback
-  before and after the details request. Record any inability to verify which
-  files Voice opened; its claim that it followed the prompt is not proof.
-- Count unrelated additions, paraphrases, omitted text and failed first exports.
-  Check that an exported bundle includes the complete queue and preserves saves
-  and feedback, including a session with no article-details request.
-- Give the pair a new file-format version, recorded in the reference schema and
-  generator configuration rather than extra main-file fields. Update generation,
-  validation, bundle reading/export and Project instructions together. Keep old
-  v2/v3 files readable and restore single-file v3 generation if the trial fails.
+| Result                                  | Required value                                                                                  |
+| --------------------------------------- | ----------------------------------------------------------------------------------------------- |
+| Author or authors found                 | The published author names, including an organizational byline when that is what the page lists |
+| Article read but no byline found        | `No authors listed`                                                                             |
+| Article could not be read after a retry | `Author lookup failed`                                                                          |
+| Publication name available              | The publication/site name                                                                       |
+| No publication name extracted           | The hostname of the resolved article URL, without a leading `www.`                              |
 
-A reconstructed bundle that passes validation does not prove what Voice said.
-A desktop text test does not prove that a test program can control or observe
-actual iPhone audio. Manual iPhone testing remains required.
+Do not emit `null` for these fields in new v4 output. In the reference, also
+record whether attribution came from the newsletter, the article page, a
+hostname fallback, an absent byline or a failed lookup. This distinguishes an
+access failure from a page that names no author. Retain the actual resolved URL.
+One inaccessible page must not prevent other articles or editions from being
+produced. A failed lookup does not itself change interest or depth.
 
-### R2 — Remove repeated articles across a day’s newsletters and retain every source (P1; #36)
+Pass verified attribution into classification so author preferences can be used.
+An error/status string is not an author. Use the same generation LLM and tools
+already running in the Project; this requires no separately selected model,
+service, API integration or Mac process.
 
-Collect all qualifying editions before rendering any queue. Resolve TLDR
-redirects, normalize known tracking parameters conservatively, and group by final article URL across newsletters. Classify each article once for all newsletters that link to it,
-retaining every source instance and its original title/summary and source order.
-Two URLs on the same website are not necessarily duplicates. Preserve different paths and query parameters that change the article content.
+Acceptance: inspect examples with a newsletter byline, a byline found only on the
+article, multiple authors, no byline, and an inaccessible page. Check publication
+fallbacks against their URLs and verify that new files contain no null attribution.
 
-Acceptance: fixed rules for choosing which source text to classify and which queue keeps the article, complete
-source and version information, no second playback occurrence of an exact URL, regenerated positions,
-totals and sweep text, and reruns that do not add duplicate entries. Test several
-complete daily sets, including days with and without duplicates, different
-newsletter descriptions for the same URL, and similar articles with distinct
-URLs. Record which articles were included, removed as duplicates and actually heard as separate facts. A replay request finds the retained article;
-queue selection must work even if the first queue Brad opens had all duplicates
-removed. Empty queues and late-arriving editions need explicit inventories and
-revision rules, never silent replacement of files used by an active session.
-Use a separate daily inventory file where possible; do not add fields to strict queue v3.
+### R3 — Remove repeated coverage across all of a day’s newsletters
 
-The issue's highest-interest, then highest-depth, then earliest-occurrence rule
-applies to historical independently scored duplicates. When an article is classified once, every copy shares its scores, so retain its earliest newsletter occurrence using the recorded source order;
-original source text remains available for a later “new context” request.
+Retrieve all qualifying General, Dev, AI and Fintech editions before generating
+queues. Resolve tracking links, group identical destination URLs, and retain all
+newsletter occurrences and their original descriptions. Different article paths
+or meaningful query parameters must not be collapsed by URL cleanup.
 
-### R3 — Brad’s answers, a separate test set and measured adoption (P0/P1; #66, #68)
+Classify each distinct article URL once. Then compare different URLs for coverage
+of the same event or announcement. Use the article titles and descriptions;
+consult the sources when needed to decide whether another item adds useful
+information. Sharing a topic or company is not enough to call two items duplicates.
 
-Use the recorded feedback to propose better interest and depth rules, then
-compare them against Brad’s answers before adoption. Here, improving the
-classifier means revising the profile, instructions or examples based on measured
-results; model fine-tuning is not part of this plan.
+- Play repeated coverage once across the daily queues.
+- Keep materially new information as an update. Prepare the update explanation
+  during generation; Voice reads the stored text rather than inventing it.
+- If the relationship is uncertain, retain the item and flag it in the review
+  record instead of silently deleting it.
+- Prefer the source occurrence with the most useful literal title and description;
+  use attribution completeness and then source order to break ties. Do not
+  mechanically choose the first occurrence if it loses useful context. Keep the
+  retained occurrence in the newsletter whose source text was selected.
+- Keep every source URL, newsletter occurrence and original description in the
+  retained item’s reference record so requested source comparisons remain possible.
 
-Use newsletters from multiple dates and all four editions when available. Keep
-three kinds of evidence distinct:
+Recalculate each queue’s positions, total and sweep after removal. Empty editions
+produce a valid empty pair (`items: []`, `sweep_playback: ""`) and are identified
+in the generation result. Voice reports no items and does not invent playback.
+Late editions must not silently replace files already used in a commute; report
+which edition is new and create an explicitly identified revision if regeneration
+is requested. Existing files remain identifiable for their session exports.
 
-- **Development data:** historical newsletters, existing labels and verified
-  corrections used to revise the profile, instructions and examples. Include
-  ordinary articles as well as errors; do not choose only articles that reached
-  the old queues or drew a complaint.
-- **Known-problem tests:** source-backed examples of omissions, wrong scores,
-  duplicate articles and unclear headlines. These show whether particular
-  problems recur, not how often the classifier succeeds on ordinary input.
-- **Final test data:** separate, previously unused delivery dates, chosen before
-  their answers or results are inspected. Compare the current and proposed
-  versions on exactly the same articles, with Brad’s answers hidden from the
-  classifier and from rule revision until scoring is complete.
+Acceptance: inspect several days with exact duplicates, the same story at
+different URLs, useful updates, similar-but-distinct stories and no duplicates.
+For every removed occurrence, show the retained article and the reason. Review
+what disappeared, not just what Voice reads. Brad can correct those decisions
+before deployment. No ongoing cross-chat “seen” database is required; removal
+happens during generation.
 
-Gold labels come from Brad before predictions are revealed. Keep every copy of
-an article or related story in the same dataset. Retain cross-edition instances
-for duplicate-removal tests, but report scoring per unique article as well.
-Previously discussed material belongs in development or known-problem tests.
-No particular historical date is required to build or adopt v2.
+### R4 — Give unclear headlines useful context
 
-Acceptance: record hashes of source, label, dataset-assignment and prediction files, and keep them unchanged during each comparison. Evaluate the current and proposed versions on identical inputs. Show tables comparing predicted labels with Brad’s answers, missed articles, unwanted discussion, errors near score thresholds, score distributions, playback time, queue sizes and results by newsletter and preference category. Run four weekly blind
-review cycles and one final reserved evaluation. The test plan states which articles count in each measurement, how missing labels are handled, how proposed classifiers are kept from seeing test answers, costs, when to stop a failing trial and which decisions need Brad’s approval.
-A justified no-change result is valid; better results on data used to revise the classifier are not sufficient to adopt v2.
+For a headline-only item whose title is an unexplained product name or otherwise
+does not say what it is about, append a short, exact excerpt from its newsletter
+description to `item_playback`. A self-contained title keeps the short existing
+playback. Keep the original title and full description in the reference.
 
-### R4 — Make short playback useful without changing depth labels (P1; #35/#66 quality feedback)
+Use the shortest complete opening sentence or sentences that explain the item.
+Do not manufacture an explanation from the name or cut a sentence to satisfy an
+arbitrary word limit. Flag unusually long excerpts for Brad’s sample review.
+Do not change the interest or depth classification merely to get more context read.
+The opening sweep remains titles and modes only. In-depth playback retains the
+full original description. Any duplicate/update wording is prepared at generation.
 
-Test whether a short, literal newsletter description gives useful context for
-unfamiliar names while preserving `headline_only`. This is a test of the text prepared for playback, not a reason to classify every unfamiliar product as `in_depth`.
+Acceptance: Brad reviews before/after examples including unclear product names,
+clickbait and already-clear headlines from several editions. During simulation,
+he judges usefulness and whether the extra reading is worthwhile. Correct the
+selection/excerpt instructions from that feedback; no separate large experiment
+is required.
 
-Acceptance: compare unchanged headline-only playback, an excerpt for every
-headline-only item, and an excerpt only for uninformative titles. Include
-unfamiliar product names, clickbait titles and clear, self-contained headlines
-from multiple dates and editions.
-Use an explicit, reviewable rule for selecting titles and the excerpt; record
-which items it changes. Compare usefulness and added seconds separately from
-classification. Copy excerpts exactly from the newsletter.
-Do not generate explanatory facts from a product name. Preserve full description
-and exact attribution or `null`. Any changed `playback_text` template requires a
-new queue version and coordinated changes to queue generation, the schema, file readers and Project instructions; current
-v3's literal template must continue to validate unchanged historical files.
+### R5 — Improve classification with a small blind review and final check
 
-Reading the full original description when requested is already solved by the
-existing file content and prompting. Preserve it when changing the file format;
-do not present it as a new classifier feature. Missing attribution remains a
-queue-generation check: preserve available values and report extraction misses.
-The existing on-request lookup of absent attribution is Voice behavior, outside
-this classifier work.
+Revise the profile, instructions and examples using existing labels and verified
+feedback. This is calibration of an LLM-based classifier, not model-weight
+training or reinforcement learning. Use the current Project as the producer for
+both baseline and candidate runs.
 
-### Supporting work for the improvements
+Use three kinds of evidence:
 
-The following requirements describe the new records and checks needed to explain
-omissions and evaluate changes. They do not require rebuilding working parsing,
-scoring or feedback handling.
+| Evidence                   | How to use it                                                                                                                              |
+| -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| Development                | Historical newsletters across dates and editions, existing answers, and verified corrections used to revise the classifier                 |
+| Tests of reported problems | Exact omission, scoring and presentation examples used to check that those problems do not recur; report separately from ordinary accuracy |
+| Final check                | Previously unused articles reserved before tuning; compare current and candidate predictions against Brad’s blind answers                  |
 
-### R5 — Find every article and explain omissions (P0; #35, #66, #37)
+Reuse Brad’s answers where they provide the needed interest and depth labels.
+Ask only for missing labels needed for a useful comparison. Present the title,
+original description, URL and verified attribution without predictions or
+rationales. Collect interest and depth independently; allow “unsure.” Keep all
+copies of the same article or closely related story in one group when assigning
+data. Do not treat a prior model prediction as Brad’s answer.
 
-Add an inventory that accounts for every newsletter article and explains where
-an omitted article was lost. Finding all articles is an existing requirement;
-the new work is making omissions visible and testable. Use that evidence to
-fix demonstrated parsing or processing errors rather than assuming every missing
-article was classified as uninteresting.
+Start with a small batch spanning multiple dates and editions; the runbook sets
+an initial review size. Inspect results before asking for another batch. Include
+articles excluded from past queues, ordinary articles and recorded errors. Do
+not measure only the items Brad heard or only examples that produced complaints.
+No particular historical date is a prerequisite. Use future newsletters for the
+final check if the recoverable history has already been used to revise the rules.
 
-Acceptance: review complete newsletters across multiple dates and all four
-editions when available. Account for every block as editorial, excluded with
-reason, or ambiguous for review. Include ordinary and unusually sparse outputs;
-report missing edition coverage rather than claiming it was tested. A private diagnostic
-inventory records the first failed stage: discovery, parsing, URL resolution,
-classification, validation, routing, duplicate removal, or rendering. Compare parsed articles against the separately prepared list of articles in the email; the parser cannot use its own output to prove it found everything. Checking only articles that reached the queue cannot establish completeness.
+Preference updates must include the recorded author and topic instructions:
+Martin Fowler defaults to high interest and in-depth discussion; Addy Osmani has
+an explicit strong author preference without an invented blanket depth correction;
+robotics and self-driving interest includes Tesla and Waymo. Include the exact
+practical-agent, software-craft and negative-topic corrections described in the
+[commute findings](commute-log-review.md). A direct preference is an input to the
+revision, not a reason for a separate research program.
 
-### R6 — Keep accurate records of each run (P0; #66)
+For each selected newsletter, account for every editorial article as included,
+excluded with a reason, or failed at a named step. This small private review
+record also shows duplicate decisions, versions used and attribution failures.
+Use source-confirmed articles rather than reconstructing missing emails from
+incomplete queues. Repeated exports and copies of a conversation count once.
+Preserve exact corrections even when the old queue’s routing version is unknown;
+do not rewrite its history or invent corrected numeric scores.
 
-This is supporting measurement work, not a new commute feature. The proposed private `classifier-candidate-manifest.v1` contains the run ID, source message and edition IDs, article title/summary/URL with private email details removed, parser
-version and exclusion reason, classifier request ID, complete output,
-validation errors, actual profile/prompt/provider/model/threshold/route versions,
-content hashes, derived route, queue inclusion/exclusion reason, and included
-filename/position. Keep observed original metadata alongside any later verified
-interpretation; unknown means unknown. Record configuration and actual execution
-separately. Avoid guessed model names.
-
-Acceptance: the article counts match at every step from the email to the final results;
-missing output is a recorded failure, never `uninterested`. Keep each attempt unchanged, including its retry history and file hashes. New run records must identify the files actually used; merely filling in a version field is insufficient. Diagnostic records and article inputs with private email details removed remain under `.private/`; no raw Gmail bodies or private work content are
-saved in new files or committed to Git.
-
-### R7 — Verify feedback while preserving the original records (P0; #35, #66)
-
-The existing feedback rules stay in place. New work collects and verifies the
-later corrections, including records the current importer cannot accept because
-their historical scoring versions are unknown. This supplies R3’s reference data.
-
-Retain exact user words, queue file hash, filename, item identity, URL, original
-scores/labels and producer metadata, whether interest, depth or routing was corrected, date and source of
-verification. Keep separate categories for verified corrections, corrections tied to specific articles whose old scoring policy is unresolved, unverified historical feedback, topic preferences, headline usefulness feedback,
-duplicates/prior awareness, playback/platform incidents, wiki captures and
-the assistant’s own summaries or interpretations. Preserve retractions and contradictory evidence.
-
-Acceptance: import all discoverable later evidence in the table above once,
-and record whether each correction was verified, rejected or remains unresolved. Revalidate against original queue and session files;
-comments alone do not establish a private-store count. Save the verification result as a new record without overwriting originals. If the old routing policy is unknown, still record Brad’s explicit interest or depth correction. Do not claim that the old route was verified. No label affects live behavior until the tested
-decision about using feedback in #68. Do not invent a corrected numeric score.
-
-When collecting the historical evidence, compare original downloads and complete
-conversations, not only file previews or the last visible chat turns. Retain the
-source turn for each correction, including explicit feedback about an earlier
-item after playback has advanced. Bind it only when the target is supported by
-the original queue and Brad’s words. Repeated exports, shared-chat copies and
-SRT versions must not multiply the same correction. These are checks on the
-classifier dataset import, not a redesign of Voice session or export behavior.
+Acceptance: show changed classifications, false skips, missed depth and unwanted
+in-depth items against Brad’s answers, with counts and missing labels stated.
+Brad decides whether the candidate is no worse and useful enough to deploy.
+Fix serious misses before release. If final-check answers are used to revise the
+classifier, obtain a small fresh check rather than presenting a rerun as unseen
+evidence. Continuing to collect feedback after deployment does not impose a
+four-week waiting period on this release.
 
 ## Part 2 — Existing behavior to preserve
 
-These are compatibility requirements for the changes above, not separate v2
-features or instructions to rewrite working code. Some existing expectations,
-such as reliable scheduled delivery, remain imperfect in practice; retaining
-an expectation does not claim that the current implementation always meets it.
-Use the existing tests and add focused checks where a v2 change could break it.
+### R6 — Run unattended in the ChatGPT Project and remain usable from the phone
 
-### Preserve source content and identity
+The weekday 11 a.m. America/New_York ChatGPT task must perform the complete
+newsletter retrieval, classification and generation process and place actual
+output files directly in the `LLM-Wiki-Car` Project Library. Brad is at work and
+this Mac is unavailable. New features must run through the existing task prompt,
+Project instructions, supporting files and the tools used in that environment.
 
-Discover direct TLDR General, Dev, AI and Fintech deliveries for the requested
-America/New_York date/range. Confirm sender and identifying TLDR text in the email body; subject alone is
-insufficient. Keep the existing text-input fallback. Extract every editorial
-item, excluding sponsors, quick-link ads, hiring/referrals and wrapper material.
-Use source delivery date for filenames, including catch-up runs. Preserve author
-and publication when explicitly supplied by the source, and distinguish a
-parser omission from attribution absent in the newsletter. Leave absent values
-`null`; do not infer a byline from a domain or a name mentioned in the text.
+Use source-email delivery dates for filenames, including catch-up requests.
+Identify missing editions and failed files in the generation result. A task
+status or promised filename does not establish that a usable download exists.
 
-### R8 — Check the two scores and apply routing rules in code (P0; #35, #68)
+The established recovery for a failed final write is a manual prompt in a new
+chat in the same Project on the phone. Preserve it. Do not build a local queue
+producer, provider integration, scheduler, upload service or Mac fallback for
+this upgrade. Repository checks and temporary review tools serve development;
+they are not part of the unattended daily process.
 
-Keep the fields and input-matching rules in [classifier instructions](../../schema/classifier-instructions.md). The classifier reports only interest and depth facts plus its request ID. It must not decide routes, Voice behavior, wiki destinations or whether to discard an article; application code makes those decisions.
-Validate finite scores, labels, one result per input, forbidden fields and
-score/label consistency before routing. Retain current thresholds until a
-reviewed experiment changes them. Keep provider/model selection outside parser
-and routing. `maybe` expresses optional interest, not model uncertainty.
+Monday, September 7 is a holiday. New newsletters arrive Monday, but Brad’s first
+listen is Tuesday morning, September 8. The target is to finish all five
+improvements during the long weekend, generate Monday’s files and have them
+ready for Tuesday. Keep the currently usable generation instructions available
+if a candidate needs more work.
 
-Acceptance: reject malformed, missing, duplicate or inconsistent results and results with unknown IDs. Report the reason for each rejection. Limited retries never silently drop items.
-Application routing includes both interested and maybe candidates under the
-current queue rules. Do not silently limit the queue to a chosen number of articles.
-Depth remains independently predicted even for uninterested items. An article’s classification may suggest it is useful for the wiki; only Brad’s explicit save request authorizes a wiki change.
+### R7 — Preserve source accuracy and separate classification from presentation
 
-### R9 — Keep queue delivery and fallback usable from the phone (P0/P1; #37, #36)
+Keep separate interest and depth scores and the existing thresholds unless a
+specific reviewed scoring change requires otherwise. Derive routes from those
+scores; the classifier must not invent routes or decide wiki saves. Validate
+scores, labels, IDs and missing/duplicate outputs before producing files.
 
-Keep generating queues in the existing Project, with manual generation using the same prompt as the fallback. A replacement must demonstrate both unattended email retrieval and delivery that works through the phone and Project. Initially, local classification is for comparison only. Local
-processing plus recurring download/re-upload from a home computer is not an acceptable permanent workflow.
+Find all editorial items in direct TLDR General, Dev, AI and Fintech deliveries;
+exclude advertisements and newsletter wrapper material. Preserve exact source
+IDs, original titles/descriptions and resolved URLs. A parsing or tool failure
+is not an uninterested classification. Do not impose an arbitrary queue size.
+Keep the current one-queue-per-Voice-session model, reading order and ordinary
+navigation, except for the explicit duplicate and context changes above.
 
-Acceptance: real parseable dated JSON `.txt` downloads for every qualifying
-edition, explicit failures/missing editions, retries that do not create duplicate files or entries, and no
-success based only on scheduler status. Retain the manual fallback until three
-consecutive qualifying scheduled weekdays succeed. A cloud/API replacement is
-conditional on proving delivery; do not assume a supported way to add files automatically to Project Library exists. Production source updates list exact files and verified
-live versions and support rollback without rewriting past queues.
+### R8 — Preserve feedback, exports, privacy and human review
 
-### Preserve descriptions, saves and older files
+Saves and corrections remain tied to the exact article. Skip, already heard,
+already wikied, general discussion and playback errors are not automatic scoring
+labels. Preserve retractions and feedback about an explicitly identified previous
+item. A wiki change still requires Brad’s explicit save.
 
-- Keep the full original description available on request. The two-file change
-  moves it to the reference file; it does not introduce this behavior.
-- Keep exact article identities, source URLs, explicit saves and corrections
-  usable in existing session exports and local import.
-- Keep old queue-v2/v3 files readable. Do not rewrite past queues to make them
-  look as though the new version generated them.
-- Preserve separate interest and depth feedback, retractions and unknown values.
-  A skip, save, prior-awareness comment or playback error is not automatically a
-  classification label.
-- Keep the existing Project/manual path usable from the phone until a reviewed
-  replacement has demonstrated the complete workflow.
+The final session bundle remains sufficient for local intake, including the
+complete queue data and supported saves/corrections. Do not redesign export
+retries or unrelated commute processing. Keep old queues and bundles readable.
 
-### Review and measurement rules
+Keep raw Gmail bodies, credentials and private work material out of Git. Store
+private article extracts, answers and review results under `.private/`; commit
+only suitable invented test cases and concise findings without private details.
 
-R10 describes how to carry out the work, rather than another product feature.
-
-### R10 — Keep PRs small and measure time and cost (P0; user request)
-
-Use focused PRs with a stated base branch, required earlier PRs, test results, sample
-before/after output and rollback. Preserve valid command behavior and fail early
-on invalid CLI arguments/private paths (#94). Keep parser, scorer, routing,
-renderer, delivery and Voice changes independently measurable.
-
-Acceptance: automated CI checks run without network access, using invented test data that contains no private information;
-paid/private replay is an explicit separate run. Record per-stage wall time,
-retries, model usage/cost when available, and human labeling time. Time outside tool calls includes the agent’s reasoning and coordination work; it is not a direct measurement of model computation. #85 abandoned Terra for commute
-maintenance; that evidence neither selects nor disqualifies an article-scoring
-model. No merge or live update occurs without Brad's approval.
-
-## Related work kept separate
-
-Brad’s review clarifies that Siri/phone-call interruptions came from a phone
-Voice setting and are not work for this plan. Export retry identity, timestamps,
-session navigation fixes, article browsing failures and wiki follow-up capture
-are commute workflow work. The two-file change must remain compatible with
-existing exports, but does not absorb those other fixes. See the
-[log review](commute-log-review.md) for those decisions.
-
-[#26](https://github.com/Brad-Balfour/llm-wiki/issues/26) explains why source and version information
-must remain available after queue changes so wiki updates can still use the actual source articles; it does not justify
-auto-saving articles. #48, #95 and #96 remain tasks for wiki updates and session-file processing,
-with compatibility tests where needed. #8, #52 and #112 are independent Pages,
-search and workspace work. #85/#119 supply operational lessons without making
-all commute timing measurements a prerequisite. Related-story automatic suppression,
-unattended cloud migration, a custom Voice client, third-axis scoring, model
-fine-tuning, and combining several providers’ predictions every day are not included in the initial v2 work.
-
-## Appendix — Background and evidence
-
-The following material explains the current version and the evidence behind the
-proposed improvements. It is not an additional implementation backlog.
-
-### Current version and which requirements apply
-
-- Profile `1.4`, `classifier-instructions.v1`, and `routing-rules.v1` are the
-  scoring and routing rules currently in the repository. Interest thresholds are 0.60 and 0.80;
-  depth is 0.60, inclusive. The repository validates model output and derives
-  routes; it does not yet provide a complete local model-to-queue producer.
-- New queue files already use `tldr-commute-queue.v3`, including literal
-  `description`, `playback_text`, and `sweep_playback`. Voice Prompt **4.2** and
-  `session-export.md` were verified live September 4. Local readers still accept
-  unchanged queue-v2 files. [Current Project record](../../chatgpt-project/README.md)
-- “Classifier v2” is a release name, **not** queue-v2, the historical
-  `tldr-classifier-v2` string invented in some queues, or another Voice prompt
-  revision. New releases must declare their actual versions of the profile, prompts, routing rules and file format.
-- The [operating-loop compatibility map](../../openspec/changes/commute-wiki-operating-loop/design.md)
-  takes priority when it differs from the older bootstrap requirements. [#66](https://github.com/Brad-Balfour/llm-wiki/issues/66)
-  and [#68](https://github.com/Brad-Balfour/llm-wiki/issues/68) defer using feedback in scoring and replacing the Project with a local program until the results justify those changes. The plan follows that sequence.
-- The old instruction to reserve July 3 onward for testing no longer proves those articles are unused: many have since been discussed or used to improve the system. A new OpenSpec change must explicitly
-  replace it with a record of which articles have already been used and a fixed, separate test set before tuning.
-- #36's August 24 decision supersedes its original source-ID-first cross-queue
-  proposal: use final article URLs with tracking removed across editions, preserve every newsletter’s source ID, and keep access through the existing Project on the phone. Its proposed queue-v3 work
-  predates the already-delivered v3 schema; do not reuse that version number for
-  incompatible duplicate removal or playback changes.
-
-### What the v1 experiments showed
-
-A **gold dataset** contains Brad’s reference answers. A **holdout** is a separate set of articles reserved for testing, whose answers have not been used to revise the classifier. In a **blind review**, Brad labels articles without seeing the model’s predictions.
-
-The local historical archive records 262 fully labeled training items, a
-41-item June 30 holdout, and a fresh 98-item July 1–2 two-axis holdout. The first
-41-item comparison matched 19/41 legacy labels and overused the middle category.
-The fresh two-axis evaluation matched interest on 53/98 (54.1%), depth on 49/55
-of items Brad wanted included (89.1%), and derived Voice behavior on 64/98 (65.3%). Its
-interest matrix includes 18 false skips: 15 items Brad labeled interested and 3 items Brad labeled maybe.
-
-After revising the profile using those same 98 labels, a rescore reached 75/98
-interest (76.5%), 50/55 depth (90.9%), and 82/98 derived Voice behavior (83.7%),
-with three false skips. **Those results measured improvement on answers already used to revise the profile, not performance on a new test set.** The old route and Voice-behavior results used different rules from today’s optional routes. They also did not measure what Voice actually said. This also was not a controlled evaluation of every
-part of the current profile, which combines Claude and Codex
-research; see [source synthesis](../source-synthesis.md).
-
-Keep collecting Brad’s labels without showing predictions, score interest and depth separately, and compare results article by article. Record file hashes so changes to the datasets can be detected. Check for articles already used in training, account for every newsletter item, and measure scoring, routing, presentation and actual Voice playback separately. This planning task has not measured v2 scoring results.
-
-### Checking the recorded feedback
-
-Original descriptions of #35 and #66 list three initially stored corrections. Later
-comments add many more. The following is a list of feedback to collect and check, not a claim
-that all rows already satisfy the existing tool that saves feedback privately. Repeated comments
-across issues and re-exported bundles count once.
-
-| Session evidence    | Exact correction or feedback to verify                                                                | What still needs checking                                                                     |
-| ------------------- | ----------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
-| July 20, 21, 24     | Codex model choice depth up; Kimi Work interest down; The Robots Cometh depth up                      | Three initially verified stored records in #35/#66                                            |
-| July 24             | Fugu-Ultra interest down                                                                              | The later issue summary marks this earlier record as unverified; check it before accepting it |
-| August 6            | iCloud Private Relay; Unit Economics of Software, depth up                                            | Original version/score-label consistency needs audit                                          |
-| August 7, 12, 13–14 | HTMX forms; Roadmap decisions; HTML over WebSockets, depth up                                         | Exact intent retained; recorder blocked on historical route metadata                          |
-| August 15           | Sol Ultrafast; Agent Plugins; DeepSeek Harness, depth up                                              | Some labels require chat plus original queue, not bundle alone                                |
-| August 18–19        | Zero-knowledge proofs; disposable CI; Software Craftsmanship; Saggar; TermDOM, depth up               | Historical metadata blocked recording                                                         |
-| August 21           | Slack Code; Waymo robocar chip; Fig, depth up; Better Batteries and Bun 1.4, interest down            | Five exact candidates, not five automatically accepted store entries                          |
-| August 28           | Sass migration; AcceptMarkdown; Claude Cowork; Anthropic lab hardware, depth up; DuckDB interest down | Five exact candidates; preserve original versions                                             |
-| September 1         | Matic robotics, interest and depth up                                                                 | Two dimension-specific records passed recorder; one article                                   |
-| September 2         | Waymo, interest and depth up                                                                          | Two independent-axis labels for one article                                                   |
-| September 3         | London robotaxis, depth up                                                                            | Preserve `maybe` interest; no inferred interest correction                                    |
-
-Sources: [#35 discussion](https://github.com/Brad-Balfour/llm-wiki/issues/35),
-[#66 discussion](https://github.com/Brad-Balfour/llm-wiki/issues/66), and the
-[dated experiment log](../commute-experiment-log.md).
-
-Several historical queues say `headline_only` at depth scores 0.60, 0.61, or
-0.66; one says `interested` at 0.79. Under committed thresholds these are
-violations of the scoring rules, which must be investigated before treating them as poor predictions. Brad’s correction can still be valid even when we cannot verify which scoring rules produced the original result.
-Do not “fix” history by renaming `commute-route-v2` to `routing-rules.v1`.
-
-Test possible rule changes in these areas before changing the live profile:
-
-| Family                                                         | Supporting evidence                                                                                           | Required counterexamples                                                                          |
-| -------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
-| Robotics, physical AI, autonomous driving                      | Robots Cometh, Matic, repeated Waymo corrections; explicit self-driving interest including Tesla              | Routine hardware/finance coverage; do not infer all robotics items require depth                  |
-| Practical agent engineering and usable techniques              | Codex selection, AI review, Agent Plugins, Slack Code, concrete implementation requests                       | Generic launches, inaccessible tools, marketing without reusable methods                          |
-| Software craft, frontend architecture, CI and product judgment | HTMX, WebSockets, CI, roadmap and craftsmanship corrections; Martin Fowler and Addy Osmani author preferences | Narrow irrelevant frameworks and uninformative routine releases                                   |
-| Whether a useful idea is also something Brad can use           | Fugu discussion, requests for advice Brad can put into practice                                               | Useful conceptual lessons despite unavailable products; no mandatory third scoring axis yet       |
-| Selective negative preferences                                 | Kimi, Bun, DuckDB, Better Batteries; routine Grok/open-weight coverage                                        | Independent workflow, governance, product or science lessons that should overcome topic shorthand |
-| Broader science, computing culture, tool awareness             | Original blind evaluation and profile 1.4                                                                     | Generic platform/business news; author/company-name memorization                                  |
-
-The August 10 statement “I love all of Addy Osmani’s articles” is an author
-preference to test, not a depth label for every article by that author. Compare
-author-aware and topic-only rules using verified attribution; include other
-authors on the same topics and articles with missing attribution. Do not guess
-authorship or treat mention of an author as a byline. The September 2
-self-driving preference explicitly includes Tesla as well as Waymo; test it
-beyond those company names before adopting a rule.
-
-Unfamiliar titles such as Mole, fx, GlassBox, Vocab Break, Muse Image, Experiential,
-Cohere Parse, and Wigolo are **presentation feedback** unless Brad explicitly corrected
-an axis. Fig can have both a presentation observation and an independent depth correction.
-The actual words override an assistant-generated `promote_to_in_depth` event.
-“Skip,” “already heard,” “already wikied,” a wiki save, favorable discussion,
-and silence are not automatic interest/depth labels.
+Brad reviews and approves PRs and live changes. Preparing later stacked PRs does
+not wait for earlier merges. Each live change names the exact Project files or
+instructions Brad must replace; record completion only after installation is
+confirmed. Restoring a prior version uses those same version-controlled files
+and the established manual replacement procedure.
