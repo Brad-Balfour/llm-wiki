@@ -6,6 +6,11 @@ The review covered all 16 open issues and all 74 comments. A second GitHub query
 
 The requirements and plan are proposals. Where an issue’s original description is out of date, the plan uses later evidence and the requirements already implemented. No issue was edited or closed during the review.
 
+The later [detailed commute log review](commute-log-review.md) records additions
+and clarifications from the dated experiment entries, supporting planning
+records and Brad’s PR review. It distinguishes classifier work from solved
+behavior and separate commute workflow problems.
+
 ## All open issues
 
 | Issue                                                                                                                                                         | Comments read | Last updated (UTC)   | How it affects this plan                                                                                                                                        |

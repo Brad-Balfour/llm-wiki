@@ -3,7 +3,9 @@
 Status: proposed for Brad's review; no live behavior changes. Evidence
 snapshot: September 5, 2026, through September 4 commute feedback. See the
 [complete 16-issue, 74-comment inventory](evidence-inventory.md) and
-[implementation and evaluation plan](implementation-plan.md).
+[implementation and evaluation plan](implementation-plan.md). The
+[commute log review](commute-log-review.md) separates additions found in the
+detailed logs from solved problems and work outside classifier v2.
 
 V2 improves the process that turns newsletters into commute queues: extract every article, classify it, apply routing rules in code, remove duplicates, and produce useful JSON files. Its first
 release should make every omission explainable and every experiment reproducible.
@@ -83,14 +85,22 @@ Do not “fix” history by renaming `commute-route-v2` to `routing-rules.v1`.
 
 Test possible rule changes in these areas before changing the live profile:
 
-| Family                                                         | Supporting evidence                                                                          | Required counterexamples                                                                          |
-| -------------------------------------------------------------- | -------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
-| Robotics, physical AI, autonomous driving                      | Robots Cometh, Matic, repeated Waymo corrections and automotive preference                   | Routine hardware/finance coverage; do not infer all robotics items require depth                  |
-| Practical agent engineering and usable techniques              | Codex selection, AI review, Agent Plugins, Slack Code, concrete implementation requests      | Generic launches, inaccessible tools, marketing without reusable methods                          |
-| Software craft, frontend architecture, CI and product judgment | HTMX, WebSockets, CI, roadmap and craftsmanship corrections; Martin Fowler author preference | Narrow irrelevant frameworks and uninformative routine releases                                   |
-| Whether a useful idea is also something Brad can use           | Fugu discussion, requests for advice Brad can put into practice                              | Useful conceptual lessons despite unavailable products; no mandatory third scoring axis yet       |
-| Selective negative preferences                                 | Kimi, Bun, DuckDB, Better Batteries; routine Grok/open-weight coverage                       | Independent workflow, governance, product or science lessons that should overcome topic shorthand |
-| Broader science, computing culture, tool awareness             | Original blind evaluation and profile 1.4                                                    | Generic platform/business news; author/company-name memorization                                  |
+| Family                                                         | Supporting evidence                                                                                           | Required counterexamples                                                                          |
+| -------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
+| Robotics, physical AI, autonomous driving                      | Robots Cometh, Matic, repeated Waymo corrections; explicit self-driving interest including Tesla              | Routine hardware/finance coverage; do not infer all robotics items require depth                  |
+| Practical agent engineering and usable techniques              | Codex selection, AI review, Agent Plugins, Slack Code, concrete implementation requests                       | Generic launches, inaccessible tools, marketing without reusable methods                          |
+| Software craft, frontend architecture, CI and product judgment | HTMX, WebSockets, CI, roadmap and craftsmanship corrections; Martin Fowler and Addy Osmani author preferences | Narrow irrelevant frameworks and uninformative routine releases                                   |
+| Whether a useful idea is also something Brad can use           | Fugu discussion, requests for advice Brad can put into practice                                               | Useful conceptual lessons despite unavailable products; no mandatory third scoring axis yet       |
+| Selective negative preferences                                 | Kimi, Bun, DuckDB, Better Batteries; routine Grok/open-weight coverage                                        | Independent workflow, governance, product or science lessons that should overcome topic shorthand |
+| Broader science, computing culture, tool awareness             | Original blind evaluation and profile 1.4                                                                     | Generic platform/business news; author/company-name memorization                                  |
+
+The August 10 statement “I love all of Addy Osmani’s articles” is an author
+preference to test, not a depth label for every article by that author. Compare
+author-aware and topic-only rules using verified attribution; include other
+authors on the same topics and articles with missing attribution. Do not guess
+authorship or treat mention of an author as a byline. The September 2
+self-driving preference explicitly includes Tesla as well as Waymo; test it
+beyond those company names before adopting a rule.
 
 Unfamiliar titles such as Mole, fx, GlassBox, Vocab Break, Muse Image, Experiential,
 Cohere Parse, and Wigolo are **presentation feedback** unless Brad explicitly corrected
@@ -110,7 +120,10 @@ Discover direct TLDR General, Dev, AI and Fintech deliveries for the requested
 America/New_York date/range. Confirm sender and identifying TLDR text in the email body; subject alone is
 insufficient. Keep the existing text-input fallback. Extract every editorial
 item, excluding sponsors, quick-link ads, hiring/referrals and wrapper material.
-Use source delivery date for filenames, including catch-up runs.
+Use source delivery date for filenames, including catch-up runs. Preserve author
+and publication when explicitly supplied by the source, and distinguish a
+parser omission from attribution absent in the newsletter. Leave absent values
+`null`; do not infer a byline from a domain or a name mentioned in the text.
 
 Acceptance: a complete newsletter test case checked by a person accounts for every block as
 editorial, excluded with reason, or ambiguous for review. A private diagnostic
@@ -157,6 +170,14 @@ and record whether each correction was verified, rejected or remains unresolved.
 comments alone do not establish a private-store count. Save the verification result as a new record without overwriting originals. If the old routing policy is unknown, still record Brad’s explicit interest or depth correction. Do not claim that the old route was verified. No label affects live behavior until the tested
 decision about using feedback in #68. Do not invent a corrected numeric score.
 
+When collecting the historical evidence, compare original downloads and complete
+conversations, not only file previews or the last visible chat turns. Retain the
+source turn for each correction, including explicit feedback about an earlier
+item after playback has advanced. Bind it only when the target is supported by
+the original queue and Brad’s words. Repeated exports, shared-chat copies and
+SRT versions must not multiply the same correction. These are checks on the
+classifier dataset import, not a redesign of Voice session or export behavior.
+
 ### R5 — Brad’s answers, a separate test set and measured adoption (P0/P1; #66, #68)
 
 Create a reviewed July 28 coverage set, a correction dataset with duplicates removed, a
@@ -193,11 +214,23 @@ original source text remains available for a later “new context” request.
 Test whether a short, literal newsletter description gives useful context for
 unfamiliar names while preserving `headline_only`. This is a test of the text prepared for playback, not a reason to classify every unfamiliar product as `in_depth`.
 
-Acceptance: compare existing headline-only playback with a short excerpt copied exactly from the newsletter, measuring usefulness and added seconds separately from classification.
+Acceptance: compare unchanged headline-only playback, an excerpt for every
+headline-only item, and an excerpt only for uninformative titles. Include
+unfamiliar product names, clickbait titles and clear, self-contained headlines.
+Use an explicit, reviewable rule for selecting titles and the excerpt; record
+which items it changes. Compare usefulness and added seconds separately from
+classification. Copy excerpts exactly from the newsletter.
 Do not generate explanatory facts from a product name. Preserve full description
 and exact attribution or `null`. Any changed `playback_text` template requires a
 new queue version and coordinated changes to queue generation, the schema, file readers and Project instructions; current
 v3's literal template must continue to validate unchanged historical files.
+
+Reading the full original description when requested is already solved by the
+existing file content and prompting. Preserve it when changing the file format;
+do not present it as a new classifier feature. Missing attribution remains a
+queue-generation check: preserve available values and report extraction misses.
+The existing on-request lookup of absent attribution is Voice behavior, outside
+this classifier work.
 
 ### R8 — Keep queue delivery and fallback usable from the phone (P0/P1; #37, #36)
 
@@ -213,7 +246,8 @@ live versions and support rollback without rewriting past queues.
 
 ### R9 — Separate the playback text from article details and test it in Voice (P1; #100, #120)
 
-Generate two JSON files per newsletter queue. The main file is deliberately small:
+Produce both JSON files together from the same queue, using the same filename
+prefix. They remain separate files. The main file is deliberately small:
 it contains only the opening sweep and the exact text to read for each item.
 Move all other data into a matching file with `-reference` immediately before the
 extension. For example:
@@ -268,12 +302,12 @@ Change the Voice prompt to make these instructions explicit:
    the reference file is not permission to use it instead of `item_playback` on
    later advances. Do not preload it for the sweep or ordinary navigation.
 
-Session export still needs the complete queue and exact item identities. The
-export step must combine the matching pair when producing the final bundle; this
-is separate from loading article details into the default Voice reading context.
-Keep this file-joining work in the export instructions/tooling, not as a reason
-to open the reference file at session start. Preserve one queue per session,
-exact saves and corrections, and existing recovery behavior.
+The format PR must also show that the existing session export can retain the
+complete queue and exact item identities from the pair. Specify and test that
+compatibility change in the format PR; do not assume an export representation
+here or require loading the reference at session start. Producing the two queue
+files together is distinct from creating the later session export. Preserve
+existing saves and corrections; redesigning export retries is outside this plan.
 
 This is the concrete experiment suggested in
 [#120’s September 4 comment](https://github.com/Brad-Balfour/llm-wiki/issues/120#issuecomment-5548380533)
@@ -294,7 +328,7 @@ Acceptance:
   scores, article order, sweep and item text. Keep the short-description trial
   in R7 separate so a result can be attributed to the file split.
 - Test actual iPhone Voice through a long session: opening sweep, next/back/jump,
-  pauses, restart, a details request that opens the reference, and a return to
+  a details request that opens the reference, and a return to
   several ordinary advances. Check that the main file supplies default playback
   before and after the details request. Record any inability to verify which
   files Voice opened; its claim that it followed the prompt is not proof.
@@ -324,6 +358,13 @@ maintenance; that evidence neither selects nor disqualifies an article-scoring
 model. No merge or live update occurs without Brad's approval.
 
 ## Related work kept separate
+
+Brad’s review clarifies that Siri/phone-call interruptions came from a phone
+Voice setting and are not work for this plan. Export retry identity, timestamps,
+session navigation fixes, article browsing failures and wiki follow-up capture
+are commute workflow work. The two-file change must remain compatible with
+existing exports, but does not absorb those other fixes. See the
+[log review](commute-log-review.md) for those decisions.
 
 [#26](https://github.com/Brad-Balfour/llm-wiki/issues/26) explains why source and version information
 must remain available after queue changes so wiki updates can still use the actual source articles; it does not justify
