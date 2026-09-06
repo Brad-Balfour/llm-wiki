@@ -124,7 +124,45 @@
             "update_note": {
               "anyOf": [{ "type": "string", "minLength": 1, "maxLength": 1000 }, { "type": "null" }]
             }
-          }
+          },
+          "allOf": [
+            {
+              "if": { "properties": { "status": { "const": "original" } } },
+              "then": {
+                "properties": {
+                  "related_retained_item": { "type": "null" },
+                  "update_note": { "type": "null" }
+                }
+              }
+            },
+            {
+              "if": { "properties": { "status": { "const": "deduplicated" } } },
+              "then": {
+                "properties": {
+                  "related_retained_item": { "type": "null" },
+                  "update_note": { "type": "null" }
+                }
+              }
+            },
+            {
+              "if": { "properties": { "status": { "const": "useful_update" } } },
+              "then": {
+                "properties": {
+                  "related_retained_item": { "$ref": "#/$defs/retainedItem" },
+                  "update_note": { "type": "string", "minLength": 1, "maxLength": 1000 }
+                }
+              }
+            },
+            {
+              "if": { "properties": { "status": { "const": "uncertain" } } },
+              "then": {
+                "properties": {
+                  "related_retained_item": { "$ref": "#/$defs/retainedItem" },
+                  "update_note": { "type": "null" }
+                }
+              }
+            }
+          ]
         },
         "interest_level": { "enum": ["interested", "maybe", "uninterested"] },
         "interest_score": { "type": "number", "minimum": 0, "maximum": 1 },
@@ -182,7 +220,18 @@
         "new_information": {
           "anyOf": [{ "type": "string", "minLength": 1, "maxLength": 1000 }, { "type": "null" }]
         }
-      }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "outcome": { "const": "kept_update" } } },
+          "then": {
+            "properties": {
+              "new_information": { "type": "string", "minLength": 1, "maxLength": 1000 }
+            }
+          },
+          "else": { "properties": { "new_information": { "type": "null" } } }
+        }
+      ]
     }
   }
 }

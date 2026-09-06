@@ -1,5 +1,8 @@
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
+import { mkdtemp, writeFile } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import path from 'node:path';
 import test from 'node:test';
 
 import {
@@ -503,4 +506,113 @@ test('rejects missing retained targets and occurrence ownership across daily pai
       ]),
     /is not stored on retained item/
   );
+});
+
+test('rejects a resolved URL retained by two daily items', () => {
+  const first = pair(1);
+  const second = pair(1);
+  second.reference.main_filename = '20260906-tldr-ai.txt';
+  second.reference.items[0]!.source_item_id = 'ai-example-1';
+  second.reference.items[0]!.source_occurrences[0]!.occurrence_id = 'ai-example-1';
+  second.reference.items[0]!.source_occurrences[0]!.source_item_id = 'ai-example-1';
+  second.reference.items[0]!.selected_source_occurrence_id = 'ai-example-1';
+  assert.throws(
+    () =>
+      validateTldrCommuteDailyPairs([
+        {
+          mainFilename: first.reference.main_filename,
+          playbackFile: first.main,
+          referenceFile: first.reference,
+        },
+        {
+          mainFilename: second.reference.main_filename,
+          playbackFile: second.main,
+          referenceFile: second.reference,
+        },
+      ]),
+    /Resolved URL .* retained by multiple daily items/
+  );
+});
+
+test('requires audit decisions for removed and related occurrences', () => {
+  const removed = pair(1);
+  removed.reference.items[0]!.source_occurrences.push({
+    occurrence_id: 'ai-missing-decision',
+    newsletter: 'TLDR AI',
+    source_item_id: 'ai-missing-decision',
+    source_order: 1,
+    title: 'Same example elsewhere',
+    description: 'Another literal description.',
+    url: 'https://ai.example.org/same-example',
+  });
+  assert.throws(
+    () =>
+      validateTldrCommuteDailyPairs([
+        {
+          mainFilename: removed.reference.main_filename,
+          playbackFile: removed.main,
+          referenceFile: removed.reference,
+        },
+      ]),
+    /is missing its coverage decision/
+  );
+
+  const update = pair(1);
+  update.reference.items[0]!.coverage = {
+    status: 'useful_update',
+    related_retained_item: {
+      main_filename: update.reference.main_filename,
+      source_item_id: update.reference.items[0]!.source_item_id,
+    },
+    decision_reason: 'Adds a material detail.',
+    update_note: 'Update: adds a material detail.',
+  };
+  assert.throws(
+    () =>
+      validateTldrCommuteDailyPairs([
+        {
+          mainFilename: update.reference.main_filename,
+          playbackFile: update.main,
+          referenceFile: update.reference,
+        },
+      ]),
+    /is missing its coverage decision/
+  );
+});
+
+test('daily queue CLI invokes cross-pair validation', async () => {
+  const first = pair(1);
+  const second = pair(1);
+  second.reference.main_filename = '20260906-tldr-ai.txt';
+  second.reference.items[0]!.source_item_id = 'ai-example-1';
+  second.reference.items[0]!.source_occurrences[0]!.occurrence_id = 'ai-example-1';
+  second.reference.items[0]!.source_occurrences[0]!.source_item_id = 'ai-example-1';
+  second.reference.items[0]!.selected_source_occurrence_id = 'ai-example-1';
+  const directory = await mkdtemp(path.join(tmpdir(), 'llm-wiki-daily-pairs-'));
+  const firstMain = path.join(directory, first.reference.main_filename);
+  const firstReference = firstMain.replace(/\.txt$/, '-reference.txt');
+  const secondMain = path.join(directory, second.reference.main_filename);
+  const secondReference = secondMain.replace(/\.txt$/, '-reference.txt');
+  await Promise.all([
+    writeFile(firstMain, JSON.stringify(first.main)),
+    writeFile(firstReference, JSON.stringify(first.reference)),
+    writeFile(secondMain, JSON.stringify(second.main)),
+    writeFile(secondReference, JSON.stringify(second.reference)),
+  ]);
+  const result = spawnSync(
+    process.execPath,
+    [
+      'dist/src/commute/validate-queue.js',
+      firstMain,
+      '--reference',
+      firstReference,
+      '--pair',
+      secondMain,
+      '--reference',
+      secondReference,
+    ],
+    { encoding: 'utf8' }
+  );
+  assert.notEqual(result.status, 0);
+  assert.match(result.stderr, /Resolved URL .* retained by multiple daily items/);
 });

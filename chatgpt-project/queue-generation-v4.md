@@ -50,7 +50,7 @@ does not change interest or depth.
 Remove tracking parameters conservatively while resolving links. Preserve
 different article paths and meaningful query parameters. Group identical final
 URLs and classify each distinct URL once, reusing its attribution and result.
-Keep every newsletter occurrence, original URL, literal title, and literal
+Keep every newsletter occurrence, resolved article URL, literal title, and literal
 description in `source_occurrences`; select the occurrence with the most useful
 literal title and description. Use attribution completeness and then source
 order only as tie breakers. The retained item's identity and source text must
@@ -156,16 +156,61 @@ for item in reference["items"]:
     assert item["selected_source_occurrence_id"] in ids, "selected occurrence"
     selected = next(o for o in item["source_occurrences"] if o["occurrence_id"] == item["selected_source_occurrence_id"])
     assert [item[k] for k in ("source_item_id", "title", "description", "url")] == [selected[k] for k in ("source_item_id", "title", "description", "url")], "selected source text"
+    coverage = item["coverage"]
+    if coverage["status"] in ("original", "deduplicated"):
+        assert coverage["related_retained_item"] is None and coverage["update_note"] is None, "plain coverage fields"
+    elif coverage["status"] == "useful_update":
+        assert coverage["related_retained_item"] and coverage["update_note"], "useful update fields"
+    else:
+        assert coverage["related_retained_item"] and coverage["update_note"] is None, "uncertain coverage fields"
     seen_occurrences.update(ids)
 canonical_main = json.dumps(main, ensure_ascii=False, separators=(",", ":"))
 digest = "sha256:" + hashlib.sha256(canonical_main.encode("utf-8")).hexdigest()
 assert reference["main_sha256"] == digest, "main hash"
 ```
 
-After every pair passes, check the full daily set: each
-`coverage_decisions[].retained_item` names an item in that day's files, its
-`source_occurrence_id` is stored on exactly that retained item, all files share
-one date and `daily_generation_id`, and no occurrence is retained by two items.
+After every pair passes, run this over `daily_pairs`, a list of
+`(main_filename, main, reference)` tuples for the complete day:
+
+```python
+assert len({r["edition_date"] for _, _, r in daily_pairs}) == 1, "daily date"
+assert len({r["daily_generation_id"] for _, _, r in daily_pairs}) == 1, "daily generation"
+targets, owners, urls, required, decisions = {}, {}, {}, {}, {}
+for filename, _, ref in daily_pairs:
+    assert filename == ref["main_filename"] and filename not in targets, "daily filename"
+    targets[filename] = {item["source_item_id"] for item in ref["items"]}
+    for item in ref["items"]:
+        owner = (filename, item["source_item_id"])
+        assert item["url"] not in urls or urls[item["url"]] == owner, "one retained item per URL"
+        urls[item["url"]] = owner
+        selected = item["selected_source_occurrence_id"]
+        for occurrence in item["source_occurrences"]:
+            oid = occurrence["occurrence_id"]
+            assert oid not in owners or owners[oid] == owner, "one retained item per occurrence"
+            owners[oid] = owner
+            if oid != selected:
+                required[oid] = (owner, {"removed_exact_url", "removed_same_story"})
+        status = item["coverage"]["status"]
+        if status in ("useful_update", "uncertain"):
+            required[selected] = (owner, {"kept_update" if status == "useful_update" else "kept_uncertain"})
+    for decision in ref["coverage_decisions"]:
+        oid = decision["source_occurrence_id"]
+        assert oid not in decisions, "one daily decision per occurrence"
+        if decision["outcome"] == "kept_update":
+            assert decision["new_information"], "kept update information"
+        else:
+            assert decision["new_information"] is None, "non-update information"
+        decisions[oid] = decision
+for oid, (owner, outcomes) in required.items():
+    decision = decisions[oid]
+    target = decision["retained_item"]
+    assert (target["main_filename"], target["source_item_id"]) == owner, "decision target"
+    assert decision["outcome"] in outcomes and owners[oid] == owner, "decision relationship"
+assert set(decisions) == set(required), "complete decision audit"
+for decision in decisions.values():
+    target = decision["retained_item"]
+    assert target["source_item_id"] in targets[target["main_filename"]], "existing retained item"
+```
 
 Validate each object against its attached v4 schema. Create both real Project
 Library files only after every pair passes. Report missing editions and failed

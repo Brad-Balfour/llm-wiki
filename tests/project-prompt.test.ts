@@ -135,12 +135,16 @@ test('v4 candidate reconciles repeated coverage across all daily editions', asyn
   assert.match(generation, /most useful\s+literal title and description/);
   assert.match(generation, /fully removed edition still gets a valid empty pair/);
   assert.match(generation, /private review table/);
+  assert.match(generation, /one retained item per URL/);
+  assert.match(generation, /complete decision audit/);
   assert.match(task, /Retrieve and extract all editions before rendering/);
   assert.match(task, /classify each distinct URL\s+once/);
   assert.match(task, /retain and flag uncertain relationships/);
   assert.match(schema, /"coverage_decisions"/);
   assert.match(schema, /"selected_source_occurrence_id"/);
   assert.match(schema, /"kept_update"/);
+  assert.match(schema, /"allOf"/);
+  assert.match(schema, /"const": "useful_update"/);
 });
 
 test('daily commute completion cannot omit a required Project update', async () => {

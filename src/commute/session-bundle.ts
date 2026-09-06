@@ -489,6 +489,8 @@ export function validateTldrCommuteDailyPairs(candidates: DailyQueueV4PairInput[
 
   const retainedItems = new Map<string, Set<string>>();
   const occurrenceOwners = new Map<string, string>();
+  const retainedUrls = new Map<string, string>();
+  const requiredDecisions = new Map<string, { owner: string; outcomes: ReadonlySet<string> }>();
   for (const pair of pairs) {
     const filename = requireString(
       pair.referenceFile.main_filename,
@@ -499,7 +501,24 @@ export function validateTldrCommuteDailyPairs(candidates: DailyQueueV4PairInput[
     for (const [index, candidate] of requireArray(pair.referenceFile.items, 'items').entries()) {
       const item = requireRecord(candidate, `items[${index}]`);
       const itemId = requireString(item.source_item_id, `items[${index}].source_item_id`);
+      const owner = `${filename}#${itemId}`;
+      const itemUrl = requireHttpUrl(item.url, `items[${index}].url`);
+      const priorUrlOwner = retainedUrls.get(itemUrl);
+      if (priorUrlOwner !== undefined && priorUrlOwner !== owner) {
+        throw new Error(`Resolved URL ${itemUrl} is retained by multiple daily items`);
+      }
+      retainedUrls.set(itemUrl, owner);
       itemIds.add(itemId);
+      const selectedOccurrenceId = requireString(
+        item.selected_source_occurrence_id,
+        `items[${index}].selected_source_occurrence_id`
+      );
+      const coverage = requireRecord(item.coverage, `items[${index}].coverage`);
+      const coverageStatus = requireEnum(
+        coverage.status,
+        ['original', 'deduplicated', 'useful_update', 'uncertain'] as const,
+        `items[${index}].coverage.status`
+      );
       for (const [occurrenceIndex, occurrenceCandidate] of requireArray(
         item.source_occurrences,
         `items[${index}].source_occurrences`
@@ -509,23 +528,43 @@ export function validateTldrCommuteDailyPairs(candidates: DailyQueueV4PairInput[
           `items[${index}].source_occurrences[${occurrenceIndex}]`
         );
         const occurrenceId = requireString(occurrence.occurrence_id, 'occurrence_id');
-        const owner = `${filename}#${itemId}`;
         const priorOwner = occurrenceOwners.get(occurrenceId);
         if (priorOwner !== undefined && priorOwner !== owner) {
           throw new Error(`Source occurrence ${occurrenceId} is retained by multiple daily items`);
         }
         occurrenceOwners.set(occurrenceId, owner);
+        if (occurrenceId !== selectedOccurrenceId) {
+          requiredDecisions.set(occurrenceId, {
+            owner,
+            outcomes: new Set(['removed_exact_url', 'removed_same_story']),
+          });
+        }
+      }
+      if (coverageStatus === 'useful_update' || coverageStatus === 'uncertain') {
+        requiredDecisions.set(selectedOccurrenceId, {
+          owner,
+          outcomes: new Set([
+            coverageStatus === 'useful_update' ? 'kept_update' : 'kept_uncertain',
+          ]),
+        });
       }
     }
     retainedItems.set(filename, itemIds);
   }
 
+  const decisions = new Map<string, ReturnType<typeof validateCoverageDecision>>();
   for (const pair of pairs) {
     for (const [index, candidate] of requireArray(
       pair.referenceFile.coverage_decisions,
       'coverage_decisions'
     ).entries()) {
       const decision = validateCoverageDecision(candidate, `coverage_decisions[${index}]`);
+      if (decisions.has(decision.sourceOccurrenceId)) {
+        throw new Error(
+          `Coverage decision for ${decision.sourceOccurrenceId} appears more than once in the daily pairs`
+        );
+      }
+      decisions.set(decision.sourceOccurrenceId, decision);
       const targetIds = retainedItems.get(decision.retainedMainFilename);
       if (targetIds === undefined || !targetIds.has(decision.retainedSourceItemId)) {
         throw new Error(
@@ -539,6 +578,23 @@ export function validateTldrCommuteDailyPairs(candidates: DailyQueueV4PairInput[
           `Coverage decision occurrence ${decision.sourceOccurrenceId} is not stored on retained item ${expectedOwner}`
         );
       }
+    }
+  }
+  for (const [occurrenceId, required] of requiredDecisions) {
+    const decision = decisions.get(occurrenceId);
+    if (decision === undefined) {
+      throw new Error(`Source occurrence ${occurrenceId} is missing its coverage decision`);
+    }
+    if (
+      `${decision.retainedMainFilename}#${decision.retainedSourceItemId}` !== required.owner ||
+      !required.outcomes.has(decision.outcome)
+    ) {
+      throw new Error(`Coverage decision for ${occurrenceId} does not match its retained item`);
+    }
+  }
+  for (const occurrenceId of decisions.keys()) {
+    if (!requiredDecisions.has(occurrenceId)) {
+      throw new Error(`Coverage decision for ${occurrenceId} has no removed or related occurrence`);
     }
   }
   return pairs;
@@ -886,8 +942,7 @@ function validateSourceOccurrence(candidate: unknown, field: string): ValidatedS
     ],
     field
   );
-  const sourceOrder = requirePositiveInteger(record.source_order, `${field}.source_order`);
-  if (sourceOrder < 1) throw new Error(`${field}.source_order must be positive`);
+  requirePositiveInteger(record.source_order, `${field}.source_order`);
   requireString(record.newsletter, `${field}.newsletter`);
   return {
     occurrenceId: requireString(record.occurrence_id, `${field}.occurrence_id`),
@@ -936,8 +991,11 @@ function validateItemCoverage(candidate: unknown, field: string): void {
       : validateRetainedItem(record.related_retained_item, `${field}.related_retained_item`);
   requireString(record.decision_reason, `${field}.decision_reason`);
   const updateNote = validateNullableText(record.update_note, `${field}.update_note`);
-  if (status === 'original' && (related !== null || updateNote !== null)) {
-    throw new Error(`${field} original items must not name a related item or update note`);
+  if (
+    (status === 'original' || status === 'deduplicated') &&
+    (related !== null || updateNote !== null)
+  ) {
+    throw new Error(`${field} ${status} items must not name a related item or update note`);
   }
   if ((status === 'useful_update' || status === 'uncertain') && related === null) {
     throw new Error(`${field} ${status} items must name the related retained item`);
@@ -957,6 +1015,7 @@ function validateCoverageDecision(
   sourceOccurrenceId: string;
   retainedMainFilename: string;
   retainedSourceItemId: string;
+  outcome: 'removed_exact_url' | 'removed_same_story' | 'kept_update' | 'kept_uncertain';
 } {
   const record = requireRecord(candidate, field);
   rejectUnknownKeys(
@@ -982,6 +1041,7 @@ function validateCoverageDecision(
     sourceOccurrenceId: requireString(record.source_occurrence_id, `${field}.source_occurrence_id`),
     retainedMainFilename: target.mainFilename,
     retainedSourceItemId: target.sourceItemId,
+    outcome,
   };
 }
 
