@@ -25,6 +25,7 @@
     "finalize:commute-performance": "npm run build --silent && node dist/src/commute/performance.js",
     "retrieve:commute-sources": "npm run build --silent && node dist/src/wiki/retrieve-maintenance-sources.js",
     "record:classifier-feedback": "npm run build --silent && node dist/src/classifier/feedback-label.js",
+    "review:classifier-v2": "node scripts/classifier-v2-review.mjs",
     "test": "npm run build && node --test dist/tests/*.test.js",
     "ci:test": "npm run test",
     "lint": "eslint .",

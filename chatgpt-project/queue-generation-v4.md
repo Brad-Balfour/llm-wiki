@@ -6,6 +6,9 @@ AI, and Fintech editions for the requested delivery date before rendering any
 file. Generate both UTF-8 JSON `.txt` files for every source newsletter in one
 daily pass. The date comes from the source email's America/New_York delivery
 date. Give every reference in the pass the same stable `daily_generation_id`.
+Use `interest-profile.md` version `2.0` and `classifier-instructions.md` version
+`classifier-instructions.v2`; store those exact values as `profile_version` and
+`prompt_version`. Keep the routing thresholds in `routing-rules.md` unchanged.
 
 For a main file such as `20260907-tldr-dev.txt`, create the sibling
 `20260907-tldr-dev-reference.txt`. Never overwrite a pair already used by a

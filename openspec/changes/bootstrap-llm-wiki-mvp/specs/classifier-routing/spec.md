@@ -22,21 +22,23 @@ into distinct schema files.
 #### Scenario: Create canonical profile files
 
 - **WHEN** the schema layer is initialized
-- **THEN** `schema/interest-profile.md` SHALL contain Brad's production v1.4
+- **THEN** `schema/interest-profile.md` SHALL contain Brad's candidate v2.0
   interest profile
 - **AND** `schema/classifier-instructions.md` SHALL contain scoring mechanics,
   output schema, fail-closed validation rules, and validation methodology
 - **AND** `schema/routing-rules.md` SHALL contain downstream derivation rules for
   commute, wiki, stream-log, review, and discard behavior.
 
-#### Scenario: Build v1.4 interest profile
+#### Scenario: Build v2.0 interest profile
 
 - **WHEN** `schema/interest-profile.md` is authored
-- **THEN** the profile SHALL use Claude v1.3 relevance/profile content as its
-  base
-- **AND** it SHALL include the agreed v1.4 refinements for fintech scope,
-  infrastructure and caching scope, Meta/Zuckerberg negative evidence, fresh
-  calibration fixes, and Codex depth heuristics.
+- **THEN** the profile SHALL preserve the accepted v1.4 scope and thresholds
+- **AND** Martin Fowler SHALL have a high-interest, in-depth default
+- **AND** Addy Osmani SHALL have a strong interest prior without a blanket depth
+  override
+- **AND** robotics and self-driving SHALL explicitly include Tesla and Waymo
+- **AND** practical-agent, software-craft, battery, Bun, and DuckDB corrections
+  SHALL be expressed as reusable category boundaries rather than title matches.
 
 ### Requirement: Source-Neutral Classifier Output
 
@@ -158,3 +160,13 @@ match.
   to distinguish near-boundary disagreements from high-confidence misses
 - **AND** score distributions SHALL be available for future threshold tuning
   without regenerating the original predictions.
+
+#### Scenario: Run the lightweight blind review
+
+- **WHEN** development or final-check inventory is prepared
+- **THEN** one prediction-only input SHALL be produced without label data
+- **AND** the labeling page SHALL contain no baseline or candidate prediction
+  data
+- **AND** exact newsletter copies SHALL remain auditable without inflating
+  distinct-article comparison counts
+- **AND** missing labels or predictions SHALL remain explicitly pending.

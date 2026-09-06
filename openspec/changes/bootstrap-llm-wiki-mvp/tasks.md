@@ -64,6 +64,12 @@ generation failures, queue discovery, or other product-quality incidents.
       route for auditability and threshold tuning. Session-bundle incidents are
       not classification persistence.
 - [x] 4.6 Route `maybe` items and validation-failed items to review when the safer destination is unclear.
+- [x] 4.7 Calibrate candidate profile 2.0 and classifier instructions v2 from
+      verified corrections while preserving the score thresholds and Project
+      producer.
+- [x] 4.8 Add lightweight private blind-review tooling that separates prediction
+      input, labeling, and comparison without calling a model or generating
+      production queues.
 
 ## 5. Commute Queue
 

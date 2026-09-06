@@ -12,6 +12,10 @@ reference schemas. Retrieve and extract all editions before rendering any one
 of them. Create one matching playback/reference pair per source newsletter and
 place both real .txt files directly in this Project Library.
 
+Classify with interest profile 2.0 and classifier instructions v2, preserving
+the existing routing thresholds. Record `profile_version: 2.0` and
+`prompt_version: classifier-instructions.v2` in each reference file.
+
 Resolve each distinct original article URL and fill attribution before
 classification, following the Project's retry, no-byline, failure, and hostname
 fallback rules. Reuse the lookup across duplicate URL occurrences and continue

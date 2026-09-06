@@ -78,13 +78,16 @@ Validation labels SHALL be collected without exposing predictions to Brad.
   as derived labels
 - **AND** the label collection workflow SHALL NOT expose those predictions.
 
-#### Scenario: Protect July 3 plus holdout
+#### Scenario: Preserve explicit development and final-check assignments
 
-- **WHEN** July 3, 2026 or later direct TLDR emails are available for examples,
-  prompt tuning, profile updates, or tests
-- **THEN** those emails SHALL remain the next clean validation holdout by default
-- **AND** they SHALL NOT be used for tuning unless Brad explicitly changes that
-  plan.
+- **WHEN** source-confirmed articles are inventoried for classifier review
+- **THEN** every label candidate SHALL be assigned to `development` or
+  `final_check` before tuning
+- **AND** exact copies and closely related stories SHALL stay in one assignment
+- **AND** final-check answers SHALL become development evidence if they influence
+  a profile or instruction revision
+- **AND** a later final claim SHALL use newly reserved material after such a
+  revision.
 
 ### Requirement: Product-Harm Review
 
@@ -94,8 +97,8 @@ Feedback review SHALL analyze corrections by product harm.
 
 - **WHEN** a batch of feedback labels or validation comparison results is
   reviewed
-- **THEN** the summary SHALL identify false skips, false discusses, pacing
-  errors, and lower-harm disagreements
+- **THEN** the summary SHALL identify false skips, missed depth, unwanted
+  in-depth items, and lower-harm disagreements
 - **AND** false skips SHALL receive the highest priority for profile or prompt
   adjustment
 - **AND** score distance from the configured threshold SHALL be used to separate
