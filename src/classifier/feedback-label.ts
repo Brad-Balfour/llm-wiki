@@ -3,7 +3,12 @@ import { appendFile, mkdir, open, readFile, unlink, type FileHandle } from 'node
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { queueSnapshotFingerprint, validateTldrCommuteQueueV2 } from '../commute/session-bundle.js';
+import {
+  createQueueV4Snapshot,
+  queueMetadataRecord,
+  queueSnapshotFingerprint,
+  validateTldrCommuteQueueV2,
+} from '../commute/session-bundle.js';
 import { errorMessage, errorCode, isExistingFile, isMissingFile } from '../shared/errors.js';
 import { requireDate, requireDateTime } from '../shared/time.js';
 import { requireHttpUrl } from '../shared/url.js';
@@ -77,7 +82,7 @@ export interface ClassifierFeedbackLabel extends ClassifierFeedbackLabelInput {
 
 interface CliOptions {
   input?: string;
-  queues: string[];
+  queues: Array<{ queue: string; reference?: string }>;
   output: string;
   help: boolean;
 }
@@ -87,6 +92,7 @@ const USAGE = `Usage: record:classifier-feedback -- --input <labels.json|labels.
 Options:
   --input <path|->  JSON object, JSON array, JSONL file, or - for stdin.
   --queue <path>    Validated queue named by the label. Repeat for multiple queues.
+  --reference <path> Matching v4 reference for the preceding --queue.
   --output <path>   Append-only JSONL path under .private/.
                     Defaults to .private/classifier-feedback/labels.jsonl.
   --help            Show this help text.
@@ -126,7 +132,11 @@ export function parseClassifierFeedbackInput(text: string): ClassifierFeedbackLa
 
 export function bindClassifierFeedbackLabels(
   inputs: ClassifierFeedbackLabelInput[],
-  queues: Array<{ filename: string; text: string }>
+  queues: Array<{
+    filename: string;
+    text: string;
+    reference?: { filename: string; text: string };
+  }>
 ): ClassifierFeedbackLabel[] {
   const byFilename = new Map<string, Record<string, unknown>>();
   for (const supplied of queues) {
@@ -139,7 +149,19 @@ export function bindClassifierFeedbackLabels(
     } catch (error) {
       throw new Error(`Queue ${supplied.filename} is invalid JSON: ${errorMessage(error)}`);
     }
-    byFilename.set(supplied.filename, validateTldrCommuteQueueV2(candidate));
+    byFilename.set(
+      supplied.filename,
+      validateTldrCommuteQueueV2(
+        supplied.reference === undefined
+          ? candidate
+          : createQueueV4Snapshot(
+              candidate,
+              JSON.parse(supplied.reference.text) as unknown,
+              supplied.filename,
+              supplied.reference.filename
+            )
+      )
+    );
   }
 
   return inputs.map((input) => {
@@ -147,7 +169,7 @@ export function bindClassifierFeedbackLabels(
     if (queue === undefined) {
       throw new Error(`No --queue file supplied for ${input.queue_filename}`);
     }
-    const items = queue.items as Record<string, unknown>[];
+    const items = queueMetadataRecord(queue).items as Record<string, unknown>[];
     const item = items.find((candidate) => candidate.source_item_id === input.source_item_id);
     if (item === undefined) {
       throw new Error(
@@ -265,9 +287,17 @@ export async function runClassifierFeedbackCommand(argv: string[]): Promise<numb
   const text =
     options.input === '-' ? await readStdin() : await readFile(path.resolve(options.input), 'utf8');
   const queueInputs = await Promise.all(
-    options.queues.map(async (queuePath) => ({
+    options.queues.map(async ({ queue: queuePath, reference }) => ({
       filename: path.basename(queuePath),
       text: await readFile(path.resolve(queuePath), 'utf8'),
+      ...(reference === undefined
+        ? {}
+        : {
+            reference: {
+              filename: path.basename(reference),
+              text: await readFile(path.resolve(reference), 'utf8'),
+            },
+          }),
     }))
   );
   const labels = bindClassifierFeedbackLabels(parseClassifierFeedbackInput(text), queueInputs);
@@ -501,7 +531,14 @@ function parseOptions(argv: string[]): CliOptions {
       options.input = readValue(argv, index, arg);
       index += 1;
     } else if (arg === '--queue') {
-      options.queues.push(readValue(argv, index, arg));
+      options.queues.push({ queue: readValue(argv, index, arg) });
+      index += 1;
+    } else if (arg === '--reference') {
+      const queue = options.queues.at(-1);
+      if (queue === undefined) throw new Error('--reference requires a preceding --queue');
+      if (queue.reference !== undefined)
+        throw new Error('Each --queue accepts at most one --reference');
+      queue.reference = readValue(argv, index, arg);
       index += 1;
     } else if (arg === '--output') {
       options.output = readValue(argv, index, arg);

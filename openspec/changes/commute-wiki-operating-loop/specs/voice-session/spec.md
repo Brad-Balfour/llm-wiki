@@ -2,6 +2,19 @@
 
 ## ADDED Requirements
 
+### Requirement: V4 Voice Reads Stored Main Strings
+
+Voice SHALL use the v4 main file as the exclusive default speech source.
+
+#### Scenario: Read v4 playback and requested details
+
+- **WHEN** Voice starts or advances through a v4 queue
+- **THEN** it SHALL read the stored sweep or `item_playback` exactly
+- **AND** it SHALL open the reference only for requested article details or
+  final export
+- **AND** an original-description request SHALL read the full literal
+  reference `description`.
+
 ### Requirement: One Active Queue Per Voice Session
 
 A Voice session SHALL consume only the queue selected by an exact filename or

@@ -1,0 +1,94 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://brad-balfour.github.io/llm-wiki/schema/tldr-commute-reference-v4.schema.json",
+  "title": "TLDR commute reference file v4",
+  "description": "Identity, source, classification, routing, and export data paired by position with a v4 playback file.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "queue_version",
+    "main_filename",
+    "main_sha256",
+    "newsletter",
+    "edition_date",
+    "source_email",
+    "total_items",
+    "profile_version",
+    "prompt_version",
+    "provider",
+    "model",
+    "parser_version",
+    "route_version",
+    "items"
+  ],
+  "properties": {
+    "queue_version": { "const": "tldr-commute-queue.v4" },
+    "main_filename": { "type": "string", "minLength": 1 },
+    "main_sha256": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+    "newsletter": { "type": "string", "minLength": 1, "maxLength": 100 },
+    "edition_date": { "type": "string", "format": "date" },
+    "source_email": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["gmail_message_id", "sender", "delivered_at"],
+      "properties": {
+        "gmail_message_id": { "type": "string", "minLength": 1 },
+        "sender": { "type": "string", "minLength": 1, "maxLength": 300 },
+        "delivered_at": { "type": "string", "format": "date-time" }
+      }
+    },
+    "total_items": { "type": "integer", "minimum": 0 },
+    "profile_version": { "type": "string", "minLength": 1 },
+    "prompt_version": { "type": "string", "minLength": 1 },
+    "provider": { "type": "string", "minLength": 1 },
+    "model": { "type": "string", "minLength": 1 },
+    "parser_version": { "type": "string", "minLength": 1 },
+    "route_version": { "type": "string", "minLength": 1 },
+    "items": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/item" }
+    }
+  },
+  "$defs": {
+    "item": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "position",
+        "source_item_id",
+        "title",
+        "description",
+        "author",
+        "publication",
+        "url",
+        "interest_level",
+        "interest_score",
+        "consumption_depth",
+        "depth_score",
+        "commute_behavior",
+        "signals",
+        "reason",
+        "classified_at",
+        "routed_at"
+      ],
+      "properties": {
+        "position": { "type": "integer", "minimum": 1 },
+        "source_item_id": { "type": "string", "minLength": 1 },
+        "title": { "type": "string", "minLength": 1, "maxLength": 500 },
+        "description": { "type": "string", "minLength": 1, "maxLength": 4000 },
+        "author": { "type": ["string", "null"], "minLength": 1, "maxLength": 300 },
+        "publication": { "type": ["string", "null"], "minLength": 1, "maxLength": 300 },
+        "url": { "type": "string", "format": "uri", "pattern": "^https?://" },
+        "interest_level": { "enum": ["interested", "maybe", "uninterested"] },
+        "interest_score": { "type": "number", "minimum": 0, "maximum": 1 },
+        "consumption_depth": { "enum": ["headline_only", "in_depth"] },
+        "depth_score": { "type": "number", "minimum": 0, "maximum": 1 },
+        "commute_behavior": { "type": "string", "minLength": 1 },
+        "signals": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+        "reason": { "type": "string", "minLength": 1, "maxLength": 2000 },
+        "classified_at": { "type": "string", "format": "date-time" },
+        "routed_at": { "type": "string", "format": "date-time" }
+      }
+    }
+  }
+}

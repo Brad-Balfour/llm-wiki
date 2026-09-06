@@ -72,6 +72,11 @@ export interface QueueSnapshot {
   queue: Record<string, unknown>;
 }
 
+export interface QueueV4Pair {
+  playbackFile: Record<string, unknown>;
+  referenceFile: Record<string, unknown>;
+}
+
 interface QueueItemIndex {
   byId: Map<string, QueueItemIdentity>;
   ordered: QueueItemIdentity[];
@@ -273,6 +278,161 @@ export function queueSnapshotFingerprint(queue: unknown): string {
   return `sha256:${createHash('sha256').update(canonicalJson(queue), 'utf8').digest('hex')}`;
 }
 
+export function playbackFileFingerprint(playback: unknown): string {
+  return `sha256:${createHash('sha256').update(JSON.stringify(playback), 'utf8').digest('hex')}`;
+}
+
+export function createQueueV4Snapshot(
+  playbackCandidate: unknown,
+  referenceCandidate: unknown,
+  mainFilename?: string,
+  referenceFilename?: string
+): Record<string, unknown> {
+  const pair = validateTldrCommuteQueuePair(
+    playbackCandidate,
+    referenceCandidate,
+    mainFilename,
+    referenceFilename
+  );
+  return {
+    queue_version: 'tldr-commute-queue.v4',
+    playback_file: pair.playbackFile,
+    reference_file: pair.referenceFile,
+  };
+}
+
+export function validateTldrCommuteQueuePair(
+  playbackCandidate: unknown,
+  referenceCandidate: unknown,
+  mainFilename?: string,
+  referenceFilename?: string
+): QueueV4Pair {
+  const playback = requireRecord(playbackCandidate, 'playback_file');
+  if (Object.keys(playback).join(',') !== 'sweep_playback,items') {
+    throw new Error('playback_file keys must be sweep_playback then items, with no other fields');
+  }
+  const playbackItems = requireArray(playback.items, 'playback_file.items');
+  playbackItems.forEach((candidate, index) => {
+    const field = `playback_file.items[${index}]`;
+    const item = requireRecord(candidate, field);
+    rejectUnknownKeys(item, ['item_playback'], field);
+    requireString(item.item_playback, `${field}.item_playback`);
+  });
+
+  const reference = requireRecord(referenceCandidate, 'reference_file');
+  rejectSensitiveQueueFields(reference, 'reference_file');
+  rejectUnknownKeys(
+    reference,
+    [
+      'queue_version',
+      'main_filename',
+      'main_sha256',
+      'newsletter',
+      'edition_date',
+      'source_email',
+      'total_items',
+      'profile_version',
+      'prompt_version',
+      'provider',
+      'model',
+      'parser_version',
+      'route_version',
+      'items',
+    ],
+    'reference_file'
+  );
+  if (reference.queue_version !== 'tldr-commute-queue.v4') {
+    throw new Error('reference_file.queue_version must be tldr-commute-queue.v4');
+  }
+  const declaredMainFilename = requireString(
+    reference.main_filename,
+    'reference_file.main_filename'
+  );
+  if (mainFilename !== undefined && declaredMainFilename !== mainFilename) {
+    throw new Error('reference_file.main_filename does not match the playback filename');
+  }
+  if (
+    referenceFilename !== undefined &&
+    referenceFilename !== declaredMainFilename.replace(/\.txt$/, '-reference.txt')
+  ) {
+    throw new Error('Reference filename must be the playback filename with -reference before .txt');
+  }
+  const mainSha256 = requireString(reference.main_sha256, 'reference_file.main_sha256');
+  if (!/^sha256:[a-f0-9]{64}$/.test(mainSha256)) {
+    throw new Error('reference_file.main_sha256 must be a SHA-256 fingerprint');
+  }
+  if (mainSha256 !== playbackFileFingerprint(playback)) {
+    throw new Error('reference_file.main_sha256 does not match the canonical playback JSON');
+  }
+  requireString(reference.newsletter, 'reference_file.newsletter');
+  requireDate(reference.edition_date, 'reference_file.edition_date');
+  validateSourceEmail(reference.source_email, 'tldr-commute-queue.v4');
+  for (const field of [
+    'profile_version',
+    'prompt_version',
+    'provider',
+    'model',
+    'parser_version',
+    'route_version',
+  ] as const) {
+    requireString(reference[field], `reference_file.${field}`);
+  }
+  const totalItems = requireNonNegativeInteger(reference.total_items, 'reference_file.total_items');
+  const referenceItems = requireArray(reference.items, 'reference_file.items');
+  if (playbackItems.length !== totalItems || referenceItems.length !== totalItems) {
+    throw new Error('v4 pair total_items must equal both item-array lengths');
+  }
+
+  const identities = referenceItems.map((candidate, index) => {
+    const field = `reference_file.items[${index}]`;
+    const item = validateQueueV4ReferenceItem(candidate, field, index + 1);
+    const playbackItem = requireRecord(playbackItems[index], `playback_file.items[${index}]`);
+    const actualPlayback = requireString(
+      playbackItem.item_playback,
+      `playback_file.items[${index}].item_playback`
+    );
+    const prefix = renderV4PlaybackPrefix(index + 1, totalItems, item.consumptionDepth, item.title);
+    const expected =
+      item.consumptionDepth === 'headline_only' ? prefix : `${prefix}\n${item.description}`;
+    if (actualPlayback !== expected) {
+      throw new Error(
+        `playback_file.items[${index}].item_playback must equal the deterministic v4 playback`
+      );
+    }
+    return item.identity;
+  });
+  requireUniqueStrings(
+    identities.map((item) => item.source_item_id),
+    'reference_file.items[].source_item_id'
+  );
+  requireUniqueStrings(
+    identities.map((item) => item.url),
+    'reference_file.items[].url'
+  );
+  const expectedSweep = referenceItems
+    .map((candidate, index) => {
+      const item = requireRecord(candidate, `reference_file.items[${index}]`);
+      return renderV4PlaybackPrefix(
+        index + 1,
+        totalItems,
+        requireEnum(
+          item.consumption_depth,
+          ['headline_only', 'in_depth'] as const,
+          `reference_file.items[${index}].consumption_depth`
+        ),
+        requireString(item.title, `reference_file.items[${index}].title`)
+      );
+    })
+    .join('\n');
+  if (
+    requireStringAllowEmpty(playback.sweep_playback, 'playback_file.sweep_playback') !==
+    expectedSweep
+  ) {
+    throw new Error('playback_file.sweep_playback must equal the deterministic v4 sweep');
+  }
+  return { playbackFile: playback, referenceFile: reference };
+}
+
 /** Validate the single queue contract without requiring a session bundle. */
 export function validateTldrCommuteQueue(candidate: unknown): Record<string, unknown> {
   const queue = requireRecord(candidate, 'queue');
@@ -283,6 +443,12 @@ export function validateTldrCommuteQueue(candidate: unknown): Record<string, unk
 
 /** @deprecated Use validateTldrCommuteQueue. Kept for source compatibility. */
 export const validateTldrCommuteQueueV2 = validateTldrCommuteQueue;
+
+export function queueMetadataRecord(queue: Record<string, unknown>): Record<string, unknown> {
+  return queue.queue_version === 'tldr-commute-queue.v4'
+    ? requireRecord(queue.reference_file, 'queue.reference_file')
+    : queue;
+}
 
 /** Hash an externally stored record byte-for-byte. Unlike a queue snapshot, a
  * durable record is not JSON-normalized before hashing. */
@@ -349,8 +515,30 @@ function validateQueueSnapshot(candidate: unknown): QueueSnapshot {
 
 function indexQueueItems(record: Record<string, unknown>): QueueItemIndex {
   const queueVersion = requireString(record.queue_version, 'queue_snapshot.queue.queue_version');
-  if (queueVersion !== 'tldr-commute-queue.v2' && queueVersion !== 'tldr-commute-queue.v3') {
+  if (
+    queueVersion !== 'tldr-commute-queue.v2' &&
+    queueVersion !== 'tldr-commute-queue.v3' &&
+    queueVersion !== 'tldr-commute-queue.v4'
+  ) {
     unsupportedQueueVersion(queueVersion);
+  }
+  if (queueVersion === 'tldr-commute-queue.v4') {
+    rejectUnknownKeys(
+      record,
+      ['queue_version', 'playback_file', 'reference_file'],
+      'queue_snapshot.queue'
+    );
+    const pair = validateTldrCommuteQueuePair(record.playback_file, record.reference_file);
+    const referenceItems = requireArray(pair.referenceFile.items, 'reference_file.items');
+    const ordered = referenceItems.map((candidate, index) => {
+      const item = validateQueueV4ReferenceItem(
+        candidate,
+        `reference_file.items[${index}]`,
+        index + 1
+      );
+      return item.identity;
+    });
+    return indexUniqueQueueItems(ordered);
   }
   requireString(record.newsletter, 'queue_snapshot.queue.newsletter');
   requireDate(record.edition_date, 'queue_snapshot.queue.edition_date');
@@ -361,6 +549,13 @@ function indexQueueItems(record: Record<string, unknown>): QueueItemIndex {
       : queueVersion === 'tldr-commute-queue.v3'
         ? indexQueue(record, 'v3')
         : unsupportedQueueVersion(queueVersion);
+  return indexUniqueQueueItems(ordered, true);
+}
+
+function indexUniqueQueueItems(
+  ordered: QueueItemIdentity[],
+  requireAtLeastOne = false
+): QueueItemIndex {
   const byId = new Map<string, QueueItemIdentity>();
   const urls = new Set<string>();
   for (const item of ordered) {
@@ -373,7 +568,7 @@ function indexQueueItems(record: Record<string, unknown>): QueueItemIndex {
     }
     urls.add(item.url);
   }
-  if (byId.size === 0) {
+  if (requireAtLeastOne && byId.size === 0) {
     throw new Error(
       'queue_snapshot.queue must contain queue items with source_item_id, title, and url'
     );
@@ -444,8 +639,94 @@ function indexQueue(record: Record<string, unknown>, version: 'v2' | 'v3'): Queu
 
 function unsupportedQueueVersion(version: string): never {
   throw new Error(
-    `queue_snapshot.queue.queue_version must be tldr-commute-queue.v2 or tldr-commute-queue.v3, not ${version}`
+    `queue_snapshot.queue.queue_version must be tldr-commute-queue.v2, tldr-commute-queue.v3, or tldr-commute-queue.v4, not ${version}`
   );
+}
+
+function validateQueueV4ReferenceItem(
+  candidate: unknown,
+  itemPath: string,
+  expectedPosition: number
+): {
+  identity: QueueItemIdentity;
+  title: string;
+  description: string;
+  consumptionDepth: 'headline_only' | 'in_depth';
+} {
+  const record = requireRecord(candidate, itemPath);
+  rejectUnknownKeys(
+    record,
+    [
+      'position',
+      'source_item_id',
+      'title',
+      'description',
+      'author',
+      'publication',
+      'url',
+      'interest_level',
+      'interest_score',
+      'consumption_depth',
+      'depth_score',
+      'commute_behavior',
+      'signals',
+      'reason',
+      'classified_at',
+      'routed_at',
+    ],
+    itemPath
+  );
+  if (requirePositiveInteger(record.position, `${itemPath}.position`) !== expectedPosition) {
+    throw new Error(`${itemPath}.position must be ${expectedPosition}`);
+  }
+  const title = requireString(record.title, `${itemPath}.title`);
+  const description = requireString(record.description, `${itemPath}.description`);
+  validateNullableString(record.author, `${itemPath}.author`);
+  validateNullableString(record.publication, `${itemPath}.publication`);
+  requireEnum(
+    record.interest_level,
+    ['interested', 'maybe', 'uninterested'] as const,
+    `${itemPath}.interest_level`
+  );
+  requireScore(record.interest_score, `${itemPath}.interest_score`);
+  const consumptionDepth = requireEnum(
+    record.consumption_depth,
+    ['headline_only', 'in_depth'] as const,
+    `${itemPath}.consumption_depth`
+  );
+  requireScore(record.depth_score, `${itemPath}.depth_score`);
+  requireString(record.commute_behavior, `${itemPath}.commute_behavior`);
+  requireStringArray(record.signals, `${itemPath}.signals`);
+  requireString(record.reason, `${itemPath}.reason`);
+  requireDateTime(record.classified_at, `${itemPath}.classified_at`);
+  requireDateTime(record.routed_at, `${itemPath}.routed_at`);
+  const identity = {
+    source_item_id: requireString(record.source_item_id, `${itemPath}.source_item_id`),
+    title,
+    url: requireHttpUrl(record.url, `${itemPath}.url`),
+  };
+  return { identity, title, description, consumptionDepth };
+}
+
+function renderV4PlaybackPrefix(
+  position: number,
+  total: number,
+  depth: 'headline_only' | 'in_depth',
+  title: string
+): string {
+  return `${position} of ${total}. ${depth === 'headline_only' ? 'Headline only' : 'In depth'}. ${title}`;
+}
+
+function requireNonNegativeInteger(candidate: unknown, field: string): number {
+  if (!Number.isInteger(candidate) || (candidate as number) < 0) {
+    throw new Error(`${field} must be a non-negative integer`);
+  }
+  return candidate as number;
+}
+
+function requireStringAllowEmpty(candidate: unknown, field: string): string {
+  if (typeof candidate !== 'string') throw new Error(`${field} must be a string`);
+  return candidate;
 }
 
 export function renderQueuePlaybackText(item: {
@@ -570,7 +851,7 @@ function validateNullableString(candidate: unknown, field: string): void {
 
 function validateSourceEmail(
   candidate: unknown,
-  queueVersion: 'tldr-commute-queue.v2' | 'tldr-commute-queue.v3'
+  queueVersion: 'tldr-commute-queue.v2' | 'tldr-commute-queue.v3' | 'tldr-commute-queue.v4'
 ): void {
   const record = requireRecord(candidate, 'queue_snapshot.queue.source_email');
   rejectUnknownKeys(

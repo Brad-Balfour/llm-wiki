@@ -1,3 +1,8 @@
+## Queue v4 pair implementation
+
+- [x] Add queue-v4 Project generation, Voice, and export instructions
+- [x] Add pair-aware queue and bundle validation without removing v2/v3 support
+
 ## Planning Gate
 
 - [ ] 0.1 Review the six-row journey contract against the observed July 20-25

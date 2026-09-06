@@ -2,6 +2,20 @@
 
 ## ADDED Requirements
 
+### Requirement: Queue V4 Startup Loads Only Playback
+
+After the classifier-v2 candidate is installed, Voice SHALL begin with one
+named v4 main file and SHALL not load its reference for ordinary playback.
+
+#### Scenario: Start and navigate a v4 queue
+
+- **WHEN** Brad selects a valid v4 main filename
+- **THEN** Voice SHALL read its complete `sweep_playback`
+- **AND** ordinary next, back, jump, repeat, and resume commands SHALL reopen
+  that main file and read the selected `item_playback`
+- **AND** requested details SHALL come from the verified sibling reference
+- **AND** ordinary playback after details SHALL return to the main file.
+
 ### Requirement: Validated Project-Library Queue Startup
 
 The Project SHALL, after the coupled queue-v3 trial deployment and before

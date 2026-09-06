@@ -2,6 +2,21 @@
 
 ## ADDED Requirements
 
+### Requirement: Queue V4 Snapshot Is Self-Contained
+
+A v4 session bundle SHALL keep the main filename and embed both complete pair
+objects in a versioned wrapper.
+
+#### Scenario: Export v4 without an earlier details request
+
+- **WHEN** Brad ends a v4 session that did not previously open reference data
+- **THEN** export SHALL load and verify the matching reference
+- **AND** `queue_snapshot.filename` SHALL remain the main filename
+- **AND** `queue_snapshot.queue` SHALL contain `queue_version`,
+  `playback_file`, and `reference_file`
+- **AND** saved items and corrections SHALL resolve to exact reference entries
+  by recorded position rather than topic memory.
+
 ### Requirement: Self-Contained Session Bundle
 
 A normally ended Voice session SHALL attempt to produce one versioned bundle

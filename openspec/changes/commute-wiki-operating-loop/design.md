@@ -1,3 +1,9 @@
+## Queue v4 pair boundary
+
+The existing Project Task remains the producer. It writes a minimal playback
+file and a complete hashed reference sibling. Voice opens the reference only
+for requested details and export; local readers validate the embedded pair.
+
 ## Context
 
 This is a product operating-loop design, not a prompt rewrite. ChatGPT Tasks,

@@ -1,5 +1,10 @@
 # Tasks
 
+## Queue v4 extension
+
+- [x] Add the queue-v4 playback/reference pair and deterministic validator
+- [x] Update Voice to return to the main file after on-demand reference access
+
 ## 1. Contract and validation
 
 - [x] 1.1 Add the queue-v3 JSON Schema with `description` and required `playback_text`.

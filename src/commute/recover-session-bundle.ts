@@ -5,6 +5,8 @@ import { optionalRecord, requireArray, requireRecord } from '../shared/validate.
 import {
   bundleArtifactFilenameMatches,
   EVIDENCE_SOURCES,
+  createQueueV4Snapshot,
+  queueMetadataRecord,
   queueSnapshotFingerprint,
   type EventEvidence,
   validateTldrCommuteQueueV2,
@@ -15,6 +17,8 @@ export interface SuppliedQueueRecoveryInput {
   bundleText: string;
   queueFilename: string;
   queueText: string;
+  referenceFilename?: string;
+  referenceText?: string;
 }
 
 export interface RecoveredWikiCapture {
@@ -76,7 +80,17 @@ export function recoverSessionBundleWithSuppliedQueue(
   input: SuppliedQueueRecoveryInput
 ): RecoveredSessionBundle {
   const bundle = parseJsonObject(input.bundleText, 'Recovery bundle');
-  const queue = validateTldrCommuteQueueV2(parseJsonObject(input.queueText, 'Recovery queue'));
+  const queueCandidate = parseJsonObject(input.queueText, 'Recovery queue');
+  const queue = validateTldrCommuteQueueV2(
+    input.referenceText === undefined
+      ? queueCandidate
+      : createQueueV4Snapshot(
+          queueCandidate,
+          parseJsonObject(input.referenceText, 'Recovery reference'),
+          input.queueFilename,
+          input.referenceFilename
+        )
+  );
   const declaredQueueFilename = declaredQueueName(bundle);
   if (declaredQueueFilename !== input.queueFilename) {
     throw new Error(
@@ -84,7 +98,7 @@ export function recoverSessionBundleWithSuppliedQueue(
     );
   }
 
-  const items = queue.items;
+  const items = queueMetadataRecord(queue).items;
   if (!Array.isArray(items)) {
     throw new Error('Recovery queue must contain an items array');
   }

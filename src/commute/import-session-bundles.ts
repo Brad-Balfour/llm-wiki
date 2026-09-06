@@ -7,9 +7,11 @@ import { errorMessage } from '../shared/errors.js';
 
 import {
   bundleArtifactFilenameMatches,
+  createQueueV4Snapshot,
   type CommuteSessionBundle,
   parseCommuteSessionBundleText,
   parseCommuteSessionBundleTextWithRelaxedArtifactFilename,
+  queueMetadataRecord,
   queueSnapshotFingerprint,
   validateTldrCommuteQueueV2,
 } from './session-bundle.js';
@@ -49,14 +51,18 @@ import type {
 const IMPORT_SCHEMA_VERSION = 'commute-session-import.v1';
 
 interface Options {
-  inputs: Array<{ bundle: string; recoveryQueue?: string }>;
+  inputs: Array<{ bundle: string; recoveryQueue?: string; recoveryReference?: string }>;
   output: string;
 }
 
 export interface SessionBundleInput {
   filename: string;
   text: string;
-  recoveryQueue?: { filename: string; text: string };
+  recoveryQueue?: {
+    filename: string;
+    text: string;
+    reference?: { filename: string; text: string };
+  };
 }
 
 interface ImportedSession {
@@ -223,6 +229,12 @@ export function reconcileSessionBundles(
             bundleText: input.text,
             queueFilename: input.recoveryQueue.filename,
             queueText: input.recoveryQueue.text,
+            ...(input.recoveryQueue.reference === undefined
+              ? {}
+              : {
+                  referenceFilename: input.recoveryQueue.reference.filename,
+                  referenceText: input.recoveryQueue.reference.text,
+                }),
           });
           if (sessionIds.has(recovered.sessionId)) {
             throw new Error(`Duplicate session_id ${recovered.sessionId}`);
@@ -579,7 +591,16 @@ function validateFullRecoveryQueue(
   } catch (error) {
     throw new Error(`Recovery queue is not valid JSON: ${errorMessage(error)}`);
   }
-  const suppliedQueue = validateTldrCommuteQueueV2(queueCandidate);
+  const suppliedQueue = validateTldrCommuteQueueV2(
+    recoveryQueue.reference === undefined
+      ? queueCandidate
+      : createQueueV4Snapshot(
+          queueCandidate,
+          JSON.parse(recoveryQueue.reference.text) as unknown,
+          recoveryQueue.filename,
+          recoveryQueue.reference.filename
+        )
+  );
   if (
     queueSnapshotFingerprint(suppliedQueue) !==
     queueSnapshotFingerprint(bundle.queue_snapshot.queue)
@@ -820,7 +841,7 @@ function queueItemConsumptionDepth(
   bundle: CommuteSessionBundle,
   sourceItemId: string
 ): string | undefined {
-  const items = bundle.queue_snapshot.queue.items;
+  const items = queueMetadataRecord(bundle.queue_snapshot.queue).items;
   if (!Array.isArray(items)) return undefined;
   for (const candidate of items) {
     if (typeof candidate !== 'object' || candidate === null || Array.isArray(candidate)) continue;
@@ -844,6 +865,14 @@ async function main(): Promise<void> {
             recoveryQueue: {
               filename: path.basename(input.recoveryQueue),
               text: await readFile(input.recoveryQueue, 'utf8'),
+              ...(input.recoveryReference === undefined
+                ? {}
+                : {
+                    reference: {
+                      filename: path.basename(input.recoveryReference),
+                      text: await readFile(input.recoveryReference, 'utf8'),
+                    },
+                  }),
             },
           }),
     }))
@@ -866,7 +895,7 @@ async function main(): Promise<void> {
 }
 
 function parseOptions(args: string[]): Options {
-  const inputs: Array<{ bundle: string; recoveryQueue?: string }> = [];
+  const inputs: Array<{ bundle: string; recoveryQueue?: string; recoveryReference?: string }> = [];
   let output: string | undefined;
 
   for (let index = 0; index < args.length; index += 1) {
@@ -886,6 +915,16 @@ function parseOptions(args: string[]): Options {
         throw new Error('Each --input accepts at most one --recover-with queue');
       prior.recoveryQueue = queue;
       index += 1;
+    } else if (arg === '--reference') {
+      const reference = args[index + 1];
+      const prior = inputs.at(-1);
+      if (!prior?.recoveryQueue || !reference) {
+        throw new Error('--reference requires a preceding --input and --recover-with queue');
+      }
+      if (prior.recoveryReference)
+        throw new Error('Each --input accepts at most one --reference file');
+      prior.recoveryReference = reference;
+      index += 1;
     } else if (arg === '--output') {
       const value = args[index + 1];
       if (!value) throw new Error('--output requires a filename');
@@ -898,7 +937,7 @@ function parseOptions(args: string[]): Options {
 
   if (inputs.length === 0 || !output) {
     throw new Error(
-      'Usage: import:commute-session-bundles -- --input <bundle.txt> [--recover-with <queue.txt>] [--input <bundle.txt> ...] --output <private-record.json>'
+      'Usage: import:commute-session-bundles -- --input <bundle.txt> [--recover-with <queue.txt> [--reference <reference.txt>]] [--input <bundle.txt> ...] --output <private-record.json>'
     );
   }
 

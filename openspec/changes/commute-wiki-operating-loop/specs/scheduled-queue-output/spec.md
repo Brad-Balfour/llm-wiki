@@ -2,6 +2,20 @@
 
 ## ADDED Requirements
 
+### Requirement: Scheduled V4 Output Produces Complete Pairs
+
+After approved installation, the existing weekday 11 a.m. Project Task SHALL
+create both files for each qualifying source email directly in Project Library.
+
+#### Scenario: Scheduled v4 generation
+
+- **WHEN** the existing Task finds a qualifying newsletter
+- **THEN** it SHALL generate and preflight a matching main/reference pair
+- **AND** the main SHALL retain the established dated queue filename
+- **AND** the reference SHALL insert `-reference` before `.txt`
+- **AND** empty editions SHALL produce valid empty pairs
+- **AND** the Task SHALL report any missing or failed file explicitly.
+
 ### Requirement: Observable Queue Artifact Output
 
 The scheduled queue-generation workflow SHALL create one real downloadable
