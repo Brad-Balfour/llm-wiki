@@ -3,21 +3,18 @@
 Status: proposed; this PR contains planning only. The
 [requirements](requirements.md) define R1–R10 and the
 [evidence inventory](evidence-inventory.md) accounts for every open issue.
-No model experiment, live Project edit, mailbox change, or implementation rollout
+No model experiment, live Project edit, mailbox change, or use of a new implementation
 has happened as part of this plan.
 
 ## Recommended sequence
 
-Ship diagnostics and trustworthy replay first. Keep Monday's existing queue
-producer available. Build and evaluate a reproducible control on old newsletters,
-then promote one measured scoring change. Add day-level exact deduplication and
+First add records that explain omissions and tools to rerun old newsletters. Keep Monday’s existing queue generator available. Compare possible scoring changes on the old newsletters before choosing one. Add daily exact duplicate removal and
 short-playback improvements as separately reviewable product changes. Retain
-stock iPhone Voice; its enforcement problem is a distinct acceptance track.
+the existing iPhone Voice app. Whether it reads the queue correctly needs a separate test.
 
-This provides incremental value before the four-week scoring experiment ends:
-missing-item explanations, reliable version binding, reusable labeled data,
-deterministic queue checks, and eventually fewer duplicate announcements. It
-does not require Brad to approve a monolithic replacement pipeline.
+This makes the system more useful before the four-week scoring experiment ends:
+missing-item explanations, accurate records of the versions used, reusable labeled data,
+repeatable queue checks, and eventually fewer duplicate announcements. Brad can review and approve each improvement separately.
 
 ## Monday, September 7, 2026
 
@@ -25,13 +22,13 @@ The first priority is a usable commute, not declaring a newly trained v2 ready.
 The current Task is recorded as weekdays at 11:00 AM America/New_York. This is
 an afternoon-queue path; it cannot promise Monday morning's new editions.
 
-1. Before Monday, preserve available historical **sanitized item-level** data and
-   inventory the baseline configuration. Do not wait four weeks while messages
+1. Before Monday, preserve available historical article titles, summaries and URLs with private email details removed and
+   record the current files and settings. Do not wait four weeks while messages
    remain in Trash. Search results already establish available candidate IDs;
    body confirmation and extraction are the next implementation steps.
 2. Keep current profile 1.4, classifier instructions v1, routing v1, queue v3,
    Voice Prompt 4.2 and export source in the live Project. Do not introduce a
-   partial schema migration before a drive.
+   partially updated file format before a drive.
 3. On Monday after delivery, inspect actual editions and downloads. Do not
    presume Fintech publishes, that every edition has arrived by 11 AM, or that a
    weekday Task notification means success. If no fresh edition arrives, report
@@ -46,120 +43,106 @@ an afternoon-queue path; it cannot promise Monday morning's new editions.
    instructions. Create real downloadable files only.
    ```
 
-5. Check real downloads, edition coverage and identity. Agent-side local
-   validation, when available, uses the existing command:
+5. Check real downloads, edition coverage and identity. When the local tools are available, the agent checks files with the existing command:
 
    ```sh
    npm run validate:commute-queue -- /absolute/path/20260907-tldr.txt
    ```
 
-   Repeat for each supplied edition. Local validation is not yet an unattended
-   phone-side enforcement mechanism. A failed file must be regenerated with the
-   same baseline sources; do not silently patch its scores, label provenance or
+   Repeat for each supplied edition. These checks do not currently run automatically on the phone. A failed file must be regenerated with the
+   same files used by the current version; do not silently patch its scores, label source and version information or
    date to make it pass. Keep any valid editions independently usable and report
-   the missing/failed ones. A sparse queue triggers full-candidate inspection,
+   the missing/failed ones. A sparse queue triggers all-article inspection,
    not an invented minimum item count.
 
-6. If the diagnostic sidecar PR has already passed review and a manual control,
-   collect its private manifest alongside baseline output. Otherwise retain the
+6. If the PR that adds a diagnostic file has already passed review and a manual comparison run,
+   collect its private inventory alongside the current queue output. Otherwise retain the
    Monday input as a named replay run once that tool exists. **Neither blocks
    the commute.** Do not attach experimental candidate queues under the live
    filenames or silently feed Monday corrections into the profile.
 7. Capture exact corrections and separate playback incidents after the commute.
-   Monday heard material is development/weekly evidence, not an untouched final
-   holdout. If Monday is chosen as a locked test, freeze predictions and label
-   blind before showing candidate predictions; default to later unseen dates
-   for the final lock so the commute is not delayed.
+   Articles heard on Monday can be used for development or weekly review, not an untouched final
+   holdout. If Monday is chosen as a reserved test, save predictions first and collect Brad’s labels without showing those predictions; default to later unseen dates
+   for the final test so the commute is not delayed.
 
-No wakeup, recurring task change, or promised Monday execution is created by this
-planning document. Those are rollout actions after the corresponding PR review.
+This document plans Monday’s fallback; it does not schedule a run or change the existing Task. Those actions follow review of the relevant PR.
 
-## Architecture and contracts
+## How the parts fit together
 
 ```text
-Current operational path:
-Gmail -> same ChatGPT Project producer -> dated queue-v3 files -> iPhone Voice
-                                              -> session bundles -> maintainer PR
+Current daily workflow:
+Gmail -> existing ChatGPT Project -> dated queue-v3 files -> iPhone Voice
+  -> session bundles -> proposed wiki changes in a PR
 
-Proposed reproducible control:
-confirmed email/body stream -> parser + source inventory -> URL canonicalizer
-  -> private full-candidate manifest -> frozen sanitized classifier inputs
-  -> configured scorer -> existing strict validator -> application routing
-  -> optional day-level exact reducer -> deterministic queue-v3 renderer
-  -> offline validator + run report
+Proposed local comparison:
+confirmed email text -> extract articles and list exclusions -> clean article URLs
+  -> record every article -> save classifier inputs without private email details
+  -> score articles -> validate results -> apply routing rules in code
+  -> optionally remove exact daily duplicates -> generate queue-v3 files
+  -> validate files and report results
 
-Data for improvement:
-exact queue + user words -> evidence adjudication -> private label corpus
-  -> blind development/weekly/final splits -> baseline/candidate comparison
-  -> reviewed promotion decision
+Learning from feedback:
+original queue + Brad’s words -> verify corrections -> private reference labels
+  -> separate development, weekly and final-test datasets
+  -> compare current and proposed versions -> review the adoption decision
 ```
 
-The Project remains the operational producer until an end-to-end replacement
-passes delivery acceptance. Initially import frozen Project predictions into the
-control harness; this enables coverage/routing/rendering checks without building
-provider adapters or paying for calls. A local scoring adapter is a separate
-conditional experiment, consistent with #68's runtime decision.
+The Project remains the program producing daily queues until an end-to-end replacement
+has demonstrated that it can deliver usable files to the phone. Initially import fixed Project predictions into the
+comparison program; this enables checks of article completeness, routing and queue text without building
+provider integrations or paying for calls. A local scoring integration is a separate
+experiment that needs a separate decision, as required by #68.
 
-Proposed private artifacts (new contracts to review, not existing commands):
+Proposed private files. These formats still need review; there are no commands for creating them yet:
 
-| Artifact                              | Contents and invariant                                                                                                   |
-| ------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
-| `source-inventory.v1`                 | Body-confirmed editions, message identity, source block IDs, expected editorial/exclusion counts; no raw Gmail body      |
-| `classifier-candidate-manifest.v1`    | Every candidate and terminal boundary outcome, run lineage and verified/observed metadata                                |
-| `classifier-evidence-adjudication.v1` | Append-only corrections and dispositions, source fingerprints, historical-policy status, no rewritten originals          |
-| `classifier-evaluation-split.v1`      | Dataset fingerprints, immutable split assignments, article/story groups, contamination/exposure ledger and sampling seed |
-| `classifier-evaluation-run.v1`        | Frozen inputs/predictions, actual model config or unknowns, prompt/profile hashes, repeat IDs, metrics and timing        |
-| `tldr-day-manifest.v1`                | All editions/source instances, canonical groups, survivor/suppressed mapping, queue hashes and generation revision       |
+| File format                           | What it records                                                                                                                     |
+| ------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| `source-inventory.v1`                 | Confirmed editions, message and article-block IDs, expected article/exclusion counts; no raw email body                             |
+| `classifier-candidate-manifest.v1`    | Every article, its final outcome, each processing attempt, and recorded versus verified versions                                    |
+| `classifier-evidence-adjudication.v1` | Corrections and verification results added without changing earlier entries; source-file hashes and whether the old policy is known |
+| `classifier-evaluation-split.v1`      | Dataset hashes and fixed assignments; related-article groups; prior use in training or discussions; random sampling seed            |
+| `classifier-evaluation-run.v1`        | Saved inputs and predictions, actual model settings or unknown values, prompt/profile hashes, repeat-run IDs, results and timing    |
+| `tldr-day-manifest.v1`                | Every edition and source occurrence, matching-URL groups, retained/removed queue occurrences, queue hashes and generation version   |
 
 Use the existing feedback-label.v1 store for compatible exact labels. Preserve
-incompatible-history candidates in the adjudication contract rather than widening
-v1's route enum without known semantics. A report may compare their independently
-verified desired axes while marking the historical original route unverified.
+historical corrections with unknown routing versions in a separate verification file. Do not add route names to v1 without knowing what they meant. A report may compare their verified interest and depth corrections while marking the historical original route unverified.
 
-For new runs, compute metadata outside model output wherever execution is owned
-by code. Project-side declared versions must be checked against pinned uploaded
-content; unsupported model/effort details remain unknown, not invented. Freeze a
-fresh observed Project baseline separately from the repository-contract control.
+For new runs, compute metadata outside model output when a local program runs the classifier. Project-side declared versions must be checked against the exact uploaded files; unsupported model/effort details remain unknown, not invented. Record a fresh run of the current Project separately from a run that applies the repository’s rules.
 
-Queue v3 has strict fields. Keep deduplication provenance in a sidecar first;
-if replay/reference access needs consumer changes, design that migration before
-promoting the feature. Never smuggle extra fields into v3. A future altered
-headline-only template or physical playback/reference split needs an explicitly
-new contract with v2/v3 compatibility in readers and embedded bundle snapshots.
+Queue v3 has strict fields. Keep the source and version details needed for duplicate removal in a companion file first;
+if replay/reference access needs file reader changes, design and test the file-reader update before adopting the feature. Do not add fields that v3 does not allow. A future altered
+headline-only template or physical playback/reference split needs a new, explicitly numbered format with v2/v3 compatibility in readers and embedded bundle snapshots.
 
 ## Reviewable PR sequence
 
 These are proposed PR identifiers, not already-open GitHub PR numbers. Default
 branches below use `agent/classifier-v2-*`; select final names at implementation.
-Target one behavioral concern per PR, usually a few production files plus focused
-fixtures. Split a row further if schema, runtime and integration changes become
-hard to inspect together. There is no requirement to force a dependent patch to
-compile or deploy against the wrong base merely to keep it small.
+Keep each PR focused on one behavior, usually a few production files plus focused
+test cases. Split a row further if schema, runtime and integration changes become
+hard to inspect together. Build each PR on the earlier changes it actually needs.
 
-| PR                                                     | Base / dependency                                 | Reviewable scope and files                                                                                                                                                                                               | Acceptance and rollback                                                                                                                                                                                 |
-| ------------------------------------------------------ | ------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| P0 — this plan                                         | `main`                                            | `docs/classifier-v2/`; requirements, issue dispositions, protocol and stack                                                                                                                                              | Review the proposed choices; no live rollback needed                                                                                                                                                    |
-| P1 — diagnostics contract and collection               | `main` after P0                                   | Source inventory + candidate manifest schema/validator; hooks in `src/tldr/`; synthetic omissions/exclusions fixtures; manual Project diagnostic instructions kept opt-in                                                | R1/R2: one complete real private manifest and July 28 boundary accounting; source count equality. Disable sidecar collection, scoring unchanged                                                         |
-| P2 — evidence/version reconciliation                   | P1 branch until merged                            | Adjudication schema and importer/report beside `src/classifier/feedback-label.ts`; reconcile all dated exact candidates, retractions and metadata mismatch cases                                                         | R2/R4: originals immutable; duplicate imports idempotent; unknown policies never aliased; no live label consumption. Stop importer, retain immutable data                                               |
-| P3 — blind labeling and baseline report                | P2 branch                                         | Split manifest, private local labeling interface and evaluator; import known legacy labels without inventing missing depth; isolated frozen Project prediction import                                                    | R5: complete July 28 gold, locked replacement split, five-boundary baseline report and tests for leaked predictions/group overlap. Stop experiment; baseline stays live                                 |
-| P4 — deterministic queue-v3 control                    | P1 branch, or `main` after P1                     | `src/commute/` renderer reusing existing validation/routing, no scorer calls; known-input golden output and honest version binding                                                                                       | R3/R9: reproduce exact v3 strings, score threshold boundaries, ordering, null attribution, missing-output failures and bundle round trip. Keep outputs offline                                          |
-| P5 — optional local scorer experiment                  | P3 + P4 merged; explicit runtime-control decision | One provider-neutral adapter interface, one configured provider, bounded batching/timeouts/retries, private prediction persistence; propose commands only here                                                           | R3/R5/R8: same frozen inputs, observed provider/model metadata, invalid batches quarantined, cost/time and Project disagreement report. Revert to imported predictions; no production ownership assumed |
-| P6 — four-week candidate experiment                    | P3; P5 optional                                   | Versioned experiment configuration, 2–4 candidate profiles/prompts per selected cluster outside canonical schema files; weekly sanitized reports                                                                         | R5: four blind weekly reports and final holdout decision. No live mutation; stop/no-change is acceptable                                                                                                |
-| P7 — measured scoring promotion                        | P6                                                | New OpenSpec change for only the winning profile/prompt/threshold/consumption policy; explicit replacement of stale holdout rules where not already handled in P3; synthetic regression cases and coupled-version record | R3/R4/R5/R8: predeclared gates and Brad approval, manual control, one-edition canary then remaining editions. Restore prior coupled sources and exact recorded versions                                 |
-| P8a — exact daily duplicate reducer                    | P4 merged                                         | Canonicalizer/day-manifest + pure reducer; source-text selection, provenance, empty queues and late-edition fixtures; no live deployment                                                                                 | R6: zero duplicate exact URLs and zero unrelated suppression on gold groups; repeat-run identity stable. Disable reducer                                                                                |
-| P8b — Project-native daily producer pilot              | P8a                                               | Explicit OpenSpec generation/provenance behavior; retrieve all editions first, classify canonical groups once, emit per-edition queues together; exact live-file deployment instructions                                 | R6/R8: identical-input manual control and phone access/replay, then scheduled trial. Keep baseline per-edition producer for rollback; this feature can advance independently of P6's scoring decision   |
-| P9 — short-playback usefulness trial                   | P4 merged; independent of scoring                 | New queue template/schema version only if needed, renderer/validator/bundle reader, bounded source-exact short-description trial and matching Project sources                                                            | R7/R9: no inferred depth changes, blind usefulness/pacing comparison and actual iPhone trial. Restore v3 producer and sources, keep old readers                                                         |
-| P10 — minimal playback artifact trial                  | After P9 decision, separate #100/#120 work        | Evaluate v3-equivalent full versus minimal artifact/reference split, exact hash/ID join, lazy reference and bundle export; no scoring changes                                                                            | R9: observed long-session evidence, reference access and export; absence of an executable phone harness stays explicit. Restore single-file v3                                                          |
-| P11 — related-story annotations / delivery replacement | Only after specific feasibility decisions         | Two separate follow-ups: related-story annotation after exact groups; or unattended Gmail/cloud plus demonstrated mobile delivery                                                                                        | R6/R8: no automatic fuzzy suppression without precision evidence; no production runtime switch until intake-through-phone works. Neither is required for first v2 adoption                              |
+| PR                                                | Builds on                                                 | What Brad reviews                                                                                                                                                                                             | Required result and how to undo the change                                                                                                                                                                                                                                                                      |
+| ------------------------------------------------- | --------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| P0 — this plan                                    | `main`                                                    | Requirements, issue findings, test plan and proposed PR order in `docs/classifier-v2/`                                                                                                                        | Agreement on the plan; no live change to undo                                                                                                                                                                                                                                                                   |
+| P1 — explain omissions and errors                 | `main` after P0                                           | Source and article inventory formats, validators, parser records in `src/tldr/`, invented omission/exclusion test cases, and optional Project instructions for diagnostic output                              | R1/R2: one complete real private inventory; every July 28 article accounted for; matching source counts. Stop collecting the extra file to undo; scoring stays unchanged                                                                                                                                        |
+| P2 — verify historical feedback and versions      | P1                                                        | Verification file format and import/report tools beside `src/classifier/feedback-label.ts`; all recorded corrections, withdrawals and version mismatches                                                      | R2/R4: preserve originals; repeated imports add no duplicates; never guess unknown policies; no use of feedback in live scoring. Stop the importer and keep the saved records                                                                                                                                   |
+| P3 — blind labeling and comparison report         | P2                                                        | Dataset assignments, private labeling page, result comparison, import of older labels without guessing missing depth, and separately saved Project predictions                                                | R5: complete July 28 reference labels, reserved final test set, report distinguishing the five original processing steps: parsing, classification, validation, routing and queue inclusion, tests for exposed predictions and articles shared between datasets. Stop the experiment; current scoring stays live |
+| P4 — generate queue-v3 files in code              | P1, or `main` after P1 merges                             | Queue generation in `src/commute/`, using existing validation and routing; no model calls; expected output from known inputs; accurate version records                                                        | R3/R9: exact playback strings, score thresholds, order, unknown author/publication values, missing-result failures, and queue-to-bundle checks. Keep generated files for local tests only                                                                                                                       |
+| P5 — optional local classifier                    | P3 and P4 merged; separate approval to test local scoring | One interface for model providers, one provider implementation, limits on batch sizes/timeouts/retries, private saved predictions and proposed commands                                                       | R3/R5/R8: same saved inputs, actual provider/model records, invalid results excluded with reasons, cost/time and comparison with Project predictions. Return to saved Project predictions; no change to daily queue generation                                                                                  |
+| P6 — four-week scoring experiment                 | P3; P5 optional                                           | Saved experiment settings; 2–4 proposed profiles/prompts per selected error group, outside the live schema files; weekly reports with private details removed                                                 | R5: four weekly blind reports and a final test-set decision. Live scoring stays unchanged; keeping the current rules is a valid result                                                                                                                                                                          |
+| P7 — adopt a measured scoring improvement         | P6                                                        | OpenSpec requirements for the selected profile, prompt, thresholds or use of feedback; replacement of old holdout instructions where P3 has not already done so; regression tests and related version records | R3/R4/R5/R8: agreed limits, Brad’s approval, manual comparison, then one real edition before the others. Restore the previous source files and recorded versions if the trial fails                                                                                                                             |
+| P8a — remove exact daily duplicates in code       | P4 merged                                                 | URL cleanup, daily inventory and duplicate-removal code; rules for choosing source text and retaining every source; empty-queue and late-delivery tests                                                       | R6: no repeated exact URLs, no unrelated article removed from the reviewed test groups, stable IDs on repeat runs. Disable duplicate removal to undo                                                                                                                                                            |
+| P8b — try daily duplicate removal in the Project  | P8a                                                       | OpenSpec and Project instructions: find all editions first, classify each matching-URL group once, generate the queues together, and specify exact files to install                                           | R6/R8: manual comparison on identical inputs, phone access and replay, then a scheduled trial. Restore the current per-edition generator if needed. This can proceed while P6 tests scoring                                                                                                                     |
+| P9 — test more useful short playback              | P4 merged; independent of scoring                         | New queue template and schema version if needed; generator, validator and bundle-reader updates; short excerpts copied exactly from the newsletter; matching Project files                                    | R7/R9: no inferred depth changes, blind usefulness/playback-time comparison and iPhone test. Restore v3 generation and Project files; retain support for older files                                                                                                                                            |
+| P10 — test separate playback and reference files  | After the P9 decision; separate #100/#120 work            | Same v3 playback text in a smaller file; matching IDs/hashes in the reference file; reference loading only when needed; complete bundle export                                                                | R9: observed long-session results, working reference access and export. State any inability to automate phone testing. Restore the single v3 file if needed                                                                                                                                                     |
+| P11 — related-story notes or replacement delivery | Separate decisions based on test results                  | Two separate follow-ups: mark similar stories after exact duplicate removal; or test unattended Gmail/cloud processing with working mobile delivery                                                           | R6/R8: do not automatically remove similar stories without measuring mistaken matches; do not switch the daily generator until the whole process works through the phone. Neither is needed for initial v2 adoption                                                                                             |
 
-P1 collection can include parser instrumentation and an opt-in Project sidecar
-request, but cannot pretend that a local hook instruments a remote Task. Verify
-which boundary actually emitted each manifest. P3's split protocol must formally
-update the relevant OpenSpec holdout clauses before corpus tuning starts; P7 then
-adds only production-behavior deltas. Keep #66 open until its real corpus and
-baseline deliverables are complete.
+P1 can add diagnostic records to the local parser and an optional request for a diagnostic file from the Project. Local parser changes do not change a scheduled Project Task; record which program produced each inventory. P3’s dataset plan must
+update the relevant OpenSpec holdout clauses before dataset tuning starts; P7 then
+adds only changes to live behavior. Keep #66 open until its real dataset and
+results for the current version are complete.
 
-Logical stack:
+PR dependencies:
 
 ```text
 P0 -> P1 -> P2 -> P3 -> P6 -> P7
@@ -170,178 +153,144 @@ P0 -> P1 -> P2 -> P3 -> P6 -> P7
 P11 follows the relevant measured decision, not the calendar.
 ```
 
-Operationally, keep at most two or three unmerged dependent PRs. A child PR targets
-its immediate parent branch so Brad sees only the new slice. Once a parent merges,
+In practice, keep at most two or three unmerged dependent PRs. A child PR targets
+its immediate parent branch so Brad sees only the new changes. Once a parent merges,
 rebase the child onto updated `main` and retarget it; verify the diff contains no
 parent commits. Shared dependencies on two stacks should merge before opening the
 integration PR. Each description names requirements, parent PR, one before/after
-example, deterministic checks, private experiment evidence and live deployment
-steps. Review code/schema/prompt behavior once at the latest complete head;
-merge only after Brad approves. A planning PR is not approval for rollout.
+example, repeatable checks, private experiment evidence and live deployment
+steps. Review code/schema/prompt behavior once at the latest complete commit;
+merge only after Brad approves. Approving this plan does not approve live changes.
 
-## Historical replay and gold collection protocol
+## Rerunning old newsletters and collecting Brad’s answers
 
-### Acquire without leaking the future test
+### Collect the newsletters and keep the final test separate
 
 The read-only search found 85 recent Trash candidates and 10 July 27–29 candidates,
-not a verified corpus. Enumerate all result pages and verify direct sender, body
+not a verified dataset. Read every page of search results and verify direct sender, body
 markers, delivery timestamp and edition type. For the July 28 coverage exercise,
 retrieve the exact day across all four newsletter types and record editions that
-are absent. Do not reconstruct unavailable newsletters from survivor queues.
+are absent. Do not use an existing queue to reconstruct an unavailable newsletter; the queue may omit articles.
 
-For replay, stream confirmed bodies through extraction without persisting raw
-email bodies. Save immutable sanitized editorial records and exclusion/review
-metadata under `.private/classifier-v2/`. Do not restore, relabel or delete mail
+For reruns, extract article data from confirmed newsletters without saving the raw email bodies. Save article records with private email details removed, plus reasons for exclusions or review. Preserve those records unchanged under `.private/classifier-v2/`. Do not restore, relabel or delete mail
 as a side effect. A Gmail API path must include Trash explicitly; a connector
 must demonstrate that its Trash query actually returns the targeted messages.
-Gmail deletes messages after 30 days in Trash, so this is the first acquisition
-priority. [Google deletion policy](https://support.google.com/mail/answer/7401),
+Gmail deletes messages after 30 days in Trash, so this is the first collection task. [Google deletion policy](https://support.google.com/mail/answer/7401),
 [API listing option](https://developers.google.com/workspace/gmail/api/reference/rest/v1/users.messages/list).
 
-Inventory historical private queues, bundle intakes, attempted labels and exact
+Inventory historical private queues, session bundles already collected, attempted labels and exact
 shared-chat evidence by identity before importing. Use existing sanitized copies
-where available; never rewrite normalized historical originals. July 28 is a
+where available; never rewrite previously processed historical files. July 28 is a
 known diagnostic development set. August and September heard/discussed material
-is replay/regression data unless a contamination audit proves otherwise.
+is useful for reruns and tests of previously reported problems unless a check for prior use of the articles proves otherwise.
 
-### Freeze datasets and collect independent answers
+### Fix the datasets before testing and collect answers independently
 
 1. Inventory original 262 training, 41 June 30 and 98 July 1–2 records. They are
    known development/calibration history now. Preserve legacy labels as legacy;
    an old single-axis `down` cannot supply an unobserved depth label.
-2. Build July 28 complete-coverage gold by asking Brad for both axes for every
-   editorial item. A source-confirmed omitted item is not gold until labeled.
+2. Build the complete July 28 reference dataset by asking Brad for both axes for every
+   editorial item. A source-confirmed omitted item is not a reference example until Brad labels it.
    Present source title/summary/link with predictions and rationales hidden.
-3. Form development and weekly review pools from known history and new labeled
-   exposure. Include every exact correction, every candidate from unusually
-   sparse days, a seeded random skip sample, near-threshold samples (interest
-   0.55–0.65 and 0.75–0.85; depth 0.55–0.65), and confident-correct controls.
-4. Choose final holdout by entire unseen delivery dates, with all canonical
-   article and related-story duplicates assigned to the same split. Preserve
+3. Form development and weekly review pools from known history and new articles Brad has labeled. Include every exact correction, every candidate from unusually
+   sparse days, a seeded random skip sample, close-to-threshold samples (interest
+   0.55–0.65 and 0.75–0.85; depth 0.55–0.65), and a comparison sample of predictions that have been verified and are far from the thresholds.
+4. Choose final holdout by entire unseen delivery dates, with all copies of the same article and related stories assigned to the same split. Preserve
    distinct newsletter instances inside their split. Exclude groups already
    present in training, prompts, wiki discussions, issue examples or reviewed
    development outputs. If the historical pool is contaminated, collect later
-   fresh dates; lack of clean material delays promotion, not the commute.
+   fresh dates; lack of clean material delays adoption, not the commute.
 5. Proposed planning target: at least 100 final-holdout editorial instances from
    at least three delivery dates covering all four newsletters when available.
-   Aim for at least 20 gold-interested and 20 gold-in-depth items before claiming
-   directional confidence; rare lanes are reported as insufficient evidence.
-   These are proposed practical floors, not a statistical power guarantee.
-   Freeze target date blocks before seeing labels; inadequate strata yield an
-   inconclusive result and a newly declared additional test, not cherry-picking.
-6. Freeze baseline and candidate versions and predictions to immutable files
-   **before** Brad labels each blind batch. The label UI must not serve hidden
-   prediction values to its client. Collect independent interest and depth,
+   Aim for at least 20 interested items and 20 in-depth items, according to Brad’s answers, before drawing conclusions; rare topics are reported as insufficient evidence.
+   These proposed minimums do not guarantee enough data to detect a real improvement.
+   Choose the test dates before seeing labels. If too few examples remain in a category, report the result as inconclusive and plan another test rather than choosing dates that favor the result.
+6. Save the current and proposed versions’ predictions in files that will not be changed
+   **before** Brad labels each blind batch. The labeling page must not receive prediction values, even in hidden page data. Collect independent interest and depth,
    optional reason and an explicit unsure/missing response. Do not force numeric
    scores from Brad. Save progress/resume without exposing earlier predictions.
-7. Candidate generation/scoring gets only allowed profile, prompts and sanitized
-   inputs; no issue feedback, label store or answer-containing chat context.
-   Execute via fresh isolated scoring contexts rather than using the research
-   conversation. The scorer may see held-out text only to predict; the tuner
-   must not inspect final test text, labels or error reports before final scoring.
-8. Freeze label hashes, then compare. A final holdout whose errors are inspected
+7. When generating predictions, provide only the allowed profile, prompts and article inputs with private details removed. Use fresh model sessions with no issue feedback, saved answers or this research conversation. The scoring model can read final-test articles to predict their labels. The person or agent revising the rules must not inspect those articles, answers or error reports before final scoring.
+8. Record hashes of the label files, then compare. A final holdout whose errors are inspected
    becomes development data for the next revision. Do not tune and report a
    second run on it as fresh validation.
 
-Separate axis records for Matic/Waymo are joined into one desired two-axis target
-per article with both source references; they are not two independent article
-samples. For a depth-only correction, do not treat the unchanged original interest
-as independently confirmed gold. Report missing dimensions and their denominators.
+Combine the separate Matic and Waymo interest/depth corrections into one reference answer per article, retaining both feedback sources. Two corrected scores for one article do not count as two tested articles. If Brad corrects depth only, do not count the original interest prediction as a confirmed answer. For each measurement, state how many articles have the required labels.
 
-### Baselines, ablations and four weekly cycles
+### Compare one change at a time over four weeks
 
-Compare (A) observed Project baseline, (B) repository-contract replay with the same
-frozen predictions, and optionally (C) one pinned local scoring configuration.
+Compare (A) observed current Project version, (B) replay using the repository’s rules with the same
+fixed predictions, and optionally (C) one fixed local scoring configuration.
 A versus B isolates validation/routing/rendering differences; A versus C is a
 producer/model comparison, not proof that a profile alone improved. Save all
 configurations and actual observed metadata. Unknown Project runtime details
 limit reproducibility and must be stated in the report.
 
-Choose the highest-harm development clusters first. For each compare 2–4
-alternatives: narrow named-example rule, transferable causal preference, overly
-broad rule, and unchanged/threshold-only control where useful. Freeze interest
-rules while evaluating depth heuristics and vice versa where feasible. Do not
-change provider, thresholds, deduplication and playback policy in the same scoring
-comparison. “Weakest valid revision” means broad safe empirical coverage, with
-fewer exception predicates and robustness after names are removed; it is not
-shortest prompt, nor a theorem establishing newsletter performance.
+Choose the groups of errors that caused the most problems first. For each compare 2–4
+alternatives: rule tied to named examples, a general rule that explains Brad’s preference, overly
+broad rule, and unchanged/threshold-only comparison where useful. Keep interest rules unchanged while evaluating depth rules and vice versa where feasible. Do not
+change provider, thresholds, duplicate removal and playback policy in the same scoring
+comparison. #68 calls this the “weakest valid revision” experiment: prefer a rule that works across more topics without adding errors, needs fewer exceptions, and still makes sense when company and product names are removed. The research behind that idea does not prove it will work for newsletters, and shorter wording alone is not the goal.
 
-Once P3's corpus is ready, run four weekly blind cycles. If ready September 7,
+Once P3's dataset is ready, run four weekly blind reviews. If ready September 7,
 provisional weeks are September 7–13, 14–20, 21–27, and September 28–October 4;
 otherwise shift the entire window. Proposed weekly review size is 20–30 items
 plus exact corrections and sparse-day coverage, with Brad's measured labeling
-burden reported. Weekly feedback may refine development candidates under the
-protocol, never live production. Freeze the finalists before opening final test
-predictions/labels. Do not repeatedly tune against the locked final holdout.
+burden reported. Weekly feedback may refine development candidates under the test plan, while leaving the live classifier unchanged. Choose and save the final candidates before opening final test
+predictions/labels. Do not repeatedly tune against the reserved final holdout.
 
-Repeat model scoring three times on a fixed development stress set to expose
-instability; retain every replicate rather than selecting the best run. For the
-final comparison, use the predeclared repeat/aggregation policy (recommended:
-three independent runs, report mean and range plus each run's failures). Saved
-prediction replay is deterministic; fresh model sampling is not.
+Repeat model scoring three times on a fixed set of difficult development examples to expose
+instability; retain every run rather than selecting the best run. For the
+final comparison, use the method for repeating and combining results agreed before testing (recommended:
+three independent runs, report mean and range plus each run's failures). Replaying saved predictions must give the same output each time. Asking the model to score articles again can give different results.
 
-### Metrics and proposed promotion gates
+### Measurements and proposed requirements for adoption
 
 These proposed limits need agreement in P3 **before** predictions are evaluated.
-They are not previously approved user preferences. Keep the hard integrity rules
-regardless of tuning; if thresholds prove too strict, amend a future protocol
+They are not previously approved user preferences. Keep the requirements for complete, accurate records
+regardless of tuning; if thresholds prove too strict, amend a future test plan
 before testing on new holdout data, not after seeing the desired result.
 
-| Measure            | Definition and proposed gate                                                                                                                                                                                                                                                                                                       |
-| ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Source coverage    | Independently enumerated editorial blocks versus parsed candidates. Zero unexplained omissions in reviewed fixtures and complete holdout editions                                                                                                                                                                                  |
-| Contract integrity | Zero invalid artifacts accepted, unknown provenance asserted as known, missing IDs silently discarded, or leaked private/holdout data. Failure stops promotion                                                                                                                                                                     |
-| False skips        | Gold interested/maybe but predicted uninterested; report count/rate over gold-surfaced items, by interest level and confidence distance. No increase versus baseline and no new high-confidence gold-interested skip (proposed score <0.50)                                                                                        |
-| Depth misses       | Gold in-depth predicted headline-only, evaluated only where depth gold exists; report conditional surfaced and end-to-end missed-in-depth counts separately. No increase versus baseline                                                                                                                                           |
-| False discusses    | Predicted in-depth and surfaced, gold uninterested or gold headline-only. Report separately from optional-label disagreement; no more than one additional case per 100 labeled instances                                                                                                                                           |
-| Weighted harm      | Predeclare a transparent diagnostic loss: 5 per gold-interested skip, 3 per gold-maybe skip, 2 per false discuss, 1 per missed depth on a surfaced item. Count each item at its highest applicable cost. Strictly lower mean holdout harm for a scoring promotion; no-change remains valid                                         |
-| Calibration        | Per-axis confusion matrices, scores and threshold-distance bins; depth denominator excludes unknown/n/a gold. Scores are ranking judgments, not assumed probabilities; reliability plots are descriptive                                                                                                                           |
-| Pacing             | Compute literal speech duration at a frozen 150 words/minute; report sweep/default text separately from optional discussion scenarios (e.g. 2 and 5 min per in-depth item). Proposed added default playback cap: 10% or two minutes per day, whichever is larger; actual discussion time remains measured, not claimed from labels |
-| Deduplication      | Zero unrelated items suppressed and complete source retention on hand-labeled exact groups. Report per-instance and per-canonical-group classification metrics so repeated stories do not inflate confidence                                                                                                                       |
-| Generalization     | Newsletter, date and preference-lane slices, named-entity removal probes, exception count and changed-item list. Report small strata as uncertain; use paired date/story-group resampling where sample size permits                                                                                                                |
-| Runtime/cost       | Per-edition and per-item latency, retries, failure rate, measured token/API cost when available, and human review time. Establish a budget from baseline before the trial; no invented price or inference-time estimate                                                                                                            |
-| Delivery           | Manual same-Project control produces real valid phone-accessible queues; scheduled replacement needs three consecutive qualifying weekdays or retains explicit manual fallback                                                                                                                                                     |
-| Voice              | Actual iPhone long-session test reports literal-match failures and exports independently. A scoring release may improve labels without claiming #100 closed; a playback-reliability claim requires zero observed foreign/omitted default text in its acceptance trial                                                              |
+| Measurement                      | Definition and proposed requirement                                                                                                                                                                                                                                                                                                                                  |
+| -------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Article completeness             | Compare articles listed independently from the email with parser output. No unexplained omissions in reviewed test cases or complete final-test editions                                                                                                                                                                                                             |
+| Accurate records and valid files | Accept no invalid file, guessed source/version claim, silently missing ID, or leaked private/final-test data. Any such failure stops adoption                                                                                                                                                                                                                        |
+| False skips                      | Brad labeled the article interested or maybe, but the model labeled it uninterested. Report counts and rates among articles Brad wanted, separated by his interest label and the prediction’s distance from the threshold. No increase over the current version and no new skip scored below 0.50 for an article Brad labeled interested                             |
+| Missed depth                     | Brad labeled an article in-depth but the model chose headline-only. Measure only where Brad supplied a depth label. Report both errors among included articles and total missed in-depth articles, including skipped ones. No increase over the current version                                                                                                      |
+| Unwanted discussion              | The queue includes an article as in-depth, but Brad labeled it uninterested or headline-only. Keep this separate from interested-versus-maybe disagreements. Allow at most one additional case per 100 labeled articles                                                                                                                                              |
+| Weighted error score             | Assign 5 points for skipping an interested article, 3 for skipping a maybe article, 2 for unwanted discussion, and 1 for missing depth on an included article. Count only the highest applicable penalty per article. Agree on these weights before testing. New scoring rules must lower the mean penalty on the final test set; keeping the current rules is valid |
+| Score agreement                  | For interest and depth separately, show a table of predicted versus Brad’s labels, score distributions and errors near each threshold. Exclude missing depth answers from the depth calculation. Do not treat the model’s scores as calibrated probabilities; any reliability chart is descriptive                                                                   |
+| Playback time                    | Estimate reading time at 150 words/minute. Show the opening sweep and default article text separately from possible discussion time (for example, 2 or 5 minutes per in-depth article). Proposed added default-reading limit: 10% or two minutes per day, whichever is larger. Measure actual discussion time separately                                             |
+| Duplicate removal                | Remove no unrelated articles and retain every source in the manually reviewed test groups. Report classification results both per newsletter occurrence and per unique article so repetition does not make the evidence look stronger                                                                                                                                |
+| Performance on other topics      | Show results by newsletter, date and preference category; test rules with company/product names removed; list exceptions and changed predictions. Mark small groups as uncertain. When estimating uncertainty by resampling, keep related dates/stories together                                                                                                     |
+| Time and cost                    | Report time per edition/article, retries, failures, measured model usage/API cost when available, and human review time. Set a budget from the current version’s results before the trial. Do not invent prices or infer model computation time from total task time                                                                                                 |
+| Delivery                         | A manual run in the same Project must create valid files usable from the phone. Keep the manual fallback unless scheduled generation works on three consecutive qualifying weekdays                                                                                                                                                                                  |
+| Voice playback                   | Test actual iPhone Voice in a long session and report text mismatches and export failures separately. Better scores do not close #100. Claim improved playback reliability only after a trial with no unrelated additions or missing default text                                                                                                                    |
 
 Report counts and paired changes alongside percentages; do not hide hard failures
 in averages or claim statistical certainty from a small holdout. A candidate
-must meet integrity, harm and pacing constraints before preference for broader
-extension or lower cost matters. Freeze the numeric gate configuration and hashes
-in the protocol PR. A severe reproducible false-skip regression stops that
-candidate immediately; no automatic global threshold patch follows.
+must meet the requirements for accurate records, acceptable errors and playback time before preference for broader
+coverage or lower cost matters. Record the numeric acceptance limits and file hashes
+in the test plan PR. Stop a proposed classifier’s trial immediately if it repeatedly causes a serious new missed-article problem. Do not automatically change the global thresholds in response.
 
-## Adoption and verification
+## Trying the changes and checking the results
 
-For each deterministic implementation PR run focused fixtures, then `npm run
-check`, `git diff --check`, and strict OpenSpec validation for touched changes.
-P1/P3 and production changes touching the J1–J6 boundary validate both baseline
-changes plus the new relevant change. CI uses synthetic fixtures, not Gmail or
-paid model calls. Private replay outputs stay private; commit only sanitized
-aggregate reports and source-backed regression examples permitted by the split.
+For each PR that changes code with fixed, repeatable results, run its focused tests, then `npm run check`, `git diff --check`, and strict OpenSpec validation for the requirements it changes. P1/P3 and changes to the commute workflow (J1–J6) must validate both existing OpenSpec changes and the new one. CI uses invented test cases, not Gmail or paid model calls. Keep private rerun results private. Commit only reports with private details removed and regression examples from datasets allowed for development.
 
-After a scoring promotion is approved: validate a manual same-Project replay,
-canary one real edition, then all editions, then assess scheduled operation.
-Record exact live files installed and verified content/version hashes; a merged
-repository diff does not deploy Project sources. Keep a release-scoped rollback
-record for materially coupled profile, prompt, thresholds, routing, queue schema,
-producer and model configuration. Do not overwrite or relabel old generated
-queues. Roll back on integrity, material coverage or delivery regression, retaining
-the failed run for diagnosis.
+After Brad approves new scoring rules, check a manual rerun in the same Project,
+try it on one real edition, then all editions, then assess scheduled operation.
+Record exact live files installed and verified content/version hashes; merging a PR does not update the files in the live Project. For each release, record how to restore the previous profile, prompt, thresholds, routing rules, queue schema, generator and model settings together. Do not overwrite or relabel old generated
+queues. Restore the previous version if records become unreliable, substantially more articles go missing, or delivery gets worse. Retain the failed run for investigation.
 
-Headline context, deduplication and minimal-artifact trials keep scoring pinned.
-For the minimal artifact trial, start with full versus minimal **equivalent text**
-and compare late-session behavior; test missing/mismatched reference, direct
-source questions and full-snapshot export before any live default. Do not build
-an autonomous iPhone harness until actual audio control/observation is demonstrated.
+Headline context, duplicate removal and small playback-file trials keep scoring unchanged.
+For the smaller playback-file trial, compare the full and smaller files using **identical spoken text**. Check what happens late in a session, when the reference file is missing or mismatched, when Brad asks about a source, and when exporting the full queue. Pass these tests before making it the default. Do not build
+an autonomous iPhone test program until actual audio control/observation is demonstrated.
 Manual acceptance is an explicit part of this plan, as requested.
 
 ## Decisions for review
 
-The recommended defaults are: Project/manual production for Monday; immutable
-historical replay first; no online feedback mutation; current two axes retained;
-new clean holdout and four weekly cycles before scoring promotion; exact daily
-URL deduplication before fuzzy story suppression; separate short-context and
-minimal-artifact trials. The proposed sample sizes, harm weights and pacing cap
-need agreement in the protocol PR. Runtime ownership remains conditional on
-measured value and end-to-end phone delivery. No paid provider choice or hosting
-commitment is required to approve the initial diagnostics work.
+The recommended defaults are: queue generation in the Project with a manual fallback for Monday; rerunning saved historical inputs first; no automatic scoring changes after feedback; interest and depth still scored separately;
+new clean holdout and four weekly cycles before adoption of new scoring rules; exact daily
+URL duplicate removal before automatically removing stories judged similar; separate short-description and
+small playback-file trials. The proposed sample sizes, error weights and playback-time limit
+need agreement in the test plan PR. Decide where classification will run only after measuring its value and confirming that files reach the phone. No paid provider choice or hosting
+commitment is required to approve the initial work on omission and error reporting.
