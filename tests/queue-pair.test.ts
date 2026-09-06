@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { spawnSync } from 'node:child_process';
 import test from 'node:test';
 
 import {
@@ -170,4 +171,41 @@ test('v4 bundle wrapper keeps complete identities for saves without preloading r
   const parsed = parseCommuteSessionBundleText(JSON.stringify(bundle));
   assert.equal(parsed.events[1]?.kind, 'item_action');
   assert.equal(parsed.events[1]?.item.source_item_id, 'example-1');
+});
+
+test('v4 bundle snapshot filename must match its embedded reference', () => {
+  const { main, reference } = pair(1);
+  const snapshot = createQueueV4Snapshot(main, reference);
+  const bundle = {
+    schema_version: 'commute-session-bundle.v1',
+    session: {
+      session_id: 'mismatched-v4-filename',
+      session_date: '2026-09-06',
+      artifact_filename: '202609060745-morning-commute-session-bundle.txt',
+      voice_surface: 'chatgpt_live',
+    },
+    queue_snapshot: { filename: '20260906-tldr-ai.txt', queue: snapshot },
+    playback: { status: 'not_started' },
+    integrity: {
+      state: 'partial',
+      incomplete_reason: 'No playback occurred.',
+      unresolved_event_ids: [],
+    },
+    events: [],
+  };
+
+  assert.throws(
+    () => parseCommuteSessionBundleText(JSON.stringify(bundle)),
+    /main_filename does not match/
+  );
+});
+
+test('bundle validator rejects a missing --reference value as usage error', () => {
+  const result = spawnSync(
+    process.execPath,
+    ['dist/src/commute/validate-session-bundle.js', '--reference'],
+    { encoding: 'utf8' }
+  );
+  assert.notEqual(result.status, 0);
+  assert.match(result.stderr, /--reference requires a filename/);
 });

@@ -89,16 +89,16 @@ function parseOptions(args: string[]): Options {
   for (let index = 0; index < args.length; index += 1) {
     const arg = args[index];
     if (arg === '--input') {
-      input = args[index + 1];
+      input = requireOptionValue(args, index, arg);
       index += 1;
     } else if (arg === '--queue') {
-      queue = args[index + 1];
+      queue = requireOptionValue(args, index, arg);
       index += 1;
     } else if (arg === '--durable-event-record') {
-      durableEventRecord = args[index + 1];
+      durableEventRecord = requireOptionValue(args, index, arg);
       index += 1;
     } else if (arg === '--reference') {
-      reference = args[index + 1];
+      reference = requireOptionValue(args, index, arg);
       index += 1;
     } else {
       throw new Error(`Unknown argument: ${arg ?? ''}`);
@@ -117,6 +117,12 @@ function parseOptions(args: string[]): Options {
     ...(reference === undefined ? {} : { reference }),
     ...(durableEventRecord === undefined ? {} : { durableEventRecord }),
   };
+}
+
+function requireOptionValue(args: string[], index: number, option: string): string {
+  const value = args[index + 1];
+  if (!value || value.startsWith('--')) throw new Error(`${option} requires a filename`);
+  return value;
 }
 
 await main();

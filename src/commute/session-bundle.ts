@@ -257,7 +257,7 @@ function validateCommuteSessionBundleCandidate(
 
   const session = validateSession(record.session, validateSessionArtifactFilename);
   const queueSnapshot = validateQueueSnapshot(record.queue_snapshot);
-  const queueItems = indexQueueItems(queueSnapshot.queue);
+  const queueItems = indexQueueItems(queueSnapshot.queue, queueSnapshot.filename);
   const playback = validatePlayback(record.playback, queueItems);
   const events = validateEvents(record.events, queueItems);
   const integrity = validateIntegrity(record.integrity, events);
@@ -513,7 +513,10 @@ function validateQueueSnapshot(candidate: unknown): QueueSnapshot {
   };
 }
 
-function indexQueueItems(record: Record<string, unknown>): QueueItemIndex {
+function indexQueueItems(
+  record: Record<string, unknown>,
+  expectedMainFilename?: string
+): QueueItemIndex {
   const queueVersion = requireString(record.queue_version, 'queue_snapshot.queue.queue_version');
   if (
     queueVersion !== 'tldr-commute-queue.v2' &&
@@ -528,7 +531,11 @@ function indexQueueItems(record: Record<string, unknown>): QueueItemIndex {
       ['queue_version', 'playback_file', 'reference_file'],
       'queue_snapshot.queue'
     );
-    const pair = validateTldrCommuteQueuePair(record.playback_file, record.reference_file);
+    const pair = validateTldrCommuteQueuePair(
+      record.playback_file,
+      record.reference_file,
+      expectedMainFilename
+    );
     const referenceItems = requireArray(pair.referenceFile.items, 'reference_file.items');
     const ordered = referenceItems.map((candidate, index) => {
       const item = validateQueueV4ReferenceItem(

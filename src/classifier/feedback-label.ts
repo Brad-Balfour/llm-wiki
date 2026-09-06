@@ -169,7 +169,8 @@ export function bindClassifierFeedbackLabels(
     if (queue === undefined) {
       throw new Error(`No --queue file supplied for ${input.queue_filename}`);
     }
-    const items = queueMetadataRecord(queue).items as Record<string, unknown>[];
+    const metadata = queueMetadataRecord(queue);
+    const items = metadata.items as Record<string, unknown>[];
     const item = items.find((candidate) => candidate.source_item_id === input.source_item_id);
     if (item === undefined) {
       throw new Error(
@@ -209,10 +210,15 @@ export function bindClassifierFeedbackLabels(
       input.source_item_id
     );
     for (const field of ['profile_version', 'prompt_version', 'provider', 'model'] as const) {
-      requireExactQueueValue(item[field], input[field], field, input.source_item_id);
+      requireExactQueueValue(
+        queue.queue_version === 'tldr-commute-queue.v4' ? metadata[field] : item[field],
+        input[field],
+        field,
+        input.source_item_id
+      );
     }
     requireExactQueueValue(
-      item.route_version,
+      queue.queue_version === 'tldr-commute-queue.v4' ? metadata.route_version : item.route_version,
       input.route_version,
       'route_version',
       input.source_item_id

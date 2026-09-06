@@ -4,6 +4,8 @@ import { tmpdir } from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 
+import { playbackFileFingerprint } from '../src/commute/session-bundle.js';
+
 import {
   appendClassifierFeedbackLabels,
   bindClassifierFeedbackLabels,
@@ -34,6 +36,78 @@ test('binds exact corrections to a validated queue and derives stable label ids'
     bindClassifierFeedbackLabels(bareOrigin, [queueInput(bareOrigin)])[0]?.url,
     'https://example.com'
   );
+});
+
+test('binds v4 corrections using producer versions from the reference root', async () => {
+  const input = (await validInputs())[0]!;
+  const mainFilename = input.queue_filename;
+  const mode = input.original.consumption_depth === 'in_depth' ? 'In depth' : 'Headline only';
+  const prefix = `1 of 1. ${mode}. ${input.title}`;
+  const description = 'Sanitized fixture description.';
+  const main = {
+    sweep_playback: prefix,
+    items: [
+      {
+        item_playback:
+          input.original.consumption_depth === 'in_depth' ? `${prefix}\n${description}` : prefix,
+      },
+    ],
+  };
+  const reference = {
+    queue_version: 'tldr-commute-queue.v4',
+    main_filename: mainFilename,
+    main_sha256: playbackFileFingerprint(main),
+    newsletter: 'Sanitized Fixture',
+    edition_date: '2026-07-01',
+    source_email: {
+      gmail_message_id: 'fixture-message',
+      sender: 'TLDR <fixture@example.com>',
+      delivered_at: '2026-07-01T08:00:00Z',
+    },
+    total_items: 1,
+    profile_version: input.profile_version,
+    prompt_version: input.prompt_version,
+    provider: input.provider,
+    model: input.model,
+    parser_version: 'fixture-parser.v1',
+    route_version: input.route_version,
+    items: [
+      {
+        position: 1,
+        source_item_id: input.source_item_id,
+        title: input.title,
+        description,
+        author: null,
+        publication: null,
+        url: input.url,
+        interest_level: input.original.interest_level,
+        interest_score: input.original.interest_score,
+        consumption_depth: input.original.consumption_depth,
+        depth_score: input.original.depth_score,
+        commute_behavior: input.original.route,
+        signals: ['sanitized_fixture'],
+        reason: 'Sanitized original classifier reason.',
+        classified_at: '2026-07-01T11:00:00Z',
+        routed_at: '2026-07-01T11:00:01Z',
+      },
+    ],
+  };
+
+  const labels = bindClassifierFeedbackLabels(
+    [input],
+    [
+      {
+        filename: mainFilename,
+        text: JSON.stringify(main),
+        reference: {
+          filename: mainFilename.replace(/\.txt$/, '-reference.txt'),
+          text: JSON.stringify(reference),
+        },
+      },
+    ]
+  );
+  assert.equal(labels[0]?.profile_version, input.profile_version);
+  assert.equal(labels[0]?.route_version, input.route_version);
 });
 
 test('rejects wrong queue filenames, item ids, titles, URLs, and original classifier data', async () => {

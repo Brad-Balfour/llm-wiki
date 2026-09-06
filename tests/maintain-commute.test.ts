@@ -364,6 +364,8 @@ test('parses bundles, recovery queues, and an output directory in order', () => 
     'a.txt',
     '--recover-with',
     'queue-a.txt',
+    '--reference',
+    'queue-a-reference.txt',
     '--input',
     'b.txt',
     '--output-dir',
@@ -374,7 +376,11 @@ test('parses bundles, recovery queues, and an output directory in order', () => 
 
   assert.equal(options.kind, 'maintain');
   assert.deepEqual(options.kind === 'maintain' ? options.inputs : undefined, [
-    { bundle: 'a.txt', recoveryQueue: 'queue-a.txt' },
+    {
+      bundle: 'a.txt',
+      recoveryQueue: 'queue-a.txt',
+      recoveryReference: 'queue-a-reference.txt',
+    },
     { bundle: 'b.txt' },
   ]);
   assert.equal(options.kind === 'maintain' ? options.outputDir : undefined, '.private/out');
@@ -420,6 +426,21 @@ test('binds a recovery queue to the preceding bundle and only once', () => {
         '.private/out',
       ]),
     /at most one --recover-with queue/
+  );
+});
+
+test('binds a v4 reference only to a preceding recovery queue', () => {
+  assert.throws(
+    () =>
+      parseOptions([
+        '--input',
+        'a.txt',
+        '--reference',
+        'reference.txt',
+        '--output-dir',
+        '.private/out',
+      ]),
+    /requires a preceding --input and --recover-with/
   );
 });
 
