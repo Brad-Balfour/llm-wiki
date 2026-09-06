@@ -6,6 +6,7 @@ import {
   createQueueV4Snapshot,
   parseCommuteSessionBundleText,
   playbackFileFingerprint,
+  validateTldrCommuteDailyPairs,
   validateTldrCommuteQueuePair,
 } from '../src/commute/session-bundle.js';
 
@@ -33,6 +34,27 @@ function pair(itemCount = 2) {
           author_source: 'newsletter',
           publication_source: 'newsletter',
           lookup_attempts: 0,
+        },
+        source_occurrences: [
+          {
+            occurrence_id: `dev-example-${position}`,
+            newsletter: 'TLDR Dev',
+            source_item_id: `example-${position}`,
+            source_order: position,
+            title,
+            description,
+            url: `https://example.com/${position}`,
+          },
+        ],
+        selected_source_occurrence_id: `dev-example-${position}`,
+        coverage: {
+          status: 'original' as 'original' | 'deduplicated' | 'useful_update' | 'uncertain',
+          related_retained_item: null as null | {
+            main_filename: string;
+            source_item_id: string;
+          },
+          decision_reason: 'No repeated daily coverage found.',
+          update_note: null as string | null,
         },
         interest_level: 'interested',
         interest_score: 0.9,
@@ -62,6 +84,7 @@ function pair(itemCount = 2) {
       sender: 'TLDR Dev <dev@example.com>',
       delivered_at: '2026-09-06T07:00:00-04:00',
     },
+    daily_generation_id: '20260906-daily-tldr',
     total_items: itemCount,
     profile_version: 'interest-profile.v1.4',
     prompt_version: 'classifier-instructions.v1',
@@ -69,6 +92,13 @@ function pair(itemCount = 2) {
     model: 'project-model',
     parser_version: 'tldr-parser.v1',
     route_version: 'routing-rules.v1',
+    coverage_decisions: [] as Array<{
+      source_occurrence_id: string;
+      outcome: 'removed_exact_url' | 'removed_same_story' | 'kept_update' | 'kept_uncertain';
+      retained_item: { main_filename: string; source_item_id: string };
+      reason: string;
+      new_information: string | null;
+    }>,
     items: items.map((item) => item.reference),
   };
   return { main, reference };
@@ -321,5 +351,156 @@ test('rejects attribution sources with inconsistent lookup attempt counts', () =
   assert.throws(
     () => validateTldrCommuteQueuePair(failed.main, failed.reference),
     /must be 2 for a failed lookup after retry/
+  );
+});
+
+test('validates exact-URL and different-URL same-story removal across daily editions', () => {
+  for (const outcome of ['removed_exact_url', 'removed_same_story'] as const) {
+    const retained = pair(1);
+    const removed = pair(0);
+    removed.reference.main_filename = '20260906-tldr-ai.txt';
+    removed.reference.newsletter = 'TLDR AI';
+    removed.reference.source_email.gmail_message_id = `ai-${outcome}`;
+    const removedOccurrence = {
+      occurrence_id: `ai-${outcome}`,
+      newsletter: 'TLDR AI',
+      source_item_id: `ai-${outcome}`,
+      source_order: 1,
+      title: outcome === 'removed_exact_url' ? 'Example 1' : 'The same launch',
+      description: 'Alternate literal coverage of the same announcement.',
+      url:
+        outcome === 'removed_exact_url'
+          ? 'https://example.com/1'
+          : 'https://reporter.example.net/the-same-launch',
+    };
+    retained.reference.items[0]!.source_occurrences.push(removedOccurrence);
+    removed.reference.coverage_decisions.push({
+      source_occurrence_id: removedOccurrence.occurrence_id,
+      outcome,
+      retained_item: {
+        main_filename: retained.reference.main_filename,
+        source_item_id: retained.reference.items[0]!.source_item_id,
+      },
+      reason:
+        outcome === 'removed_exact_url'
+          ? 'The resolved destination URL is identical.'
+          : 'The two URLs cover the same announcement without additional facts.',
+      new_information: null,
+    });
+
+    assert.doesNotThrow(() =>
+      validateTldrCommuteDailyPairs([
+        {
+          mainFilename: retained.reference.main_filename,
+          playbackFile: retained.main,
+          referenceFile: retained.reference,
+        },
+        {
+          mainFilename: removed.reference.main_filename,
+          playbackFile: removed.main,
+          referenceFile: removed.reference,
+        },
+      ])
+    );
+  }
+});
+
+test('keeps a meaningful update and unrelated coverage while preserving daily links', () => {
+  const original = pair(1);
+  const update = pair(1);
+  update.reference.main_filename = '20260906-tldr-fintech.txt';
+  update.reference.newsletter = 'TLDR Fintech';
+  update.reference.source_email.gmail_message_id = 'fintech-update';
+  const updateItem = update.reference.items[0]!;
+  updateItem.source_item_id = 'fintech-update';
+  updateItem.url = 'https://finance.example.net/example-update';
+  updateItem.attribution.resolved_url = updateItem.url;
+  updateItem.source_occurrences[0]!.occurrence_id = 'fintech-update';
+  updateItem.source_occurrences[0]!.source_item_id = updateItem.source_item_id;
+  updateItem.source_occurrences[0]!.url = updateItem.url;
+  updateItem.selected_source_occurrence_id = 'fintech-update';
+  updateItem.coverage = {
+    status: 'useful_update',
+    related_retained_item: {
+      main_filename: original.reference.main_filename,
+      source_item_id: original.reference.items[0]!.source_item_id,
+    },
+    decision_reason: 'This report adds the announced price and launch date.',
+    update_note: 'Update: this report adds the announced price and launch date.',
+  };
+  update.reference.coverage_decisions.push({
+    source_occurrence_id: updateItem.source_occurrences[0]!.occurrence_id,
+    outcome: 'kept_update',
+    retained_item: {
+      main_filename: update.reference.main_filename,
+      source_item_id: updateItem.source_item_id,
+    },
+    reason: updateItem.coverage.decision_reason,
+    new_information: 'The announced price and launch date.',
+  });
+
+  const unrelated = pair(1);
+  unrelated.reference.main_filename = '20260906-tldr-ai.txt';
+  unrelated.reference.newsletter = 'TLDR AI';
+  unrelated.reference.source_email.gmail_message_id = 'ai-unrelated';
+  const unrelatedItem = unrelated.reference.items[0]!;
+  unrelatedItem.source_item_id = 'ai-unrelated';
+  unrelatedItem.url = 'https://ai.example.org/unrelated-research';
+  unrelatedItem.attribution.resolved_url = unrelatedItem.url;
+  unrelatedItem.source_occurrences[0]!.occurrence_id = 'ai-unrelated';
+  unrelatedItem.source_occurrences[0]!.source_item_id = unrelatedItem.source_item_id;
+  unrelatedItem.source_occurrences[0]!.url = unrelatedItem.url;
+  unrelatedItem.selected_source_occurrence_id = 'ai-unrelated';
+
+  assert.doesNotThrow(() =>
+    validateTldrCommuteDailyPairs([
+      {
+        mainFilename: original.reference.main_filename,
+        playbackFile: original.main,
+        referenceFile: original.reference,
+      },
+      {
+        mainFilename: update.reference.main_filename,
+        playbackFile: update.main,
+        referenceFile: update.reference,
+      },
+      {
+        mainFilename: unrelated.reference.main_filename,
+        playbackFile: unrelated.main,
+        referenceFile: unrelated.reference,
+      },
+    ])
+  );
+});
+
+test('rejects missing retained targets and occurrence ownership across daily pairs', () => {
+  const retained = pair(1);
+  const removed = pair(0);
+  removed.reference.main_filename = '20260906-tldr-ai.txt';
+  removed.reference.coverage_decisions.push({
+    source_occurrence_id: 'missing-occurrence',
+    outcome: 'removed_same_story',
+    retained_item: {
+      main_filename: retained.reference.main_filename,
+      source_item_id: retained.reference.items[0]!.source_item_id,
+    },
+    reason: 'Invented broken relationship.',
+    new_information: null,
+  });
+  assert.throws(
+    () =>
+      validateTldrCommuteDailyPairs([
+        {
+          mainFilename: retained.reference.main_filename,
+          playbackFile: retained.main,
+          referenceFile: retained.reference,
+        },
+        {
+          mainFilename: removed.reference.main_filename,
+          playbackFile: removed.main,
+          referenceFile: removed.reference,
+        },
+      ]),
+    /is not stored on retained item/
   );
 });

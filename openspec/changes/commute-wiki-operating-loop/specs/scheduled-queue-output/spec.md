@@ -24,6 +24,30 @@ create both files for each qualifying source email directly in Project Library.
 - **AND** it SHALL reuse that result for duplicate URL occurrences
 - **AND** one inaccessible source SHALL not block other articles or editions.
 
+### Requirement: Daily V4 Output Reconciles Repeated Coverage
+
+The scheduled Project generation pass SHALL retrieve all qualifying editions
+before rendering and SHALL play redundant daily coverage only once.
+
+#### Scenario: Reconcile exact duplicates, repeated stories, and updates
+
+- **WHEN** multiple editions contain the same resolved URL or different URLs
+  covering the same event or announcement
+- **THEN** generation SHALL classify each distinct URL once
+- **AND** it SHALL remove coverage that adds no useful facts
+- **AND** it SHALL retain material new information as a prepared update
+- **AND** it SHALL retain and flag uncertain relationships
+- **AND** sharing a topic or company alone SHALL NOT establish a duplicate
+- **AND** it SHALL prefer the occurrence with the most useful literal source text.
+
+#### Scenario: Record daily coverage decisions
+
+- **WHEN** generation removes or relates a source occurrence
+- **THEN** the reference files SHALL retain every occurrence and original description
+- **AND** each decision SHALL name its retained file and item, reason, and any new information
+- **AND** a fully removed edition SHALL still produce a valid empty pair
+- **AND** positions, totals, sweeps, and hashes SHALL be rebuilt after removal.
+
 ### Requirement: Observable Queue Artifact Output
 
 The scheduled queue-generation workflow SHALL create one real downloadable

@@ -77,6 +77,13 @@ export interface QueueV4Pair {
   referenceFile: Record<string, unknown>;
 }
 
+export interface DailyQueueV4PairInput {
+  mainFilename: string;
+  referenceFilename?: string;
+  playbackFile: unknown;
+  referenceFile: unknown;
+}
+
 interface QueueItemIndex {
   byId: Map<string, QueueItemIdentity>;
   ordered: QueueItemIdentity[];
@@ -330,6 +337,7 @@ export function validateTldrCommuteQueuePair(
       'newsletter',
       'edition_date',
       'source_email',
+      'daily_generation_id',
       'total_items',
       'profile_version',
       'prompt_version',
@@ -337,6 +345,7 @@ export function validateTldrCommuteQueuePair(
       'model',
       'parser_version',
       'route_version',
+      'coverage_decisions',
       'items',
     ],
     'reference_file'
@@ -367,6 +376,7 @@ export function validateTldrCommuteQueuePair(
   requireString(reference.newsletter, 'reference_file.newsletter');
   requireDate(reference.edition_date, 'reference_file.edition_date');
   validateSourceEmail(reference.source_email, 'tldr-commute-queue.v4');
+  requireString(reference.daily_generation_id, 'reference_file.daily_generation_id');
   for (const field of [
     'profile_version',
     'prompt_version',
@@ -409,6 +419,27 @@ export function validateTldrCommuteQueuePair(
     identities.map((item) => item.url),
     'reference_file.items[].url'
   );
+  const decisions = requireArray(
+    reference.coverage_decisions,
+    'reference_file.coverage_decisions'
+  ).map((candidate, index) =>
+    validateCoverageDecision(candidate, `reference_file.coverage_decisions[${index}]`)
+  );
+  requireUniqueStrings(
+    decisions.map((decision) => decision.sourceOccurrenceId),
+    'reference_file.coverage_decisions[].source_occurrence_id'
+  );
+  const localItemIds = new Set(identities.map((item) => item.source_item_id));
+  for (const decision of decisions) {
+    if (
+      decision.retainedMainFilename === declaredMainFilename &&
+      !localItemIds.has(decision.retainedSourceItemId)
+    ) {
+      throw new Error(
+        `reference_file.coverage_decisions retained item ${decision.retainedSourceItemId} does not exist in ${declaredMainFilename}`
+      );
+    }
+  }
   const expectedSweep = referenceItems
     .map((candidate, index) => {
       const item = requireRecord(candidate, `reference_file.items[${index}]`);
@@ -431,6 +462,86 @@ export function validateTldrCommuteQueuePair(
     throw new Error('playback_file.sweep_playback must equal the deterministic v4 sweep');
   }
   return { playbackFile: playback, referenceFile: reference };
+}
+
+export function validateTldrCommuteDailyPairs(candidates: DailyQueueV4PairInput[]): QueueV4Pair[] {
+  const pairs = candidates.map((candidate) =>
+    validateTldrCommuteQueuePair(
+      candidate.playbackFile,
+      candidate.referenceFile,
+      candidate.mainFilename,
+      candidate.referenceFilename
+    )
+  );
+  if (pairs.length === 0) return pairs;
+
+  const generationIds = new Set(
+    pairs.map((pair) =>
+      requireString(pair.referenceFile.daily_generation_id, 'daily_generation_id')
+    )
+  );
+  const editionDates = new Set(
+    pairs.map((pair) => requireDate(pair.referenceFile.edition_date, 'edition_date'))
+  );
+  if (generationIds.size !== 1 || editionDates.size !== 1) {
+    throw new Error('Daily v4 pairs must share one daily_generation_id and edition_date');
+  }
+
+  const retainedItems = new Map<string, Set<string>>();
+  const occurrenceOwners = new Map<string, string>();
+  for (const pair of pairs) {
+    const filename = requireString(
+      pair.referenceFile.main_filename,
+      'reference_file.main_filename'
+    );
+    if (retainedItems.has(filename)) throw new Error(`Duplicate daily main filename: ${filename}`);
+    const itemIds = new Set<string>();
+    for (const [index, candidate] of requireArray(pair.referenceFile.items, 'items').entries()) {
+      const item = requireRecord(candidate, `items[${index}]`);
+      const itemId = requireString(item.source_item_id, `items[${index}].source_item_id`);
+      itemIds.add(itemId);
+      for (const [occurrenceIndex, occurrenceCandidate] of requireArray(
+        item.source_occurrences,
+        `items[${index}].source_occurrences`
+      ).entries()) {
+        const occurrence = requireRecord(
+          occurrenceCandidate,
+          `items[${index}].source_occurrences[${occurrenceIndex}]`
+        );
+        const occurrenceId = requireString(occurrence.occurrence_id, 'occurrence_id');
+        const owner = `${filename}#${itemId}`;
+        const priorOwner = occurrenceOwners.get(occurrenceId);
+        if (priorOwner !== undefined && priorOwner !== owner) {
+          throw new Error(`Source occurrence ${occurrenceId} is retained by multiple daily items`);
+        }
+        occurrenceOwners.set(occurrenceId, owner);
+      }
+    }
+    retainedItems.set(filename, itemIds);
+  }
+
+  for (const pair of pairs) {
+    for (const [index, candidate] of requireArray(
+      pair.referenceFile.coverage_decisions,
+      'coverage_decisions'
+    ).entries()) {
+      const decision = validateCoverageDecision(candidate, `coverage_decisions[${index}]`);
+      const targetIds = retainedItems.get(decision.retainedMainFilename);
+      if (targetIds === undefined || !targetIds.has(decision.retainedSourceItemId)) {
+        throw new Error(
+          `Coverage decision target ${decision.retainedMainFilename}#${decision.retainedSourceItemId} does not exist in the daily pairs`
+        );
+      }
+      const owner = occurrenceOwners.get(decision.sourceOccurrenceId);
+      const expectedOwner = `${decision.retainedMainFilename}#${decision.retainedSourceItemId}`;
+      if (owner !== expectedOwner) {
+        throw new Error(
+          `Coverage decision occurrence ${decision.sourceOccurrenceId} is not stored on retained item ${expectedOwner}`
+        );
+      }
+    }
+  }
+  return pairs;
 }
 
 /** Validate the single queue contract without requiring a session bundle. */
@@ -672,6 +783,9 @@ function validateQueueV4ReferenceItem(
       'publication',
       'attribution',
       'url',
+      'source_occurrences',
+      'selected_source_occurrence_id',
+      'coverage',
       'interest_level',
       'interest_score',
       'consumption_depth',
@@ -691,13 +805,39 @@ function validateQueueV4ReferenceItem(
   const description = requireString(record.description, `${itemPath}.description`);
   const author = requireString(record.author, `${itemPath}.author`);
   const publication = requireString(record.publication, `${itemPath}.publication`);
-  validateAttribution(
-    record.attribution,
-    itemPath,
-    author,
-    publication,
-    identityUrl(record.url, itemPath)
+  const url = identityUrl(record.url, itemPath);
+  validateAttribution(record.attribution, itemPath, author, publication, url);
+  const occurrences = requireArray(record.source_occurrences, `${itemPath}.source_occurrences`).map(
+    (occurrence, index) =>
+      validateSourceOccurrence(occurrence, `${itemPath}.source_occurrences[${index}]`)
   );
+  if (occurrences.length === 0) {
+    throw new Error(`${itemPath}.source_occurrences must contain at least one occurrence`);
+  }
+  requireUniqueStrings(
+    occurrences.map((occurrence) => occurrence.occurrenceId),
+    `${itemPath}.source_occurrences[].occurrence_id`
+  );
+  const selectedOccurrenceId = requireString(
+    record.selected_source_occurrence_id,
+    `${itemPath}.selected_source_occurrence_id`
+  );
+  const selectedOccurrence = occurrences.find(
+    (occurrence) => occurrence.occurrenceId === selectedOccurrenceId
+  );
+  if (selectedOccurrence === undefined) {
+    throw new Error(`${itemPath}.selected_source_occurrence_id must name a source occurrence`);
+  }
+  const sourceItemId = requireString(record.source_item_id, `${itemPath}.source_item_id`);
+  if (
+    selectedOccurrence.sourceItemId !== sourceItemId ||
+    selectedOccurrence.title !== title ||
+    selectedOccurrence.description !== description ||
+    selectedOccurrence.url !== url
+  ) {
+    throw new Error(`${itemPath} must copy identity and source text from its selected occurrence`);
+  }
+  validateItemCoverage(record.coverage, `${itemPath}.coverage`);
   requireEnum(
     record.interest_level,
     ['interested', 'maybe', 'uninterested'] as const,
@@ -716,11 +856,133 @@ function validateQueueV4ReferenceItem(
   requireDateTime(record.classified_at, `${itemPath}.classified_at`);
   requireDateTime(record.routed_at, `${itemPath}.routed_at`);
   const identity = {
-    source_item_id: requireString(record.source_item_id, `${itemPath}.source_item_id`),
+    source_item_id: sourceItemId,
     title,
-    url: requireHttpUrl(record.url, `${itemPath}.url`),
+    url,
   };
   return { identity, title, description, consumptionDepth };
+}
+
+interface ValidatedSourceOccurrence {
+  occurrenceId: string;
+  sourceItemId: string;
+  title: string;
+  description: string;
+  url: string;
+}
+
+function validateSourceOccurrence(candidate: unknown, field: string): ValidatedSourceOccurrence {
+  const record = requireRecord(candidate, field);
+  rejectUnknownKeys(
+    record,
+    [
+      'occurrence_id',
+      'newsletter',
+      'source_item_id',
+      'source_order',
+      'title',
+      'description',
+      'url',
+    ],
+    field
+  );
+  const sourceOrder = requirePositiveInteger(record.source_order, `${field}.source_order`);
+  if (sourceOrder < 1) throw new Error(`${field}.source_order must be positive`);
+  requireString(record.newsletter, `${field}.newsletter`);
+  return {
+    occurrenceId: requireString(record.occurrence_id, `${field}.occurrence_id`),
+    sourceItemId: requireString(record.source_item_id, `${field}.source_item_id`),
+    title: requireString(record.title, `${field}.title`),
+    description: requireString(record.description, `${field}.description`),
+    url: requireHttpUrl(record.url, `${field}.url`),
+  };
+}
+
+function validateRetainedItem(
+  candidate: unknown,
+  field: string
+): {
+  mainFilename: string;
+  sourceItemId: string;
+} {
+  const record = requireRecord(candidate, field);
+  rejectUnknownKeys(record, ['main_filename', 'source_item_id'], field);
+  return {
+    mainFilename: requireString(record.main_filename, `${field}.main_filename`),
+    sourceItemId: requireString(record.source_item_id, `${field}.source_item_id`),
+  };
+}
+
+function validateNullableText(candidate: unknown, field: string): string | null {
+  if (candidate === null) return null;
+  return requireString(candidate, field);
+}
+
+function validateItemCoverage(candidate: unknown, field: string): void {
+  const record = requireRecord(candidate, field);
+  rejectUnknownKeys(
+    record,
+    ['status', 'related_retained_item', 'decision_reason', 'update_note'],
+    field
+  );
+  const status = requireEnum(
+    record.status,
+    ['original', 'deduplicated', 'useful_update', 'uncertain'] as const,
+    `${field}.status`
+  );
+  const related =
+    record.related_retained_item === null
+      ? null
+      : validateRetainedItem(record.related_retained_item, `${field}.related_retained_item`);
+  requireString(record.decision_reason, `${field}.decision_reason`);
+  const updateNote = validateNullableText(record.update_note, `${field}.update_note`);
+  if (status === 'original' && (related !== null || updateNote !== null)) {
+    throw new Error(`${field} original items must not name a related item or update note`);
+  }
+  if ((status === 'useful_update' || status === 'uncertain') && related === null) {
+    throw new Error(`${field} ${status} items must name the related retained item`);
+  }
+  if (status === 'useful_update' && updateNote === null) {
+    throw new Error(`${field} useful updates must include update_note`);
+  }
+  if (status !== 'useful_update' && updateNote !== null) {
+    throw new Error(`${field} update_note is only allowed for useful updates`);
+  }
+}
+
+function validateCoverageDecision(
+  candidate: unknown,
+  field: string
+): {
+  sourceOccurrenceId: string;
+  retainedMainFilename: string;
+  retainedSourceItemId: string;
+} {
+  const record = requireRecord(candidate, field);
+  rejectUnknownKeys(
+    record,
+    ['source_occurrence_id', 'outcome', 'retained_item', 'reason', 'new_information'],
+    field
+  );
+  const outcome = requireEnum(
+    record.outcome,
+    ['removed_exact_url', 'removed_same_story', 'kept_update', 'kept_uncertain'] as const,
+    `${field}.outcome`
+  );
+  const target = validateRetainedItem(record.retained_item, `${field}.retained_item`);
+  requireString(record.reason, `${field}.reason`);
+  const newInformation = validateNullableText(record.new_information, `${field}.new_information`);
+  if (outcome === 'kept_update' && newInformation === null) {
+    throw new Error(`${field}.new_information is required for a kept update`);
+  }
+  if (outcome !== 'kept_update' && newInformation !== null) {
+    throw new Error(`${field}.new_information is only allowed for a kept update`);
+  }
+  return {
+    sourceOccurrenceId: requireString(record.source_occurrence_id, `${field}.source_occurrence_id`),
+    retainedMainFilename: target.mainFilename,
+    retainedSourceItemId: target.sourceItemId,
+  };
 }
 
 function identityUrl(candidate: unknown, itemPath: string): string {

@@ -64,6 +64,7 @@ test('binds v4 corrections using producer versions from the reference root', asy
       sender: 'TLDR <fixture@example.com>',
       delivered_at: '2026-07-01T08:00:00Z',
     },
+    daily_generation_id: '20260701-daily-tldr',
     total_items: 1,
     profile_version: input.profile_version,
     prompt_version: input.prompt_version,
@@ -71,6 +72,7 @@ test('binds v4 corrections using producer versions from the reference root', asy
     model: input.model,
     parser_version: 'fixture-parser.v1',
     route_version: input.route_version,
+    coverage_decisions: [],
     items: [
       {
         position: 1,
@@ -85,6 +87,24 @@ test('binds v4 corrections using producer versions from the reference root', asy
           author_source: 'no_authors_listed',
           publication_source: 'hostname_fallback',
           lookup_attempts: 1,
+        },
+        source_occurrences: [
+          {
+            occurrence_id: `fixture-${input.source_item_id}`,
+            newsletter: 'Sanitized Fixture',
+            source_item_id: input.source_item_id,
+            source_order: 1,
+            title: input.title,
+            description,
+            url: input.url,
+          },
+        ],
+        selected_source_occurrence_id: `fixture-${input.source_item_id}`,
+        coverage: {
+          status: 'original',
+          related_retained_item: null,
+          decision_reason: 'No repeated daily coverage found.',
+          update_note: null,
         },
         interest_level: input.original.interest_level,
         interest_score: input.original.interest_score,

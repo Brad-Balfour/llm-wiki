@@ -17,6 +17,20 @@ the strings spoken by default from reference metadata.
 - **AND** validation SHALL recompute the sweep, item strings, positions, counts,
   filename, and canonical main hash.
 
+### Requirement: Queue V4 Renders After Daily Coverage Reconciliation
+
+Queue v4 playback SHALL be rendered only after exact duplicates and repeated
+story decisions have been applied across the day's editions.
+
+#### Scenario: Rebuild playback after a removal
+
+- **WHEN** one or more source occurrences are removed as redundant coverage
+- **THEN** the retained occurrence SHALL remain in the newsletter whose literal
+  source text was selected
+- **AND** every affected queue SHALL have contiguous positions and corrected totals
+- **AND** its sweep and item playback SHALL be regenerated from those final positions
+- **AND** a queue with no retained items SHALL use an empty sweep and item array.
+
 #### Scenario: Read historical playback
 
 - **WHEN** local tools receive a valid v2 or v3 queue or bundle

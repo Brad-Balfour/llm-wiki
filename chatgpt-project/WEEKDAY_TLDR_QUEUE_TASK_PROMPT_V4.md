@@ -8,13 +8,22 @@
 Using the Gmail connector, find all direct TLDR General, Dev, AI, and Fintech
 newsletter emails delivered on the day this task runs. Follow the LLM-Wiki-Car
 Project's v4 queue-generation instructions and the attached playback and
-reference schemas. Create one matching playback/reference pair per source
-newsletter and place both real .txt files directly in this Project Library.
+reference schemas. Retrieve and extract all editions before rendering any one
+of them. Create one matching playback/reference pair per source newsletter and
+place both real .txt files directly in this Project Library.
 
 Resolve each distinct original article URL and fill attribution before
 classification, following the Project's retry, no-byline, failure, and hostname
 fallback rules. Reuse the lookup across duplicate URL occurrences and continue
 other articles when one lookup fails.
+
+Group exact resolved URLs across the whole day and classify each distinct URL
+once. Then compare different URLs for the same event or announcement. Remove
+only redundant coverage, keep material new information as a prepared update,
+and retain and flag uncertain relationships. Prefer the occurrence with the
+most useful literal source text. Preserve every occurrence and removal decision
+in the references, rebuild queue positions and sweeps, and include the required
+private repeated-coverage review table in the run result.
 
 Use the source email's America/New_York delivery date in each filename. The main
 file keeps the normal YYYYMMDD-tldr[-edition].txt name and contains only
