@@ -1,6 +1,6 @@
-# Brad TLDR Interest Profile v1.4
+# Brad TLDR Interest Profile v2.0
 
-Version: `1.4`
+Version: `2.0`
 Scope: TLDR newsletters only for the MVP (`TLDR`, `TLDR AI`, `TLDR Dev`,
 `TLDR Fintech`).
 
@@ -17,7 +17,13 @@ central to the title and summary.
 - Practical AI-agent engineering workflows: coding agent harnesses, multi-agent
   collaboration, human/agent parallel work, review bottlenecks, orchestration
   tools, agent loops, context management, QA, evals, prompt debt, and AI-native
-  developer workflows that connect to daily work.
+  developer workflows that connect to daily work. Concrete harness, plugin,
+  code-review, documentation, and quality-control techniques are stronger than
+  generic agent product launches.
+- Articles by Martin Fowler default to high interest and in-depth because Brad
+  wants his arguments and examples, not only awareness of the headline.
+- Articles by Addy Osmani have a strong interest prior. Choose depth from the
+  article's substance; this preference is not a blanket in-depth rule.
 - AI plus trust, authenticity, governance, verification, enterprise adoption, and
   sovereignty, especially when connected to fintech or high-stakes product
   decisions.
@@ -31,6 +37,8 @@ central to the title and summary.
   reliability decisions with product consequences.
 - General software-engineering craft, software history, career development, and
   computing-culture essays when framed as an argument with transferable insight.
+  Substantive craftsmanship, migration, progressive-enhancement, browser UI,
+  and low-JavaScript architecture pieces are usually worth in-depth treatment.
   Dry organizational news does not qualify by subject alone.
 - AI's effect on software engineering practice, engineering roles, taste,
   judgment, labor markets, code quality, and the AI-native productivity divide.
@@ -43,9 +51,11 @@ central to the title and summary.
   weak matches unless they include one of those hooks.
 - Frontend and web engineering tradeoffs Brad may apply, such as practical state
   management, browser architecture choices, UX engineering, and tool selection.
-- Robots, physical AI, novel autonomous vehicles, and AI-embedded devices when
-  the story is about a genuine technical/product capability rather than generic
-  company finance.
+- Robots, physical AI, self-driving vehicles, and AI-embedded devices when the
+  story is about a genuine technical/product capability rather than generic
+  company finance. Tesla and Waymo self-driving developments are explicit strong
+  interests. Prefer in-depth for engineering, deployment, reliability, fleet,
+  or adoption detail; shallow launch awareness can remain headline-only.
 - Novel human-computer interfaces, including brain-computer interfaces and
   interaction models that change how people work with computers.
 - Macro AI economics and AI strategy essays with real analytical substance:
@@ -84,8 +94,8 @@ Items matching these lanes should receive low interest scores unless the item ha
 a strong independent product, engineering, governance, or scientific lesson.
 
 - AI chip, GPU, accelerator, and hardware announcements.
-- SQL/database-specific internals and narrow database tooling, even when framed
-  as AI-assisted engineering.
+- SQL/database-specific internals and narrow database tooling, including DuckDB
+  product news, even when framed as AI-assisted engineering.
 - Raw ML training-infrastructure optimization internals, including low-level
   fine-tuning, expert parallelism, kernels, distributed training plumbing, and
   benchmark minutiae.
@@ -104,8 +114,11 @@ a strong independent product, engineering, governance, or scientific lesson.
 - Consumer hardware leaks, phone rumors, clickbait devices, and vague product
   teases.
 - Tools and stacks Brad does not personally use when the tool itself is the
-  point, including Cursor, Vercel, Deno, PyTorch, Lean, Android-specific tooling,
-  and generic framework announcements.
+  point, including Cursor, Vercel, Deno, Bun, PyTorch, Lean, Android-specific
+  tooling, and generic framework announcements.
+- Commodity battery-product blurbs and vague battery-improvement claims. A
+  concrete fundamental-science or capability breakthrough can still qualify
+  under the tentative science lane.
 - General space-industry finance, launch, satellite, and IPO/business analysis
   unless the item contains a novel device, vehicle, AI capability, or strongly
   opinionated technical/product lesson.
@@ -126,3 +139,25 @@ Do not store private Range.com notes, sensitive freeform context, raw Gmail
 bodies, credentials, or unreviewed work material in committed artifacts. If an
 item appears work-relevant but sensitive, surface it for review rather than
 public wiki promotion.
+
+## Depth Calibration Anchors
+
+Use these verified corrections as category boundaries, not title-matching rules:
+
+- Practical agent and AI-assisted engineering items deserve in-depth treatment
+  when their descriptions promise reusable harness, plugin, review, context,
+  documentation, or quality methods. The Sol Ultrafast, Agent Plugins, DeepSeek
+  Harness, Slack Code, Fig, and Claude Cowork corrections exemplify that pattern.
+- Software-craft and applicable web-engineering pieces deserve in-depth treatment
+  when the source contains an argument, migration method, or architecture lesson.
+  The HTMX forms, HTML over WebSockets, software craftsmanship, Sass migration,
+  AcceptMarkdown, Saggar, and TermDOM corrections exemplify that pattern.
+- Robotics and self-driving pieces deserve in-depth treatment when they contain
+  capability, engineering, deployment, or adoption detail. Matic, the Waymo chip,
+  and London robotaxi corrections exemplify that pattern.
+- Hardware is not automatically deep or interesting. The Anthropic lab-hardware
+  correction was about operational substance at a closely tracked AI company;
+  it does not reverse the general negative prior for chip and hardware blurbs.
+
+Named examples clarify the evidence behind a rule. Apply the rule to the actual
+title, description, and verified attribution; do not classify by title lookup.

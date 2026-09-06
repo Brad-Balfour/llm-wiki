@@ -32,8 +32,10 @@ queue schema with `queue-generation-v4.md`,
 `tldr-commute-reference-v4.schema.json`; replace `session-export.md` and
 `commute-session-bundle-v1.schema.json`; and replace the existing weekday Task
 body with `WEEKDAY_TLDR_QUEUE_TASK_PROMPT_V4.md`. Later PRs in the stack name
-the candidate classifier/profile replacements. Keep the Task's weekday 11 a.m.
-America/New_York schedule and all unrelated working Project sources.
+the candidate classifier/profile replacements: `interest-profile.md` version
+2.0 and `classifier-instructions.md` version `classifier-instructions.v2`. Keep
+the Task's weekday 11 a.m. America/New_York schedule and all unrelated working
+Project sources.
 
 Until Brad confirms those replacements, Queue v3, Prompt 4.2, profile 1.4,
 classifier instructions v1, and the v3 Task body remain the live versions.

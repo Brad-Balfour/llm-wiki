@@ -75,14 +75,14 @@ duplicate instances.
 The system SHALL preserve clean validation data unless Brad explicitly changes
 the validation plan.
 
-#### Scenario: Encounter July 3 plus TLDR emails
+#### Scenario: Assign classifier review material
 
-- **WHEN** direct TLDR emails dated July 3, 2026 or later are available for
-  ingestion, fixtures, tuning, or validation
-- **THEN** the workflow SHALL treat them as the next clean validation holdout by
-  default
-- **AND** the workflow SHALL NOT mix them into profile tuning, calibration, or
-  implementation fixtures unless Brad explicitly changes that decision.
+- **WHEN** source-confirmed TLDR articles are selected for classifier review
+- **THEN** the workflow SHALL record an explicit `development` or `final_check`
+  assignment before tuning
+- **AND** related stories SHALL not cross those assignments
+- **AND** every editorial candidate SHALL be accounted for as labeled, excluded
+  with a reason, or failed at a named step.
 
 ### Requirement: Parse Failures Route To Review
 
@@ -96,4 +96,3 @@ The ingestion workflow SHALL fail closed when TLDR parsing is ambiguous.
   context for manual inspection
 - **AND** the content SHALL NOT be silently discarded or promoted to a source
   record.
-

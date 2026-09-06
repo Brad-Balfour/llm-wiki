@@ -1,7 +1,7 @@
 # TLDR Classifier Instructions
 
-Version: `classifier-instructions.v1`
-Profile version: `1.4`
+Version: `classifier-instructions.v2`
+Profile version: `2.0`
 Scope: Source-neutral classification of parsed TLDR editorial items.
 
 The classifier emits only a source-neutral request reference plus interest and
@@ -148,12 +148,17 @@ automatic surfacing.
 
 1. Read the title, summary, and verified attribution against
    `schema/interest-profile.md`.
-2. Assign `interest_score` from `0.0` to `1.0`.
-3. Set `interest_level` from the configured interest score band.
-4. Assign `depth_score` independently from `0.0` to `1.0`.
-5. Set `consumption_depth` from the configured depth score band.
-6. Emit short `signals` that name the strongest profile/depth cues.
-7. Emit a concise `reason` that explains the source-neutral judgment.
+2. Apply an explicit verified-author preference only when that person or
+   organization is the article's byline. Do not infer it from a name in the
+   title or summary.
+3. Assign `interest_score` from `0.0` to `1.0`. A concrete strong positive can
+   outweigh a broad negative lane; a generic mention of a favored topic cannot.
+4. Set `interest_level` from the configured interest score band.
+5. Assign `depth_score` independently from `0.0` to `1.0`, based on the likely
+   value beyond the supplied summary. Do not copy the interest score.
+6. Set `consumption_depth` from the configured depth score band.
+7. Emit short `signals` that name the strongest profile/depth cues.
+8. Emit a concise `reason` that explains the source-neutral judgment.
 
 ## Headline-Only Signals
 
@@ -179,7 +184,7 @@ Never use `headline_only` as a synonym for `uninterested`.
 Prefer `in_depth` when the linked item likely contains:
 
 - Practical AI-assisted engineering techniques, agent loops, evals, QA, review,
-  context management, or workflow changes.
+  context management, documentation, plugin/harness design, or workflow changes.
 - Product/design judgment, taste, usability, experimentation, or technical
   communication with transferable lessons.
 - AI strategy, token economics, routing, moats, pricing, governance, or business
@@ -188,8 +193,14 @@ Prefer `in_depth` when the linked item likely contains:
   high-stakes automation patterns.
 - Frontend, web, or software architecture guidance Brad may apply.
 - Computing-culture, software-history, or career essays with reusable framing.
+- Software craftsmanship, progressive enhancement, migration, browser UI, or
+  low-JavaScript architecture with a concrete argument or applicable method.
 - Major physical-AI, fusion, bioscience, or fundamental-science capability
   changes where the details matter.
+
+An unfamiliar tool name does not establish depth. Conversely, a short or generic
+title does not make a practical article shallow when its description promises
+methods, examples, tradeoffs, or deployment evidence.
 
 ## Forbidden Output Fields
 
@@ -246,16 +257,24 @@ Provider/model metadata is added by application code outside the model output:
 
 For blind validation rounds:
 
-1. Generate predictions and save them to a fixed file before Brad labels items.
-2. Do not expose predictions during label collection.
-3. Collect labels independently for interest and depth.
-4. Preserve cross-edition duplicate instances.
-5. Compare interest and depth separately.
-6. Categorize product harm as false skips, false discusses, pacing errors, and
-   lower-harm label disagreements.
-7. Treat false skips as the highest-priority product harm.
-8. Keep July 3, 2026 and later direct TLDR emails as the next clean holdout
-   unless Brad explicitly changes the validation plan.
+1. Assign every source-confirmed article to `development` or `final_check` before
+   tuning. Keep closely related stories in the same assignment.
+2. Generate baseline and candidate predictions from the same prediction-only
+   input and save each to a fixed private file before Brad labels final-check
+   items. Prediction inputs never contain Brad's labels.
+3. Generate the labeling page from the article inventory alone. Do not expose
+   either prediction file, model reasons, or scores during label collection.
+4. Collect labels independently for interest and depth and allow `unsure`.
+5. Preserve every newsletter occurrence in the inventory, but count an exact
+   duplicate article once in comparison metrics.
+6. Compare interest and depth separately. Report missing labels and predictions
+   rather than treating them as correct.
+7. Categorize product harm as false skips, missed depth, unwanted in-depth items,
+   and lower-harm disagreements. Treat false skips as highest priority and retain
+   score distance from the configured thresholds.
+8. Keep problem-focused examples separate from ordinary articles in the report.
+   Final-check items become development evidence if their answers cause tuning;
+   reserve fresh items before making another final claim.
 
 Do not patch the canonical interest profile from a single weak or noisy
 disagreement. Use repeated, high-harm, or clearly explanatory correction patterns.
