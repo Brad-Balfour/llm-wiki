@@ -5,26 +5,25 @@ all 16 open issues, their 74 comments, and commute feedback through September 4,
 [detailed log review](commute-log-review.md) and
 [implementation and evaluation plan](implementation-plan.md).
 
-The proposed release has **four improvements**, not ten new product features.
-The remaining work supplies evidence for those changes or preserves the current
-workflow. Existing requirement IDs are retained so review comments and plan
-references still match.
+R1–R4 describe the four proposed improvements. R5–R7 supply the records and
+verified feedback needed to test them. Part 2 contains the behavior to preserve
+and review rules (R8–R10).
 
 ## Part 1 — New improvements and the work needed to test them
 
 | Improvement                          | What changes                                                                                                                          | Requirement / proposed PRs |
 | ------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------- | -------------------------- |
-| Two-file queue                       | Produce a lean playback file and a matching `-reference` file together. Voice loads the reference only for requested article details. | R9 / P10                   |
-| Daily duplicate removal              | Identify the same article across all newsletters, classify it once and play it once while retaining every source.                     | R6 / P8a–P8b               |
-| Better classification                | Revise interest/depth rules using verified feedback and compare results with Brad’s blind answers and a separate final test set.      | R5 / P3, P6–P7             |
-| Useful context for unclear headlines | Test a short literal excerpt for titles that do not explain what an article is about, without changing depth labels.                  | R7 / P9                    |
+| Two-file queue                       | Produce a lean playback file and a matching `-reference` file together. Voice loads the reference only for requested article details. | R1 / P10                   |
+| Daily duplicate removal              | Identify the same article across all newsletters, classify it once and play it once while retaining every source.                     | R2 / P8a–P8b               |
+| Better classification                | Revise interest/depth rules using verified feedback and compare results with Brad’s blind answers and a separate final test set.      | R3 / P3, P6–P7             |
+| Useful context for unclear headlines | Test a short literal excerpt for titles that do not explain what an article is about, without changing depth labels.                  | R4 / P9                    |
 
 The fourth is a separate presentation experiment; it need not delay the other
 three. Reading the original description on request already works and is not a
 new feature.
 
 There is also supporting work: explain missing articles, collect usable historical
-feedback, and save enough information to rerun and compare results (R1/R2/R4;
+feedback, and save enough information to rerun and compare results (R5/R6/R7;
 P1–P2). Those tools are not all implemented today. The local queue generator in
 P4 supports repeatable tests and the new output formats; it is not a commitment
 to replace the daily Project workflow. A local model integration or replacement
@@ -40,7 +39,7 @@ Priority levels: P0 establishes usable evidence and keeps commutes working;
 P1 adds measured improvements; P2 denotes a separate experiment. These priorities
 are distinct from the P0–P11 PR identifiers in the implementation plan.
 
-### R9 — Separate the playback text from article details and test it in Voice (P1; #100, #120)
+### R1 — Separate the playback text from article details and test it in Voice (P1; #100, #120)
 
 Produce both JSON files together from the same queue, using the same filename
 prefix. They remain separate files. The main file is deliberately small:
@@ -121,8 +120,10 @@ Acceptance:
   a reference must not change which article is current. Check that both files
   are available in the same Project from the phone.
 - Compare the current single file against the two-file version with identical
-  scores, article order, sweep and item text. Keep the short-description trial
-  in R7 separate so a result can be attributed to the file split.
+  scores, article order, sweep and item text. Repeat across multiple dates and
+  editions, including short and long queues; no single queue establishes the
+  result. Keep the short-description trial
+  in R4 separate so a result can be attributed to the file split.
 - Test actual iPhone Voice through a long session: opening sweep, next/back/jump,
   a details request that opens the reference, and a return to
   several ordinary advances. Check that the main file supplies default playback
@@ -140,7 +141,7 @@ A reconstructed bundle that passes validation does not prove what Voice said.
 A desktop text test does not prove that a test program can control or observe
 actual iPhone audio. Manual iPhone testing remains required.
 
-### R6 — Remove repeated articles across a day’s newsletters and retain every source (P1; #36)
+### R2 — Remove repeated articles across a day’s newsletters and retain every source (P1; #36)
 
 Collect all qualifying editions before rendering any queue. Resolve TLDR
 redirects, normalize known tracking parameters conservatively, and group by final article URL across newsletters. Classify each article once for all newsletters that link to it,
@@ -149,7 +150,10 @@ Two URLs on the same website are not necessarily duplicates. Preserve different 
 
 Acceptance: fixed rules for choosing which source text to classify and which queue keeps the article, complete
 source and version information, no second playback occurrence of an exact URL, regenerated positions,
-totals and sweep text, and reruns that do not add duplicate entries. Record which articles were included, removed as duplicates and actually heard as separate facts. A replay request finds the retained article;
+totals and sweep text, and reruns that do not add duplicate entries. Test several
+complete daily sets, including days with and without duplicates, different
+newsletter descriptions for the same URL, and similar articles with distinct
+URLs. Record which articles were included, removed as duplicates and actually heard as separate facts. A replay request finds the retained article;
 queue selection must work even if the first queue Brad opens had all duplicates
 removed. Empty queues and late-arriving editions need explicit inventories and
 revision rules, never silent replacement of files used by an active session.
@@ -159,31 +163,47 @@ The issue's highest-interest, then highest-depth, then earliest-occurrence rule
 applies to historical independently scored duplicates. When an article is classified once, every copy shares its scores, so retain its earliest newsletter occurrence using the recorded source order;
 original source text remains available for a later “new context” request.
 
-### R5 — Brad’s answers, a separate test set and measured adoption (P0/P1; #66, #68)
+### R3 — Brad’s answers, a separate test set and measured adoption (P0/P1; #66, #68)
 
 Use the recorded feedback to propose better interest and depth rules, then
 compare them against Brad’s answers before adoption. Here, improving the
 classifier means revising the profile, instructions or examples based on measured
 results; model fine-tuning is not part of this plan.
 
-Create a reviewed July 28 coverage set, a correction dataset with duplicates removed, a
-separate development set, and a new reserved final holdout. Gold labels come from
-Brad before predictions are revealed. Keep articles already used or discussed out of the
-final holdout. Preserve cross-edition instances for evaluation, while assigning
-every copy of an article or related story to the same dataset.
+Use newsletters from multiple dates and all four editions when available. Keep
+three kinds of evidence distinct:
+
+- **Development data:** historical newsletters, existing labels and verified
+  corrections used to revise the profile, instructions and examples. Include
+  ordinary articles as well as errors; do not choose only articles that reached
+  the old queues or drew a complaint.
+- **Known-problem tests:** source-backed examples of omissions, wrong scores,
+  duplicate articles and unclear headlines. These show whether particular
+  problems recur, not how often the classifier succeeds on ordinary input.
+- **Final test data:** separate, previously unused delivery dates, chosen before
+  their answers or results are inspected. Compare the current and proposed
+  versions on exactly the same articles, with Brad’s answers hidden from the
+  classifier and from rule revision until scoring is complete.
+
+Gold labels come from Brad before predictions are revealed. Keep every copy of
+an article or related story in the same dataset. Retain cross-edition instances
+for duplicate-removal tests, but report scoring per unique article as well.
+Previously discussed material belongs in development or known-problem tests.
+No particular historical date is required to build or adopt v2.
 
 Acceptance: record hashes of source, label, dataset-assignment and prediction files, and keep them unchanged during each comparison. Evaluate the current and proposed versions on identical inputs. Show tables comparing predicted labels with Brad’s answers, missed articles, unwanted discussion, errors near score thresholds, score distributions, playback time, queue sizes and results by newsletter and preference category. Run four weekly blind
 review cycles and one final reserved evaluation. The test plan states which articles count in each measurement, how missing labels are handled, how proposed classifiers are kept from seeing test answers, costs, when to stop a failing trial and which decisions need Brad’s approval.
 A justified no-change result is valid; better results on data used to revise the classifier are not sufficient to adopt v2.
 
-### R7 — Make short playback useful without changing depth labels (P1; #35/#66 quality feedback)
+### R4 — Make short playback useful without changing depth labels (P1; #35/#66 quality feedback)
 
 Test whether a short, literal newsletter description gives useful context for
 unfamiliar names while preserving `headline_only`. This is a test of the text prepared for playback, not a reason to classify every unfamiliar product as `in_depth`.
 
 Acceptance: compare unchanged headline-only playback, an excerpt for every
 headline-only item, and an excerpt only for uninformative titles. Include
-unfamiliar product names, clickbait titles and clear, self-contained headlines.
+unfamiliar product names, clickbait titles and clear, self-contained headlines
+from multiple dates and editions.
 Use an explicit, reviewable rule for selecting titles and the excerpt; record
 which items it changes. Compare usefulness and added seconds separately from
 classification. Copy excerpts exactly from the newsletter.
@@ -205,7 +225,7 @@ The following requirements describe the new records and checks needed to explain
 omissions and evaluate changes. They do not require rebuilding working parsing,
 scoring or feedback handling.
 
-### R1 — Find every article and explain omissions (P0; #35, #66, #37)
+### R5 — Find every article and explain omissions (P0; #35, #66, #37)
 
 Add an inventory that accounts for every newsletter article and explains where
 an omitted article was lost. Finding all articles is an existing requirement;
@@ -213,12 +233,14 @@ the new work is making omissions visible and testable. Use that evidence to
 fix demonstrated parsing or processing errors rather than assuming every missing
 article was classified as uninteresting.
 
-Acceptance: a complete newsletter test case checked by a person accounts for every block as
-editorial, excluded with reason, or ambiguous for review. A private diagnostic
+Acceptance: review complete newsletters across multiple dates and all four
+editions when available. Account for every block as editorial, excluded with
+reason, or ambiguous for review. Include ordinary and unusually sparse outputs;
+report missing edition coverage rather than claiming it was tested. A private diagnostic
 inventory records the first failed stage: discovery, parsing, URL resolution,
 classification, validation, routing, duplicate removal, or rendering. Compare parsed articles against the separately prepared list of articles in the email; the parser cannot use its own output to prove it found everything. Checking only articles that reached the queue cannot establish completeness.
 
-### R2 — Keep accurate records of each run (P0; #66)
+### R6 — Keep accurate records of each run (P0; #66)
 
 This is supporting measurement work, not a new commute feature. The proposed private `classifier-candidate-manifest.v1` contains the run ID, source message and edition IDs, article title/summary/URL with private email details removed, parser
 version and exclusion reason, classifier request ID, complete output,
@@ -232,11 +254,11 @@ Acceptance: the article counts match at every step from the email to the final r
 missing output is a recorded failure, never `uninterested`. Keep each attempt unchanged, including its retry history and file hashes. New run records must identify the files actually used; merely filling in a version field is insufficient. Diagnostic records and article inputs with private email details removed remain under `.private/`; no raw Gmail bodies or private work content are
 saved in new files or committed to Git.
 
-### R4 — Verify feedback while preserving the original records (P0; #35, #66)
+### R7 — Verify feedback while preserving the original records (P0; #35, #66)
 
 The existing feedback rules stay in place. New work collects and verifies the
 later corrections, including records the current importer cannot accept because
-their historical scoring versions are unknown. This supplies R5’s reference data.
+their historical scoring versions are unknown. This supplies R3’s reference data.
 
 Retain exact user words, queue file hash, filename, item identity, URL, original
 scores/labels and producer metadata, whether interest, depth or routing was corrected, date and source of
@@ -276,7 +298,7 @@ and publication when explicitly supplied by the source, and distinguish a
 parser omission from attribution absent in the newsletter. Leave absent values
 `null`; do not infer a byline from a domain or a name mentioned in the text.
 
-### R3 — Check the two scores and apply routing rules in code (P0; #35, #68)
+### R8 — Check the two scores and apply routing rules in code (P0; #35, #68)
 
 Keep the fields and input-matching rules in [classifier instructions](../../schema/classifier-instructions.md). The classifier reports only interest and depth facts plus its request ID. It must not decide routes, Voice behavior, wiki destinations or whether to discard an article; application code makes those decisions.
 Validate finite scores, labels, one result per input, forbidden fields and
@@ -289,7 +311,7 @@ Application routing includes both interested and maybe candidates under the
 current queue rules. Do not silently limit the queue to a chosen number of articles.
 Depth remains independently predicted even for uninterested items. An article’s classification may suggest it is useful for the wiki; only Brad’s explicit save request authorizes a wiki change.
 
-### R8 — Keep queue delivery and fallback usable from the phone (P0/P1; #37, #36)
+### R9 — Keep queue delivery and fallback usable from the phone (P0/P1; #37, #36)
 
 Keep generating queues in the existing Project, with manual generation using the same prompt as the fallback. A replacement must demonstrate both unattended email retrieval and delivery that works through the phone and Project. Initially, local classification is for comparison only. Local
 processing plus recurring download/re-upload from a home computer is not an acceptable permanent workflow.

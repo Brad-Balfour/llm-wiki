@@ -10,8 +10,8 @@ has happened as part of this plan.
 
 There are four proposed improvements: the two-file queue, daily duplicate
 removal, better classification validated against Brad’s answers, and a separate
-trial of context for unclear headlines. R1/R2/R4 supply records and verified
-feedback for those improvements. R3/R8 and the preservation rules describe what
+trial of context for unclear headlines. R5/R6/R7 supply records and verified
+feedback for those improvements. R8/R9 and the preservation rules describe what
 must keep working; R10 describes review and measurement practices.
 
 The PR table breaks that work into reviewable steps, not twelve required new
@@ -23,7 +23,11 @@ checks are met.
 
 ## Recommended sequence
 
-First add records that explain omissions and tools to rerun old newsletters. Keep Monday’s existing queue generator available. Compare possible scoring changes on the old newsletters before choosing one. Add daily exact duplicate removal and
+First inventory available newsletters across dates and editions, existing labels
+and recorded corrections. Add only the missing tools for collecting, replaying
+and comparing that evidence. Keep Monday’s existing queue generator available.
+Develop scoring changes on historical data and validate them on separate unused
+data. Add the two-file output, daily exact duplicate removal and
 short-playback improvements as separately reviewable product changes. Retain
 the existing iPhone Voice app. Whether it reads the queue correctly needs a separate test.
 
@@ -125,7 +129,7 @@ historical corrections with unknown routing versions in a separate verification 
 For new runs, compute metadata outside model output when a local program runs the classifier. Project-side declared versions must be checked against the exact uploaded files; unsupported model/effort details remain unknown, not invented. Record a fresh run of the current Project separately from a run that applies the repository’s rules.
 
 Queue v3 has strict fields. Keep the source and version details needed for duplicate removal in a companion file first;
-if replay/reference access needs file reader changes, design and test the file-reader update before adopting the feature. Do not add fields that v3 does not allow. The two-file design in R9 needs a new format: the main file contains only `sweep_playback` and an array of `item_playback` strings wrapped in one-field objects; all other data goes into the matching `-reference` file. Record the format version in the reference file and generator settings. Keep v2/v3 support in file readers and session bundles. An altered headline-only template is a separate R7 experiment.
+if replay/reference access needs file reader changes, design and test the file-reader update before adopting the feature. Do not add fields that v3 does not allow. The two-file design in R1 needs a new format: the main file contains only `sweep_playback` and an array of `item_playback` strings wrapped in one-field objects; all other data goes into the matching `-reference` file. Record the format version in the reference file and generator settings. Keep v2/v3 support in file readers and session bundles. An altered headline-only template is a separate R4 experiment.
 
 ## Reviewable PR sequence
 
@@ -135,21 +139,21 @@ Keep each PR focused on one behavior, usually a few production files plus focuse
 test cases. Split a row further if schema, runtime and integration changes become
 hard to inspect together. Build each PR on the earlier changes it actually needs.
 
-| PR                                                | Builds on                                                 | What Brad reviews                                                                                                                                                                                                                                      | Required result and how to undo the change                                                                                                                                                                                                                                                                      |
-| ------------------------------------------------- | --------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| P0 — this plan                                    | `main`                                                    | Requirements, issue findings, test plan and proposed PR order in `docs/classifier-v2/`                                                                                                                                                                 | Agreement on the plan; no live change to undo                                                                                                                                                                                                                                                                   |
-| P1 — explain omissions and errors                 | `main` after P0                                           | Source and article inventory formats, validators, parser records in `src/tldr/`, invented omission/exclusion test cases, and optional Project instructions for diagnostic output                                                                       | R1/R2: one complete real private inventory; every July 28 article accounted for; matching source counts. Stop collecting the extra file to undo; scoring stays unchanged                                                                                                                                        |
-| P2 — verify historical feedback and versions      | P1                                                        | Verification file format and import/report tools beside `src/classifier/feedback-label.ts`; all recorded corrections, withdrawals and version mismatches                                                                                               | R2/R4: preserve originals; repeated imports add no duplicates; never guess unknown policies; no use of feedback in live scoring. Stop the importer and keep the saved records                                                                                                                                   |
-| P3 — blind labeling and comparison report         | P2                                                        | Dataset assignments, private labeling page, result comparison, import of older labels without guessing missing depth, and separately saved Project predictions                                                                                         | R5: complete July 28 reference labels, reserved final test set, report distinguishing the five original processing steps: parsing, classification, validation, routing and queue inclusion, tests for exposed predictions and articles shared between datasets. Stop the experiment; current scoring stays live |
-| P4 — generate queue-v3 files in code              | P1, or `main` after P1 merges                             | Queue generation in `src/commute/`, using existing validation and routing; no model calls; expected output from known inputs; accurate version records                                                                                                 | R3/R9: exact playback strings, score thresholds, order, unknown author/publication values, missing-result failures, and queue-to-bundle checks. Keep generated files for local tests only                                                                                                                       |
-| P5 — optional local classifier                    | P3 and P4 merged; separate approval to test local scoring | One interface for model providers, one provider implementation, limits on batch sizes/timeouts/retries, private saved predictions and proposed commands                                                                                                | R3/R5/R8: same saved inputs, actual provider/model records, invalid results excluded with reasons, cost/time and comparison with Project predictions. Return to saved Project predictions; no change to daily queue generation                                                                                  |
-| P6 — four-week scoring experiment                 | P3; P5 optional                                           | Saved experiment settings; 2–4 proposed profiles/prompts per selected error group, outside the live schema files; weekly reports with private details removed                                                                                          | R5: four weekly blind reports and a final test-set decision. Live scoring stays unchanged; keeping the current rules is a valid result                                                                                                                                                                          |
-| P7 — adopt a measured scoring improvement         | P6                                                        | OpenSpec requirements for the selected profile, prompt, thresholds or use of feedback; replacement of old holdout instructions where P3 has not already done so; regression tests and related version records                                          | R3/R4/R5/R8: agreed limits, Brad’s approval, manual comparison, then one real edition before the others. Restore the previous source files and recorded versions if the trial fails                                                                                                                             |
-| P8a — remove exact daily duplicates in code       | P4 merged                                                 | URL cleanup, daily inventory and duplicate-removal code; rules for choosing source text and retaining every source; empty-queue and late-delivery tests                                                                                                | R6: no repeated exact URLs, no unrelated article removed from the reviewed test groups, stable IDs on repeat runs. Disable duplicate removal to undo                                                                                                                                                            |
-| P8b — try daily duplicate removal in the Project  | P8a                                                       | OpenSpec and Project instructions: find all editions first, classify each matching-URL group once, generate the queues together, and specify exact files to install                                                                                    | R6/R8: manual comparison on identical inputs, phone access and replay, then a scheduled trial. Restore the current per-edition generator if needed. This can proceed while P6 tests scoring                                                                                                                     |
-| P9 — test more useful short playback              | P4 merged; independent of scoring                         | New queue template and schema version if needed; generator, validator and bundle-reader updates; short excerpts copied exactly from the newsletter; matching Project files                                                                             | R7/R9: no inferred depth changes, blind usefulness/playback-time comparison and iPhone test. Restore v3 generation and Project files; retain support for older files                                                                                                                                            |
-| P10 — generate and test the two-file queue        | P4 merged; independent of P9 and scoring changes          | R9’s exact main-file shape (`sweep_playback`, `items[].item_playback`); all other data in `-reference`; pair checks; prompt that opens only the main file at start and the reference only for requested article details; existing export compatibility | R9: identical-text comparison on iPhone, including default playback after a details request; correct item matching; complete exports with and without reference questions. Restore single-file v3 if needed                                                                                                     |
-| P11 — related-story notes or replacement delivery | Separate decisions based on test results                  | Two separate follow-ups: mark similar stories after exact duplicate removal; or test unattended Gmail/cloud processing with working mobile delivery                                                                                                    | R6/R8: do not automatically remove similar stories without measuring mistaken matches; do not switch the daily generator until the whole process works through the phone. Neither is needed for initial v2 adoption                                                                                             |
+| PR                                                | Builds on                                                 | What Brad reviews                                                                                                                                                                                                                                      | Required result and how to undo the change                                                                                                                                                                                                                                                                                                     |
+| ------------------------------------------------- | --------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| P0 — this plan                                    | `main`                                                    | Requirements, issue findings, test plan and proposed PR order in `docs/classifier-v2/`                                                                                                                                                                 | Agreement on the plan; no live change to undo                                                                                                                                                                                                                                                                                                  |
+| P1 — explain omissions and errors                 | `main` after P0                                           | Source and article inventory formats, validators, parser records in `src/tldr/`, invented omission/exclusion test cases, and optional Project instructions for diagnostic output                                                                       | R5/R6: complete private inventories across multiple dates and editions; every article accounted for and source counts matched. Stop collecting the extra file to undo; scoring stays unchanged                                                                                                                                                 |
+| P2 — verify historical feedback and versions      | P1                                                        | Verification file format and import/report tools beside `src/classifier/feedback-label.ts`; all recorded corrections, withdrawals and version mismatches                                                                                               | R6/R7: preserve originals; repeated imports add no duplicates; never guess unknown policies; no use of feedback in live scoring. Stop the importer and keep the saved records                                                                                                                                                                  |
+| P3 — blind labeling and comparison report         | P2                                                        | Dataset assignments, private labeling page, result comparison, import of older labels without guessing missing depth, and separately saved Project predictions                                                                                         | R3: multi-date development labels, known-problem tests and a separate reserved final test set, report distinguishing the five original processing steps: parsing, classification, validation, routing and queue inclusion, tests for exposed predictions and articles shared between datasets. Stop the experiment; current scoring stays live |
+| P4 — generate queue-v3 files in code              | P1, or `main` after P1 merges                             | Queue generation in `src/commute/`, using existing validation and routing; no model calls; expected output from known inputs; accurate version records                                                                                                 | R1/R8: exact playback strings, score thresholds, order, unknown author/publication values, missing-result failures, and queue-to-bundle checks. Keep generated files for local tests only                                                                                                                                                      |
+| P5 — optional local classifier                    | P3 and P4 merged; separate approval to test local scoring | One interface for model providers, one provider implementation, limits on batch sizes/timeouts/retries, private saved predictions and proposed commands                                                                                                | R3/R8/R9: same saved inputs, actual provider/model records, invalid results excluded with reasons, cost/time and comparison with Project predictions. Return to saved Project predictions; no change to daily queue generation                                                                                                                 |
+| P6 — four-week scoring experiment                 | P3; P5 optional                                           | Saved experiment settings; 2–4 proposed profiles/prompts per selected error group, outside the live schema files; weekly reports with private details removed                                                                                          | R3: four weekly blind reports and a final test-set decision. Live scoring stays unchanged; keeping the current rules is a valid result                                                                                                                                                                                                         |
+| P7 — adopt a measured scoring improvement         | P6                                                        | OpenSpec requirements for the selected profile, prompt, thresholds or use of feedback; replacement of old holdout instructions where P3 has not already done so; regression tests and related version records                                          | R3/R7/R8/R9: agreed limits, Brad’s approval, manual comparison, then one real edition before the others. Restore the previous source files and recorded versions if the trial fails                                                                                                                                                            |
+| P8a — remove exact daily duplicates in code       | P4 merged                                                 | URL cleanup, daily inventory and duplicate-removal code; rules for choosing source text and retaining every source; empty-queue and late-delivery tests                                                                                                | R2: no repeated exact URLs, no unrelated article removed from the reviewed test groups, stable IDs on repeat runs. Disable duplicate removal to undo                                                                                                                                                                                           |
+| P8b — try daily duplicate removal in the Project  | P8a                                                       | OpenSpec and Project instructions: find all editions first, classify each matching-URL group once, generate the queues together, and specify exact files to install                                                                                    | R2/R9: manual comparison on identical inputs, phone access and replay, then a scheduled trial. Restore the current per-edition generator if needed. This can proceed while P6 tests scoring                                                                                                                                                    |
+| P9 — test more useful short playback              | P4 merged; independent of scoring                         | New queue template and schema version if needed; generator, validator and bundle-reader updates; short excerpts copied exactly from the newsletter; matching Project files                                                                             | R1/R4: no inferred depth changes, blind usefulness/playback-time comparison and iPhone test. Restore v3 generation and Project files; retain support for older files                                                                                                                                                                           |
+| P10 — generate and test the two-file queue        | P4 merged; independent of P9 and scoring changes          | R1’s exact main-file shape (`sweep_playback`, `items[].item_playback`); all other data in `-reference`; pair checks; prompt that opens only the main file at start and the reference only for requested article details; existing export compatibility | R1: identical-text comparison on iPhone, including default playback after a details request; correct item matching; complete exports with and without reference questions. Restore single-file v3 if needed                                                                                                                                    |
+| P11 — related-story notes or replacement delivery | Separate decisions based on test results                  | Two separate follow-ups: mark similar stories after exact duplicate removal; or test unattended Gmail/cloud processing with working mobile delivery                                                                                                    | R2/R9: do not automatically remove similar stories without measuring mistaken matches; do not switch the daily generator until the whole process works through the phone. Neither is needed for initial v2 adoption                                                                                                                            |
 
 P1 can add diagnostic records to the local parser and an optional request for a diagnostic file from the Project. Local parser changes do not change a scheduled Project Task; record which program produced each inventory. P3’s dataset plan must
 update the relevant OpenSpec holdout clauses before dataset tuning starts; P7 then
@@ -201,35 +205,58 @@ are not added to the classifier PR sequence.
 
 ## Rerunning old newsletters and collecting Brad’s answers
 
-### Collect the newsletters and keep the final test separate
+### Build three datasets with different purposes
 
-The read-only search found 85 recent Trash candidates and 10 July 27–29 candidates,
-not a verified dataset. Read every page of search results and verify direct sender, body
-markers, delivery timestamp and edition type. For the July 28 coverage exercise,
-retrieve the exact day across all four newsletter types and record editions that
-are absent. Do not use an existing queue to reconstruct an unavailable newsletter; the queue may omit articles.
+| Dataset             | Sources and selection                                                                                                                                                                                         | What it establishes                                                                                                      |
+| ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| Development         | Recoverable newsletters across dates and General, Dev, AI and Fintech editions; existing labels and verified corrections. Include ordinary complete editions, random samples and targeted examples of errors. | Helps revise the profile and instructions. Results on these articles do not establish improvement on unseen material.    |
+| Known-problem tests | Exact, verified examples from the feedback logs: omissions, wrong scores, duplicates and unclear headlines. May reuse development material; report these results separately.                                  | Checks that specific reported problems are fixed without treating a collection of complaints as a representative sample. |
+| Final test          | Complete, previously unused delivery dates spanning multiple dates and editions, selected before inspecting labels or outcomes. Keep related stories out of development data.                                 | Compares current and proposed classifiers on identical inputs they were not tuned against.                               |
 
-For reruns, extract article data from confirmed newsletters without saving the raw email bodies. Save article records with private email details removed, plus reasons for exclusions or review. Preserve those records unchanged under `.private/classifier-v2/`. Do not restore, relabel or delete mail
-as a side effect. A Gmail API path must include Trash explicitly; a connector
-must demonstrate that its Trash query actually returns the targeted messages.
-Gmail deletes messages after 30 days in Trash, so this is the first collection task. [Google deletion policy](https://support.google.com/mail/answer/7401),
+July 28 supplies one possible omission test because its queues were unusually
+sparse. If the original newsletters are recoverable, investigate where those
+articles were lost. It is not a required labeling batch, the foundation of the
+datasets, or a prerequisite for the output-format and duplicate-removal PRs.
+If it cannot be recovered, record that limitation and use other source-backed
+omission examples. Do not reconstruct missing emails from incomplete queues.
+
+### Collect available newsletters across dates and editions
+
+The [read-only search inventory](evidence-inventory.md#gmail-feasibility-check)
+records message candidates, not a verified dataset. Paginate search results and
+confirm sender, newsletter body markers, delivery date and edition. Record the
+available date range and edition coverage before selecting development and test
+data. Retrieve ordinary newsletters as well as known failures; do not restrict
+collection to a single date or to articles included in past queues.
+
+For reruns, extract article data from confirmed newsletters without saving raw
+email bodies. Keep records with private email details removed under
+`.private/classifier-v2/`, together with source identities and exclusion reasons.
+Do not restore, relabel or delete mail. A Gmail API path must explicitly include
+Trash; a connector must demonstrate that its query returns the targeted messages.
+Collect recoverable inputs promptly because messages are deleted after 30 days
+in Trash. [Google deletion policy](https://support.google.com/mail/answer/7401),
 [API listing option](https://developers.google.com/workspace/gmail/api/reference/rest/v1/users.messages/list).
 
-Inventory historical private queues, session bundles already collected, attempted labels and exact
-shared-chat evidence by identity before importing. Use existing sanitized copies
-where available; never rewrite previously processed historical files. July 28 is a
-known diagnostic development set. August and September heard/discussed material
-is useful for reruns and tests of previously reported problems unless a check for prior use of the articles proves otherwise.
+Inventory previously collected queues, bundles, labels and complete recorded
+conversations without rewriting them. Heard or discussed articles can support
+development and known-problem tests. They cannot be presented as untouched final
+test material. If too little unused historical material remains, reserve later
+newsletters for the final test while keeping the current commute workflow usable.
 
 ### Fix the datasets before testing and collect answers independently
 
 1. Inventory original 262 training, 41 June 30 and 98 July 1–2 records. They are
    known development/calibration history now. Preserve legacy labels as legacy;
    an old single-axis `down` cannot supply an unobserved depth label.
-2. Build the complete July 28 reference dataset by asking Brad for both axes for every
-   editorial item. A source-confirmed omitted item is not a reference example until Brad labels it.
-   Present source title/summary/link with predictions and rationales hidden.
-3. Form development and weekly review pools from known history and new articles Brad has labeled. Include every exact correction, every candidate from unusually
+2. Select complete development editions across multiple dates and all four
+   newsletter types when available, before inspecting their classification
+   results. Ask Brad for interest and depth independently, with title,
+   description and link visible but predictions hidden. Include every editorial
+   item in those selected editions, including articles omitted from old queues.
+   Add verified historical corrections without inventing missing labels. Record
+   what the data covers and any gaps; no one delivery date is mandatory.
+3. Form development and weekly review pools from known history and new articles Brad has labeled. Keep ordinary complete-edition results separate from targeted error samples so the latter do not distort overall accuracy. Include every exact correction, every candidate from unusually
    sparse days, a seeded random skip sample, close-to-threshold samples (interest
    0.55–0.65 and 0.75–0.85; depth 0.55–0.65), and a comparison sample of predictions that have been verified and are far from the thresholds.
 4. Choose final holdout by entire unseen delivery dates, with all copies of the same article and related stories assigned to the same split. Preserve
@@ -311,6 +338,14 @@ in the test plan PR. Stop a proposed classifier’s trial immediately if it repe
 
 ## Trying the changes and checking the results
 
+Use data suited to each change. Scoring uses development data, known-problem
+tests and a separate final test. Duplicate removal uses several complete daily
+sets with and without duplicates, including different descriptions for the same
+article and similar but distinct URLs. Headline context uses unclear and clear
+titles across dates and editions. Two-file playback uses short and long queues
+from multiple dates, with identical content in each single-file/pair comparison.
+None of the four changes depends on one historical newsletter set.
+
 For each PR that changes code with fixed, repeatable results, run its focused tests, then `npm run check`, `git diff --check`, and strict OpenSpec validation for the requirements it changes. P1/P3 and changes to the commute workflow (J1–J6) must validate both existing OpenSpec changes and the new one. CI uses invented test cases, not Gmail or paid model calls. Keep private rerun results private. Commit only reports with private details removed and regression examples from datasets allowed for development.
 
 After Brad approves new scoring rules, check a manual rerun in the same Project,
@@ -320,7 +355,7 @@ queues. Restore the previous version if records become unreliable, substantially
 
 Headline context, duplicate removal and two-file queue trials keep scoring unchanged.
 P10 can begin after P4; it does not wait for P9 or the four-week scoring experiment.
-Use the exact JSON shape and filename pair in [R9](requirements.md#r9--separate-the-playback-text-from-article-details-and-test-it-in-voice-p1-100-120).
+Use the exact JSON shape and filename pair in [R1](requirements.md#r1--separate-the-playback-text-from-article-details-and-test-it-in-voice-p1-100-120).
 Build it in two reviewable steps, splitting into dependent PRs if needed:
 
 1. Add pair generation and validation, plus the minimal compatibility changes
@@ -337,14 +372,16 @@ Build it in two reviewable steps, splitting into dependent PRs if needed:
    survive the file-format change. It does not redesign session exports or retries.
 
 Compare single-file v3 and the pair using **identical scores, order and spoken
-text**. Include a long sequence of ordinary advances, a details request, and
+text** within each comparison. Use multiple dates and editions, including short
+and long queues. Each comparison changes the format only; several comparisons
+check whether the result holds beyond one queue. Include a long sequence of ordinary advances, a details request, and
 several more advances to check whether Voice returns to reading only the main
 file. Test next/back/jump, missing or mismatched reference files,
 and exports both with and without a prior details request. Record wrong text,
 paraphrases, missing text and failed exports. If actual file loading cannot be
 observed, report that limit rather than claiming the prompt enforced it.
 
-Keep the R7 short-description change out of this comparison. Restore the previous
+Keep the R4 short-description change out of this comparison. Restore the previous
 generator and Project instructions if the pair fails. Do not build an autonomous
 iPhone test program until actual audio control and observation are demonstrated;
 manual iPhone testing remains part of the plan.
