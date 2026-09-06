@@ -139,6 +139,16 @@ All comments below were reviewed. The original issue requirements still apply un
 - Repository requirements: [bootstrap design](../../openspec/changes/bootstrap-llm-wiki-mvp/design.md), [current workflow design and which earlier requirements it replaces](../../openspec/changes/commute-wiki-operating-loop/design.md), [record of the files installed in the live Project](../../chatgpt-project/README.md), [experiment log](../commute-experiment-log.md), classifier types/validator, routing implementation, current queue-generation instructions and schemas.
 - Historical local research archive was read, not copied: `codex-docs/tldr-interest-profile-session-state.md`; `codex-docs/schema/tldr-holdout-comparison.md`; `codex-docs/schema/tldr-fresh-holdout-comparison-two-axis.md`; `codex-docs/schema/tldr-fresh-holdout-comparison-two-axis-calibration-v2.md`. These paths are relative to the parent research workspace and are not public repository dependencies. The requirements summarize the findings; raw labels and private research text remain outside Git.
 
+## Clarification during PR review
+
+Brad specified the two-file design during review of PR #126: a main JSON file
+containing only `sweep_playback` and `items[].item_playback`, with every other
+field moved to a matching `-reference` file. Voice opens only the main file at
+start and reads the reference only for requested article details. R9 and P10 now
+state this design explicitly, including how export preserves the full queue.
+This is additional user direction after the original issue review; the issue
+and comment counts above remain the original snapshot.
+
 ## Gmail feasibility check
 
 Read-only ID searches returned 85 candidates for `in:trash from:(tldrnewsletter.com) after:2026/08/01 before:2026/09/06`, and 10 for `in:anywhere from:(tldrnewsletter.com) after:2026/07/27 before:2026/07/30`, both without another page. These are message-search candidates, not counts of newsletters or articles confirmed by reading the emails. No message bodies were read or saved, and no mailbox state was changed. This inventory does not establish which July 28 editions are recoverable or which messages are unused material suitable for the final test.

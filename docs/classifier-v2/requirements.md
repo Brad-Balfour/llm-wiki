@@ -211,21 +211,104 @@ consecutive qualifying scheduled weekdays succeed. A cloud/API replacement is
 conditional on proving delivery; do not assume a supported way to add files automatically to Project Library exists. Production source updates list exact files and verified
 live versions and support rollback without rewriting past queues.
 
-### R9 — Keep existing files usable and test actual Voice playback (P0/P2; #100)
+### R9 — Separate the playback text from article details and test it in Voice (P1; #100, #120)
 
-Preserve one queue per session, repeatable sweep/playback strings, navigation,
-session bundles containing the full queue, exact item saves/feedback and local recovery.
-Reconstructed files that pass validation do not prove what Voice actually said. Test actual
-iPhone Voice independently of offline JSON checks.
+Generate two JSON files per newsletter queue. The main file is deliberately small:
+it contains only the opening sweep and the exact text to read for each item.
+Move all other data into a matching file with `-reference` immediately before the
+extension. For example:
 
-Acceptance: a representative long session covers sweep, next/back/jump, pause,
-discussion, restart and reopening of the correct queue, literal text, exact URL questions and visible
-export. Content from an unrelated article, missing literal content and failed first exports are
-counted. Prompt 4.2 and v3 have already failed this outcome on September 4; do not
-claim a new scorer solves it. The separate playback and reference file
-proposal in [#120's latest comment](https://github.com/Brad-Balfour/llm-wiki/issues/120#issuecomment-5548380533)
-needs its own limited trial, checks that both files have matching IDs and hashes, bundle compatibility and
-rollback. A successful desktop text test does not prove that a test program can control or observe iPhone audio.
+- Main: `20260907-tldr-dev.txt`
+- Reference: `20260907-tldr-dev-reference.txt`
+
+Both files contain JSON; `.txt` preserves the current download convention. The
+main file has exactly this shape, with `sweep_playback` written first and an
+`items` array containing N entries:
+
+```json
+{
+  "sweep_playback": "1 of 2. Headline only. Example one\n2 of 2. In depth. Example two",
+  "items": [
+    {
+      "item_playback": "1 of 2. Headline only. Example one"
+    },
+    {
+      "item_playback": "2 of 2. In depth. Example two\nThe exact newsletter description for example two."
+    }
+  ]
+}
+```
+
+There are no other fields in the main file or its item entries. In particular,
+do not add IDs, scores, separate titles, depth labels, descriptions, URLs, author,
+publication, version fields or hashes. Titles and reading modes can occur within
+the prepared spoken strings, as they do today. `item_playback` is the name for
+this new format; generate its value from the existing `playback_text` without
+changing the spoken text in the first trial.
+
+The reference file retains all the information needed for article questions,
+feedback and export: source and item IDs, titles, URLs, descriptions, interest and
+depth scores and labels, routing, author/publication, source details and versions.
+It also records the main filename, a hash of the main file, and the item positions
+that link its records to the main array. All extra matching and validation data
+belongs here, so the main file stays small. Generate and check both files together;
+never silently replace one file from a pair already used in a session.
+
+Change the Voice prompt to make these instructions explicit:
+
+1. At the start, open only the main file. Read `sweep_playback` exactly.
+2. On each next-item advance, read only that entry’s `item_playback` exactly.
+   Keep the current array position for next, back and jump commands. Do not
+   assemble text from other fields, summarize it, or add an explanation.
+3. Open the matching `-reference` file only when Brad asks for additional article
+   details. Match the current position to its reference record; use its URL if
+   the question requires reading the source article. If the reference is missing
+   or does not match, say so rather than guessing.
+4. After answering, return to the main file for default playback. Having opened
+   the reference file is not permission to use it instead of `item_playback` on
+   later advances. Do not preload it for the sweep or ordinary navigation.
+
+Session export still needs the complete queue and exact item identities. The
+export step must combine the matching pair when producing the final bundle; this
+is separate from loading article details into the default Voice reading context.
+Keep this file-joining work in the export instructions/tooling, not as a reason
+to open the reference file at session start. Preserve one queue per session,
+exact saves and corrections, and existing recovery behavior.
+
+This is the concrete experiment suggested in
+[#120’s September 4 comment](https://github.com/Brad-Balfour/llm-wiki/issues/120#issuecomment-5548380533)
+and clarified by Brad during review of this plan. The hypothesis is that fewer
+fields available during default playback will reduce invented or summarized text.
+It is not established that this will fix Voice’s behavior. Prompt 4.2 and a
+single v3 file still had failures on September 4.
+
+Acceptance:
+
+- Generate the exact two-field main object and one-field item objects above.
+  Check item counts, order, literal strings, reference positions and the main
+  file hash in the reference file. Reject extra fields in the main file.
+- Test missing, swapped, stale, reordered and mismatched reference files. Opening
+  a reference must not change which article is current. Check that both files
+  are available in the same Project from the phone.
+- Compare the current single file against the two-file version with identical
+  scores, article order, sweep and item text. Keep the short-description trial
+  in R7 separate so a result can be attributed to the file split.
+- Test actual iPhone Voice through a long session: opening sweep, next/back/jump,
+  pauses, restart, a details request that opens the reference, and a return to
+  several ordinary advances. Check that the main file supplies default playback
+  before and after the details request. Record any inability to verify which
+  files Voice opened; its claim that it followed the prompt is not proof.
+- Count unrelated additions, paraphrases, omitted text and failed first exports.
+  Check that an exported bundle includes the complete queue and preserves saves
+  and feedback, including a session with no article-details request.
+- Give the pair a new file-format version, recorded in the reference schema and
+  generator configuration rather than extra main-file fields. Update generation,
+  validation, bundle reading/export and Project instructions together. Keep old
+  v2/v3 files readable and restore single-file v3 generation if the trial fails.
+
+A reconstructed bundle that passes validation does not prove what Voice said.
+A desktop text test does not prove that a test program can control or observe
+actual iPhone audio. Manual iPhone testing remains required.
 
 ### R10 — Keep PRs small and measure time and cost (P0; user request)
 
