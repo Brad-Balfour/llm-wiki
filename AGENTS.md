@@ -87,6 +87,26 @@ repositories. Borrow only patterns that fit this Node/Jekyll pipeline; do not
 import Astro, browser, Playwright, Cloudflare, or frontend configuration unless
 the task introduces that surface.
 
+## Planning and implementation handoffs
+
+Write practical runbooks that another coding model can execute without reading
+past conversations. Separate existing behavior from proposed changes. Number
+requirements in reading order and update references when reorganizing them.
+For each phase, name tasks, exact files, PR outputs/dependencies, the agent’s work,
+Brad’s steps, manual validation, deployment timing and completion criteria.
+
+Prepare independent work and stacked PRs while Brad is unavailable; do not wait
+for earlier merges to begin later coding. State exactly which results depend on
+his answers or approval. Make validation proportional to the actual product
+risk and Brad’s acceptance criteria. Preserve the working production environment;
+do not introduce a second system just to make testing more elaborate.
+
+Keep only decisions and evidence useful for implementation, faster improvement
+or preventing repeat mistakes. Do not catalogue abandoned reasonable approaches
+or turn a proposed experiment into an ongoing requirement. Every live Project
+change must identify the exact version-controlled files to replace or restore,
+using the existing installation-confirmation procedure.
+
 ## Implementation rules
 
 - Use plain, direct language in user-facing updates and durable documentation.
