@@ -6,6 +6,21 @@ Status: proposed; this PR contains planning only. The
 No model experiment, live Project edit, mailbox change, or use of a new implementation
 has happened as part of this plan.
 
+## Scope of the build
+
+There are four proposed improvements: the two-file queue, daily duplicate
+removal, better classification validated against Brad’s answers, and a separate
+trial of context for unclear headlines. R1/R2/R4 supply records and verified
+feedback for those improvements. R3/R8 and the preservation rules describe what
+must keep working; R10 describes review and measurement practices.
+
+The PR table breaks that work into reviewable steps, not twelve required new
+features. Reuse existing validators, routing and import behavior. Build only the
+missing collection, comparison and output tools. P5’s local model integration
+and P11’s later experiments are optional. The four-week scoring trial does not
+block the two-file or duplicate-removal trials once their own prerequisites and
+checks are met.
+
 ## Recommended sequence
 
 First add records that explain omissions and tools to rerun old newsletters. Keep Monday’s existing queue generator available. Compare possible scoring changes on the old newsletters before choosing one. Add daily exact duplicate removal and
