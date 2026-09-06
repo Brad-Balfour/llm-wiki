@@ -16,6 +16,9 @@ const classifierInputs: ClassifierInputItem[] = [
     title: 'OpenAI adds evaluation hooks for agents',
     summary: 'OpenAI released new evaluation hooks for agent workflows.',
     url: 'https://example.com/tldr/openai-agent-evals',
+    author: 'Example Author',
+    publication: 'Example Engineering',
+    attribution_status: 'verified',
   },
   {
     classifier_item_id: 'item-camera-update',
@@ -26,6 +29,9 @@ const classifierInputs: ClassifierInputItem[] = [
     title: 'Smartphone maker previews a minor camera update',
     summary: 'A device launch added a modest camera mode.',
     url: 'https://example.com/tldr/minor-camera-update',
+    author: null,
+    publication: 'example.com',
+    attribution_status: 'lookup_failed',
   },
 ];
 

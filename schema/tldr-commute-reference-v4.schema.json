@@ -60,6 +60,7 @@
         "description",
         "author",
         "publication",
+        "attribution",
         "url",
         "interest_level",
         "interest_score",
@@ -76,8 +77,23 @@
         "source_item_id": { "type": "string", "minLength": 1 },
         "title": { "type": "string", "minLength": 1, "maxLength": 500 },
         "description": { "type": "string", "minLength": 1, "maxLength": 4000 },
-        "author": { "type": ["string", "null"], "minLength": 1, "maxLength": 300 },
-        "publication": { "type": ["string", "null"], "minLength": 1, "maxLength": 300 },
+        "author": { "type": "string", "minLength": 1, "maxLength": 300 },
+        "publication": { "type": "string", "minLength": 1, "maxLength": 300 },
+        "attribution": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["resolved_url", "author_source", "publication_source", "lookup_attempts"],
+          "properties": {
+            "resolved_url": { "type": "string", "format": "uri", "pattern": "^https?://" },
+            "author_source": {
+              "enum": ["newsletter", "article_page", "no_authors_listed", "lookup_failed"]
+            },
+            "publication_source": {
+              "enum": ["newsletter", "article_page", "hostname_fallback"]
+            },
+            "lookup_attempts": { "type": "integer", "minimum": 0, "maximum": 2 }
+          }
+        },
         "url": { "type": "string", "format": "uri", "pattern": "^https?://" },
         "interest_level": { "enum": ["interested", "maybe", "uninterested"] },
         "interest_score": { "type": "number", "minimum": 0, "maximum": 1 },
