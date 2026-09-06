@@ -147,6 +147,33 @@ test('v4 candidate reconciles repeated coverage across all daily editions', asyn
   assert.match(schema, /"const": "useful_update"/);
 });
 
+test('v4 candidate prepares literal context for unclear headlines', async () => {
+  const [generation, task, voice, schema] = await Promise.all([
+    readFile('chatgpt-project/queue-generation-v4.md', 'utf8'),
+    readFile('chatgpt-project/WEEKDAY_TLDR_QUEUE_TASK_PROMPT_V4.md', 'utf8'),
+    readFile('chatgpt-project/CHATGPT_CAR_QUEUE_PROMPT.md', 'utf8'),
+    readFile('schema/tldr-commute-reference-v4.schema.json', 'utf8'),
+  ]);
+
+  assert.match(generation, /shortest complete opening sentence\s+or sentences/);
+  assert.match(generation, /Do not truncate a sentence, rewrite it, or manufacture/);
+  assert.match(generation, /self-contained headline short with null context/);
+  assert.match(generation, /Never add headline\s+context to an in-depth item/);
+  assert.match(generation, /sweep_lines\.append\(prefix\)/);
+  assert.match(generation, /update_prefix"\] == item\["coverage"\]\["update_note"\]/);
+  assert.match(
+    generation,
+    /excerpt_source_occurrence_id"\] == item\["selected_source_occurrence_id"\]/
+  );
+  assert.match(generation, /complete excerpt sentence/);
+  assert.match(task, /classification labels unchanged by this presentation step/);
+  assert.match(voice, /literal context excerpt or an update prefix/);
+  assert.match(voice, /without changing the announced depth label/);
+  assert.match(schema, /"playback_context"/);
+  assert.match(schema, /"unusually_long_excerpt"/);
+  assert.ok(schema.includes('"pattern": "[.!?]'));
+});
+
 test('daily commute completion cannot omit a required Project update', async () => {
   const [skill, agents] = await Promise.all([
     readFile('.codex/skills/process-daily-commute/SKILL.md', 'utf8'),

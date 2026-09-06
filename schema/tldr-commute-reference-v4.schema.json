@@ -72,6 +72,7 @@
         "source_occurrences",
         "selected_source_occurrence_id",
         "coverage",
+        "playback_context",
         "interest_level",
         "interest_score",
         "consumption_depth",
@@ -164,6 +165,36 @@
             }
           ]
         },
+        "playback_context": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "headline_context",
+            "excerpt_source_occurrence_id",
+            "unusually_long_excerpt",
+            "update_prefix"
+          ],
+          "properties": {
+            "headline_context": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 1000,
+                  "pattern": "[.!?][\"'”’)]?$"
+                },
+                { "type": "null" }
+              ]
+            },
+            "excerpt_source_occurrence_id": {
+              "anyOf": [{ "type": "string", "minLength": 1 }, { "type": "null" }]
+            },
+            "unusually_long_excerpt": { "type": "boolean" },
+            "update_prefix": {
+              "anyOf": [{ "type": "string", "minLength": 1, "maxLength": 1000 }, { "type": "null" }]
+            }
+          }
+        },
         "interest_level": { "enum": ["interested", "maybe", "uninterested"] },
         "interest_score": { "type": "number", "minimum": 0, "maximum": 1 },
         "consumption_depth": { "enum": ["headline_only", "in_depth"] },
@@ -173,7 +204,36 @@
         "reason": { "type": "string", "minLength": 1, "maxLength": 2000 },
         "classified_at": { "type": "string", "format": "date-time" },
         "routed_at": { "type": "string", "format": "date-time" }
-      }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "coverage": {
+                "properties": { "status": { "const": "useful_update" } },
+                "required": ["status"]
+              }
+            },
+            "required": ["coverage"]
+          },
+          "then": {
+            "properties": {
+              "playback_context": {
+                "properties": {
+                  "update_prefix": { "type": "string", "minLength": 1, "maxLength": 1000 }
+                }
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "playback_context": {
+                "properties": { "update_prefix": { "type": "null" } }
+              }
+            }
+          }
+        }
+      ]
     },
     "sourceOccurrence": {
       "type": "object",

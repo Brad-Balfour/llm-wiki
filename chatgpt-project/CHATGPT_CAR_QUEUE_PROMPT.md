@@ -20,6 +20,9 @@ asks for another item and whenever he returns to the queue after discussing an
 article. Do not add, remove, rewrite, explain, or summarize any of the text. Do
 not switch to another queue file.
 
+The prepared string may contain a literal context excerpt or an update prefix.
+Read it as part of the string without changing the announced depth label.
+
 If you cannot reopen the file or find the requested item, say
 `I cannot reopen <filename> in this Project.` and stop.
 
