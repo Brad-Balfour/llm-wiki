@@ -101,6 +101,25 @@ test('blind page contains no predictions and exports local JSON answers', async 
   assert.doesNotMatch(html, /SECRET_BASELINE_REASON|interest_score|depth_score/);
 });
 
+test('blind page escapes JavaScript line separators in embedded article text', async () => {
+  const special = structuredClone(inventory);
+  special.items[0]!.description = 'First\u2028second\u2029third';
+  const fixture = await setup({ inventory: special });
+  const result = run([
+    'label-page',
+    '--inventory',
+    fixture.inventory,
+    '--assignment',
+    'development',
+    '--out',
+    fixture.output,
+  ]);
+  assert.equal(result.status, 0, result.stderr);
+  const html = await readFile(fixture.output, 'utf8');
+  assert.match(html, /First\\u2028second\\u2029third/);
+  assert.doesNotMatch(html, /First\u2028second\u2029third/);
+});
+
 test('comparison counts distinct articles once and leaves missing answers pending', async () => {
   const labels = {
     dataset_id: 'weekend-review',
@@ -118,10 +137,13 @@ test('comparison counts distinct articles once and leaves missing answers pendin
     prediction('article-a', 'interested', 0.85, 'headline_only', 0.45),
     prediction('article-b', 'uninterested', 0.3, 'headline_only', 0.2),
   ]);
-  const candidate = predictions([
-    prediction('article-a', 'uninterested', 0.4, 'in_depth', 0.7),
-    prediction('article-b', 'maybe', 0.65, 'headline_only', 0.3),
-  ]);
+  const candidate = predictions(
+    [
+      prediction('article-a', 'uninterested', 0.4, 'in_depth', 0.7),
+      prediction('article-b', 'maybe', 0.65, 'headline_only', 0.3),
+    ],
+    'candidate'
+  );
   const fixture = await setup({ inventory, labels, baseline, candidate });
   const result = run([
     'compare',
@@ -147,7 +169,104 @@ test('comparison counts distinct articles once and leaves missing answers pendin
   assert.match(report, /Missing or unsure interest labels: 1/);
   assert.match(report, /\| False skips \| 0 \| 1 \|/);
   assert.match(report, /\| Missed depth \| 1 \| 0 \|/);
+  assert.match(report, /Baseline: profile `1\.4`/);
   assert.match(report, /`article-b` — Ordinary product update/);
+});
+
+test('comparison treats interest and depth answers independently', async () => {
+  const labels = {
+    dataset_id: 'weekend-review',
+    assignment: 'development',
+    labels: [
+      {
+        article_id: 'article-a',
+        interest_label: 'unsure',
+        depth_label: 'in_depth',
+      },
+    ],
+  };
+  const baseline = predictions([prediction('article-a', 'maybe', 0.65, 'headline_only', 0.4)]);
+  const candidate = predictions(
+    [prediction('article-a', 'interested', 0.85, 'in_depth', 0.75)],
+    'candidate'
+  );
+  const fixture = await setup({ inventory, labels, baseline, candidate });
+  const result = run([
+    'compare',
+    '--inventory',
+    fixture.inventory,
+    '--assignment',
+    'development',
+    '--labels',
+    fixture.labels,
+    '--baseline',
+    fixture.baseline,
+    '--candidate',
+    fixture.candidate,
+    '--out',
+    fixture.output,
+  ]);
+  assert.equal(result.status, 0, result.stderr);
+  const report = await readFile(fixture.output, 'utf8');
+  assert.match(report, /\| Interest comparisons \| 0 \| 0 \|/);
+  assert.match(report, /\| Depth comparisons \| 1 \| 1 \|/);
+  assert.match(report, /\| Missed depth \| 1 \| 0 \|/);
+});
+
+test('comparison rejects incorrect baseline or candidate version identities', async () => {
+  const labels = { dataset_id: 'weekend-review', assignment: 'development', labels: [] };
+  const baseline = predictions([]);
+  const candidate = predictions([]);
+  const fixture = await setup({ inventory, labels, baseline, candidate });
+  const result = run([
+    'compare',
+    '--inventory',
+    fixture.inventory,
+    '--assignment',
+    'development',
+    '--labels',
+    fixture.labels,
+    '--baseline',
+    fixture.baseline,
+    '--candidate',
+    fixture.candidate,
+    '--out',
+    fixture.output,
+  ]);
+  assert.notEqual(result.status, 0);
+  assert.match(result.stderr, /candidate must use profile 2\.0/);
+});
+
+test('inventory enforces author and attribution-status consistency', async () => {
+  const invalid = structuredClone(inventory);
+  invalid.items[0]!.author = null;
+  const fixture = await setup({ inventory: invalid });
+  const result = run([
+    'prediction-input',
+    '--inventory',
+    fixture.inventory,
+    '--assignment',
+    'development',
+    '--out',
+    fixture.output,
+  ]);
+  assert.notEqual(result.status, 0);
+  assert.match(result.stderr, /author must be a string when attribution_status is verified/);
+
+  invalid.items[0]!.author = 'Unverified Author';
+  invalid.items[0]!.attribution_status = 'lookup_failed';
+  await writeFile(fixture.inventory, JSON.stringify(invalid));
+  const retry = run([
+    'prediction-input',
+    '--inventory',
+    fixture.inventory,
+    '--assignment',
+    'development',
+    '--out',
+    fixture.output,
+  ]);
+  assert.notEqual(retry.status, 0);
+  assert.match(retry.stderr, /author must be null when attribution_status is lookup_failed/);
 });
 
 test('inventory prevents related stories from crossing review assignments', async () => {
@@ -210,12 +329,16 @@ function prediction(
   return { classifier_item_id, interest_level, interest_score, consumption_depth, depth_score };
 }
 
-function predictions(items: ReturnType<typeof prediction>[]) {
+function predictions(
+  items: ReturnType<typeof prediction>[],
+  kind: 'baseline' | 'candidate' = 'baseline'
+) {
   return {
     dataset_id: 'weekend-review',
     assignment: 'development',
-    profile_version: '2.0',
-    prompt_version: 'classifier-instructions.v2',
+    profile_version: kind === 'baseline' ? '1.4' : '2.0',
+    prompt_version:
+      kind === 'baseline' ? 'classifier-instructions.v1' : 'classifier-instructions.v2',
     items,
   };
 }

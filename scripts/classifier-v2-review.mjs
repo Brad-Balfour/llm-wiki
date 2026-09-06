@@ -6,6 +6,11 @@ const ASSIGNMENTS = new Set(['development', 'final_check']);
 const DISPOSITIONS = new Set(['label', 'excluded', 'failed']);
 const INTEREST = new Set(['interested', 'maybe', 'uninterested']);
 const DEPTH = new Set(['headline_only', 'in_depth']);
+const SCORE_BANDS = Object.freeze({ interestedMin: 0.8, maybeMin: 0.6, inDepthMin: 0.6 });
+const EXPECTED_VERSIONS = Object.freeze({
+  baseline: { profile: '1.4', prompt: 'classifier-instructions.v1' },
+  candidate: { profile: '2.0', prompt: 'classifier-instructions.v2' },
+});
 
 export function readInventory(candidate) {
   requireObject(candidate, 'inventory');
@@ -54,13 +59,21 @@ export function readInventory(candidate) {
       throw new Error(`Resolved URL ${item.url} appears as both ${priorArticle} and ${articleId}`);
     }
     articleUrls.set(item.url, articleId);
-    if (item.author !== null) requireString(item.author, `${field}.author`);
+    const author = item.author === null ? null : requireString(item.author, `${field}.author`);
     requireString(item.publication, `${field}.publication`);
-    requireEnum(
+    const attributionStatus = requireEnum(
       item.attribution_status,
       new Set(['verified', 'no_authors_listed', 'lookup_failed']),
       `${field}.attribution_status`
     );
+    if (attributionStatus === 'verified' && author === null) {
+      throw new Error(`${field}.author must be a string when attribution_status is verified`);
+    }
+    if (attributionStatus !== 'verified' && author !== null) {
+      throw new Error(
+        `${field}.author must be null when attribution_status is ${attributionStatus}`
+      );
+    }
     const occurrences = requireArray(item.source_occurrences, `${field}.source_occurrences`);
     if (occurrences.length === 0) throw new Error(`${field}.source_occurrences must not be empty`);
     for (const [occurrenceIndex, occurrence] of occurrences.entries()) {
@@ -116,10 +129,10 @@ export function buildLabelPage(inventory, assignment) {
     publication: item.publication,
     source_occurrences: item.source_occurrences,
   }));
-  const payload = JSON.stringify({ dataset_id: checked.dataset_id, assignment, items }).replaceAll(
-    '<',
-    '\\u003c'
-  );
+  const payload = JSON.stringify({ dataset_id: checked.dataset_id, assignment, items })
+    .replaceAll('<', '\\u003c')
+    .replaceAll('\u2028', '\\u2028')
+    .replaceAll('\u2029', '\\u2029');
   return `<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Classifier v2 blind review</title><style>
@@ -138,8 +151,20 @@ export function compareReview(inventory, labels, baseline, candidate, assignment
   const checked = readInventory(inventory);
   const selected = selectedItems(checked, assignment);
   const labelMap = readLabels(labels, checked.dataset_id, assignment);
-  const baselineSet = readPredictions(baseline, checked.dataset_id, assignment, 'baseline');
-  const candidateSet = readPredictions(candidate, checked.dataset_id, assignment, 'candidate');
+  const baselineSet = readPredictions(
+    baseline,
+    checked.dataset_id,
+    assignment,
+    'baseline',
+    EXPECTED_VERSIONS.baseline
+  );
+  const candidateSet = readPredictions(
+    candidate,
+    checked.dataset_id,
+    assignment,
+    'candidate',
+    EXPECTED_VERSIONS.candidate
+  );
   const selectedIds = new Set(selected.map((item) => item.article_id));
   for (const [name, ids] of [
     ['label', labelMap.keys()],
@@ -183,12 +208,18 @@ export function compareReview(inventory, labels, baseline, candidate, assignment
     '# Classifier v2 blind comparison',
     '',
     `Dataset: \`${checked.dataset_id}\`; assignment: \`${assignment}\`.`,
+    `Baseline: profile \`${baselineSet.profileVersion}\`, prompt \`${baselineSet.promptVersion}\`; candidate: profile \`${candidateSet.profileVersion}\`, prompt \`${candidateSet.promptVersion}\`.`,
     '',
     '## Results',
     '',
     '| Measure | Baseline | Candidate |',
     '| --- | ---: | ---: |',
-    metricRow('Labeled comparisons', baselineMetrics.compared, candidateMetrics.compared),
+    metricRow(
+      'Interest comparisons',
+      baselineMetrics.interestCompared,
+      candidateMetrics.interestCompared
+    ),
+    metricRow('Depth comparisons', baselineMetrics.depthCompared, candidateMetrics.depthCompared),
     metricRow('False skips', baselineMetrics.falseSkips.length, candidateMetrics.falseSkips.length),
     metricRow(
       'Missed depth',
@@ -248,7 +279,8 @@ export function compareReview(inventory, labels, baseline, candidate, assignment
 
 function metrics(rows, key) {
   const result = {
-    compared: 0,
+    interestCompared: 0,
+    depthCompared: 0,
     falseSkips: [],
     missedDepth: [],
     unwantedInDepth: [],
@@ -257,27 +289,22 @@ function metrics(rows, key) {
   for (const row of rows) {
     const prediction = row[key];
     const gold = row.label;
-    if (!prediction || !isKnownInterest(gold?.interest_label)) continue;
-    result.compared += 1;
-    if (prediction.interest_level === 'uninterested' && gold.interest_label !== 'uninterested') {
-      result.falseSkips.push(row);
-    } else if (prediction.interest_level !== gold.interest_label) {
-      result.lowerHarmInterest.push(row);
+    if (!prediction) continue;
+    if (isKnownInterest(gold?.interest_label)) {
+      result.interestCompared += 1;
+      if (prediction.interest_level === 'uninterested' && gold.interest_label !== 'uninterested') {
+        result.falseSkips.push(row);
+      } else if (prediction.interest_level !== gold.interest_label) {
+        result.lowerHarmInterest.push(row);
+      }
     }
-    if (
-      gold.interest_label !== 'uninterested' &&
-      gold.depth_label === 'in_depth' &&
-      prediction.interest_level !== 'uninterested' &&
-      prediction.consumption_depth === 'headline_only'
-    ) {
+    if (gold?.depth_label === 'headline_only' || gold?.depth_label === 'in_depth') {
+      result.depthCompared += 1;
+    }
+    if (gold?.depth_label === 'in_depth' && prediction.consumption_depth === 'headline_only') {
       result.missedDepth.push(row);
     }
-    if (
-      gold.interest_label !== 'uninterested' &&
-      gold.depth_label === 'headline_only' &&
-      prediction.interest_level !== 'uninterested' &&
-      prediction.consumption_depth === 'in_depth'
-    ) {
+    if (gold?.depth_label === 'headline_only' && prediction.consumption_depth === 'in_depth') {
       result.unwantedInDepth.push(row);
     }
   }
@@ -330,13 +357,19 @@ function readLabels(candidate, datasetId, assignment) {
   return map;
 }
 
-function readPredictions(candidate, datasetId, assignment, name) {
+function readPredictions(candidate, datasetId, assignment, name, expectedVersions) {
   requireObject(candidate, name);
   if (candidate.dataset_id !== datasetId || candidate.assignment !== assignment) {
     throw new Error(`${name} dataset_id and assignment must match the inventory selection`);
   }
-  requireString(candidate.profile_version, `${name}.profile_version`);
-  requireString(candidate.prompt_version, `${name}.prompt_version`);
+  if (
+    candidate.profile_version !== expectedVersions.profile ||
+    candidate.prompt_version !== expectedVersions.prompt
+  ) {
+    throw new Error(
+      `${name} must use profile ${expectedVersions.profile} and ${expectedVersions.prompt}`
+    );
+  }
   const items = new Map();
   for (const [index, prediction] of requireArray(candidate.items, `${name}.items`).entries()) {
     const field = `${name}.items[${index}]`;
@@ -348,21 +381,28 @@ function readPredictions(candidate, datasetId, assignment, name) {
     requireEnum(prediction.consumption_depth, DEPTH, `${field}.consumption_depth`);
     requireScore(prediction.depth_score, `${field}.depth_score`);
     const expectedInterest =
-      prediction.interest_score >= 0.8
+      prediction.interest_score >= SCORE_BANDS.interestedMin
         ? 'interested'
-        : prediction.interest_score >= 0.6
+        : prediction.interest_score >= SCORE_BANDS.maybeMin
           ? 'maybe'
           : 'uninterested';
-    const expectedDepth = prediction.depth_score >= 0.6 ? 'in_depth' : 'headline_only';
+    const expectedDepth =
+      prediction.depth_score >= SCORE_BANDS.inDepthMin ? 'in_depth' : 'headline_only';
     if (
       prediction.interest_level !== expectedInterest ||
       prediction.consumption_depth !== expectedDepth
     ) {
-      throw new Error(`${field} labels must match the configured score thresholds`);
+      throw new Error(
+        `${field} labels must match the score bands in schema/classifier-instructions.md`
+      );
     }
     items.set(id, prediction);
   }
-  return { items };
+  return {
+    items,
+    profileVersion: candidate.profile_version,
+    promptVersion: candidate.prompt_version,
+  };
 }
 
 function selectedItems(inventory, assignment) {
@@ -388,11 +428,11 @@ function pendingRows(label, rows) {
 
 function thresholdDistance(prediction, harm) {
   if (harm === 'missed depth' || harm === 'unwanted in-depth') {
-    return Math.abs(prediction.depth_score - 0.6);
+    return Math.abs(prediction.depth_score - SCORE_BANDS.inDepthMin);
   }
   return Math.min(
-    Math.abs(prediction.interest_score - 0.6),
-    Math.abs(prediction.interest_score - 0.8)
+    Math.abs(prediction.interest_score - SCORE_BANDS.maybeMin),
+    Math.abs(prediction.interest_score - SCORE_BANDS.interestedMin)
   );
 }
 
