@@ -159,11 +159,19 @@ test('v4 candidate prepares literal context for unclear headlines', async () => 
   assert.match(generation, /Do not truncate a sentence, rewrite it, or manufacture/);
   assert.match(generation, /self-contained headline short with null context/);
   assert.match(generation, /Never add headline\s+context to an in-depth item/);
+  assert.match(generation, /sweep_lines\.append\(prefix\)/);
+  assert.match(generation, /update_prefix"\] == item\["coverage"\]\["update_note"\]/);
+  assert.match(
+    generation,
+    /excerpt_source_occurrence_id"\] == item\["selected_source_occurrence_id"\]/
+  );
+  assert.match(generation, /complete excerpt sentence/);
   assert.match(task, /classification labels unchanged by this presentation step/);
   assert.match(voice, /literal context excerpt or an update prefix/);
   assert.match(voice, /without changing the announced depth label/);
   assert.match(schema, /"playback_context"/);
   assert.match(schema, /"unusually_long_excerpt"/);
+  assert.ok(schema.includes('"pattern": "[.!?]'));
 });
 
 test('daily commute completion cannot omit a required Project update', async () => {

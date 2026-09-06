@@ -139,25 +139,30 @@ import hashlib, json
 
 assert list(main) == ["sweep_playback", "items"], "main keys/order"
 assert len(main["items"]) == len(reference["items"]) == reference["total_items"], "pair counts"
-lines = []
+sweep_lines = []
 for index, (played, item) in enumerate(zip(main["items"], reference["items"]), 1):
     assert item["position"] == index, f"reference position {index}"
     assert list(played) == ["item_playback"], f"main item {index} shape"
     mode = "Headline only" if item["consumption_depth"] == "headline_only" else "In depth"
     prefix = f'{index} of {reference["total_items"]}. {mode}. {item["title"]}'
     context = item["playback_context"]
-    lines = [prefix]
+    sweep_lines.append(prefix)
+    playback_lines = [prefix]
+    assert context["update_prefix"] == item["coverage"]["update_note"], f"update prefix {index}"
     if context["update_prefix"] is not None:
-        assert context["update_prefix"] == item["coverage"]["update_note"], f"update prefix {index}"
-        lines.append(context["update_prefix"])
+        playback_lines.append(context["update_prefix"])
     if item["consumption_depth"] == "in_depth":
         assert context["headline_context"] is None, f"in-depth context {index}"
-        lines.append(item["description"])
+        playback_lines.append(item["description"])
     elif context["headline_context"] is not None:
+        assert context["excerpt_source_occurrence_id"] == item["selected_source_occurrence_id"], f"selected excerpt {index}"
         occurrence = next(o for o in item["source_occurrences"] if o["occurrence_id"] == context["excerpt_source_occurrence_id"])
         assert occurrence["description"].startswith(context["headline_context"]), f"literal opening excerpt {index}"
-        lines.append(context["headline_context"])
-    expected = "\n".join(lines)
+        excerpt_ending = context["headline_context"].strip().rstrip("\"'”’)]")
+        assert excerpt_ending.endswith((".", "!", "?")), f"complete excerpt sentence {index}"
+        assert context["headline_context"] != context["update_prefix"], f"separate update and excerpt {index}"
+        playback_lines.append(context["headline_context"])
+    expected = "\n".join(playback_lines)
     assert played["item_playback"] == expected, f"item playback {index}"
     attribution = item["attribution"]
     assert attribution["resolved_url"] == item["url"], f"resolved URL {index}"
@@ -174,8 +179,7 @@ for index, (played, item) in enumerate(zip(main["items"], reference["items"]), 1
         from urllib.parse import urlparse
         expected_host = urlparse(item["url"]).hostname.removeprefix("www.")
         assert item["publication"] == expected_host, f"publication fallback {index}"
-    lines.append(prefix)
-assert main["sweep_playback"] == "\n".join(lines), "sweep"
+assert main["sweep_playback"] == "\n".join(sweep_lines), "sweep"
 assert reference["main_filename"] == main_filename, "main filename"
 assert reference["daily_generation_id"] == daily_generation_id, "daily generation"
 seen_occurrences = set()

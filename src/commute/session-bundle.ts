@@ -911,6 +911,7 @@ function validateQueueV4ReferenceItem(
     `${itemPath}.playback_context`,
     consumptionDepth,
     description,
+    selectedOccurrenceId,
     occurrences,
     coverage
   );
@@ -1029,6 +1030,7 @@ function validatePlaybackContext(
   field: string,
   consumptionDepth: 'headline_only' | 'in_depth',
   selectedDescription: string,
+  selectedOccurrenceId: string,
   occurrences: ValidatedSourceOccurrence[],
   coverage: {
     status: 'original' | 'deduplicated' | 'useful_update' | 'uncertain';
@@ -1065,6 +1067,9 @@ function validatePlaybackContext(
     throw new Error(`${field} cannot flag a missing excerpt as unusually long`);
   }
   if (headlineContext !== null && occurrenceId !== null) {
+    if (occurrenceId !== selectedOccurrenceId) {
+      throw new Error(`${field}.excerpt_source_occurrence_id must name the selected occurrence`);
+    }
     const occurrence = occurrences.find((value) => value.occurrenceId === occurrenceId);
     if (occurrence === undefined) {
       throw new Error(`${field}.excerpt_source_occurrence_id must name a source occurrence`);
@@ -1072,12 +1077,23 @@ function validatePlaybackContext(
     if (!occurrence.description.startsWith(headlineContext)) {
       throw new Error(`${field}.headline_context must be a literal opening source excerpt`);
     }
+    const trimmedContext = headlineContext.trim();
+    const closingCharacters = new Set(['"', "'", '”', '’', ')', ']']);
+    const finalCharacter = closingCharacters.has(trimmedContext.at(-1) ?? '')
+      ? trimmedContext.at(-2)
+      : trimmedContext.at(-1);
+    if (finalCharacter !== '.' && finalCharacter !== '!' && finalCharacter !== '?') {
+      throw new Error(`${field}.headline_context must end at a complete sentence boundary`);
+    }
   }
   if (coverage.status === 'useful_update' && updatePrefix !== coverage.updateNote) {
     throw new Error(`${field}.update_prefix must equal the prepared useful-update note`);
   }
   if (coverage.status !== 'useful_update' && updatePrefix !== null) {
     throw new Error(`${field}.update_prefix is only allowed for useful updates`);
+  }
+  if (headlineContext !== null && headlineContext === updatePrefix) {
+    throw new Error(`${field}.update_prefix must not be represented as quoted headline context`);
   }
 
   const lines: string[] = [];

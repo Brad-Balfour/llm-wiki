@@ -668,3 +668,60 @@ test('rejects invented headline context and context on in-depth items', () => {
     /must not add headline context to an in-depth item/
   );
 });
+
+test('rejects context from a non-selected occurrence and truncated sentences', () => {
+  const wrongOccurrence = pair(1);
+  wrongOccurrence.reference.items[0]!.source_occurrences.push({
+    occurrence_id: 'ai-example-1',
+    newsletter: 'TLDR AI',
+    source_item_id: 'ai-example-1',
+    source_order: 1,
+    title: 'Alternate example',
+    description: 'Alternate literal description.',
+    url: wrongOccurrence.reference.items[0]!.url,
+  });
+  wrongOccurrence.reference.items[0]!.playback_context.headline_context =
+    'Alternate literal description.';
+  wrongOccurrence.reference.items[0]!.playback_context.excerpt_source_occurrence_id =
+    'ai-example-1';
+  wrongOccurrence.main.items[0]!.item_playback += '\nAlternate literal description.';
+  wrongOccurrence.reference.main_sha256 = playbackFileFingerprint(wrongOccurrence.main);
+  assert.throws(
+    () => validateTldrCommuteQueuePair(wrongOccurrence.main, wrongOccurrence.reference),
+    /must name the selected occurrence/
+  );
+
+  const truncated = pair(1);
+  truncated.reference.items[0]!.playback_context.headline_context = 'Literal';
+  truncated.reference.items[0]!.playback_context.excerpt_source_occurrence_id =
+    truncated.reference.items[0]!.selected_source_occurrence_id;
+  truncated.main.items[0]!.item_playback += '\nLiteral';
+  truncated.reference.main_sha256 = playbackFileFingerprint(truncated.main);
+  assert.throws(
+    () => validateTldrCommuteQueuePair(truncated.main, truncated.reference),
+    /complete sentence boundary/
+  );
+});
+
+test('keeps useful-update text separate from quoted headline context', () => {
+  const candidate = pair(1);
+  const item = candidate.reference.items[0]!;
+  item.coverage = {
+    status: 'useful_update',
+    related_retained_item: {
+      main_filename: candidate.reference.main_filename,
+      source_item_id: item.source_item_id,
+    },
+    decision_reason: 'Adds material detail.',
+    update_note: item.description,
+  };
+  item.playback_context.update_prefix = item.description;
+  item.playback_context.headline_context = item.description;
+  item.playback_context.excerpt_source_occurrence_id = item.selected_source_occurrence_id;
+  candidate.main.items[0]!.item_playback += `\n${item.description}\n${item.description}`;
+  candidate.reference.main_sha256 = playbackFileFingerprint(candidate.main);
+  assert.throws(
+    () => validateTldrCommuteQueuePair(candidate.main, candidate.reference),
+    /must not be represented as quoted headline context/
+  );
+});
