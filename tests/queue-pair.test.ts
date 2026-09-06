@@ -281,6 +281,7 @@ test('rejects null attribution and status strings presented as verified authors'
   const second = pair(1);
   second.reference.items[0]!.author = 'Author lookup failed';
   second.reference.items[0]!.attribution.author_source = 'article_page';
+  second.reference.items[0]!.attribution.lookup_attempts = 1;
   assert.throws(
     () => validateTldrCommuteQueuePair(second.main, second.reference),
     /status strings are not verified author names/
@@ -289,8 +290,36 @@ test('rejects null attribution and status strings presented as verified authors'
   const fallback = pair(1);
   fallback.reference.items[0]!.publication = 'Wrong Site';
   fallback.reference.items[0]!.attribution.publication_source = 'hostname_fallback';
+  fallback.reference.items[0]!.attribution.lookup_attempts = 1;
   assert.throws(
     () => validateTldrCommuteQueuePair(fallback.main, fallback.reference),
     /publication must equal example\.com/
+  );
+});
+
+test('rejects attribution sources with inconsistent lookup attempt counts', () => {
+  const newsletter = pair(1);
+  newsletter.reference.items[0]!.attribution.lookup_attempts = 1;
+  assert.throws(
+    () => validateTldrCommuteQueuePair(newsletter.main, newsletter.reference),
+    /must be 0 when newsletter attribution is sufficient/
+  );
+
+  const page = pair(1);
+  page.reference.items[0]!.attribution.author_source = 'article_page';
+  assert.throws(
+    () => validateTldrCommuteQueuePair(page.main, page.reference),
+    /must be at least 1 for non-newsletter attribution/
+  );
+
+  const failed = pair(1);
+  failed.reference.items[0]!.author = 'Author lookup failed';
+  failed.reference.items[0]!.publication = 'example.com';
+  failed.reference.items[0]!.attribution.author_source = 'lookup_failed';
+  failed.reference.items[0]!.attribution.publication_source = 'hostname_fallback';
+  failed.reference.items[0]!.attribution.lookup_attempts = 1;
+  assert.throws(
+    () => validateTldrCommuteQueuePair(failed.main, failed.reference),
+    /must be 2 for a failed lookup after retry/
   );
 });

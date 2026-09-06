@@ -95,6 +95,21 @@ for index, (played, item) in enumerate(zip(main["items"], reference["items"]), 1
     prefix = f'{index} of {reference["total_items"]}. {mode}. {item["title"]}'
     expected = prefix if item["consumption_depth"] == "headline_only" else prefix + "\n" + item["description"]
     assert played["item_playback"] == expected, f"item playback {index}"
+    attribution = item["attribution"]
+    assert attribution["resolved_url"] == item["url"], f"resolved URL {index}"
+    if attribution["author_source"] == "no_authors_listed":
+        assert item["author"] == "No authors listed", f"absent byline {index}"
+    elif attribution["author_source"] == "lookup_failed":
+        assert item["author"] == "Author lookup failed", f"failed lookup {index}"
+        assert attribution["lookup_attempts"] == 2, f"failed lookup attempts {index}"
+    else:
+        assert item["author"] not in ("No authors listed", "Author lookup failed"), f"verified author {index}"
+    newsletter_sufficient = attribution["author_source"] == attribution["publication_source"] == "newsletter"
+    assert (attribution["lookup_attempts"] == 0) == newsletter_sufficient, f"lookup attempts {index}"
+    if attribution["publication_source"] == "hostname_fallback":
+        from urllib.parse import urlparse
+        expected_host = urlparse(item["url"]).hostname.removeprefix("www.")
+        assert item["publication"] == expected_host, f"publication fallback {index}"
     lines.append(prefix)
 assert main["sweep_playback"] == "\n".join(lines), "sweep"
 assert reference["main_filename"] == main_filename, "main filename"

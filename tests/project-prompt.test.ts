@@ -114,6 +114,9 @@ test('v4 candidate resolves and records attribution before classification', asyn
   assert.match(generation, /`No authors listed`/);
   assert.match(generation, /`Author lookup failed`/);
   assert.match(generation, /hostname\s+without leading `www\.`/);
+  assert.match(generation, /resolved URL \{index\}/);
+  assert.match(generation, /failed lookup attempts \{index\}/);
+  assert.match(generation, /publication fallback \{index\}/);
   assert.match(task, /fill attribution before\s+classification/);
   assert.match(classifier, /status\/error text are not authors/);
   assert.match(schema, /"author_source"/);

@@ -755,6 +755,16 @@ function validateAttribution(
   );
   const attempts = requireNonNegativeInteger(record.lookup_attempts, `${field}.lookup_attempts`);
   if (attempts > 2) throw new Error(`${field}.lookup_attempts must be no more than 2`);
+  const newsletterSufficient = authorSource === 'newsletter' && publicationSource === 'newsletter';
+  if (newsletterSufficient && attempts !== 0) {
+    throw new Error(`${field}.lookup_attempts must be 0 when newsletter attribution is sufficient`);
+  }
+  if (!newsletterSufficient && attempts === 0) {
+    throw new Error(`${field}.lookup_attempts must be at least 1 for non-newsletter attribution`);
+  }
+  if (authorSource === 'lookup_failed' && attempts !== 2) {
+    throw new Error(`${field}.lookup_attempts must be 2 for a failed lookup after retry`);
+  }
   if (authorSource === 'no_authors_listed' && author !== 'No authors listed') {
     throw new Error(`${itemPath}.author must be No authors listed for absent-byline status`);
   }
