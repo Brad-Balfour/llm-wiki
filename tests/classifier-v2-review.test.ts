@@ -234,7 +234,7 @@ test('comparison rejects incorrect baseline or candidate version identities', as
     fixture.output,
   ]);
   assert.notEqual(result.status, 0);
-  assert.match(result.stderr, /candidate must use profile 2\.0/);
+  assert.match(result.stderr, /candidate must use profile 2\.1/);
 });
 
 test('inventory enforces author and attribution-status consistency', async () => {
@@ -336,7 +336,7 @@ function predictions(
   return {
     dataset_id: 'weekend-review',
     assignment: 'development',
-    profile_version: kind === 'baseline' ? '1.4' : '2.0',
+    profile_version: kind === 'baseline' ? '1.4' : '2.1',
     prompt_version:
       kind === 'baseline' ? 'classifier-instructions.v1' : 'classifier-instructions.v2',
     items,

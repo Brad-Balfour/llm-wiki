@@ -1,6 +1,6 @@
-# Brad TLDR Interest Profile v2.0
+# Brad TLDR Interest Profile v2.1
 
-Version: `2.0`
+Version: `2.1`
 Scope: TLDR newsletters only for the MVP (`TLDR`, `TLDR AI`, `TLDR Dev`,
 `TLDR Fintech`).
 
@@ -51,6 +51,11 @@ central to the title and summary.
   weak matches unless they include one of those hooks.
 - Frontend and web engineering tradeoffs Brad may apply, such as practical state
   management, browser architecture choices, UX engineering, and tool selection.
+- Browser-native AI runtimes and client-side inference when the item explains a
+  practical way to build or deploy them. WebGPU, WebAssembly, worker isolation,
+  browser caching, and usable integration APIs are strong signals when they are
+  central to the item. A bare repository, framework, or local-model announcement
+  does not qualify on its own.
 - Robots, physical AI, self-driving vehicles, and AI-embedded devices when the
   story is about a genuine technical/product capability rather than generic
   company finance. Tesla and Waymo self-driving developments are explicit strong
@@ -70,8 +75,9 @@ central to the title and summary.
 Items matching these lanes are optional or substance-dependent. Score them by how
 specific, current, and useful the title and summary make the item appear.
 
-- LLM architecture deep-dives that explain useful concepts beyond the headline,
-  without becoming raw training-systems minutiae.
+- LLM architecture deep-dives that explain concepts Brad can apply beyond the
+  headline, without becoming speculative model anatomy, release commentary, or
+  raw training-systems minutiae.
 - Macro AI market sizing, token pricing, and usage data when the item is mostly
   descriptive and lacks a durable argument.
 - Frontier model releases when the writeup contains substance beyond "model X
@@ -87,6 +93,10 @@ specific, current, and useful the title and summary make the item appear.
   This remains tentative and should not override strong negative lanes casually.
 - Borderline product/platform news that touches a known interest but lacks a
   clear daily-use, product, governance, or technical lesson.
+- Focused engineering incident reports with a surprising measured fix and a
+  reusable diagnostic lesson can be `maybe` even when the affected system is a
+  normally disfavored database or backend stack. This is not a strong-interest
+  database lane.
 
 ## Not Interested Signals
 
@@ -95,12 +105,15 @@ a strong independent product, engineering, governance, or scientific lesson.
 
 - AI chip, GPU, accelerator, and hardware announcements.
 - SQL/database-specific internals and narrow database tooling, including DuckDB
-  product news, even when framed as AI-assisted engineering.
+  product news, even when framed as AI-assisted engineering. A concrete
+  debugging postmortem may qualify only for the moderate incident-report lane.
 - Raw ML training-infrastructure optimization internals, including low-level
   fine-tuning, expert parallelism, kernels, distributed training plumbing, and
   benchmark minutiae.
 - Open-source or local LLM model releases and benchmark posts, including generic
-  coding-model announcements.
+  coding-model announcements. Routine comparisons around a new model remain low
+  interest even when they contain many measurements; require a reusable eval or
+  engineering method to override this prior.
 - Chinese AI model news as a category, unless the item has a separate, concrete
   product/workflow/governance lesson.
 - Crypto, stablecoin, blockchain, and prediction-market hype, including fintech
@@ -108,7 +121,9 @@ a strong independent product, engineering, governance, or scientific lesson.
 - Meta, Zuckerberg, WhatsApp, and Meta corporate strategy stories, even when the
   story touches AI, fintech, prediction markets, or WhatsApp. Exceptions require
   a standalone technical, product, governance, or scientific lesson that would be
-  interesting without Meta as the subject.
+  interesting without Meta as the subject. Concrete evidence about AI changing
+  engineering roles, team structure, or labor is governed by the positive
+  AI-and-work lane instead; shallow organizational awareness stays headline-only.
 - Generic cybersecurity vulnerabilities, exploits, RCE writeups, and threat-news
   items unless the core issue is AI-specific.
 - Consumer hardware leaks, phone rumors, clickbait devices, and vague product
@@ -125,6 +140,9 @@ a strong independent product, engineering, governance, or scientific lesson.
 - Generic backend-scale, load-balancing, framework, and operations-scale stories
   unless they connect to current work, product/cost tradeoffs, architecture
   choices, caching, reviewability, or another durable engineering lesson.
+- Venture-capital and investing-industry analysis without a concrete AI product,
+  governance, engineering, or labor-market lesson. A provocative label or broad
+  argument about investor incentives does not override this prior by itself.
 - SEO, marketing, generic open-source repos, and growth-tool announcements
   without a direct AI-engineering or product-judgment angle.
 
@@ -152,6 +170,10 @@ Use these verified corrections as category boundaries, not title-matching rules:
   when the source contains an argument, migration method, or architecture lesson.
   The HTMX forms, HTML over WebSockets, software craftsmanship, Sass migration,
   AcceptMarkdown, Saggar, and TermDOM corrections exemplify that pattern.
+- Browser-native AI runtime pieces deserve in-depth treatment when their
+  descriptions promise concrete integration APIs, worker or caching patterns,
+  deployment tradeoffs, or other applicable implementation detail. A bare tool
+  announcement remains shallow.
 - Robotics and self-driving pieces deserve in-depth treatment when they contain
   capability, engineering, deployment, or adoption detail. Matic, the Waymo chip,
   and London robotaxi corrections exemplify that pattern.

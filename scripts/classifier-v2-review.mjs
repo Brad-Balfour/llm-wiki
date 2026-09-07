@@ -9,7 +9,7 @@ const DEPTH = new Set(['headline_only', 'in_depth']);
 const SCORE_BANDS = Object.freeze({ interestedMin: 0.8, maybeMin: 0.6, inDepthMin: 0.6 });
 const EXPECTED_VERSIONS = Object.freeze({
   baseline: { profile: '1.4', prompt: 'classifier-instructions.v1' },
-  candidate: { profile: '2.0', prompt: 'classifier-instructions.v2' },
+  candidate: { profile: '2.1', prompt: 'classifier-instructions.v2' },
 });
 
 export function readInventory(candidate) {

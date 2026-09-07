@@ -1,7 +1,7 @@
 # TLDR Classifier Instructions
 
 Version: `classifier-instructions.v2`
-Profile version: `2.0`
+Profile version: `2.1`
 Scope: Source-neutral classification of parsed TLDR editorial items.
 
 The classifier emits only a source-neutral request reference plus interest and
@@ -170,6 +170,12 @@ Prefer `headline_only` when:
 - It is a shallow launch, availability change, acquisition, funding round,
   personnel move, pricing change, product rumor, policy update, benchmark
   headline, device reveal, or market blurb.
+- It is a routine model-release benchmark comparison without a reusable
+  evaluation method or engineering lesson.
+- It is corporate workforce or organization analysis whose useful value is the
+  reported change and consequence, without a practical method Brad can apply.
+- It is venture-capital or investing-industry commentary whose argument is
+  already captured by the supplied summary.
 - The likely reaction is "good to know" rather than "I want to inspect this."
 - The item matches a known-awareness category such as Anthropic/OpenAI/Perplexity
   access, pricing, model availability, or policy changes, but the summary is
@@ -192,6 +198,10 @@ Prefer `in_depth` when the linked item likely contains:
 - Range-relevant trust, verification, data quality, compliance, correctness, or
   high-stakes automation patterns.
 - Frontend, web, or software architecture guidance Brad may apply.
+- Browser-native AI runtime implementation involving WebGPU, WebAssembly,
+  workers, caching, integration APIs, or deployment tradeoffs.
+- A concrete engineering incident report that explains a surprising measured
+  fix and a reusable debugging or performance-diagnosis method.
 - Computing-culture, software-history, or career essays with reusable framing.
 - Software craftsmanship, progressive enhancement, migration, browser UI, or
   low-JavaScript architecture with a concrete argument or applicable method.
