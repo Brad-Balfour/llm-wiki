@@ -73,7 +73,7 @@ answers. A prediction file has this shape:
 {
   "dataset_id": "classifier-v2-202609",
   "assignment": "development",
-  "profile_version": "2.0",
+  "profile_version": "2.1",
   "prompt_version": "classifier-instructions.v2",
   "items": [
     {
@@ -96,13 +96,13 @@ For the baseline chat, attach the prediction input plus the installed profile
 > profile_version to 1.4, and prompt_version to classifier-instructions.v1. Do
 > not generate commute files or use any label file or prior discussion.
 
-For the candidate chat, attach the same prediction input plus profile 2.0 and
+For the candidate chat, attach the same prediction input plus profile 2.1 and
 classifier instructions v2, then send:
 
 > Classify every attached prediction-input item using only the attached profile
-> 2.0 and classifier instructions v2. Return one JSON object in the documented
+> 2.1 and classifier instructions v2. Return one JSON object in the documented
 > prediction-file shape. Set dataset_id and assignment exactly from the input,
-> profile_version to 2.0, and prompt_version to classifier-instructions.v2. Do
+> profile_version to 2.1, and prompt_version to classifier-instructions.v2. Do
 > not generate commute files or use any label file or prior discussion.
 
 Save the JSON responses as separate private baseline and candidate files before

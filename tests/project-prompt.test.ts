@@ -183,19 +183,23 @@ test('classifier v2 candidate records calibrated versions and blind-review bound
     readFile('docs/classifier-v2/review-tool.md', 'utf8'),
   ]);
 
-  assert.match(profile, /Version: `2\.0`/);
+  assert.match(profile, /Version: `2\.1`/);
   assert.match(profile, /Martin Fowler default to high interest and in-depth/);
   assert.match(profile, /Addy Osmani have a strong interest prior/);
   assert.match(profile, /Tesla and Waymo self-driving developments/);
   assert.match(profile, /Better Batteries|battery-product blurbs/);
   assert.match(profile, /Bun/);
   assert.match(profile, /DuckDB/);
+  assert.match(profile, /Browser-native AI runtimes and client-side inference/);
+  assert.match(profile, /Routine comparisons around a new model remain low/);
+  assert.match(profile, /surprising measured fix and a\s+reusable diagnostic lesson/);
+  assert.match(classifier, /corporate workforce or organization analysis/);
   assert.match(classifier, /Version: `classifier-instructions\.v2`/);
   assert.match(classifier, /explicit verified-author preference/);
   assert.match(classifier, /`development` or `final_check`/);
   assert.doesNotMatch(classifier, /July 3, 2026 and later/);
   assert.match(generation, /profile_version` and\s+`prompt_version`/);
-  assert.match(task, /profile 2\.0 and classifier instructions v2/);
+  assert.match(task, /profile 2\.1 and classifier instructions v2/);
   assert.match(reviewTool, /makes no model calls/);
   assert.match(reviewTool, /no scores, predictions, or model reasons/);
 });
