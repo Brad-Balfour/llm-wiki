@@ -22,14 +22,14 @@ into distinct schema files.
 #### Scenario: Create canonical profile files
 
 - **WHEN** the schema layer is initialized
-- **THEN** `schema/interest-profile.md` SHALL contain Brad's candidate v2.0
+- **THEN** `schema/interest-profile.md` SHALL contain Brad's candidate v2.1
   interest profile
 - **AND** `schema/classifier-instructions.md` SHALL contain scoring mechanics,
   output schema, fail-closed validation rules, and validation methodology
 - **AND** `schema/routing-rules.md` SHALL contain downstream derivation rules for
   commute, wiki, stream-log, review, and discard behavior.
 
-#### Scenario: Build v2.0 interest profile
+#### Scenario: Build v2.1 interest profile
 
 - **WHEN** `schema/interest-profile.md` is authored
 - **THEN** the profile SHALL preserve the accepted v1.4 scope and thresholds

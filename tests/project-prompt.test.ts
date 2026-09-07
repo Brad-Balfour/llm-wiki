@@ -175,13 +175,17 @@ test('v4 candidate prepares literal context for unclear headlines', async () => 
 });
 
 test('classifier v2 candidate records calibrated versions and blind-review boundaries', async () => {
-  const [profile, classifier, generation, task, reviewTool] = await Promise.all([
-    readFile('schema/interest-profile.md', 'utf8'),
-    readFile('schema/classifier-instructions.md', 'utf8'),
-    readFile('chatgpt-project/queue-generation-v4.md', 'utf8'),
-    readFile('chatgpt-project/WEEKDAY_TLDR_QUEUE_TASK_PROMPT_V4.md', 'utf8'),
-    readFile('docs/classifier-v2/review-tool.md', 'utf8'),
-  ]);
+  const [profile, classifier, generation, task, reviewTool, contract, tasks, plan] =
+    await Promise.all([
+      readFile('schema/interest-profile.md', 'utf8'),
+      readFile('schema/classifier-instructions.md', 'utf8'),
+      readFile('chatgpt-project/queue-generation-v4.md', 'utf8'),
+      readFile('chatgpt-project/WEEKDAY_TLDR_QUEUE_TASK_PROMPT_V4.md', 'utf8'),
+      readFile('docs/classifier-v2/review-tool.md', 'utf8'),
+      readFile('openspec/changes/bootstrap-llm-wiki-mvp/specs/classifier-routing/spec.md', 'utf8'),
+      readFile('openspec/changes/bootstrap-llm-wiki-mvp/tasks.md', 'utf8'),
+      readFile('docs/classifier-v2/implementation-plan.md', 'utf8'),
+    ]);
 
   assert.match(profile, /Version: `2\.1`/);
   assert.match(profile, /Martin Fowler default to high interest and in-depth/);
@@ -202,6 +206,9 @@ test('classifier v2 candidate records calibrated versions and blind-review bound
   assert.match(task, /profile 2\.1 and classifier instructions v2/);
   assert.match(reviewTool, /makes no model calls/);
   assert.match(reviewTool, /no scores, predictions, or model reasons/);
+  assert.match(contract, /candidate v2\.1/);
+  assert.match(tasks, /\[ \] 4\.9 Validate profile 2\.1 with a new unseen final-check sample/);
+  assert.match(plan, /calibrated profile is\s+2\.1/);
 });
 
 test('daily commute completion cannot omit a required Project update', async () => {

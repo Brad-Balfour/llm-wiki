@@ -34,7 +34,7 @@ do not claim a new file is installed merely because it is committed.
 
 **This release:** queue v4 uses a playback/reference pair; Voice Prompt 5.0 reads
 it; the candidate classifier instructions are v2 and the calibrated profile is
-2.0. Routing thresholds remain unchanged. Keep session bundle v1’s outer fields
+2.1. Routing thresholds remain unchanged. Keep session bundle v1’s outer fields
 and accept a v4 snapshot as described below. Retain old v2/v3 readers and files.
 These are planned version labels, not claims about the current Project.
 
@@ -281,7 +281,7 @@ that feedback; do not schedule another large test just for this change.
 
 ### Build while Brad is busy
 
-1. Prepare candidate profile 2.0 and classifier instructions v2 using verified
+1. Prepare candidate profile 2.1 and classifier instructions v2 using verified
    historical corrections and explicit preferences. Keep current score thresholds.
    Preserve the input additions from PR 2.
 2. Add the small review script named in the file table. It consumes saved private
