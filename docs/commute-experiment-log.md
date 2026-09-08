@@ -145,7 +145,7 @@ reopen chat as an interruption within the Dev flow. It did not convert the
 half-finished third Monday queue into a session or infer events for it.
 
 The normalized intake retained two exact wiki saves, one exact depth promotion,
-four bundle quality incidents, three general captures, and no unresolved item.
+four bundle quality incidents, three general captures, and no unresolved items.
 The depth correction moves the Zod memory-footprint article from headline-only
 to in-depth. Praise for the intentionally terse `cn` headline remains positive
 presentation evidence rather than a depth label.
