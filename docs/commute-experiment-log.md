@@ -74,6 +74,9 @@ found a queue as proof.
 - The four September 3 General, Dev, AI, and Fintech queues, four recovered
   evening session bundles, and seven shared-chat URLs. Three URLs are SRT
   representations paired with the General, Dev, and AI Voice conversations.
+- The September 7 General and Dev v4 queue pairs, two September 8 recovered
+  bundles, and three shared chats. One chat is an interruption/restart segment
+  inside the General session rather than a third completed queue.
 - The live `Weekday TLDR Queues` Task conversation/configuration, the July
   21-24 Task Update emails, the July 24 manual queue-generation control, and
   the live Project settings/sources inspected on July 26.
@@ -130,6 +133,39 @@ retrieve sources, and preserve history after the drive.
 | Aug. 16    | Two recovered catch-up sessions and three discussion-enriched wiki saves                       | Validate the August 14 Dev and August 13 AI queues, reconcile two malformed noon exports with three chats, preserve three exact saves and their discussion, and audit every substantive user turn.               | Both snapshots matched, but both bundles labeled post-noon exports as morning; Dev also retained a completed-session cursor rejected categorically by the then-current validator. Recovery preserved three exact saves. The chats added a Voice/context interruption, headline-sweep violation, false verbatim claim, wrong reading mode, and failed first export. There were no classifier corrections or unresolved captures. |
 | Aug. 20    | General and Dev playback audit plus governed-memory save                                      | Retrieve and validate the two exact queues and bundles, reconcile both complete shared chats, preserve the Redis memory-governance discussion, and separate headline QA from classifier labels.                  | Both snapshots matched and both bundles became strict-valid after the local validator stopped treating a truthful completed-session revisit cursor as an error. The two Dev save events named one article and were consolidated into one discussion-enriched wiki result. The repeated _fx_ complaint remained headline-informativeness QA because Brad explicitly left the depth judgment open. |
 | Aug. 21    | Two catch-up queues, three current queues, exact feedback audit, and no-save control            | Retrieve five exact queues and bundles, reconcile six complete shared chats, preserve five exact classifier corrections, and separate unsaved discussion, playback defects, and duplicate signals.                | Every queue validated and every embedded snapshot matched. Fintech, Dev, and AI bundles were strict-valid; AI catch-up and General required supplied-queue recovery for lifecycle errors. Intake accepted all five sessions with no unresolved captures or wiki candidates. The chats established three additional exact General corrections omitted by malformed recovery. |
+| Sep. 8     | Two completed v4 trial queues, split-chat recovery, and two source-grounded saves               | Validate the September 7 General and Dev playback/reference pairs and their September 8 bundles, reconcile three chats, retain one exact depth correction, and separate the unfinished third queue from completed intake. | Both recovered bundles were strict-valid and canonically matched their downloaded pairs. Voice truncated an embedded-newline item, omitted a sweep, stalled on two transitions, and repeatedly failed to reopen visible `v2-trial` files. The next generation returned to canonical names, but that does not retroactively make the unfinished queue a completed session. |
+
+### September 8 Acceptance And Maintenance Result
+
+The two downloaded v4 playback/reference pairs validated together with 24
+items, and both recovered session bundles passed strict validation and matched
+their separately downloaded pairs as canonical JSON. The shared-chat audit
+treated the restart/export chat as part of the General session and the failed
+reopen chat as an interruption within the Dev flow. It did not convert the
+half-finished third Monday queue into a session or infer events for it.
+
+The normalized intake retained two exact wiki saves, one exact depth promotion,
+four bundle quality incidents, three general captures, and no unresolved item.
+The depth correction moves the Zod memory-footprint article from headline-only
+to in-depth. Praise for the intentionally terse `cn` headline remains positive
+presentation evidence rather than a depth label.
+
+The two saved discussions produced concepts about opinionated end-to-end test
+APIs and agent-legible codebases. The first distinguishes Shopify's native
+mobile computer-vision implementation from the transferable web pattern of
+assertion-carrying actions, safe selectors, diagnostics, and a stability gate.
+The second preserves the practical loop of recording recurring intervention
+causes, improving observability and durable memory, and checking whether those
+changes reduce future supervision.
+
+Artifact naming caused avoidable recovery work. Both completed bundles named
+the experimental `20260907-*-v2-trial.txt` playback files, while the live
+Project prompt expected canonical dated names and initially failed to reopen
+files that were visible in Library and later readable after attachment. The
+September 8 generation visibly returned to canonical filenames. This is a
+bounded one-day naming/configuration mismatch plus another Library-discovery
+failure; it does not establish that changing prompt wording would make stock
+Voice bind the correct file on every turn.
 
 ### July 24 Bundle Acceptance Result
 
