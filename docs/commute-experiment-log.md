@@ -134,6 +134,43 @@ retrieve sources, and preserve history after the drive.
 | Aug. 20    | General and Dev playback audit plus governed-memory save                                      | Retrieve and validate the two exact queues and bundles, reconcile both complete shared chats, preserve the Redis memory-governance discussion, and separate headline QA from classifier labels.                  | Both snapshots matched and both bundles became strict-valid after the local validator stopped treating a truthful completed-session revisit cursor as an error. The two Dev save events named one article and were consolidated into one discussion-enriched wiki result. The repeated _fx_ complaint remained headline-informativeness QA because Brad explicitly left the depth judgment open. |
 | Aug. 21    | Two catch-up queues, three current queues, exact feedback audit, and no-save control            | Retrieve five exact queues and bundles, reconcile six complete shared chats, preserve five exact classifier corrections, and separate unsaved discussion, playback defects, and duplicate signals.                | Every queue validated and every embedded snapshot matched. Fintech, Dev, and AI bundles were strict-valid; AI catch-up and General required supplied-queue recovery for lifecycle errors. Intake accepted all five sessions with no unresolved captures or wiki candidates. The chats established three additional exact General corrections omitted by malformed recovery. |
 | Sep. 8     | Two completed v4 trial queues, split-chat recovery, and two source-grounded saves               | Validate the September 7 General and Dev playback/reference pairs and their September 8 bundles, reconcile three chats, retain one exact depth correction, and separate the unfinished third queue from completed intake. | Both recovered bundles were strict-valid and canonically matched their downloaded pairs. Voice truncated an embedded-newline item, omitted a sweep, stalled on two transitions, and repeatedly failed to reopen visible `v2-trial` files. The next generation returned to canonical names, but that does not retroactively make the unfinished queue a completed session. |
+| Sep. 9     | Three v4 sessions, exact contrail-depth correction, and embedded-newline playback audit         | Validate three playback/reference pairs and bundles, reconcile two unique shared chats, preserve one exact depth correction, and separate unsaved discussion from playback and Library-recovery incidents.          | All three bundles passed strict validation and canonically matched 37 downloaded queue items. Intake accepted one partial and two recovered sessions with one depth correction, four bundled incidents, one workflow capture, no wiki candidates, and no unresolved items. Voice again stopped at embedded newlines and repeatedly struggled to reopen visible Library files. |
+
+### September 9 Acceptance And Classifier Result
+
+The three downloaded v4 playback/reference pairs validated with 37 items: the
+September 8 AI queue and the September 7 `v2-trial` AI and Fintech queues. All
+three session bundles passed strict validation and canonically matched their
+separately downloaded pairs. The `18:08` AI bundle is a separate partial
+session, while the recovered `18:28` bundle covers the Fintech chat. The two
+unique shared chats contain 52 user messages; the repeated URL was counted once.
+
+The normalized intake accepted all three sessions with no unresolved items and
+no wiki-maintenance candidates. It retained one exact classifier correction:
+September 8 AI item `1a081349c861bb06-16`, _Google Tests AI-Powered Contrail
+Avoidance on Long-Haul Flights_, changes from `maybe` / `headline_only` to
+`maybe` / `in_depth`. The queue-bound private label preserves its original
+scores and producer versions. Questions and conclusions about managed agents,
+TPUs, Apple neural acceleration, `hip-agent`, _The Education of a Doomer_, and
+_The Chasm_ remain unsaved discussion; they are not silently converted into
+wiki work or classifier labels.
+
+The bundles retain four quality incidents. The AI `v2-trial` sweep stopped
+after its third newline-separated entry and later treated item eight as the end
+of a twelve-item queue. Fintech items five and ten initially stopped before the
+complete in-depth `item_playback` value; item ten specifically lost the text
+after its embedded newline. Brad separately asked that the newline failure be
+kept as workflow feedback. The chats add repeated delays and failures while
+reopening files that were visible in Library, including another export-time
+search in the wrong Library scope.
+
+The tracked Prompt 5.0 candidate already requires the complete
+`sweep_playback` and `item_playback` strings to be read exactly, including text
+after literal newlines, and requires the exact main/reference pair to be
+reopened. This evidence therefore belongs with the supported queue-binding
+limitation rather than another wording-only prompt revision. No behavior file
+or live Project source changes in this pass, so no Project synchronization is
+required.
 
 ### September 8 Acceptance And Maintenance Result
 
