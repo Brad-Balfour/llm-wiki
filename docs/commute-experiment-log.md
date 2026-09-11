@@ -135,6 +135,47 @@ retrieve sources, and preserve history after the drive.
 | Aug. 21    | Two catch-up queues, three current queues, exact feedback audit, and no-save control            | Retrieve five exact queues and bundles, reconcile six complete shared chats, preserve five exact classifier corrections, and separate unsaved discussion, playback defects, and duplicate signals.                | Every queue validated and every embedded snapshot matched. Fintech, Dev, and AI bundles were strict-valid; AI catch-up and General required supplied-queue recovery for lifecycle errors. Intake accepted all five sessions with no unresolved captures or wiki candidates. The chats established three additional exact General corrections omitted by malformed recovery. |
 | Sep. 8     | Two completed v4 trial queues, split-chat recovery, and two source-grounded saves               | Validate the September 7 General and Dev playback/reference pairs and their September 8 bundles, reconcile three chats, retain one exact depth correction, and separate the unfinished third queue from completed intake. | Both recovered bundles were strict-valid and canonically matched their downloaded pairs. Voice truncated an embedded-newline item, omitted a sweep, stalled on two transitions, and repeatedly failed to reopen visible `v2-trial` files. The next generation returned to canonical names, but that does not retroactively make the unfinished queue a completed session. |
 | Sep. 9     | Three v4 sessions, exact contrail-depth correction, and embedded-newline playback audit         | Validate three playback/reference pairs and bundles, reconcile two unique shared chats, preserve one exact depth correction, and separate unsaved discussion from playback and Library-recovery incidents.          | All three bundles passed strict validation and canonically matched 37 downloaded queue items. Intake accepted one partial and two recovered sessions with one depth correction, four bundled incidents, one workflow capture, no wiki candidates, and no unresolved items. Voice again stopped at embedded newlines and repeatedly struggled to reopen visible Library files. |
+| Sep. 10    | Three current v4 sessions, duplicate-chat reconciliation, and two discussion-enriched saves    | Validate three current playback/reference pairs and bundles, reconcile the supplied chats with the already-published September 9 intake, retain three exact depth corrections, and preserve two saved Dev discussions. | All current bundles passed strict validation and canonically matched 32 downloaded queue items. Intake accepted three partial sessions with two wiki candidates, three depth corrections, four incidents, and no unresolved items. The supplied chats were duplicate provenance for September 9 and again showed Library lookup failures and newline-truncated playback. |
+
+### September 10 Acceptance, Maintenance, And Playback Result
+
+The three current Library playback/reference pairs validated with 32 items:
+September 8 General and Dev, and September 9 General. All three September 10
+session bundles passed strict validation and canonically matched their
+separately downloaded queues. Each is marked partial because the bundle is the
+complete available session evidence, not because a known item remains
+unresolved; the deterministic intake reports zero unresolved items.
+
+The three supplied shared chats map to the September 9 bundles already accepted
+and published in PR #139. They are retained as duplicate provenance and
+recovery evidence, but their three sessions and 37 queue items are not counted
+again in the September 10 workload.
+
+The intake retained two explicit Dev saves. The testing-techniques discussion
+extends _AI-Native Software Engineering_ with the study's weak results for
+named techniques and the commute's explicitly untested structured-specification
+hypothesis. The Fable 5.1 system-prompt discussion extends _Adaptive Context
+Engineering_ with a versioned-dependency rule: reevaluate prompt hotfixes and
+product constraints when the model changes.
+
+Three exact General depth corrections were recorded for the ChatGPT writing-
+style analysis, XPeng IRON, and Tesla Cybercab items. All move from
+`headline_only` to `in_depth`; the first also moves from `quick_read` to
+`discuss`. The complaint that the _Claude Ads_ headline lacked enough context
+is presentation QA rather than an exact classifier label.
+
+Four current quality incidents remain distinct from classifier feedback. The
+General sweep stopped during item six and expanded beyond the literal sweep
+string. Dev item five used generated prose instead of its literal
+`item_playback`, and item twelve substituted substantially different playback.
+The fourth incident is the insufficiently descriptive _Claude Ads_ headline.
+
+The supplied chats also reproduce the prior export-time failure to reopen files
+that remained visible in Library, forcing the canonical queue JSON to be pasted
+into the conversation. Embedded newlines remain a separate playback defect;
+issue #138 owns the requested removal of `\n` characters from playback
+strings. This pass changes evidence and wiki content only, so it requires no
+prompt-only workaround or live Project source synchronization.
 
 ### September 9 Acceptance And Classifier Result
 
