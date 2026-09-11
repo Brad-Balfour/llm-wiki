@@ -2,15 +2,15 @@
 type: concept
 title: 'AI-Native Software Engineering'
 # prettier-ignore
-aliases: ["Control the ideas, not the code","Engineer away the slop","How building software is changing at Anthropic","AI-native fintech architecture","LLMs reward expertise","Agentic Code Quality","How I use AI in 2026","How teams build"]
+aliases: ["Control the ideas, not the code","Engineer away the slop","How building software is changing at Anthropic","AI-native fintech architecture","LLMs reward expertise","Agentic Code Quality","How I use AI in 2026","How teams build","How Well Do Agents Use Test and Verification Techniques?"]
 # prettier-ignore
 tags: ["ai-engineering","software-design","correctness","code-review","formal-verification","quality-gates","multi-agent-systems","fintech","compliance","auditability","domain-expertise","prompting","human-judgment","agentic-code","back-pressure"]
 wiki_slug: ai-native-software-engineering
 created: 2026-07-16
-updated: 2026-08-19
+updated: 2026-09-10
 confidence: high
 # prettier-ignore
-provenance: [{"source_item_id":"19f6057544b9bae7-06","url":"https://antirez.com/news/169"},{"source_item_id":"general-20260724-05","url":"https://ghuntley.com/slop/"},{"source_item_id":"19fadaee19e22a31-18","url":"https://newsletter.pragmaticengineer.com/p/inside-anthropic"},{"source_item_id":"19fb33942bb1cc3e-04","url":"https://hackernoon.com/what-fintech-founders-get-wrong-about-ai-native-development"},{"source_item_id":"19fcc720f38e999b-06","url":"https://www.seangoedecke.com/llms-reward-expertise/?utm_source=tldrnewsletter"},{"source_item_id":"19feb593f3d9a2d9-05","url":"https://addyo.substack.com/p/agentic-code-quality?utm_source=tldrnewsletter"},{"source_item_id":"1a0148c07c36290e-11","url":"https://blog.sshh.io/p/how-i-use-ai-in-2026-coding-writing?utm_source=tldrnewsletter"},{"source_item_id":"1a014a54dae9b027-09","url":"https://linear.app/data?utm_source=tldrdev"}]
+provenance: [{"source_item_id":"19f6057544b9bae7-06","url":"https://antirez.com/news/169"},{"source_item_id":"general-20260724-05","url":"https://ghuntley.com/slop/"},{"source_item_id":"19fadaee19e22a31-18","url":"https://newsletter.pragmaticengineer.com/p/inside-anthropic"},{"source_item_id":"19fb33942bb1cc3e-04","url":"https://hackernoon.com/what-fintech-founders-get-wrong-about-ai-native-development"},{"source_item_id":"19fcc720f38e999b-06","url":"https://www.seangoedecke.com/llms-reward-expertise/?utm_source=tldrnewsletter"},{"source_item_id":"19feb593f3d9a2d9-05","url":"https://addyo.substack.com/p/agentic-code-quality?utm_source=tldrnewsletter"},{"source_item_id":"1a0148c07c36290e-11","url":"https://blog.sshh.io/p/how-i-use-ai-in-2026-coding-writing?utm_source=tldrnewsletter"},{"source_item_id":"1a014a54dae9b027-09","url":"https://linear.app/data?utm_source=tldrdev"},{"source_item_id":"1a080bcb33cc0f31-01","url":"https://danluu.com/agentic-testing/"}]
 ---
 
 # AI-Native Software Engineering
@@ -56,6 +56,27 @@ also provide trustworthy feedback and low-damage failure when builds,
 permissions, requirements, or tests are incomplete. Human attention can then
 focus on ambiguous failures and on auditing whether the automated gates have
 meaningful blind spots.
+
+## Technique Names Do Not Supply Testing Judgment
+
+Dan Luu's controlled agent study compared 26 testing and verification
+conditions, including four reusable skills, across a Rust compression task. It
+used GPT-5.6 Sol at medium and extra-high reasoning effort, 80 runs per
+condition and effort, and hidden correctness checks. No named technique
+dominated, and the default agent was above average. Test-driven development
+underperformed despite producing about twice as many tests.
+
+The important failure was not simply too little testing. Agents often applied a
+technique superficially, adding tests without identifying the risky properties
+or improving hidden-test correctness. A technique label can organize work, but
+it does not supply the judgment needed to choose useful invariants, generators,
+oracles, and failure cases.
+
+The commute discussion proposed that structured specifications, state
+diagrams, or sequence diagrams might improve this reasoning. That is a
+hypothesis, not a result of the study: specification formality was not varied.
+The practical rule is to evaluate techniques by the failures they expose and
+the hidden checks they satisfy, not by test count or process vocabulary.
 
 ## From Coding Assistant to Managed Work
 
@@ -203,6 +224,15 @@ on more context. Whether that extra output is valuable still depends on product
 judgment, verification, and outcome measures outside the development tool.
 
 ## Source Notes
+
+### [How Well Do Agents Use Test and Verification Techniques?](https://danluu.com/agentic-testing/)
+
+<!-- source-item-id: 1a080bcb33cc0f31-01 -->
+
+Dan Luu, 2026-09. A controlled comparison of agent testing and verification
+techniques. The source cautions against treating small rank differences as
+strong evidence and did not test whether more formal specifications improve
+results.
 
 ### [Control the ideas, not the code](https://antirez.com/news/169)
 
