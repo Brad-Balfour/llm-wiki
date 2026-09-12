@@ -257,6 +257,10 @@ and finalized output under `.private/`.
   head's review workflow to complete, inspect submitted reviews and unresolved
   threads, and address actionable findings in that PR or a clearly linked
   follow-up before publishing.
+- After opening or updating any PR, wait for the latest-head checks and requested
+  automated reviews, then inspect every unresolved review thread before calling
+  the PR merge-ready. Repeat this cycle after each fix push; do not rely on Brad
+  to relay review findings.
 - After addressing a PR review comment, reply in that thread with the fix and
   validation evidence, then resolve the thread. The user has given standing
   authorization for this review follow-through; do not leave fixed comments
