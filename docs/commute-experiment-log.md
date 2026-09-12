@@ -77,13 +77,17 @@ found a queue as proof.
 - The September 7 General and Dev v4 queue pairs, two September 8 recovered
   bundles, and three shared chats. One chat is an interruption/restart segment
   inside the General session rather than a third completed queue.
-- The three September 9 v4 playback/reference pairs, three recovered bundles,
-  and two unique shared chats covering General, Dev, and AI playback.
-- The three September 10 v4 playback/reference pairs, three recovered bundles,
-  and three supplied shared chats that duplicate the September 9 sessions.
-- The seven September 9-11 v4 playback/reference pairs, seven September 11
-  recovered bundles, and nine complete shared chats covering seven sessions
-  plus two failed or interrupted Dev attempts.
+- The September 8 AI and September 7 AI and Fintech `v2-trial` v4
+  playback/reference pairs, three September 9 recovered bundles, and two unique
+  shared chats covering those three sessions.
+- The September 8 General and Dev and September 9 General v4
+  playback/reference pairs, three September 10 recovered bundles, and three
+  supplied shared chats retained as duplicate provenance for the September 9
+  sessions.
+- Seven September 11 recovered bundles paired with the September 9 Dev and AI,
+  September 10 General, Dev, AI, and Fintech, and September 11 General v4
+  playback/reference pairs, plus nine complete shared chats covering seven
+  sessions and two failed or interrupted Dev attempts.
 - The live `Weekday TLDR Queues` Task conversation/configuration, the July
   21-24 Task Update emails, the July 24 manual queue-generation control, and
   the live Project settings/sources inspected on July 26.
