@@ -188,8 +188,10 @@ For every daily commute intake:
    captures, duplicate/prior-awareness signals, and unresolved evidence.
 3. Preserve the private normalized intake under `.private/`, then add the
    sanitized durable findings to the experiment log or other appropriate
-   tracked memory. Do not silently turn an interesting discussion into a wiki
-   save or classifier label.
+   tracked memory. When adding or changing a dated experiment-log result, update
+   the `Evidence Sources` inventory in the same diff and cross-check its queue,
+   bundle, and shared-chat counts against the result. Do not silently turn an
+   interesting discussion into a wiki save or classifier label.
 4. Route every material recurring finding to its existing open GitHub issue
    when one fits. Add an evidence-backed comment with the exact date, artifact
    identity, observed behavior, boundary, and resulting PR. Avoid duplicating
@@ -255,6 +257,10 @@ and finalized output under `.private/`.
   head's review workflow to complete, inspect submitted reviews and unresolved
   threads, and address actionable findings in that PR or a clearly linked
   follow-up before publishing.
+- After opening or updating any PR, wait for the latest-head checks and requested
+  automated reviews, then inspect every unresolved review thread before calling
+  the PR merge-ready. Repeat this cycle after each fix push; do not rely on Brad
+  to relay review findings.
 - After addressing a PR review comment, reply in that thread with the fix and
   validation evidence, then resolve the thread. The user has given standing
   authorization for this review follow-through; do not leave fixed comments
