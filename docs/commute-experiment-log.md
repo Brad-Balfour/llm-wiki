@@ -136,6 +136,48 @@ retrieve sources, and preserve history after the drive.
 | Sep. 8     | Two completed v4 trial queues, split-chat recovery, and two source-grounded saves               | Validate the September 7 General and Dev playback/reference pairs and their September 8 bundles, reconcile three chats, retain one exact depth correction, and separate the unfinished third queue from completed intake. | Both recovered bundles were strict-valid and canonically matched their downloaded pairs. Voice truncated an embedded-newline item, omitted a sweep, stalled on two transitions, and repeatedly failed to reopen visible `v2-trial` files. The next generation returned to canonical names, but that does not retroactively make the unfinished queue a completed session. |
 | Sep. 9     | Three v4 sessions, exact contrail-depth correction, and embedded-newline playback audit         | Validate three playback/reference pairs and bundles, reconcile two unique shared chats, preserve one exact depth correction, and separate unsaved discussion from playback and Library-recovery incidents.          | All three bundles passed strict validation and canonically matched 37 downloaded queue items. Intake accepted one partial and two recovered sessions with one depth correction, four bundled incidents, one workflow capture, no wiki candidates, and no unresolved items. Voice again stopped at embedded newlines and repeatedly struggled to reopen visible Library files. |
 | Sep. 10    | Three current v4 sessions, duplicate-chat reconciliation, and two discussion-enriched saves    | Validate three current playback/reference pairs and bundles, reconcile the supplied chats with the already-published September 9 intake, retain three exact depth corrections, and preserve two saved Dev discussions. | All current bundles passed strict validation and canonically matched 32 downloaded queue items. Intake accepted three partial sessions with two wiki candidates, three depth corrections, four incidents, and no unresolved items. The supplied chats were duplicate provenance for September 9 and again showed Library lookup failures and newline-truncated playback. |
+| Sep. 11    | Seven catch-up sessions and Instant-versus-Thinking Voice comparison                          | Validate seven playback/reference pairs and bundles, audit nine complete chats, retain one exact Dev depth correction, and compare observed Voice behavior across six Instant and three Thinking chats.                  | All seven snapshots matched 35 downloaded queue items. Six bundles were strict-valid; AI required supplied-pair recovery after recording a next transition beyond the final item. Both modes showed Library and literal-playback failures, so this uncontrolled sample does not establish a reliable mode effect.                    |
+
+### September 11 Seven-Session And Voice-Effort Result
+
+Seven downloaded v4 playback/reference pairs validated with 35 items: September
+9 Dev and AI; September 10 General, Dev, AI, and Fintech; and September 11
+General. Every embedded snapshot canonically matched its separately downloaded
+pair. Six bundles passed strict validation. The September 10 AI bundle required
+bounded supplied-pair recovery because its final `next` transition moved beyond
+the four-item queue. The deterministic run keeps that lifecycle mismatch as its
+one unresolved comparison item.
+
+The nine complete shared chats contain 129 actual user messages after excluding
+the repeated unavailable-custom-instructions marker. They include seven
+completed sessions plus two failed or interrupted Dev attempts. Intake retained
+one exact classifier correction: September 9 Dev item `.gitignore everything by
+default` changes from `headline_only` to `in_depth`. There were no wiki saves,
+general captures, or unresolved user captures.
+
+The bundles retain ten quality incidents: four in-depth item playbacks that
+stopped after the headline in September 9 Dev; one truncated September 10
+General sweep; two separately interrupted Fintech sweep segments; and three
+September 11 General failures involving nonliteral playback and loss of the
+selected Library file. The chats add repeated Library discovery failures,
+manual attachment pressure, a September 11 AI request that proceeded with the
+September 9 AI pair, and a material September 10 AI contradiction: Voice spoke
+an `S* = QP` item while the recovered bundle silently named the canonical
+Connections item at that position.
+
+The serialized chat metadata identifies six chats as GPT-5.6 Instant and three
+as GPT-5.6 Thinking with standard effort. The evidence does not show a
+consistent quality advantage. Instant included the wrong-date session, the
+invalid AI lifecycle, and repeated Library failures; Thinking included repeated
+headline/sweep truncation, Library loss, a forced app restart, and export retry.
+The queues, session lengths, attachment state, restarts, and requested tasks
+were not controlled, so this is useful product evidence but not a causal
+Instant-versus-Thinking experiment.
+
+Prompt 5.0 already requires literal complete playback and exact-pair reopening.
+Another wording-only change would not make stock Voice retain the selected file
+or make generated bundles truthfully reflect spoken output. No live Project
+prompt or source document changed in this pass.
 
 ### September 10 Acceptance, Maintenance, And Playback Result
 
