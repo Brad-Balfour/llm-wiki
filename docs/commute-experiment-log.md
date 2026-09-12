@@ -77,6 +77,13 @@ found a queue as proof.
 - The September 7 General and Dev v4 queue pairs, two September 8 recovered
   bundles, and three shared chats. One chat is an interruption/restart segment
   inside the General session rather than a third completed queue.
+- The three September 9 v4 playback/reference pairs, three recovered bundles,
+  and two unique shared chats covering General, Dev, and AI playback.
+- The three September 10 v4 playback/reference pairs, three recovered bundles,
+  and three supplied shared chats that duplicate the September 9 sessions.
+- The seven September 9-11 v4 playback/reference pairs, seven September 11
+  recovered bundles, and nine complete shared chats covering seven sessions
+  plus two failed or interrupted Dev attempts.
 - The live `Weekday TLDR Queues` Task conversation/configuration, the July
   21-24 Task Update emails, the July 24 manual queue-generation control, and
   the live Project settings/sources inspected on July 26.

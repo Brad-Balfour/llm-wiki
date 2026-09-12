@@ -188,8 +188,10 @@ For every daily commute intake:
    captures, duplicate/prior-awareness signals, and unresolved evidence.
 3. Preserve the private normalized intake under `.private/`, then add the
    sanitized durable findings to the experiment log or other appropriate
-   tracked memory. Do not silently turn an interesting discussion into a wiki
-   save or classifier label.
+   tracked memory. When adding or changing a dated experiment-log result, update
+   the `Evidence Sources` inventory in the same diff and cross-check its queue,
+   bundle, and shared-chat counts against the result. Do not silently turn an
+   interesting discussion into a wiki save or classifier label.
 4. Route every material recurring finding to its existing open GitHub issue
    when one fits. Add an evidence-backed comment with the exact date, artifact
    identity, observed behavior, boundary, and resulting PR. Avoid duplicating
