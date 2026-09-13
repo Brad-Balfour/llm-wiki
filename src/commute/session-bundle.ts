@@ -323,7 +323,7 @@ export function validateTldrCommuteQueuePair(
     const field = `playback_file.items[${index}]`;
     const item = requireRecord(candidate, field);
     rejectUnknownKeys(item, ['item_playback'], field);
-    requireString(item.item_playback, `${field}.item_playback`);
+    requireSingleLineString(item.item_playback, `${field}.item_playback`);
   });
 
   const reference = requireRecord(referenceCandidate, 'reference_file');
@@ -402,7 +402,7 @@ export function validateTldrCommuteQueuePair(
       `playback_file.items[${index}].item_playback`
     );
     const prefix = renderV4PlaybackPrefix(index + 1, totalItems, item.consumptionDepth, item.title);
-    const expected = [prefix, ...item.playbackLines].join('\n');
+    const expected = [prefix, ...item.playbackLines].map(normalizePlaybackSegment).join(' ');
     if (actualPlayback !== expected) {
       throw new Error(
         `playback_file.items[${index}].item_playback must equal the deterministic v4 playback`
@@ -453,9 +453,9 @@ export function validateTldrCommuteQueuePair(
         requireString(item.title, `reference_file.items[${index}].title`)
       );
     })
-    .join('\n');
+    .join(' ');
   if (
-    requireStringAllowEmpty(playback.sweep_playback, 'playback_file.sweep_playback') !==
+    requireSingleLineStringAllowEmpty(playback.sweep_playback, 'playback_file.sweep_playback') !==
     expectedSweep
   ) {
     throw new Error('playback_file.sweep_playback must equal the deterministic v4 sweep');
@@ -1211,7 +1211,11 @@ function renderV4PlaybackPrefix(
   depth: 'headline_only' | 'in_depth',
   title: string
 ): string {
-  return `${position} of ${total}. ${depth === 'headline_only' ? 'Headline only' : 'In depth'}. ${title}`;
+  return `${position} of ${total}. ${depth === 'headline_only' ? 'Headline only' : 'In depth'}. ${normalizePlaybackSegment(title)}`;
+}
+
+function normalizePlaybackSegment(value: string): string {
+  return value.replace(/\s*[\r\n]+\s*/g, ' ');
 }
 
 function requireNonNegativeInteger(candidate: unknown, field: string): number {
@@ -1224,6 +1228,18 @@ function requireNonNegativeInteger(candidate: unknown, field: string): number {
 function requireStringAllowEmpty(candidate: unknown, field: string): string {
   if (typeof candidate !== 'string') throw new Error(`${field} must be a string`);
   return candidate;
+}
+
+function requireSingleLineString(candidate: unknown, field: string): string {
+  const value = requireString(candidate, field);
+  if (/[\r\n]/.test(value)) throw new Error(`${field} must not contain newline characters`);
+  return value;
+}
+
+function requireSingleLineStringAllowEmpty(candidate: unknown, field: string): string {
+  const value = requireStringAllowEmpty(candidate, field);
+  if (/[\r\n]/.test(value)) throw new Error(`${field} must not contain newline characters`);
+  return value;
 }
 
 export function renderQueuePlaybackText(item: {

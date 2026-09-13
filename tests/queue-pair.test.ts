@@ -22,7 +22,7 @@ function pair(itemCount = 2) {
     const prefix = `${position} of ${itemCount}. ${consumptionDepth === 'headline_only' ? 'Headline only' : 'In depth'}. ${title}`;
     return {
       playback: {
-        item_playback: consumptionDepth === 'headline_only' ? prefix : `${prefix}\n${description}`,
+        item_playback: consumptionDepth === 'headline_only' ? prefix : `${prefix} ${description}`,
       },
       reference: {
         position,
@@ -79,7 +79,7 @@ function pair(itemCount = 2) {
     };
   });
   const main = {
-    sweep_playback: items.map((item) => item.sweep).join('\n'),
+    sweep_playback: items.map((item) => item.sweep).join(' '),
     items: items.map((item) => item.playback),
   };
   const reference = {
@@ -164,6 +164,41 @@ test('accepts a valid empty v4 pair', () => {
   const { main, reference } = pair(0);
   assert.equal(main.sweep_playback, '');
   assert.equal(validateTldrCommuteQueuePair(main, reference).referenceFile.total_items, 0);
+});
+
+test('rejects newline characters in every v4 playback string', () => {
+  const itemNewline = pair();
+  itemNewline.main.items[0]!.item_playback += '\nUnexpected continuation.';
+  itemNewline.reference.main_sha256 = playbackFileFingerprint(itemNewline.main);
+  assert.throws(
+    () => validateTldrCommuteQueuePair(itemNewline.main, itemNewline.reference),
+    /item_playback must not contain newline characters/
+  );
+
+  const sweepCarriageReturn = pair();
+  sweepCarriageReturn.main.sweep_playback = sweepCarriageReturn.main.sweep_playback.replace(
+    ' 2 of 2',
+    '\r2 of 2'
+  );
+  sweepCarriageReturn.reference.main_sha256 = playbackFileFingerprint(sweepCarriageReturn.main);
+  assert.throws(
+    () => validateTldrCommuteQueuePair(sweepCarriageReturn.main, sweepCarriageReturn.reference),
+    /sweep_playback must not contain newline characters/
+  );
+});
+
+test('normalizes source line breaks to spaces in deterministic v4 playback', () => {
+  const candidate = pair();
+  const item = candidate.reference.items[1]!;
+  item.title = 'Example\n2';
+  item.description = 'Literal description\r\n2.';
+  item.source_occurrences[0]!.title = item.title;
+  item.source_occurrences[0]!.description = item.description;
+  candidate.main.sweep_playback = '1 of 2. Headline only. Example 1 2 of 2. In depth. Example 2';
+  candidate.main.items[1]!.item_playback = '2 of 2. In depth. Example 2 Literal description 2.';
+  candidate.reference.main_sha256 = playbackFileFingerprint(candidate.main);
+
+  assert.doesNotThrow(() => validateTldrCommuteQueuePair(candidate.main, candidate.reference));
 });
 
 test('v4 bundle wrapper keeps complete identities for saves without preloading reference data', () => {
@@ -438,7 +473,7 @@ test('keeps a meaningful update and unrelated coverage while preserving daily li
     update_note: 'Update: this report adds the announced price and launch date.',
   };
   updateItem.playback_context.update_prefix = updateItem.coverage.update_note;
-  update.main.items[0]!.item_playback = `${update.main.items[0]!.item_playback}\n${updateItem.coverage.update_note}`;
+  update.main.items[0]!.item_playback = `${update.main.items[0]!.item_playback} ${updateItem.coverage.update_note}`;
   update.reference.main_sha256 = playbackFileFingerprint(update.main);
   update.reference.coverage_decisions.push({
     source_occurrence_id: updateItem.source_occurrences[0]!.occurrence_id,
@@ -577,7 +612,7 @@ test('requires audit decisions for removed and related occurrences', () => {
     update_note: 'Update: adds a material detail.',
   };
   update.reference.items[0]!.playback_context.update_prefix = 'Update: adds a material detail.';
-  update.main.items[0]!.item_playback += '\nUpdate: adds a material detail.';
+  update.main.items[0]!.item_playback += ' Update: adds a material detail.';
   update.reference.main_sha256 = playbackFileFingerprint(update.main);
   assert.throws(
     () =>
@@ -637,7 +672,7 @@ test('adds literal source context only to unclear headline-only playback', () =>
     item.playback_context.headline_context = excerpt;
     item.playback_context.excerpt_source_occurrence_id = item.selected_source_occurrence_id;
     item.playback_context.unusually_long_excerpt = titleKind === 'clickbait';
-    candidate.main.items[0]!.item_playback += `\n${excerpt}`;
+    candidate.main.items[0]!.item_playback += ` ${excerpt}`;
     candidate.reference.main_sha256 = playbackFileFingerprint(candidate.main);
     assert.doesNotThrow(() => validateTldrCommuteQueuePair(candidate.main, candidate.reference));
   }
@@ -684,7 +719,7 @@ test('rejects context from a non-selected occurrence and truncated sentences', (
     'Alternate literal description.';
   wrongOccurrence.reference.items[0]!.playback_context.excerpt_source_occurrence_id =
     'ai-example-1';
-  wrongOccurrence.main.items[0]!.item_playback += '\nAlternate literal description.';
+  wrongOccurrence.main.items[0]!.item_playback += ' Alternate literal description.';
   wrongOccurrence.reference.main_sha256 = playbackFileFingerprint(wrongOccurrence.main);
   assert.throws(
     () => validateTldrCommuteQueuePair(wrongOccurrence.main, wrongOccurrence.reference),
@@ -695,7 +730,7 @@ test('rejects context from a non-selected occurrence and truncated sentences', (
   truncated.reference.items[0]!.playback_context.headline_context = 'Literal';
   truncated.reference.items[0]!.playback_context.excerpt_source_occurrence_id =
     truncated.reference.items[0]!.selected_source_occurrence_id;
-  truncated.main.items[0]!.item_playback += '\nLiteral';
+  truncated.main.items[0]!.item_playback += ' Literal';
   truncated.reference.main_sha256 = playbackFileFingerprint(truncated.main);
   assert.throws(
     () => validateTldrCommuteQueuePair(truncated.main, truncated.reference),
@@ -718,7 +753,7 @@ test('keeps useful-update text separate from quoted headline context', () => {
   item.playback_context.update_prefix = item.description;
   item.playback_context.headline_context = item.description;
   item.playback_context.excerpt_source_occurrence_id = item.selected_source_occurrence_id;
-  candidate.main.items[0]!.item_playback += `\n${item.description}\n${item.description}`;
+  candidate.main.items[0]!.item_playback += ` ${item.description} ${item.description}`;
   candidate.reference.main_sha256 = playbackFileFingerprint(candidate.main);
   assert.throws(
     () => validateTldrCommuteQueuePair(candidate.main, candidate.reference),

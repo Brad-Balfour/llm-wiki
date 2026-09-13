@@ -43,7 +43,10 @@ sweep_playback and items[].item_playback. The sibling inserts -reference before
 classification, routing, and version metadata. Compute and verify main_sha256
 with the code tool, validate both schemas, positions, counts, playback text,
 sweep, filename, hash, unique IDs and unique URLs, and create the downloads only
-after the pair passes. Empty editions use a valid empty pair.
+after the pair passes. Render `sweep_playback` and every `item_playback` as one
+line: separate playback segments with spaces and replace source line breaks with
+spaces so neither field contains a carriage return or newline. Empty editions
+use a valid empty pair.
 
 Do not use Google Drive, external storage, folders, placeholders, a local Mac
 process, or a separate archive step. Do not overwrite files already used by a
