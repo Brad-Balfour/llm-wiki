@@ -24,14 +24,16 @@ not change the live Project automatically.
 
 ## Classifier v2 candidate (not installed)
 
-The review stack prepares Queue v4 and Prompt 5.0 without changing the live
-Project. After the full stack is approved, replace the Project Instructions
-with `CHATGPT_CAR_QUEUE_PROMPT.md`; replace `queue-generation-v3.md` and the v3
-queue schema with `queue-generation-v4.md`,
+The review stack prepares Queue v4, generation-instruction and weekday Task
+revisions 4.1, and Prompt 5.0 without changing the live Project. After the full
+stack is approved, replace the Project Instructions with
+`CHATGPT_CAR_QUEUE_PROMPT.md`; replace `queue-generation-v3.md` and the v3 queue
+schema with `queue-generation-v4.md` revision 4.1,
 `tldr-commute-playback-v4.schema.json`, and
 `tldr-commute-reference-v4.schema.json`; replace `session-export.md` and
 `commute-session-bundle-v1.schema.json`; and replace the existing weekday Task
-body with `WEEKDAY_TLDR_QUEUE_TASK_PROMPT_V4.md`. Later PRs in the stack name
+body with `WEEKDAY_TLDR_QUEUE_TASK_PROMPT_V4.md` revision 4.1. Later PRs in the
+stack name
 the candidate classifier/profile replacements: `interest-profile.md` version
 2.1 and `classifier-instructions.md` version `classifier-instructions.v2`. Keep
 the Task's weekday 11 a.m. America/New_York schedule and all unrelated working

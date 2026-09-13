@@ -17,6 +17,14 @@ matching complete reference file while local readers retain v2/v3 support.
 - **AND** reference entries SHALL match main entries by position
 - **AND** a missing, stale, swapped, or reordered reference SHALL be rejected.
 
+#### Scenario: Render single-line voice playback
+
+- **WHEN** generation renders `sweep_playback` or `items[].item_playback`
+- **THEN** playback segments SHALL be separated with spaces
+- **AND** each contiguous source carriage-return or newline run SHALL become one space
+- **AND** neither rendered field SHALL contain a carriage return or newline
+- **AND** local schema and pair validation SHALL reject either character.
+
 ### Requirement: Queue V4 Preserves Daily Coverage Provenance
 
 Queue v4 reference files SHALL make every repeated-coverage decision auditable

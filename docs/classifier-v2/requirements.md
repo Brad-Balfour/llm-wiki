@@ -23,16 +23,18 @@ The main file has exactly these fields, with `sweep_playback` first:
 
 ```json
 {
-  "sweep_playback": "1 of 2. Headline only. Example one\n2 of 2. In depth. Example two",
+  "sweep_playback": "1 of 2. Headline only. Example one 2 of 2. In depth. Example two",
   "items": [
     { "item_playback": "1 of 2. Headline only. Example one" },
-    { "item_playback": "2 of 2. In depth. Example two\nThe original newsletter description." }
+    { "item_playback": "2 of 2. In depth. Example two The original newsletter description." }
   ]
 }
 ```
 
 No scores, IDs, URLs, descriptions, schema versions or other metadata go in the
 main file. Item numbers and modes are already written into the playback strings.
+The sweep and every item playback are single-line strings. Separate their
+segments with spaces and replace each contiguous source CR/LF run with one space.
 All other queue data goes in the reference file, including descriptions, titles,
 author/publication, URLs, scores, source identities, versions and duplicate
 relationships. Reference entries match the main array by position. Record the

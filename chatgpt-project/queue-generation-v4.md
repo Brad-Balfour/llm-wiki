@@ -1,4 +1,4 @@
-# TLDR Queue Generation Instructions — Playback/Reference Pair v4
+# TLDR Queue Generation Instructions — Playback/Reference Pair v4.1
 
 Use these instructions with `tldr-commute-playback-v4.schema.json` and
 `tldr-commute-reference-v4.schema.json`. Retrieve all qualifying General, Dev,
@@ -103,12 +103,16 @@ The main object has exactly two keys in this order: `sweep_playback`, then
 scores, URLs, descriptions, titles, versions, or other metadata.
 
 Order all headline-only items before in-depth items. For item N of M, the sweep
-line is `<N> of <M>. <Headline only|In depth>. <title>`. Join sweep lines with
-newlines. Start `item_playback` with that line. Append a prepared update prefix
-on its own line when present. Then append the literal headline-context excerpt
-for an unclear headline-only item, or the full literal newsletter description
-for every in-depth item. A clear headline-only item has no appended text. An
-empty queue is `{ "sweep_playback": "", "items": [] }`.
+segment is `<N> of <M>. <Headline only|In depth>. <title>`. Join all sweep
+segments with one space so `sweep_playback` is a single line. Start
+`item_playback` with that segment. Append a prepared update prefix, then the
+literal headline-context excerpt for an unclear headline-only item or the full
+literal newsletter description for every in-depth item, separating each part
+with one space. Replace each contiguous run of carriage returns or newlines in a
+source value with one space; preserve all neighboring whitespace and otherwise
+keep the source text literal. A clear headline-only item has no appended text.
+Neither playback field may contain `\r` or `\n`. An empty queue is
+`{ "sweep_playback": "", "items": [] }`.
 
 ## Reference file
 
@@ -125,7 +129,10 @@ following in the Project code tool after constructing `main`; do not ask the
 model to write or estimate the digest:
 
 ```python
-import hashlib, json
+import hashlib, json, re
+
+def single_line(value):
+    return re.sub(r"[\r\n]+", " ", value)
 
 # The v4 main contains only strings, arrays, and objects, so these options emit
 # the same UTF-8 JSON bytes as JSON.stringify(parsedMain), preserving key order.
@@ -165,8 +172,9 @@ for index, (played, item) in enumerate(zip(main["items"], reference["items"]), 1
         assert excerpt_ending.endswith((".", "!", "?")), f"complete excerpt sentence {index}"
         assert context["headline_context"] != context["update_prefix"], f"separate update and excerpt {index}"
         playback_lines.append(context["headline_context"])
-    expected = "\n".join(playback_lines)
+    expected = " ".join(single_line(value) for value in playback_lines)
     assert played["item_playback"] == expected, f"item playback {index}"
+    assert "\n" not in played["item_playback"] and "\r" not in played["item_playback"], f"single-line item playback {index}"
     attribution = item["attribution"]
     assert attribution["resolved_url"] == item["url"], f"resolved URL {index}"
     if attribution["author_source"] == "no_authors_listed":
@@ -182,7 +190,8 @@ for index, (played, item) in enumerate(zip(main["items"], reference["items"]), 1
         from urllib.parse import urlparse
         expected_host = urlparse(item["url"]).hostname.removeprefix("www.")
         assert item["publication"] == expected_host, f"publication fallback {index}"
-assert main["sweep_playback"] == "\n".join(sweep_lines), "sweep"
+assert main["sweep_playback"] == " ".join(single_line(value) for value in sweep_lines), "sweep"
+assert "\n" not in main["sweep_playback"] and "\r" not in main["sweep_playback"], "single-line sweep"
 assert reference["main_filename"] == main_filename, "main filename"
 assert reference["daily_generation_id"] == daily_generation_id, "daily generation"
 seen_occurrences = set()
