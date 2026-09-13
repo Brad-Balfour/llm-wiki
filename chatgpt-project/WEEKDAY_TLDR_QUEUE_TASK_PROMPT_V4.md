@@ -1,4 +1,4 @@
-# Weekday TLDR Queue Task Prompt — v4 Candidate
+# Weekday TLDR Queue Task Prompt — v4.1 Candidate
 
 > Candidate body for the existing **Weekday TLDR Queues** Task. Keep the Task
 > active Monday–Friday at 11:00 AM America/New_York. Do not install until the
@@ -44,9 +44,10 @@ classification, routing, and version metadata. Compute and verify main_sha256
 with the code tool, validate both schemas, positions, counts, playback text,
 sweep, filename, hash, unique IDs and unique URLs, and create the downloads only
 after the pair passes. Render `sweep_playback` and every `item_playback` as one
-line: separate playback segments with spaces and replace source line breaks with
-spaces so neither field contains a carriage return or newline. Empty editions
-use a valid empty pair.
+line by separating playback segments with spaces. Replace each contiguous CR/LF
+run in a source value with one space without consuming neighboring whitespace,
+then verify neither playback field contains a line break. Empty editions use a
+valid empty pair.
 
 Do not use Google Drive, external storage, folders, placeholders, a local Mac
 process, or a separate archive step. Do not overwrite files already used by a

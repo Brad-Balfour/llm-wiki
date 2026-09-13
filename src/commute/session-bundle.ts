@@ -1215,7 +1215,7 @@ function renderV4PlaybackPrefix(
 }
 
 function normalizePlaybackSegment(value: string): string {
-  return value.replace(/\s*[\r\n]+\s*/g, ' ');
+  return value.replace(/[\r\n]+/g, ' ');
 }
 
 function requireNonNegativeInteger(candidate: unknown, field: string): number {

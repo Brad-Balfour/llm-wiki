@@ -187,15 +187,15 @@ test('rejects newline characters in every v4 playback string', () => {
   );
 });
 
-test('normalizes source line breaks to spaces in deterministic v4 playback', () => {
+test('repairs source line breaks without consuming neighboring whitespace', () => {
   const candidate = pair();
   const item = candidate.reference.items[1]!;
   item.title = 'Example\n2';
-  item.description = 'Literal description\r\n2.';
+  item.description = 'Literal\t\r\n  description 2.';
   item.source_occurrences[0]!.title = item.title;
   item.source_occurrences[0]!.description = item.description;
   candidate.main.sweep_playback = '1 of 2. Headline only. Example 1 2 of 2. In depth. Example 2';
-  candidate.main.items[1]!.item_playback = '2 of 2. In depth. Example 2 Literal description 2.';
+  candidate.main.items[1]!.item_playback = '2 of 2. In depth. Example 2 Literal\t   description 2.';
   candidate.reference.main_sha256 = playbackFileFingerprint(candidate.main);
 
   assert.doesNotThrow(() => validateTldrCommuteQueuePair(candidate.main, candidate.reference));

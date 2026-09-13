@@ -348,14 +348,14 @@ links. Brad replaces the Project sources/Instructions and Task body, then confir
 Record the installed versions in `chatgpt-project/README.md`. Do not replace old
 artifact files or unrelated Project sources.
 
-| Destination                | Exact replacement                                                                                                            |
-| -------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
-| Project Instructions field | Contents of `chatgpt-project/CHATGPT_CAR_QUEUE_PROMPT.md` for Prompt 5.0                                                     |
-| Project Sources            | Replace `queue-generation-v3.md` with `queue-generation-v4.md`; replace the active queue-v3 schema with both v4 schema files |
-| Project Sources            | Replace `session-export.md` and `commute-session-bundle-v1.schema.json` with the compatible versions from PR 1               |
-| Project Sources            | Replace `classifier-instructions.md` and `interest-profile.md` with the accepted candidate versions                          |
-| Existing weekday Task body | Contents of `chatgpt-project/WEEKDAY_TLDR_QUEUE_TASK_PROMPT_V4.md`; retain weekdays at 11 a.m. America/New_York              |
-| Project Sources retained   | `routing-rules.md` and unrelated working sources                                                                             |
+| Destination                | Exact replacement                                                                                                                         |
+| -------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| Project Instructions field | Contents of `chatgpt-project/CHATGPT_CAR_QUEUE_PROMPT.md` for Prompt 5.0                                                                  |
+| Project Sources            | Replace `queue-generation-v3.md` with `queue-generation-v4.md` revision 4.1; replace the active queue-v3 schema with both v4 schema files |
+| Project Sources            | Replace `session-export.md` and `commute-session-bundle-v1.schema.json` with the compatible versions from PR 1                            |
+| Project Sources            | Replace `classifier-instructions.md` and `interest-profile.md` with the accepted candidate versions                                       |
+| Existing weekday Task body | Contents of `chatgpt-project/WEEKDAY_TLDR_QUEUE_TASK_PROMPT_V4.md` revision 4.1; retain weekdays at 11 a.m. America/New_York              |
+| Project Sources retained   | `routing-rules.md` and unrelated working sources                                                                                          |
 
 Before replacement, identify the Git commit containing each currently installed
 file and note any live differences. Restoring a previous version means copying

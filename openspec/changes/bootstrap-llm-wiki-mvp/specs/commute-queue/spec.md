@@ -21,7 +21,7 @@ matching complete reference file while local readers retain v2/v3 support.
 
 - **WHEN** generation renders `sweep_playback` or `items[].item_playback`
 - **THEN** playback segments SHALL be separated with spaces
-- **AND** source carriage returns and newlines SHALL be replaced with spaces
+- **AND** each contiguous source carriage-return or newline run SHALL become one space
 - **AND** neither rendered field SHALL contain a carriage return or newline
 - **AND** local schema and pair validation SHALL reject either character.
 

@@ -106,6 +106,8 @@ test('v4 candidate resolves and records attribution before classification', asyn
     readFile('schema/tldr-commute-reference-v4.schema.json', 'utf8'),
   ]);
 
+  assert.match(generation, /Playback\/Reference Pair v4\.1/);
+  assert.match(task, /Task Prompt — v4\.1 Candidate/);
   assert.match(generation, /retry\s+once/);
   assert.match(
     generation,

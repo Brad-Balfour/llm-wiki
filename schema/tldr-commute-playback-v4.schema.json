@@ -9,7 +9,7 @@
   "properties": {
     "sweep_playback": {
       "type": "string",
-      "pattern": "^[^\\r\\n]*$",
+      "pattern": "^(?![\\s\\S]*[\\r\\n])[\\s\\S]*$",
       "description": "The complete sweep as one string with no carriage returns or newline characters."
     },
     "items": {
@@ -23,7 +23,7 @@
             "type": "string",
             "minLength": 1,
             "maxLength": 5000,
-            "pattern": "^[^\\r\\n]*$",
+            "pattern": "^(?![\\s\\S]*[\\r\\n])[\\s\\S]*$",
             "description": "The complete item playback as one string with no carriage returns or newline characters."
           }
         }

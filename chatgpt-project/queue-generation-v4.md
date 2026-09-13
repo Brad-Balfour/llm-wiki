@@ -1,4 +1,4 @@
-# TLDR Queue Generation Instructions — Playback/Reference Pair v4
+# TLDR Queue Generation Instructions — Playback/Reference Pair v4.1
 
 Use these instructions with `tldr-commute-playback-v4.schema.json` and
 `tldr-commute-reference-v4.schema.json`. Retrieve all qualifying General, Dev,
@@ -108,11 +108,11 @@ segments with one space so `sweep_playback` is a single line. Start
 `item_playback` with that segment. Append a prepared update prefix, then the
 literal headline-context excerpt for an unclear headline-only item or the full
 literal newsletter description for every in-depth item, separating each part
-with one space. Replace any carriage return or newline inside a source title,
-description, excerpt, or prepared update with one space when rendering playback;
-do not otherwise rewrite the source text. A clear headline-only item has no
-appended text. Neither playback field may contain `\r` or `\n`. An empty queue
-is `{ "sweep_playback": "", "items": [] }`.
+with one space. Replace each contiguous run of carriage returns or newlines in a
+source value with one space; preserve all neighboring whitespace and otherwise
+keep the source text literal. A clear headline-only item has no appended text.
+Neither playback field may contain `\r` or `\n`. An empty queue is
+`{ "sweep_playback": "", "items": [] }`.
 
 ## Reference file
 
@@ -129,7 +129,10 @@ following in the Project code tool after constructing `main`; do not ask the
 model to write or estimate the digest:
 
 ```python
-import hashlib, json
+import hashlib, json, re
+
+def single_line(value):
+    return re.sub(r"[\r\n]+", " ", value)
 
 # The v4 main contains only strings, arrays, and objects, so these options emit
 # the same UTF-8 JSON bytes as JSON.stringify(parsedMain), preserving key order.
@@ -142,10 +145,7 @@ main_sha256 = "sha256:" + hashlib.sha256(canonical_main.encode("utf-8")).hexdige
 Run this check against the final objects before writing either download:
 
 ```python
-import hashlib, json, re
-
-def single_line(value):
-    return re.sub(r"\s*[\r\n]+\s*", " ", value)
+import hashlib, json
 
 assert list(main) == ["sweep_playback", "items"], "main keys/order"
 assert len(main["items"]) == len(reference["items"]) == reference["total_items"], "pair counts"
