@@ -1,4 +1,5 @@
 import { createHash } from 'node:crypto';
+import { isDeepStrictEqual } from 'node:util';
 
 import { errorMessage } from '../shared/errors.js';
 import { stripMarkdownFence } from '../shared/json.js';
@@ -372,6 +373,25 @@ export function createRepairedQueueV4Snapshot(
     ),
     repairedFieldCount,
   };
+}
+
+export function rawQueueV4PairMatchesSnapshot(
+  bundleCandidate: unknown,
+  playbackCandidate: unknown,
+  referenceCandidate: unknown
+): boolean {
+  try {
+    const bundle = requireRecord(bundleCandidate, 'bundle');
+    const snapshot = requireRecord(bundle.queue_snapshot, 'bundle.queue_snapshot');
+    const queue = requireRecord(snapshot.queue, 'bundle.queue_snapshot.queue');
+    return (
+      queue.queue_version === 'tldr-commute-queue.v4' &&
+      isDeepStrictEqual(queue.playback_file, playbackCandidate) &&
+      isDeepStrictEqual(queue.reference_file, referenceCandidate)
+    );
+  } catch {
+    return false;
+  }
 }
 
 function repairBundleV4PlaybackNewlines(candidate: Record<string, unknown>): {

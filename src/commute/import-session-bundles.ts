@@ -1,10 +1,10 @@
 import { createHash } from 'node:crypto';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
-import { isDeepStrictEqual } from 'node:util';
 import { fileURLToPath } from 'node:url';
 
 import { errorMessage } from '../shared/errors.js';
+import { parseJsonObject } from '../shared/json.js';
 
 import {
   bundleArtifactFilenameMatches,
@@ -14,6 +14,7 @@ import {
   parseCommuteSessionBundleTextWithRelaxedArtifactFilename,
   queueMetadataRecord,
   queueSnapshotFingerprint,
+  rawQueueV4PairMatchesSnapshot,
   validateTldrCommuteQueueV2,
 } from './session-bundle.js';
 import {
@@ -598,15 +599,10 @@ function validateRawLegacyPairMatch(
   if (recoveryQueue.reference === undefined) {
     throw new Error('Legacy v4 playback repair requires the exact supplied reference file');
   }
-  const rawBundle = requireRecord(JSON.parse(bundleText) as unknown, 'bundle');
-  const snapshot = requireRecord(rawBundle.queue_snapshot, 'bundle.queue_snapshot');
-  const queue = requireRecord(snapshot.queue, 'bundle.queue_snapshot.queue');
-  const suppliedPlayback = JSON.parse(recoveryQueue.text) as unknown;
-  const suppliedReference = JSON.parse(recoveryQueue.reference.text) as unknown;
-  if (
-    !isDeepStrictEqual(queue.playback_file, suppliedPlayback) ||
-    !isDeepStrictEqual(queue.reference_file, suppliedReference)
-  ) {
+  const rawBundle = parseJsonObject(bundleText, 'bundle');
+  const suppliedPlayback = parseJsonObject(recoveryQueue.text, 'Recovery queue');
+  const suppliedReference = parseJsonObject(recoveryQueue.reference.text, 'Recovery reference');
+  if (!rawQueueV4PairMatchesSnapshot(rawBundle, suppliedPlayback, suppliedReference)) {
     throw new Error('Raw legacy v4 supplied pair does not exactly match the bundle snapshot');
   }
 }

@@ -2,12 +2,14 @@ import { createHash } from 'node:crypto';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 
+import { parseJsonObject } from '../shared/json.js';
 import { reconcileSessionBundles } from './import-session-bundles.js';
 import {
   createRepairedQueueV4Snapshot,
   parseCommuteSessionBundleText,
   parseCommuteSessionBundleTextWithRelaxedArtifactFilename,
   queueSnapshotFingerprint,
+  rawQueueV4PairMatchesSnapshot,
   validateTldrCommuteQueueV2,
 } from './session-bundle.js';
 
@@ -141,27 +143,49 @@ function compareRecoveryQueue(input: {
 }) {
   try {
     let bundle;
+    let embeddedRepairCount = 0;
     try {
       bundle = parseCommuteSessionBundleText(input.text);
     } catch {
-      bundle = parseCommuteSessionBundleTextWithRelaxedArtifactFilename(
+      const relaxed = parseCommuteSessionBundleTextWithRelaxedArtifactFilename(
         input.text,
         input.filename
-      ).bundle;
+      );
+      bundle = relaxed.bundle;
+      embeddedRepairCount = relaxed.repairedPlaybackFieldCount;
     }
-    const supplied = validateTldrCommuteQueueV2(
-      input.recoveryQueue.reference === undefined
-        ? (JSON.parse(input.recoveryQueue.text) as unknown)
+    const rawSuppliedPlayback = parseJsonObject(input.recoveryQueue.text, 'Recovery queue');
+    const recoveryReference = input.recoveryQueue.reference;
+    const rawSuppliedReference =
+      recoveryReference === undefined
+        ? undefined
+        : parseJsonObject(recoveryReference.text, 'Recovery reference');
+    const repairedSupplied =
+      rawSuppliedReference === undefined
+        ? undefined
         : createRepairedQueueV4Snapshot(
-            JSON.parse(input.recoveryQueue.text) as unknown,
-            JSON.parse(input.recoveryQueue.reference.text) as unknown,
+            rawSuppliedPlayback,
+            rawSuppliedReference,
             input.recoveryQueue.filename,
-            input.recoveryQueue.reference.filename
-          ).queue
+            recoveryReference!.filename
+          );
+    const supplied = validateTldrCommuteQueueV2(
+      repairedSupplied === undefined ? rawSuppliedPlayback : repairedSupplied.queue
     );
     const suppliedFingerprint = queueSnapshotFingerprint(supplied);
     const embeddedFingerprint = queueSnapshotFingerprint(bundle.queue_snapshot.queue);
+    const repairApplied =
+      embeddedRepairCount > 0 || (repairedSupplied?.repairedFieldCount ?? 0) > 0;
+    const rawPairMatches =
+      !repairApplied ||
+      (rawSuppliedReference !== undefined &&
+        rawQueueV4PairMatchesSnapshot(
+          parseJsonObject(input.text, 'bundle'),
+          rawSuppliedPlayback,
+          rawSuppliedReference
+        ));
     const matches =
+      rawPairMatches &&
       input.recoveryQueue.filename === bundle.queue_snapshot.filename &&
       suppliedFingerprint === embeddedFingerprint;
     return {

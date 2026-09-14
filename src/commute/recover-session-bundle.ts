@@ -1,6 +1,6 @@
 import { createHash } from 'node:crypto';
 
-import { errorMessage } from '../shared/errors.js';
+import { parseJsonObject } from '../shared/json.js';
 import { optionalRecord, requireArray, requireRecord } from '../shared/validate.js';
 import {
   bundleArtifactFilenameMatches,
@@ -8,6 +8,7 @@ import {
   createRepairedQueueV4Snapshot,
   queueMetadataRecord,
   queueSnapshotFingerprint,
+  rawQueueV4PairMatchesSnapshot,
   type EventEvidence,
   validateTldrCommuteQueueV2,
 } from './session-bundle.js';
@@ -81,15 +82,28 @@ export function recoverSessionBundleWithSuppliedQueue(
 ): RecoveredSessionBundle {
   const bundle = parseJsonObject(input.bundleText, 'Recovery bundle');
   const queueCandidate = parseJsonObject(input.queueText, 'Recovery queue');
-  const queue = validateTldrCommuteQueueV2(
+  const referenceCandidate =
     input.referenceText === undefined
-      ? queueCandidate
+      ? undefined
+      : parseJsonObject(input.referenceText, 'Recovery reference');
+  const repaired =
+    referenceCandidate === undefined
+      ? undefined
       : createRepairedQueueV4Snapshot(
           queueCandidate,
-          parseJsonObject(input.referenceText, 'Recovery reference'),
+          referenceCandidate,
           input.queueFilename,
           input.referenceFilename
-        ).queue
+        );
+  if (
+    repaired !== undefined &&
+    repaired.repairedFieldCount > 0 &&
+    !rawQueueV4PairMatchesSnapshot(bundle, queueCandidate, referenceCandidate)
+  ) {
+    throw new Error('Raw legacy v4 supplied pair does not exactly match the bundle snapshot');
+  }
+  const queue = validateTldrCommuteQueueV2(
+    repaired === undefined ? queueCandidate : repaired.queue
   );
   const declaredQueueFilename = declaredQueueName(bundle);
   if (declaredQueueFilename !== input.queueFilename) {
@@ -113,7 +127,14 @@ export function recoverSessionBundleWithSuppliedQueue(
   const qualityIncidents: RecoveredQualityIncident[] = [];
   const generalCaptures: RecoveredGeneralCapture[] = [];
   const recoveredEventIds = new Set<string>();
-  const recoveryWarnings = [...artifactEvidence.warnings];
+  const recoveryWarnings = [
+    ...artifactEvidence.warnings,
+    ...(repaired !== undefined && repaired.repairedFieldCount > 0
+      ? [
+          `Self-healed ${repaired.repairedFieldCount} v4 playback field(s) by replacing legacy newline runs with spaces.`,
+        ]
+      : []),
+  ];
 
   for (const [index, event] of events.entries()) {
     const field = `Recovery bundle events[${index}]`;
@@ -599,14 +620,6 @@ function byPosition(position: number, queueItems: ExactQueueItem[], field: strin
   const item = queueItems[position - 1];
   if (!item) throw new Error(`${field} position ${position} is outside the supplied queue`);
   return item;
-}
-
-function parseJsonObject(text: string, field: string): Record<string, unknown> {
-  try {
-    return requireRecord(JSON.parse(text) as unknown, field);
-  } catch (error) {
-    throw new Error(`${field} is not valid JSON: ${errorMessage(error)}`);
-  }
 }
 
 function requiredString(candidate: unknown, field: string): string {

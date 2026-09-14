@@ -240,6 +240,49 @@ test('self-heals legacy v4 playback newlines with an exact supplied pair', () =>
   ]);
   assert.equal(driftedResult.sessions[0]?.status, 'rejected');
   assert.match(driftedResult.sessions[0]?.error ?? '', /does not exactly match/);
+
+  const fencedResult = reconcileSessionBundles([
+    {
+      filename: bundle.session.artifact_filename,
+      text: `\`\`\`json\n${JSON.stringify(bundle)}\n\`\`\``,
+      recoveryQueue: {
+        filename: reference.main_filename,
+        text: JSON.stringify(main),
+        reference: {
+          filename: '20260906-tldr-dev-reference.txt',
+          text: JSON.stringify(reference),
+        },
+      },
+    },
+  ]);
+  assert.equal(fencedResult.sessions[0]?.status, 'accepted');
+
+  const malformedBundle = {
+    ...bundle,
+    playback: { ...bundle.playback, status: 'invalid-for-full-validation' },
+  };
+  const fallbackResult = reconcileSessionBundles([
+    {
+      filename: bundle.session.artifact_filename,
+      text: JSON.stringify(malformedBundle),
+      recoveryQueue: {
+        filename: reference.main_filename,
+        text: JSON.stringify(main),
+        reference: {
+          filename: '20260906-tldr-dev-reference.txt',
+          text: JSON.stringify(reference),
+        },
+      },
+    },
+  ]);
+  assert.equal(fallbackResult.sessions[0]?.status, 'accepted');
+  assert.equal(fallbackResult.sessions[0]?.integrity_state, 'recovered');
+  assert.match(
+    fallbackResult.sessions[0]?.recovery_warnings?.find((warning) =>
+      warning.startsWith('Self-healed')
+    ) ?? '',
+    /Self-healed 2 v4 playback/
+  );
 });
 
 test('preserves an invalid bundle as a rejected independent session', () => {
