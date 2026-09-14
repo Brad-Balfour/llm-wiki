@@ -4,7 +4,7 @@ import path from 'node:path';
 
 import { reconcileSessionBundles } from './import-session-bundles.js';
 import {
-  createQueueV4Snapshot,
+  createRepairedQueueV4Snapshot,
   parseCommuteSessionBundleText,
   parseCommuteSessionBundleTextWithRelaxedArtifactFilename,
   queueSnapshotFingerprint,
@@ -152,12 +152,12 @@ function compareRecoveryQueue(input: {
     const supplied = validateTldrCommuteQueueV2(
       input.recoveryQueue.reference === undefined
         ? (JSON.parse(input.recoveryQueue.text) as unknown)
-        : createQueueV4Snapshot(
+        : createRepairedQueueV4Snapshot(
             JSON.parse(input.recoveryQueue.text) as unknown,
             JSON.parse(input.recoveryQueue.reference.text) as unknown,
             input.recoveryQueue.filename,
             input.recoveryQueue.reference.filename
-          )
+          ).queue
     );
     const suppliedFingerprint = queueSnapshotFingerprint(supplied);
     const embeddedFingerprint = queueSnapshotFingerprint(bundle.queue_snapshot.queue);

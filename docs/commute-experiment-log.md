@@ -88,6 +88,10 @@ found a queue as proof.
   September 10 General, Dev, AI, and Fintech, and September 11 General v4
   playback/reference pairs, plus nine complete shared chats covering seven
   sessions and two failed or interrupted Dev attempts.
+- The September 11 AI and Dev and September 14 General v4 playback/reference
+  pairs, three September 13-14 session bundles, and no separately supplied
+  shared chats. The original Library downloads were retained as private intake
+  evidence while normalized recovery remained separate.
 - The live `Weekday TLDR Queues` Task conversation/configuration, the July
   21-24 Task Update emails, the July 24 manual queue-generation control, and
   the live Project settings/sources inspected on July 26.
@@ -148,6 +152,37 @@ retrieve sources, and preserve history after the drive.
 | Sep. 9     | Three v4 sessions, exact contrail-depth correction, and embedded-newline playback audit         | Validate three playback/reference pairs and bundles, reconcile two unique shared chats, preserve one exact depth correction, and separate unsaved discussion from playback and Library-recovery incidents.          | All three bundles passed strict validation and canonically matched 37 downloaded queue items. Intake accepted one partial and two recovered sessions with one depth correction, four bundled incidents, one workflow capture, no wiki candidates, and no unresolved items. Voice again stopped at embedded newlines and repeatedly struggled to reopen visible Library files. |
 | Sep. 10    | Three current v4 sessions, duplicate-chat reconciliation, and two discussion-enriched saves    | Validate three current playback/reference pairs and bundles, reconcile the supplied chats with the already-published September 9 intake, retain three exact depth corrections, and preserve two saved Dev discussions. | All current bundles passed strict validation and canonically matched 32 downloaded queue items. Intake accepted three partial sessions with two wiki candidates, three depth corrections, four incidents, and no unresolved items. The supplied chats were duplicate provenance for September 9 and again showed Library lookup failures and newline-truncated playback. |
 | Sep. 11    | Seven catch-up sessions and Instant-versus-Thinking Voice comparison                          | Validate seven playback/reference pairs and bundles, audit nine complete chats, retain one exact Dev depth correction, and compare observed Voice behavior across six Instant and three Thinking chats.                  | All seven snapshots matched 35 downloaded queue items. Six bundles were strict-valid; AI required supplied-pair recovery after recording a next transition beyond the final item. Both modes showed Library and literal-playback failures, so this uncontrolled sample does not establish a reliable mode effect.                    |
+| Sep. 14    | Three-session v4.1 transition intake, bounded newline repair, and Agents API save             | Validate three playback/reference pairs and bundles, self-heal legacy newline-bearing v4 playback during bounded intake, retain one exact depth correction, and preserve the saved Agents API discussion.               | The September 14 General pair and bundle were strict-valid. The older September 11 AI and Dev artifacts matched their embedded snapshots byte-for-byte but carried 13 playback fields generated before v4.1 newline removal; bounded repair normalized and revalidated them. Intake accepted all three sessions with one wiki candidate, one correction, eight incidents, and no unresolved items. |
+
+### September 14 Three-Session, Self-Healing, And Maintenance Result
+
+Three downloaded v4 playback/reference pairs covered 22 queue items: September
+11 AI and Dev and September 14 General. Their three September 13-14 bundles
+embedded byte-for-byte matches for the downloaded pairs. General passed strict
+validation. The two older pairs contained 13 playback fields with CR/LF runs
+from before queue-generation v4.1 stopped emitting those characters.
+
+Daily intake now applies a bounded transition repair instead of rejecting those
+sessions: it replaces each newline run with one space, recomputes the playback
+hash, validates the complete normalized pair, and records a recovery warning.
+The raw downloads remain unchanged, and the strict producer validator still
+rejects them so a new generator regression stays visible. With that repair, all
+three supplied-pair comparisons matched and intake retained no unresolved item.
+
+The bundles contain eight quality incidents: Dev omitted its complete sweep,
+paraphrased item four, and truncated item seven; AI required manual attachment
+after failing to reopen its exact queue and stopped its sweep after item three;
+General paused during item four, added noncanonical sentences, and was disrupted
+during item eight. General also retains Brad's exact correction that the Tesla
+Roadster item should have been `in_depth`.
+
+Dev retained one exact wiki save for OpenAI's Agents API plus the surrounding
+discussion about practical office automation, implementer/reviewer separation,
+bounded permissions, customer-controlled infrastructure, and API-versus-seat
+billing. The resulting concept update distinguishes official announcement and
+self-hosting facts from the conditional inference that a Coder workspace could
+host the executor. No Project prompt or Project source file changed in this run,
+so no live Project upload is required.
 
 ### September 11 Seven-Session And Voice-Effort Result
 

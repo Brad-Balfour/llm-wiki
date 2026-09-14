@@ -1,13 +1,14 @@
 import { createHash } from 'node:crypto';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
+import { isDeepStrictEqual } from 'node:util';
 import { fileURLToPath } from 'node:url';
 
 import { errorMessage } from '../shared/errors.js';
 
 import {
   bundleArtifactFilenameMatches,
-  createQueueV4Snapshot,
+  createRepairedQueueV4Snapshot,
   type CommuteSessionBundle,
   parseCommuteSessionBundleText,
   parseCommuteSessionBundleTextWithRelaxedArtifactFilename,
@@ -163,6 +164,7 @@ export function reconcileSessionBundles(
       }
       let relaxedBundle: CommuteSessionBundle | undefined;
       let relaxedDeclaredArtifactFilename: string | undefined;
+      let relaxedRepairedPlaybackFieldCount = 0;
       if (input.recoveryQueue) {
         try {
           const relaxed = parseCommuteSessionBundleTextWithRelaxedArtifactFilename(
@@ -171,12 +173,21 @@ export function reconcileSessionBundles(
           );
           relaxedBundle = relaxed.bundle;
           relaxedDeclaredArtifactFilename = relaxed.declaredArtifactFilename;
+          relaxedRepairedPlaybackFieldCount = relaxed.repairedPlaybackFieldCount;
+          if (relaxed.repairedPlaybackFieldCount > 0) {
+            strictRecoveryWarnings.push(
+              `Self-healed ${relaxed.repairedPlaybackFieldCount} v4 playback field(s) by replacing legacy newline runs with spaces.`
+            );
+          }
         } catch {
           // Continue to bounded wiki-only recovery for other malformed bundles.
         }
       }
       if (relaxedBundle && input.recoveryQueue) {
         try {
+          if (relaxedRepairedPlaybackFieldCount > 0) {
+            validateRawLegacyPairMatch(input.text, input.recoveryQueue);
+          }
           validateFullRecoveryQueue(relaxedBundle, input.recoveryQueue);
           bundle = relaxedBundle;
           if (relaxedDeclaredArtifactFilename === undefined) {
@@ -561,10 +572,14 @@ function collectStrictArtifactClaims(inputs: SessionBundleInput[]): Map<string, 
     } catch {
       if (!input.recoveryQueue) continue;
       try {
-        bundle = parseCommuteSessionBundleTextWithRelaxedArtifactFilename(
+        const relaxed = parseCommuteSessionBundleTextWithRelaxedArtifactFilename(
           input.text,
           input.filename
-        ).bundle;
+        );
+        bundle = relaxed.bundle;
+        if (relaxed.repairedPlaybackFieldCount > 0) {
+          validateRawLegacyPairMatch(input.text, input.recoveryQueue);
+        }
         validateFullRecoveryQueue(bundle, input.recoveryQueue);
       } catch {
         continue;
@@ -574,6 +589,26 @@ function collectStrictArtifactClaims(inputs: SessionBundleInput[]): Map<string, 
     if (!claims.has(artifactKey)) claims.set(artifactKey, bundle.session.session_id);
   }
   return claims;
+}
+
+function validateRawLegacyPairMatch(
+  bundleText: string,
+  recoveryQueue: NonNullable<SessionBundleInput['recoveryQueue']>
+): void {
+  if (recoveryQueue.reference === undefined) {
+    throw new Error('Legacy v4 playback repair requires the exact supplied reference file');
+  }
+  const rawBundle = requireRecord(JSON.parse(bundleText) as unknown, 'bundle');
+  const snapshot = requireRecord(rawBundle.queue_snapshot, 'bundle.queue_snapshot');
+  const queue = requireRecord(snapshot.queue, 'bundle.queue_snapshot.queue');
+  const suppliedPlayback = JSON.parse(recoveryQueue.text) as unknown;
+  const suppliedReference = JSON.parse(recoveryQueue.reference.text) as unknown;
+  if (
+    !isDeepStrictEqual(queue.playback_file, suppliedPlayback) ||
+    !isDeepStrictEqual(queue.reference_file, suppliedReference)
+  ) {
+    throw new Error('Raw legacy v4 supplied pair does not exactly match the bundle snapshot');
+  }
 }
 
 function validateFullRecoveryQueue(
@@ -594,12 +629,12 @@ function validateFullRecoveryQueue(
   const suppliedQueue = validateTldrCommuteQueueV2(
     recoveryQueue.reference === undefined
       ? queueCandidate
-      : createQueueV4Snapshot(
+      : createRepairedQueueV4Snapshot(
           queueCandidate,
           JSON.parse(recoveryQueue.reference.text) as unknown,
           recoveryQueue.filename,
           recoveryQueue.reference.filename
-        )
+        ).queue
   );
   if (
     queueSnapshotFingerprint(suppliedQueue) !==

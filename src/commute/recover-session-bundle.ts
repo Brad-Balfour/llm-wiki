@@ -5,7 +5,7 @@ import { optionalRecord, requireArray, requireRecord } from '../shared/validate.
 import {
   bundleArtifactFilenameMatches,
   EVIDENCE_SOURCES,
-  createQueueV4Snapshot,
+  createRepairedQueueV4Snapshot,
   queueMetadataRecord,
   queueSnapshotFingerprint,
   type EventEvidence,
@@ -84,12 +84,12 @@ export function recoverSessionBundleWithSuppliedQueue(
   const queue = validateTldrCommuteQueueV2(
     input.referenceText === undefined
       ? queueCandidate
-      : createQueueV4Snapshot(
+      : createRepairedQueueV4Snapshot(
           queueCandidate,
           parseJsonObject(input.referenceText, 'Recovery reference'),
           input.queueFilename,
           input.referenceFilename
-        )
+        ).queue
   );
   const declaredQueueFilename = declaredQueueName(bundle);
   if (declaredQueueFilename !== input.queueFilename) {

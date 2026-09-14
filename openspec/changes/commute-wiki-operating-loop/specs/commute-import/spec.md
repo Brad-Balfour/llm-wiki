@@ -15,6 +15,22 @@ resolve v4 items from the embedded reference while retaining v2/v3 readers.
 - **AND** a mismatched filename, hash, position, count, or identity SHALL fail
   before item-specific evidence is used.
 
+#### Scenario: Self-heal legacy v4 playback newlines during intake
+
+- **WHEN** daily intake receives a legacy v4 bundle and its exact separately
+  supplied playback/reference pair
+- **AND** their only v4.1 contract defect is one or more CR/LF runs inside
+  playback fields
+- **THEN** intake SHALL replace each contiguous newline run with one space
+- **AND** it SHALL recompute the playback hash and revalidate the complete pair
+  before item-specific evidence is used
+- **AND** it SHALL record the repair as a warning while preserving the raw
+  downloaded artifacts
+- **AND** strict producer validation SHALL continue to reject the unmodified
+  newline-bearing artifacts
+- **AND** intake SHALL NOT normalize any other filename, identity, count, order,
+  or content drift under this repair.
+
 ### Requirement: Multi-Bundle Single Import
 
 The local commute import command SHALL accept one or more session bundles in a

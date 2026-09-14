@@ -77,6 +77,11 @@ export interface QueueV4Pair {
   referenceFile: Record<string, unknown>;
 }
 
+export interface RepairedQueueV4Snapshot {
+  queue: Record<string, unknown>;
+  repairedFieldCount: number;
+}
+
 export interface DailyQueueV4PairInput {
   mainFilename: string;
   referenceFilename?: string;
@@ -198,6 +203,7 @@ export function parseCommuteSessionBundleText(text: string): CommuteSessionBundl
 export interface RelaxedArtifactFilenameParse {
   bundle: CommuteSessionBundle;
   declaredArtifactFilename?: string;
+  repairedPlaybackFieldCount: number;
 }
 
 export function parseCommuteSessionBundleTextWithRelaxedArtifactFilename(
@@ -217,16 +223,20 @@ export function parseCommuteSessionBundleTextWithRelaxedArtifactFilename(
   ) {
     requireString(rawArtifactFilename, 'session.artifact_filename');
   }
-  const normalizedCandidate =
+  const filenameNormalizedCandidate =
     declaredArtifactFilename === undefined
       ? {
           ...candidate,
           session: { ...session, artifact_filename: fallbackArtifactFilename },
         }
       : candidate;
+  const { candidate: normalizedCandidate, repairedFieldCount } = repairBundleV4PlaybackNewlines(
+    filenameNormalizedCandidate
+  );
 
   return {
     bundle: validateCommuteSessionBundleCandidate(normalizedCandidate, false),
+    repairedPlaybackFieldCount: repairedFieldCount,
     ...(declaredArtifactFilename === undefined ? {} : { declaredArtifactFilename }),
   };
 }
@@ -305,6 +315,90 @@ export function createQueueV4Snapshot(
     queue_version: 'tldr-commute-queue.v4',
     playback_file: pair.playbackFile,
     reference_file: pair.referenceFile,
+  };
+}
+
+/**
+ * Normalize playback files produced before queue-generation v4.1 replaced
+ * embedded CR/LF runs with spaces. Strict validation still rejects the raw
+ * producer artifact; supplied-pair recovery uses this bounded repair and then
+ * revalidates the complete pair, including its recomputed main hash.
+ */
+export function createRepairedQueueV4Snapshot(
+  playbackCandidate: unknown,
+  referenceCandidate: unknown,
+  mainFilename?: string,
+  referenceFilename?: string
+): RepairedQueueV4Snapshot {
+  const playback = requireRecord(playbackCandidate, 'playback_file');
+  let repairedFieldCount = 0;
+  const repair = (candidate: unknown): unknown => {
+    if (typeof candidate !== 'string' || !/[\r\n]/.test(candidate)) return candidate;
+    repairedFieldCount += 1;
+    return candidate.replace(/[\r\n]+/g, ' ');
+  };
+  const rawItems = Array.isArray(playback.items) ? playback.items : playback.items;
+  const repairedPlayback = {
+    ...playback,
+    sweep_playback: repair(playback.sweep_playback),
+    items: Array.isArray(rawItems)
+      ? rawItems.map((candidate) => {
+          if (typeof candidate !== 'object' || candidate === null || Array.isArray(candidate)) {
+            return candidate;
+          }
+          const item = candidate as Record<string, unknown>;
+          return { ...item, item_playback: repair(item.item_playback) };
+        })
+      : rawItems,
+  };
+  const reference = requireRecord(referenceCandidate, 'reference_file');
+  if (
+    repairedFieldCount > 0 &&
+    requireString(reference.main_sha256, 'reference_file.main_sha256') !==
+      playbackFileFingerprint(playback)
+  ) {
+    throw new Error('reference_file.main_sha256 does not match the raw playback file');
+  }
+  const repairedReference =
+    repairedFieldCount === 0
+      ? reference
+      : { ...reference, main_sha256: playbackFileFingerprint(repairedPlayback) };
+  return {
+    queue: createQueueV4Snapshot(
+      repairedPlayback,
+      repairedReference,
+      mainFilename,
+      referenceFilename
+    ),
+    repairedFieldCount,
+  };
+}
+
+function repairBundleV4PlaybackNewlines(candidate: Record<string, unknown>): {
+  candidate: Record<string, unknown>;
+  repairedFieldCount: number;
+} {
+  const snapshot = requireRecord(candidate.queue_snapshot, 'queue_snapshot');
+  const queue = requireRecord(snapshot.queue, 'queue_snapshot.queue');
+  if (queue.queue_version !== 'tldr-commute-queue.v4') {
+    return { candidate, repairedFieldCount: 0 };
+  }
+  const mainFilename = requireString(snapshot.filename, 'queue_snapshot.filename');
+  const repaired = createRepairedQueueV4Snapshot(
+    queue.playback_file,
+    queue.reference_file,
+    mainFilename,
+    mainFilename.replace(/\.txt$/, '-reference.txt')
+  );
+  if (repaired.repairedFieldCount === 0) {
+    return { candidate, repairedFieldCount: 0 };
+  }
+  return {
+    candidate: {
+      ...candidate,
+      queue_snapshot: { ...snapshot, queue: repaired.queue },
+    },
+    repairedFieldCount: repaired.repairedFieldCount,
   };
 }
 

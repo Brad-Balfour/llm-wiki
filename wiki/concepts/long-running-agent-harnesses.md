@@ -2,15 +2,15 @@
 type: concept
 title: 'Long-Running Agent Harnesses'
 # prettier-ignore
-aliases: ["The Coming Loop","Hidden Technical Debt of AI Systems: Agent Harness","Codex-maxxing for long-running work","Autoresearch","Software Factories, Light and Dark","The Continuous Thunderdome","The Harness Is the Thing","Harness Engineering"]
+aliases: ["The Coming Loop","Hidden Technical Debt of AI Systems: Agent Harness","Codex-maxxing for long-running work","Autoresearch","Software Factories, Light and Dark","The Continuous Thunderdome","The Harness Is the Thing","Harness Engineering","Introducing the Agents API"]
 # prettier-ignore
 tags: ["ai-agents","agent-harnesses","long-running-agents","software-factories","verification","context-management","feedback-loops"]
 wiki_slug: long-running-agent-harnesses
 created: 2026-08-24
-updated: 2026-08-28
+updated: 2026-09-14
 confidence: medium
 # prettier-ignore
-provenance: [{"source_item_id":"url_1fbd37ebeb0805e9","url":"https://openai.com/index/codex-maxxing-long-running-work/"},{"source_item_id":"url_d3b96db102288163","url":"https://leehanchung.github.io/blogs/2026/05/08/hidden-technical-debt-agent-harness/"},{"source_item_id":"url_2eece697b1d063df","url":"https://lucumr.pocoo.org/2026/6/23/the-coming-loop/"},{"source_item_id":"url_7e29fd14ca16f2a8","url":"https://www.latent.space/p/autoresearch-introspection"},{"source_item_id":"url_6becd8bc303db51e","url":"https://yegge.ai/essays/the-shape-of-things-to-come/"},{"source_item_id":"url_050f975f8d6191b8","url":"https://addyo.substack.com/p/software-factories-light-and-dark"},{"source_item_id":"1a042ecbb2412172-06","url":"https://scott-fryxell.github.io/blog/the-harness-is-the-thing/"},{"source_item_id":"1a0480e09f24878f-13","url":"https://habitat-thinking.github.io/ai-literacy-superpowers/plugins/ai-literacy-superpowers/explanation/harness-engineering/"}]
+provenance: [{"source_item_id":"url_1fbd37ebeb0805e9","url":"https://openai.com/index/codex-maxxing-long-running-work/"},{"source_item_id":"url_d3b96db102288163","url":"https://leehanchung.github.io/blogs/2026/05/08/hidden-technical-debt-agent-harness/"},{"source_item_id":"url_2eece697b1d063df","url":"https://lucumr.pocoo.org/2026/6/23/the-coming-loop/"},{"source_item_id":"url_7e29fd14ca16f2a8","url":"https://www.latent.space/p/autoresearch-introspection"},{"source_item_id":"url_6becd8bc303db51e","url":"https://yegge.ai/essays/the-shape-of-things-to-come/"},{"source_item_id":"url_050f975f8d6191b8","url":"https://addyo.substack.com/p/software-factories-light-and-dark"},{"source_item_id":"1a042ecbb2412172-06","url":"https://scott-fryxell.github.io/blog/the-harness-is-the-thing/"},{"source_item_id":"1a0480e09f24878f-13","url":"https://habitat-thinking.github.io/ai-literacy-superpowers/plugins/ai-literacy-superpowers/explanation/harness-engineering/"},{"source_item_id":"1a0903454aaa91c2-06","url":"https://openai.com/index/introducing-the-agents-api/"}]
 ---
 
 # Long-Running Agent Harnesses
@@ -61,6 +61,35 @@ one working method while the model underneath changes. The value is not a
 larger prompt. It is the inspectable division of labor, the retained state
 between roles, and an explicit point where reviewed work becomes accepted
 project state.
+
+## Managed Harness, Customer-Controlled Execution
+
+OpenAI's Agents API makes the harness a managed service while leaving the
+execution boundary configurable. The public beta exposes the infrastructure
+behind Codex for long-running work, context compaction, tool discovery, and
+subagent delegation. OpenAI operates the harness, while the agent's compute can
+run in an OpenAI-hosted environment, customer infrastructure, or a sandbox
+partner.
+
+The self-hosted path draws a useful systems boundary: OpenAI runs the harness,
+but a customer runs `codex exec-server` inside an isolated laptop, container,
+or remote workspace. The executor performs shell, file, and local MCP work at
+the harness's request over an outbound WebSocket. Because files and credentials
+are shared inside one environment, the documentation requires isolation by
+user or workload.
+
+The commute discussion translated that architecture into an office software
+workflow: a ticket can enter a tightly scoped implementation loop, then pass to
+an independent reviewer before promotion. Permissions, tests, and human gates
+remain part of the harness rather than model discretion. A Coder workspace
+could plausibly host the self-hosted executor if it satisfies the documented
+networking, CLI, key, and isolation requirements; that is an architectural
+inference, not a compatibility claim made by OpenAI.
+
+OpenAI says there is no additional Agents API fee beyond model tokens and tool
+use. Whether a particular employer's ChatGPT Enterprise agreement includes or
+separately bills API use is an organization-specific commercial question and
+should be verified against that agreement.
 
 ## A Harness Is a Living Constraint System
 
@@ -138,6 +167,17 @@ reduction.
 Habitat Thinking. Documents a living harness, progressive enforcement from
 agent judgment to deterministic checks, garbage collection, and inner, middle,
 and outer feedback loops.
+
+### [Introducing the Agents API](https://openai.com/index/introducing-the-agents-api/)
+
+<!-- source-item-id: 1a0903454aaa91c2-06 -->
+
+OpenAI, 2026-09-10. Announces the public beta, the managed-harness boundary,
+three compute-placement options, long-running and multi-agent capabilities, and
+token-and-tool billing without an additional Agents API fee. The corresponding
+[self-hosted environment guide](https://developers.openai.com/api/docs/guides/agents-api/environments/self-hosted)
+documents the customer-run executor, outbound connection, credentials, and
+isolation requirements.
 
 ## Related
 
