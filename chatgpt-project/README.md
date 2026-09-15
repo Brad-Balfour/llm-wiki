@@ -140,6 +140,14 @@ intake preserves that defect as a warning and continues when the supplied queue,
 item, and explicit wiki action remain exact. Strict bundle validation still
 reports the naming defect so generator quality does not become invisible.
 
+Queue-generation v4.1 removed embedded CR/LF characters from playback fields.
+When daily intake encounters a legacy v4 bundle and supplied pair from before
+that cutover, it replaces each contiguous newline run with one space, recomputes
+the main-file hash, and revalidates the complete pair before using any evidence.
+The repair is recorded as a warning and the downloaded files remain unchanged.
+The standalone strict validator continues to reject raw newline-bearing producer
+artifacts, so new regressions do not become silently valid.
+
 ```sh
 npm run import:commute-session-bundles -- \
   --input /path/to/malformed-bundle.txt \

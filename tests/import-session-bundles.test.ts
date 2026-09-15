@@ -7,6 +7,11 @@ import {
   maintenanceCandidateKey,
   reconcileSessionBundles,
 } from '../src/commute/import-session-bundles.js';
+import {
+  createRepairedQueueV4Snapshot,
+  playbackFileFingerprint,
+  queueSnapshotFingerprint,
+} from '../src/commute/session-bundle.js';
 
 const fixturePath = path.resolve('tests/fixtures/commute-bundles/valid-partial-bundle.json');
 const validBundle = readFileSync(fixturePath, 'utf8');
@@ -54,6 +59,230 @@ test('carries evidence-backed discussion only with its exact wiki capture', () =
   const candidate = result.maintenance_candidates[0];
   assert.equal(candidate?.discussion?.summary, discussion.summary);
   assert.equal(candidate?.discussion?.discussion_key.startsWith('discussion-'), true);
+});
+
+test('self-heals legacy v4 playback newlines with an exact supplied pair', () => {
+  const prefix = '1 of 1. In depth. Legacy queue item';
+  const description = 'First line.\nSecond line.';
+  const main = {
+    sweep_playback: '1 of 1.\nIn depth. Legacy queue item',
+    items: [{ item_playback: `${prefix} First line.\nSecond line.` }],
+  };
+  const reference = {
+    queue_version: 'tldr-commute-queue.v4',
+    main_filename: '20260906-tldr-dev.txt',
+    main_sha256: playbackFileFingerprint(main),
+    newsletter: 'TLDR Dev',
+    edition_date: '2026-09-06',
+    source_email: {
+      gmail_message_id: 'legacy-v4-message',
+      sender: 'TLDR Dev <dev@example.com>',
+      delivered_at: '2026-09-06T07:00:00-04:00',
+    },
+    daily_generation_id: '20260906-daily-tldr',
+    total_items: 1,
+    profile_version: '2.1',
+    prompt_version: 'classifier-instructions.v2',
+    provider: 'openai',
+    model: 'project-model',
+    parser_version: 'tldr-email-parser-v4',
+    route_version: 'routing-rules.v1',
+    coverage_decisions: [],
+    items: [
+      {
+        position: 1,
+        source_item_id: 'legacy-v4-item',
+        title: 'Legacy queue item',
+        description,
+        author: 'Example Author',
+        publication: 'Example Publication',
+        attribution: {
+          resolved_url: 'https://example.com/legacy-v4',
+          author_source: 'newsletter',
+          publication_source: 'newsletter',
+          lookup_attempts: 0,
+        },
+        url: 'https://example.com/legacy-v4',
+        source_occurrences: [
+          {
+            occurrence_id: 'legacy-v4-occurrence',
+            newsletter: 'TLDR Dev',
+            source_item_id: 'legacy-v4-item',
+            source_order: 1,
+            title: 'Legacy queue item',
+            description,
+            url: 'https://example.com/legacy-v4',
+          },
+        ],
+        selected_source_occurrence_id: 'legacy-v4-occurrence',
+        coverage: {
+          status: 'original',
+          related_retained_item: null,
+          decision_reason: 'Retained as original daily coverage.',
+          update_note: null,
+        },
+        playback_context: {
+          headline_context: null,
+          excerpt_source_occurrence_id: null,
+          unusually_long_excerpt: false,
+          update_prefix: null,
+        },
+        interest_level: 'interested',
+        interest_score: 0.9,
+        consumption_depth: 'in_depth',
+        depth_score: 0.8,
+        commute_behavior: 'discuss',
+        signals: ['fixture'],
+        reason: 'Fixture classification.',
+        classified_at: '2026-09-06T11:00:00-04:00',
+        routed_at: '2026-09-06T11:00:00-04:00',
+      },
+    ],
+  };
+  const identity = {
+    source_item_id: 'legacy-v4-item',
+    title: 'Legacy queue item',
+    url: 'https://example.com/legacy-v4',
+  };
+  const bundle = {
+    schema_version: 'commute-session-bundle.v1',
+    session: {
+      session_id: 'legacy-v4-newline-session',
+      session_date: '2026-09-06',
+      artifact_filename: '202609060745-morning-commute-session-bundle.txt',
+      voice_surface: 'chatgpt_live',
+    },
+    queue_snapshot: {
+      filename: '20260906-tldr-dev.txt',
+      queue: {
+        queue_version: 'tldr-commute-queue.v4',
+        playback_file: main,
+        reference_file: reference,
+      },
+    },
+    playback: {
+      status: 'completed',
+      last_announced_source_item_id: identity.source_item_id,
+    },
+    integrity: {
+      state: 'partial',
+      incomplete_reason: 'The chat is the available evidence.',
+      unresolved_event_ids: [],
+    },
+    events: [
+      {
+        event_id: 'announce-1',
+        sequence: 1,
+        kind: 'item_announced',
+        item: identity,
+        evidence: [{ source: 'selected_queue_snapshot', reference: 'Exact v4 item.' }],
+      },
+      {
+        event_id: 'save-1',
+        sequence: 2,
+        kind: 'item_action',
+        action: 'wiki_this',
+        item: identity,
+        user_words: 'Wiki this.',
+        evidence: [{ source: 'explicit_user_capture', reference: 'Brad said: Wiki this.' }],
+      },
+    ],
+  };
+
+  const result = reconcileSessionBundles([
+    {
+      filename: bundle.session.artifact_filename,
+      text: JSON.stringify(bundle),
+      recoveryQueue: {
+        filename: reference.main_filename,
+        text: JSON.stringify(main),
+        reference: {
+          filename: '20260906-tldr-dev-reference.txt',
+          text: JSON.stringify(reference),
+        },
+      },
+    },
+  ]);
+
+  assert.equal(result.sessions[0]?.status, 'accepted');
+  assert.equal(result.sessions[0]?.integrity_state, 'partial');
+  assert.match(result.sessions[0]?.recovery_warnings?.[0] ?? '', /Self-healed 2 v4 playback/);
+  assert.equal(result.maintenance_candidates.length, 1);
+  const repaired = createRepairedQueueV4Snapshot(
+    main,
+    reference,
+    reference.main_filename,
+    '20260906-tldr-dev-reference.txt'
+  );
+  assert.equal(result.sessions[0]?.queue_fingerprint, queueSnapshotFingerprint(repaired.queue));
+
+  const driftedMain = {
+    ...main,
+    items: [{ item_playback: `${prefix} First line.\n\nSecond line.` }],
+  };
+  const driftedReference = {
+    ...reference,
+    main_sha256: playbackFileFingerprint(driftedMain),
+  };
+  const driftedResult = reconcileSessionBundles([
+    {
+      filename: bundle.session.artifact_filename,
+      text: JSON.stringify(bundle),
+      recoveryQueue: {
+        filename: reference.main_filename,
+        text: JSON.stringify(driftedMain),
+        reference: {
+          filename: '20260906-tldr-dev-reference.txt',
+          text: JSON.stringify(driftedReference),
+        },
+      },
+    },
+  ]);
+  assert.equal(driftedResult.sessions[0]?.status, 'rejected');
+  assert.match(driftedResult.sessions[0]?.error ?? '', /does not exactly match/);
+
+  const fencedResult = reconcileSessionBundles([
+    {
+      filename: bundle.session.artifact_filename,
+      text: `\`\`\`json\n${JSON.stringify(bundle)}\n\`\`\``,
+      recoveryQueue: {
+        filename: reference.main_filename,
+        text: `\`\`\`json\n${JSON.stringify(main)}\n\`\`\``,
+        reference: {
+          filename: '20260906-tldr-dev-reference.txt',
+          text: `\`\`\`json\n${JSON.stringify(reference)}\n\`\`\``,
+        },
+      },
+    },
+  ]);
+  assert.equal(fencedResult.sessions[0]?.status, 'accepted');
+
+  const malformedBundle = {
+    ...bundle,
+    playback: { ...bundle.playback, status: 'invalid-for-full-validation' },
+  };
+  const fallbackResult = reconcileSessionBundles([
+    {
+      filename: bundle.session.artifact_filename,
+      text: JSON.stringify(malformedBundle),
+      recoveryQueue: {
+        filename: reference.main_filename,
+        text: JSON.stringify(main),
+        reference: {
+          filename: '20260906-tldr-dev-reference.txt',
+          text: JSON.stringify(reference),
+        },
+      },
+    },
+  ]);
+  assert.equal(fallbackResult.sessions[0]?.status, 'accepted');
+  assert.equal(fallbackResult.sessions[0]?.integrity_state, 'recovered');
+  assert.match(
+    fallbackResult.sessions[0]?.recovery_warnings?.find((warning) =>
+      warning.startsWith('Self-healed')
+    ) ?? '',
+    /Self-healed 2 v4 playback/
+  );
 });
 
 test('preserves an invalid bundle as a rejected independent session', () => {
