@@ -616,18 +616,13 @@ function validateFullRecoveryQueue(
       `Recovery queue filename ${recoveryQueue.filename} does not match bundle queue ${bundle.queue_snapshot.filename}`
     );
   }
-  let queueCandidate: unknown;
-  try {
-    queueCandidate = JSON.parse(recoveryQueue.text) as unknown;
-  } catch (error) {
-    throw new Error(`Recovery queue is not valid JSON: ${errorMessage(error)}`);
-  }
+  const queueCandidate = parseJsonObject(recoveryQueue.text, 'Recovery queue');
   const suppliedQueue = validateTldrCommuteQueueV2(
     recoveryQueue.reference === undefined
       ? queueCandidate
       : createRepairedQueueV4Snapshot(
           queueCandidate,
-          JSON.parse(recoveryQueue.reference.text) as unknown,
+          parseJsonObject(recoveryQueue.reference.text, 'Recovery reference'),
           recoveryQueue.filename,
           recoveryQueue.reference.filename
         ).queue

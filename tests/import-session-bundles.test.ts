@@ -247,10 +247,10 @@ test('self-heals legacy v4 playback newlines with an exact supplied pair', () =>
       text: `\`\`\`json\n${JSON.stringify(bundle)}\n\`\`\``,
       recoveryQueue: {
         filename: reference.main_filename,
-        text: JSON.stringify(main),
+        text: `\`\`\`json\n${JSON.stringify(main)}\n\`\`\``,
         reference: {
           filename: '20260906-tldr-dev-reference.txt',
-          text: JSON.stringify(reference),
+          text: `\`\`\`json\n${JSON.stringify(reference)}\n\`\`\``,
         },
       },
     },
