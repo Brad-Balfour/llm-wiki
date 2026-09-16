@@ -2,15 +2,15 @@
 type: concept
 title: 'Review-Driven Software Factories'
 # prettier-ignore
-aliases: ["Why Software Factories Fail","Human-in-the-loop software factories","Agentic documentation workflows","Foreman software factory","Hiring Agents Is the Easy Part","Warp Factories","Quality Assurance Agent","Stop being the code review bottleneck","How Uber built a software factory for agentic coding","When code is abundant"]
+aliases: ["Why Software Factories Fail","Human-in-the-loop software factories","Agentic documentation workflows","Foreman software factory","Hiring Agents Is the Easy Part","Warp Factories","Quality Assurance Agent","Stop being the code review bottleneck","How Uber built a software factory for agentic coding","When code is abundant","How to Write an Effective Software Design Document"]
 # prettier-ignore
 tags: ["ai-agents","software-design","planning","code-review","context-management","documentation","workflow-automation","platform-engineering","governance","mcp"]
 wiki_slug: review-driven-software-factories
 created: 2026-07-25
-updated: 2026-08-26
+updated: 2026-09-15
 confidence: medium
 # prettier-ignore
-provenance: [{"source_item_id":"dev-20260724-01","url":"https://github.com/humanlayer/advanced-context-engineering-for-coding-agents/blob/main/wsff.md"},{"source_item_id":"19fd6c96b2d39a67-11","url":"https://github.blog/ai-and-ml/github-copilot/automating-cross-repo-documentation-with-github-agentic-workflows/?utm_source=tldrdev"},{"source_item_id":"19ffad638bac0403-02","url":"https://blog.cloudflare.com/astro-issue-triage/?utm_source=tldrdev"},{"source_item_id":"19ffffe9eeaeab99-06","url":"https://github.com/vercel-labs/eve-software-factory-template?utm_source=tldrnewsletter"},{"source_item_id":"19ffb53bd896ad92-11","url":"https://x.com/AlanaDLevin/status/2087526319999303784"},{"source_item_id":"1a01a57197aa438b-18","url":"https://techcrunch.com/2026/08/18/warps-new-system-is-an-out-of-the-box-software-factory-for-ai-development/?utm_source=tldrai"},{"source_item_id":"url_adf03cc09f382e8e","url":"https://www.warp.dev/factories/request-access"},{"source_item_id":"url_79e1f7b5ba46a169","url":"https://docs.warp.dev/factories/"},{"source_item_id":"url_80300d7978de226c","url":"https://docs.warp.dev/factories/infrastructure-and-security/"},{"source_item_id":"url_853c86ea5e82c5b4","url":"https://www.linkedin.com/blog/engineering/ai/qa-agent-reimagining-software-quality-with-ai-driven-autonomous-testing"},{"source_item_id":"url_f7ffc84157ac5d1c","url":"https://newsletter.posthog.com/p/code-review-tips"},{"source_item_id":"1a038ac5916976e5-05","url":"https://newsletter.port.io/p/how-uber-built-a-software-factory?utm_source=tldrnewsletter"},{"source_item_id":"1a03919a99717a24-09","url":"https://about.gitlab.com/blog/when-code-is-abundant/?utm_source=tldrai"},{"source_item_id":"url_74ac61e244043f10","url":"https://claude.com/blog/the-ai-native-sdlc-playbook"}]
+provenance: [{"source_item_id":"dev-20260724-01","url":"https://github.com/humanlayer/advanced-context-engineering-for-coding-agents/blob/main/wsff.md"},{"source_item_id":"19fd6c96b2d39a67-11","url":"https://github.blog/ai-and-ml/github-copilot/automating-cross-repo-documentation-with-github-agentic-workflows/?utm_source=tldrdev"},{"source_item_id":"19ffad638bac0403-02","url":"https://blog.cloudflare.com/astro-issue-triage/?utm_source=tldrdev"},{"source_item_id":"19ffffe9eeaeab99-06","url":"https://github.com/vercel-labs/eve-software-factory-template?utm_source=tldrnewsletter"},{"source_item_id":"19ffb53bd896ad92-11","url":"https://x.com/AlanaDLevin/status/2087526319999303784"},{"source_item_id":"1a01a57197aa438b-18","url":"https://techcrunch.com/2026/08/18/warps-new-system-is-an-out-of-the-box-software-factory-for-ai-development/?utm_source=tldrai"},{"source_item_id":"url_adf03cc09f382e8e","url":"https://www.warp.dev/factories/request-access"},{"source_item_id":"url_79e1f7b5ba46a169","url":"https://docs.warp.dev/factories/"},{"source_item_id":"url_80300d7978de226c","url":"https://docs.warp.dev/factories/infrastructure-and-security/"},{"source_item_id":"url_853c86ea5e82c5b4","url":"https://www.linkedin.com/blog/engineering/ai/qa-agent-reimagining-software-quality-with-ai-driven-autonomous-testing"},{"source_item_id":"url_f7ffc84157ac5d1c","url":"https://newsletter.posthog.com/p/code-review-tips"},{"source_item_id":"1a038ac5916976e5-05","url":"https://newsletter.port.io/p/how-uber-built-a-software-factory?utm_source=tldrnewsletter"},{"source_item_id":"1a03919a99717a24-09","url":"https://about.gitlab.com/blog/when-code-is-abundant/?utm_source=tldrai"},{"source_item_id":"url_74ac61e244043f10","url":"https://claude.com/blog/the-ai-native-sdlc-playbook"},{"source_item_id":"1a0a4ca47348bc23-04","url":"https://refactoringenglish.com/excerpts/write-an-effective-design-doc/"}]
 ---
 
 # Review-Driven Software Factories
@@ -40,6 +40,29 @@ Subagents are useful here as context-isolation boundaries: research, review, and
 implementation can happen without filling the main decision context with every
 intermediate detail. They do not make accountability or cross-boundary review
 optional.
+
+## Design Documents as Attention Budgets
+
+Michael Lynch's design-document guidance adds a practical filter to upstream
+review: document decisions in proportion to the penalty for being wrong. A
+hard-to-reverse language, storage, security, or interface choice deserves more
+space and review than an easily changed presentation detail. The goal is not to
+specify the implementation twice, but to spend reviewer attention where a bad
+decision would be expensive.
+
+An effective document should stand on its own for a capable reader who was not
+in the preceding meetings. It establishes the objective and background, makes
+goals and non-goals explicit, shows important scenarios and diagrams, records
+constraints, and links related material. Optional sections should follow the
+project's actual risk: interfaces, dependencies, SLOs, monitoring, security,
+privacy, or legal concerns matter only when they help reviewers test the design.
+
+Open questions belong in the document rather than being hidden until the author
+has a polished answer. Each should state the problem, plausible options, and
+the next step; once resolved, retain the discussion beside the decision. This
+turns the document into a durable decision record and gives reviewers a clear
+place to contribute, instead of presenting a finished-looking proposal that
+discourages useful challenge.
 
 ## Documentation as a Review-Driven Propagation Workflow
 
@@ -294,6 +317,16 @@ vendor thesis, but it identifies the same boundary seen throughout this page:
 autonomy scales only when review criteria, authority, and proof scale with it.
 
 ## Source Notes
+
+### [How to Write an Effective Software Design Document](https://refactoringenglish.com/excerpts/write-an-effective-design-doc/)
+
+<!-- source-item-id: 1a0a4ca47348bc23-04 -->
+
+TLDR Dev, 2026-09-15. Michael Lynch's Refactoring English excerpt supplies the
+cost-of-error filter, cold-reader test, component guidance, open-issue format,
+and retained decision history. The page adapts those practices to review-driven
+agent work; the source is general software-writing guidance rather than an
+agent-workflow study.
 
 ### [Why Software Factories Fail](https://github.com/humanlayer/advanced-context-engineering-for-coding-agents/blob/main/wsff.md)
 

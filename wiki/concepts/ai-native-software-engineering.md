@@ -2,15 +2,15 @@
 type: concept
 title: 'AI-Native Software Engineering'
 # prettier-ignore
-aliases: ["Control the ideas, not the code","Engineer away the slop","How building software is changing at Anthropic","AI-native fintech architecture","LLMs reward expertise","Agentic Code Quality","How I use AI in 2026","How teams build","How Well Do Agents Use Test and Verification Techniques?"]
+aliases: ["Control the ideas, not the code","Engineer away the slop","How building software is changing at Anthropic","AI-native fintech architecture","LLMs reward expertise","Agentic Code Quality","How I use AI in 2026","How teams build","How Well Do Agents Use Test and Verification Techniques?","If Coding Is Solved, What Now? Measuring Code Sloppiness","SlopCodeBench"]
 # prettier-ignore
 tags: ["ai-engineering","software-design","correctness","code-review","formal-verification","quality-gates","multi-agent-systems","fintech","compliance","auditability","domain-expertise","prompting","human-judgment","agentic-code","back-pressure"]
 wiki_slug: ai-native-software-engineering
 created: 2026-07-16
-updated: 2026-09-10
+updated: 2026-09-15
 confidence: high
 # prettier-ignore
-provenance: [{"source_item_id":"19f6057544b9bae7-06","url":"https://antirez.com/news/169"},{"source_item_id":"general-20260724-05","url":"https://ghuntley.com/slop/"},{"source_item_id":"19fadaee19e22a31-18","url":"https://newsletter.pragmaticengineer.com/p/inside-anthropic"},{"source_item_id":"19fb33942bb1cc3e-04","url":"https://hackernoon.com/what-fintech-founders-get-wrong-about-ai-native-development"},{"source_item_id":"19fcc720f38e999b-06","url":"https://www.seangoedecke.com/llms-reward-expertise/?utm_source=tldrnewsletter"},{"source_item_id":"19feb593f3d9a2d9-05","url":"https://addyo.substack.com/p/agentic-code-quality?utm_source=tldrnewsletter"},{"source_item_id":"1a0148c07c36290e-11","url":"https://blog.sshh.io/p/how-i-use-ai-in-2026-coding-writing?utm_source=tldrnewsletter"},{"source_item_id":"1a014a54dae9b027-09","url":"https://linear.app/data?utm_source=tldrdev"},{"source_item_id":"1a080bcb33cc0f31-01","url":"https://danluu.com/agentic-testing/"}]
+provenance: [{"source_item_id":"19f6057544b9bae7-06","url":"https://antirez.com/news/169"},{"source_item_id":"general-20260724-05","url":"https://ghuntley.com/slop/"},{"source_item_id":"19fadaee19e22a31-18","url":"https://newsletter.pragmaticengineer.com/p/inside-anthropic"},{"source_item_id":"19fb33942bb1cc3e-04","url":"https://hackernoon.com/what-fintech-founders-get-wrong-about-ai-native-development"},{"source_item_id":"19fcc720f38e999b-06","url":"https://www.seangoedecke.com/llms-reward-expertise/?utm_source=tldrnewsletter"},{"source_item_id":"19feb593f3d9a2d9-05","url":"https://addyo.substack.com/p/agentic-code-quality?utm_source=tldrnewsletter"},{"source_item_id":"1a0148c07c36290e-11","url":"https://blog.sshh.io/p/how-i-use-ai-in-2026-coding-writing?utm_source=tldrnewsletter"},{"source_item_id":"1a014a54dae9b027-09","url":"https://linear.app/data?utm_source=tldrdev"},{"source_item_id":"1a080bcb33cc0f31-01","url":"https://danluu.com/agentic-testing/"},{"source_item_id":"1a09fa599d2a0b5a-03","url":"https://earendil.com/posts/measuring-code-sloppiness/"},{"source_item_id":"url_slop_code_bench","url":"https://github.com/SprocketLab/slop-code-bench"}]
 ---
 
 # AI-Native Software Engineering
@@ -77,6 +77,27 @@ diagrams, or sequence diagrams might improve this reasoning. That is a
 hypothesis, not a result of the study: specification formality was not varied.
 The practical rule is to evaluate techniques by the failures they expose and
 the hidden checks they satisfy, not by test count or process vocabulary.
+
+## Correctness Can Hide Iterative Code Erosion
+
+Passing tests does not establish that repeated agent edits leave a codebase in
+a healthy shape. SlopCodeBench studies a narrower failure mode: an agent starts
+from a repository, receives a sequence of specification refinements, and is
+measured after each checkpoint. The benchmark is public, MIT-licensed research
+software from Sprocket Lab rather than a commercial product.
+
+The useful distinction is between task correctness and accumulated structure.
+A change can satisfy the current tests while also adding unnecessary code,
+duplicating logic, or making later changes harder. The EARENDIL article argues
+that simple structural measures such as code volume, duplication, and erosion
+across checkpoints can expose this drift more consistently than asking another
+model for one holistic quality score.
+
+These measures are diagnostic signals, not a complete definition of quality.
+More lines or abstractions may be justified, and the benchmark still embeds
+human choices about specifications, repositories, and metrics. Its durable
+lesson is to evaluate an agent over a sequence of revisions, not only on the
+final green test run, and to retain checkpoints so degradation is observable.
 
 ## From Coding Assistant to Managed Work
 
@@ -224,6 +245,23 @@ on more context. Whether that extra output is valuable still depends on product
 judgment, verification, and outcome measures outside the development tool.
 
 ## Source Notes
+
+### [If coding is solved, what now?: Measuring the sloppiness of code](https://earendil.com/posts/measuring-code-sloppiness/)
+
+<!-- source-item-id: 1a09fa599d2a0b5a-03 -->
+
+TLDR Dev, 2026-09-14. Sebastian's EARENDIL article motivates structural
+quality measures for agent-generated code and points to SlopCodeBench. Its
+interpretation of early benchmark results is an informed argument, not an
+independent replication.
+
+### [SlopCodeBench](https://github.com/SprocketLab/slop-code-bench)
+
+<!-- source-item-id: url_slop_code_bench -->
+
+The public Sprocket Lab repository supplies the benchmark implementation,
+iterative-checkpoint design, and MIT license. It establishes that the saved
+item refers to open-source research software, not a product being sold.
 
 ### [How Well Do Agents Use Test and Verification Techniques?](https://danluu.com/agentic-testing/)
 
