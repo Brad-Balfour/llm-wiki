@@ -83,8 +83,9 @@ the hidden checks they satisfy, not by test count or process vocabulary.
 Passing tests does not establish that repeated agent edits leave a codebase in
 a healthy shape. SlopCodeBench studies a narrower failure mode: an agent starts
 from a repository, receives a sequence of specification refinements, and is
-measured after each checkpoint. The benchmark is public, MIT-licensed research
-software from Sprocket Lab rather than a commercial product.
+measured after each checkpoint. The public Sprocket Lab repository provides
+MIT-licensed research software; it does not establish whether separate paid
+offerings exist.
 
 The useful distinction is between task correctness and accumulated structure.
 A change can satisfy the current tests while also adding unnecessary code,
