@@ -2,7 +2,7 @@
 type: tool
 title: 'AgentsDock'
 # prettier-ignore
-aliases: ["AgentsServer"]
+aliases: []
 # prettier-ignore
 tags: ["coding-agents","remote-development","mobile","self-hosting","codex","claude-code","cursor","tmux"]
 wiki_slug: agentsdock

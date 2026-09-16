@@ -261,7 +261,8 @@ independent replication.
 
 The public Sprocket Lab repository supplies the benchmark implementation,
 iterative-checkpoint design, and MIT license. It establishes that the saved
-item refers to open-source research software, not a product being sold.
+item includes open-source research software; it does not establish whether
+separate commercial services or paid offerings exist.
 
 ### [How Well Do Agents Use Test and Verification Techniques?](https://danluu.com/agentic-testing/)
 

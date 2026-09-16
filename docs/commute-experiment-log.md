@@ -191,9 +191,11 @@ the exact visible pair and repeatedly inserted unnecessary checking between
 literal array reads; AI expanded item five during the sweep and then interpreted
 "continue" as a pause. The chats corroborate those incidents and add the same
 boundary failures in General plus several first-attempt export failures across
-AI, Fintech, General, and Dev. Prompt 5.0 already requires exact pair reopening,
-literal complete sweep and item playback, and a visible export; these remain
-product/runtime findings rather than a reason to loosen validation.
+AI, Fintech, General, and Dev. The tracked Prompt 5.0 candidate already requires
+exact pair reopening, literal complete sweep and item playback, and a visible
+export, but the repository does not record that candidate as installed in the
+live Project. These remain product/runtime findings rather than a reason to
+loosen validation.
 
 Deterministic intake reports three unresolved items: the rejected General
 session, its unverified canonical comparison, and the Dev design-document save
