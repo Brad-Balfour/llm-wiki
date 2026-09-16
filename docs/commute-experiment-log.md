@@ -92,6 +92,11 @@ found a queue as proof.
   pairs, three September 13-14 session bundles, and no separately supplied
   shared chats. The original Library downloads were retained as private intake
   evidence while normalized recovery remained separate.
+- Five September 14-15 v4 playback/reference pairs, five September 15 session
+  bundles, and five complete shared chats covering 116 actual user messages.
+  All embedded snapshots matched the separately downloaded pairs; one General
+  pair remained producer-invalid because its Xcode headline context began with
+  the description's second sentence rather than a literal opening excerpt.
 - The live `Weekday TLDR Queues` Task conversation/configuration, the July
   21-24 Task Update emails, the July 24 manual queue-generation control, and
   the live Project settings/sources inspected on July 26.
@@ -153,6 +158,52 @@ retrieve sources, and preserve history after the drive.
 | Sep. 10    | Three current v4 sessions, duplicate-chat reconciliation, and two discussion-enriched saves    | Validate three current playback/reference pairs and bundles, reconcile the supplied chats with the already-published September 9 intake, retain three exact depth corrections, and preserve two saved Dev discussions. | All current bundles passed strict validation and canonically matched 32 downloaded queue items. Intake accepted three partial sessions with two wiki candidates, three depth corrections, four incidents, and no unresolved items. The supplied chats were duplicate provenance for September 9 and again showed Library lookup failures and newline-truncated playback. |
 | Sep. 11    | Seven catch-up sessions and Instant-versus-Thinking Voice comparison                          | Validate seven playback/reference pairs and bundles, audit nine complete chats, retain one exact Dev depth correction, and compare observed Voice behavior across six Instant and three Thinking chats.                  | All seven snapshots matched 35 downloaded queue items. Six bundles were strict-valid; AI required supplied-pair recovery after recording a next transition beyond the final item. Both modes showed Library and literal-playback failures, so this uncontrolled sample does not establish a reliable mode effect.                    |
 | Sep. 14    | Three-session v4.1 transition intake, bounded newline repair, and Agents API save             | Validate three playback/reference pairs and bundles, self-heal legacy newline-bearing v4 playback during bounded intake, retain one exact depth correction, and preserve the saved Agents API discussion.               | The September 14 General pair and bundle were strict-valid. The older September 11 AI and Dev artifacts matched their embedded snapshots byte-for-byte but carried 13 playback fields generated before v4.1 newline removal; bounded repair normalized and revalidated them. Intake accepted all three sessions with one wiki candidate, one correction, eight incidents, and no unresolved items. |
+| Sep. 15    | Five-session v4 intake, producer-validation failure, and three source-grounded saves          | Validate five playback/reference pairs and bundles, reconcile five complete chats, preserve three explicit wiki saves, and separate a positive playback-context result from classifier corrections.                       | All five embedded snapshots matched 50 downloaded queue items. Four bundles were strict-valid; General was rejected because one reference context was not an opening source excerpt. Intake retained three wiki candidates, four bundled incidents, two positive general captures, no exact classifier correction, and three deterministic unresolved items. |
+
+### September 15 Five-Session, Producer-Validation, And Maintenance Result
+
+Five downloaded v4 playback/reference pairs covered 50 queue items: September
+14 Dev, AI, and Fintech plus September 15 General and Dev. Each of the five
+bundles embedded a byte-for-byte semantic match for its separately downloaded
+pair. Four bundles passed strict validation. The September 15 General pair and
+bundle failed the same producer check: the Xcode item's `headline_context`
+started with the description's second sentence rather than a literal opening
+excerpt. Because the canonical download and embedded snapshot agree, this is a
+generation defect rather than bundle substitution or local comparison drift.
+
+The five complete shared chats contain 116 actual user messages. The private
+coverage ledger dispositions all 63 substantive messages individually and
+groups 53 start, end, navigation, acknowledgement, or incomplete-transcription
+controls. The chats recover three explicit saves: SlopCodeBench, AgentsDock as
+a possible future remote-access option, and Michael Lynch's software design
+document guidance. Source review enriched the existing AI-native engineering
+and review-driven factory concepts and added an AgentsDock tool page; no raw
+conversation text or private work context entered the public wiki.
+
+The AI chat's two classifier-adjacent captures are one positive result, not a
+correction. Brad first checked whether the expanded headline-only playback was
+the exact generated string, then confirmed that the appended context behaved
+as intended. There was no final interest or depth label change in any supplied
+chat.
+
+The bundles retain four quality incidents: morning Dev twice failed to reopen
+the exact visible pair and repeatedly inserted unnecessary checking between
+literal array reads; AI expanded item five during the sweep and then interpreted
+"continue" as a pause. The chats corroborate those incidents and add the same
+boundary failures in General plus several first-attempt export failures across
+AI, Fintech, General, and Dev. The tracked Prompt 5.0 candidate already requires
+exact pair reopening, literal complete sweep and item playback, and a visible
+export, but the repository does not record that candidate as installed in the
+live Project. These remain product/runtime findings rather than a reason to
+loosen validation.
+
+Deterministic intake reports three unresolved items: the rejected General
+session, its unverified canonical comparison, and the Dev design-document save
+whose discussion was absent from the bundle. The shared chat safely recovers
+the third item's discussion for wiki maintenance, while the two General records
+remain unresolved evidence of the invalid producer artifact. No Project prompt
+or Project source file changed in this run, so no live Project upload is
+required.
 
 ### September 14 Three-Session, Self-Healing, And Maintenance Result
 
