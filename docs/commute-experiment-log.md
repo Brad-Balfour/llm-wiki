@@ -97,6 +97,10 @@ found a queue as proof.
   All embedded snapshots matched the separately downloaded pairs; one General
   pair remained producer-invalid because its Xcode headline context began with
   the description's second sentence rather than a literal opening excerpt.
+- The September 15 AI and September 16 General, Dev, and AI v4
+  playback/reference pairs, four September 16 bundles, three unique supplied
+  shared chats (one supplied URL was repeated), and the directly observed AI
+  Project conversation. Original Library downloads remain in private intake.
 - The live `Weekday TLDR Queues` Task conversation/configuration, the July
   21-24 Task Update emails, the July 24 manual queue-generation control, and
   the live Project settings/sources inspected on July 26.
@@ -159,6 +163,42 @@ retrieve sources, and preserve history after the drive.
 | Sep. 11    | Seven catch-up sessions and Instant-versus-Thinking Voice comparison                          | Validate seven playback/reference pairs and bundles, audit nine complete chats, retain one exact Dev depth correction, and compare observed Voice behavior across six Instant and three Thinking chats.                  | All seven snapshots matched 35 downloaded queue items. Six bundles were strict-valid; AI required supplied-pair recovery after recording a next transition beyond the final item. Both modes showed Library and literal-playback failures, so this uncontrolled sample does not establish a reliable mode effect.                    |
 | Sep. 14    | Three-session v4.1 transition intake, bounded newline repair, and Agents API save             | Validate three playback/reference pairs and bundles, self-heal legacy newline-bearing v4 playback during bounded intake, retain one exact depth correction, and preserve the saved Agents API discussion.               | The September 14 General pair and bundle were strict-valid. The older September 11 AI and Dev artifacts matched their embedded snapshots byte-for-byte but carried 13 playback fields generated before v4.1 newline removal; bounded repair normalized and revalidated them. Intake accepted all three sessions with one wiki candidate, one correction, eight incidents, and no unresolved items. |
 | Sep. 15    | Five-session v4 intake, producer-validation failure, and three source-grounded saves          | Validate five playback/reference pairs and bundles, reconcile five complete chats, preserve three explicit wiki saves, and separate a positive playback-context result from classifier corrections.                       | All five embedded snapshots matched 50 downloaded queue items. Four bundles were strict-valid; General was rejected because one reference context was not an opening source excerpt. Intake retained three wiki candidates, four bundled incidents, two positive general captures, no exact classifier correction, and three deterministic unresolved items. |
+| Sep. 16    | Four-session v4 intake and two discussion-enriched saves                                      | Validate a prior-day AI catch-up pair and three current pairs and bundles, reconcile three supplied chats plus the observed AI Project chat, and preserve explicit saves and workflow feedback.                 | All four pairs and bundles passed strict validation and their snapshots matched 32 downloaded items. The General bundle omitted a chat-proven save; Voice still lost exact Library files and interrupted sweep/export flow. No exact classifier correction was made. |
+
+### September 16 Four-Session And Chat-Reconciliation Result
+
+The morning session used the September 15 AI queue; the evening sessions used
+September 16 General, Dev, and AI. All four original v4 playback/reference
+pairs passed strict validation, as did all four downloaded session bundles.
+Their embedded snapshots matched the corresponding downloaded pairs, covering
+32 items in total. The morning and AI bundles reported `recovered`; General
+and Dev reported `partial`. Three unique shared URLs were supplied for the
+morning AI, General, and Dev conversations; the General URL appeared twice.
+The evening AI Project conversation was inspected directly in the signed-in
+Project, not represented as a fourth supplied share URL.
+
+Two exact wiki saves were recovered. The AI bundle retained Brad's save of
+TypeSafe AI's _Introducing System One Models & Jev_, including discussion of
+licensing, price, a possible lower-cost post-commute structured-decision step,
+and Live Voice feasibility. The General bundle omitted Brad's explicit request
+to save Steve Yegge's _Seats and Sunsets_ and the full discussion. The General
+shared chat independently binds that request to queue item three; the wiki
+update records role continuity, retained external history, selective retrieval,
+and the distinction between the essay's claims and an implementation choice.
+No save was inferred from mere article discussion. No exact classifier-depth
+or interest correction was given.
+
+The bundles record a morning exact-file reopening failure, General's sweep
+stopping after item one and final-item handling failure, and AI's initial
+queue reopening failure. The chats corroborate those incidents and additionally
+show General and Dev export retries that required Brad to reattach the exact
+queue/reference pair. These are runtime and reconstruction problems, not
+grounds to relax producer or bundle validation. The omitted General save is
+particularly important: a strict-valid bundle can still be semantically
+incomplete against the conversation. The AI discussion also challenged the
+framing of an x402 article, but did not request a wiki save or a classifier
+label change. No Project prompt or source file changed in this run, so there
+is no live Project upload to perform.
 
 ### September 15 Five-Session, Producer-Validation, And Maintenance Result
 
