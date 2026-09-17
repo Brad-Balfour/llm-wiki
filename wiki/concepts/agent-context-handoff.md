@@ -7,10 +7,10 @@ aliases: ["Preserving an agent trajectory","A Field Guide to Fable: Finding Your
 tags: ["ai-agents","context-management","model-routing","software-engineering"]
 wiki_slug: agent-context-handoff
 created: 2026-07-21
-updated: 2026-08-24
+updated: 2026-09-16
 confidence: medium
 # prettier-ignore
-provenance: [{"source_item_id":"url_4942c519be3d86ed","url":"https://stencil.so/blog/prewalk"},{"source_item_id":"url_7c4bbc509bc1334f","url":"https://x.com/trq212/status/2073100352921215386"},{"source_item_id":"url_2d8aa34e5e8fcc46","url":"https://yegge.ai/essays/model-welfare/"}]
+provenance: [{"source_item_id":"url_4942c519be3d86ed","url":"https://stencil.so/blog/prewalk"},{"source_item_id":"url_7c4bbc509bc1334f","url":"https://x.com/trq212/status/2073100352921215386"},{"source_item_id":"url_2d8aa34e5e8fcc46","url":"https://yegge.ai/essays/model-welfare/"},{"source_item_id":"1a0aa1046fbadf4a-06","url":"https://yegge.ai/essays/seats-and-sunsets/"}]
 ---
 
 # Agent Context Handoff
@@ -57,6 +57,27 @@ audit trail, and treat a visible escalation as a valid outcome. Claims that
 human-like treatment measurably improves model performance require independent
 evaluation.
 
+## Role Continuity Is More Than Task Completion
+
+In _Seats and Sunsets_, Yegge describes a “seat” as a persistent role with a
+purpose, expectations, scope, authority, context, and work history. A model
+session can occupy a seat without the seat being identical to that session.
+This is different from assigning a fresh Jira-style task: the incoming occupant
+needs to understand the role's ongoing obligations and prior decisions, not
+just the next ticket. The essay's continuity proposal is an external-state and
+handoff design, not evidence that a model has durable internal memory.
+
+Brad's September 16 commute discussion pressed on the practical boundary:
+what is retained between occupants, what is loaded immediately, and what is
+retrieved only when relevant? A workable implementation would keep a small
+entry context and durable, searchable records for deeper history, with explicit
+rules about who may update them. Loading every historical detail into every
+session would be costly and could bury the current task. The specific storage
+format and retrieval policy are design choices; the essay does not establish
+one universally correct implementation. Likewise, a seat should not silently
+inherit the authority of a previous occupant merely because it inherited its
+notes.
+
 ## Source Notes
 
 ### [You only need the frontier model for one single edit](https://stencil.so/blog/prewalk)
@@ -79,6 +100,15 @@ about finding unknowns before, during, and after agent-assisted implementation.
 Steve Yegge, 2026-08. Combines practical continuity patterns with strong,
 unsubstantiated claims about model feelings and personhood; this entry retains
 the former without treating the latter as fact.
+
+### [Seats and Sunsets](https://yegge.ai/essays/seats-and-sunsets/)
+
+<!-- source-item-id: 1a0aa1046fbadf4a-06 -->
+
+Steve Yegge. Saved explicitly during the September 16 General commute. The
+shared chat, not the exported session bundle, preserves the save request and
+Brad's follow-up questions about role continuity, durable memory, and selective
+retrieval.
 
 ## Related
 
