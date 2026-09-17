@@ -3,9 +3,10 @@ import { readFile } from 'node:fs/promises';
 import test from 'node:test';
 
 test('commute publication policy keeps review proportional and updates brief', async () => {
-  const [agents, skill] = await Promise.all([
+  const [agents, skill, experimentGuide] = await Promise.all([
     readFile('AGENTS.md', 'utf8'),
     readFile('.codex/skills/process-daily-commute/SKILL.md', 'utf8'),
+    readFile('docs/commute-performance-experiment.md', 'utf8'),
   ]);
 
   for (const policy of [agents, skill]) {
@@ -20,7 +21,12 @@ test('commute publication policy keeps review proportional and updates brief', a
   assert.match(agents, /experiment ended after the September 15 Sol Medium run/i);
   assert.match(agents, /Use Sol Light\/Low for routine daily commutes/i);
   assert.match(agents, /Do not collect new experimental phase profiles/i);
+  assert.match(skill, /experiment ended after the September 15 Sol Medium run/i);
+  assert.match(skill, /Do\s+not start a new phase profile or model-comparison run/i);
+  assert.match(experimentGuide, /Historical operator guide/i);
+  assert.match(experimentGuide, /resume profiling only if Brad explicitly reopens/i);
   assert.match(agents, /Do not request a second\s+confirmation for the same exact deletion batch/i);
+  assert.match(skill, /If browser deletion needs\s+action-time confirmation and Brad is away/i);
   assert.match(
     agents,
     /documentation-only or\s+mechanical review fix does not trigger another general-purpose review round/i
