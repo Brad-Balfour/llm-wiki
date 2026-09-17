@@ -10,31 +10,14 @@ file review. Read the `Recurring daily commute processing` section of
 `AGENTS.md` first; it is the authoritative policy. Use this skill for execution
 order and completion checks.
 
-## Five-phase performance profile (#119)
+## Model and performance guidance
 
-For the next 3–5 representative #85 runs, read the phase-profile contract and
-commands in `docs/commute-performance-experiment.md` before any action. Capture
-actual invocation time and start `acquisition` then, without asking Brad for
-checkpoints. Start/finish exactly these phases as the work moves between them:
-
-- `acquisition`: Library/shared-chat retrieval, downloads and initial hashing.
-- `evidence_processing`: decoding, validation, queue comparison, coverage,
-  reconciliation and durable-action decisions.
-- `repository_work`: source research, synthesis, tracked edits and local review.
-- `verification_publication`: checks, commit/push/PR, issue routing, review/rework.
-- `cleanup_finalization`: merged-main pull, artifact cleanup, finalization and
-  handoff preparation.
-
-Keep the private draft updated from task/tool timestamps. Assign each active
-interval and tool call once, count parallel tool wall time once, and exclude
-human/merge waiting. Follow the operator guide's finalization accounting: the
-recorder adds measured finalizer execution to cleanup automatically. Never add
-it manually or count it twice. Prepare the handoff before finalizing and report
-the resulting comparison table with the final handoff.
-
-After 3–5 runs, post the guide's comparison and optimization recommendation to
-#85. Historical phase timing remains unknown. An interrupted/unmerged run keeps
-its draft; never fabricate completed phases.
+The #85 experiment ended after the September 15 Sol Medium run. Use Sol
+Light/Low for routine commutes and escalate only when the work warrants it. Do
+not start a new phase profile or model-comparison run unless Brad explicitly
+reopens the experiment. The procedures in
+`docs/commute-performance-experiment.md` are retained as historical guidance
+for existing records, not as a daily requirement.
 
 ## Publication scope and communication
 
@@ -208,7 +191,10 @@ durably complete:
 After an authorized merge, pull `main` and verify the repository before cleanup.
 Complete already-authorized exact cleanup and the final handoff without asking
 Brad to repeat authorization already recorded in `AGENTS.md`; report any
-mandatory environment safety confirmation precisely.
+mandatory environment safety confirmation precisely. If browser deletion needs
+action-time confirmation and Brad is away, finish independent publication,
+issue routing, local cleanup, and handoff first; leave only the exact browser
+deletions pending. Do not ask twice for the same confirmed deletion batch.
 
 1. If the run has a PR, do not delete anything until that exact PR is merged.
    An open, draft, closed-unmerged, or checks-pending PR leaves cleanup pending.

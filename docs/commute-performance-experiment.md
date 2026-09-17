@@ -1,5 +1,11 @@
 # Commute performance experiment
 
+> Historical operator guide. The #85 model/effort experiment ended after the
+> September 15, 2026 Sol Medium run. The sequence, recording commands, and
+> decision criteria below document existing measurements; they are not active
+> instructions for future daily commutes. Use Sol Light/Low routinely and
+> resume profiling only if Brad explicitly reopens the experiment.
+
 Issue #85 measures whether a less expensive Codex model or reasoning effort can
 reduce the time from invoking `/process daily commute` through publication
 without weakening evidence integrity or requiring more of Brad's attention.
@@ -10,7 +16,7 @@ Treat the August 23, 2026 merges of the publication-policy and unified-
 orchestration changes as a new operating epoch. The August 5–21 history remains
 the baseline, but it is not directly comparable model evidence for this epoch.
 
-Collect 6–10 representative runs in total. Run the first on Sol Medium as the
+The planned sequence was to collect 6–10 representative runs in total: run the first on Sol Medium as the
 post-change control, the second on Terra Medium, then continue alternating the
 two arms for the remaining runs. An odd-sized sample ends on the next arm in
 that sequence. Keep prompts, deterministic validation, review policy, and daily

@@ -223,21 +223,21 @@ For every daily commute intake:
 9. After an authorized merge, pull `main`, verify the repository, complete any
    already-authorized exact artifact cleanup, and issue the final handoff
    without asking Brad to repeat authorization already recorded here. Report
-   any mandatory environment safety confirmation precisely.
+   any mandatory environment safety confirmation precisely. If a browser UI
+   requires action-time deletion confirmation and Brad is away, finish all
+   independent publication, issue, local cleanup, and handoff work first;
+   leave only the exact browser deletions pending. Do not request a second
+   confirmation for the same exact deletion batch once it has been given.
 
 If the day produces no justified tracked change, report an explicit no-change
 result with the validation and issue-routing evidence; do not manufacture a PR
 or public wiki content merely to make the loop look active.
 
-While the issue #85 model/effort experiment is active, every assigned
-experimental `/process daily commute` run must create its private
-`commute-performance-input.v1` record and invoke
-`npm run finalize:commute-performance` exactly once. Finalize only after merged
-cleanup is complete or after the complete no-change result is established, so
-the record covers the full terminal lifecycle. Use timestamps and counts already
-available to the agent; this passive measurement must not add a user prompt or
-ask Brad for a timing acknowledgment. Keep the input, linked `commute-run.v1`,
-and finalized output under `.private/`.
+The #85 model/effort experiment ended after the September 15 Sol Medium run.
+Use Sol Light/Low for routine daily commutes. Escalate only when the evidence
+or task complexity warrants it. Do not collect new experimental phase profiles
+or delay a daily handoff for experiment bookkeeping unless Brad explicitly
+reopens the experiment. Preserve existing private measurements.
 
 ## Git and handoff
 
@@ -257,10 +257,10 @@ and finalized output under `.private/`.
   head's review workflow to complete, inspect submitted reviews and unresolved
   threads, and address actionable findings in that PR or a clearly linked
   follow-up before publishing.
-- After opening or updating any PR, wait for the latest-head checks and requested
-  automated reviews, then inspect every unresolved review thread before calling
-  the PR merge-ready. Repeat this cycle after each fix push; do not rely on Brad
-  to relay review findings.
+- After opening or updating a PR, wait for required checks and apply the commute
+  risk tiers above. Inspect unresolved review threads. A documentation-only or
+  mechanical review fix does not trigger another general-purpose review round;
+  do not hold an otherwise merge-ready PR for an unrequired review.
 - After addressing a PR review comment, reply in that thread with the fix and
   validation evidence, then resolve the thread. The user has given standing
   authorization for this review follow-through; do not leave fixed comments
