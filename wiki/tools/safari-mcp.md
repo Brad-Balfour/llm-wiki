@@ -56,3 +56,9 @@ codex mcp add safari-mcp -- /usr/bin/safaridriver --mcp
 
 WebKit, 2026-09-17. Describes Safari MCP's supported surfaces, local execution
 model, setup, and example agent integrations.
+
+## Related
+
+- {% include wiki-related-link.md slug="claude-code-subagents" %}
+- {% include wiki-related-link.md slug="deterministic-agent-workflows" %}
+- {% include wiki-related-link.md slug="frontend-soak-testing" %}
