@@ -7,10 +7,10 @@ aliases: ["Agent Memory as a Moat","Memory-augmented generation","Multi-writer a
 tags: ["ai-agents","context-management","memory","governance","multi-agent-systems","provenance"]
 wiki_slug: governed-agent-memory
 created: 2026-08-20
-updated: 2026-09-04
+updated: 2026-09-20
 confidence: medium
 # prettier-ignore
-provenance: [{"source_item_id":"1a01ef1e822ce589-02","url":"https://redis.io/blog/compounding-context-memory-as-the-moat/?utm_source=tldrdev"},{"source_item_id":"1a06c9fbf7abaa9b-10","url":"https://huggingface.co/blog/funes?utm_source=tldrai"}]
+provenance: [{"source_item_id":"1a01ef1e822ce589-02","url":"https://redis.io/blog/compounding-context-memory-as-the-moat/?utm_source=tldrdev"},{"source_item_id":"1a06c9fbf7abaa9b-10","url":"https://huggingface.co/blog/funes?utm_source=tldrai"},{"source_item_id":"1a0b4c0b55707f18-11","url":"https://github.com/yifanzhang-pro/Agora"}]
 ---
 
 # Governed Agent Memory
@@ -126,6 +126,22 @@ redaction and a second pre-publish secret scan, then reuse it across agents and
 machines. These controls reduce exposure but do not make arbitrary session logs
 safe to publish without reviewing the documented scanner boundary.
 
+## Git as a Research Contribution Graph
+
+Agora applies append-only Git history to collective research rather than using
+GitHub as the author or central scheduler. Each result, failure, hypothesis, or
+reproduction is an immutable contribution whose parents name the work it builds
+on. A rebuildable SQLite index supplies search over the Git record; evidence
+scores credit cross-account reproduction and reuse, while `analyze()` surfaces
+leading, contested, and underexplored work.
+
+This is stronger provenance than a shared markdown folder, but it is not a
+general memory solution. Its demonstrated run still concentrated on one lineage
+and showed substantial parallel rediscovery. The project's analysis views are
+recommendations, not a documented ready-to-install GitHub Action or a central
+task allocator. A separate consolidation policy would still be needed for a
+maintained knowledge base.
+
 ## Implications for Conversation-Only Workflows
 
 The following is synthesis from the commute discussion.
@@ -146,8 +162,8 @@ sync, or server-side trace boundary; filesystem access cannot be assumed.
 
 For LLM-Wiki-Car, the practical distinction is:
 
-- the existing shared-chat intake already captures discussion for durable wiki
-  maintenance;
+- a complete supplied shared-chat transcript can preserve discussion for durable
+  wiki maintenance, but a share may expose only an excerpt; and
 - additional execution traces could help explain recurring queue-reload and
   literal-playback failures; and
 - neither source establishes that stock ChatGPT Voice exposes those traces or
@@ -187,6 +203,16 @@ results are project-authored measurements, not a general reliability claim.
 The distinctions above between observable harness traces, hidden model
 reasoning, phone-app availability, and the current LLM-Wiki-Car transcript path
 are discussion-derived synthesis rather than claims made by the article.
+
+### [Agora: Git as Shared Memory for Collective AutoResearch](https://github.com/yifanzhang-pro/Agora)
+
+<!-- source-item-id: 1a0b4c0b55707f18-11 -->
+
+Yifan Zhang and collaborators describe an append-only Git DAG for independent
+research agents, including a rebuildable contribution index, cross-account
+evidence scores, and recommendation views. The stated limits and the need for
+separate consolidation policy are synthesis from the source and commute
+discussion.
 
 ## Related
 
