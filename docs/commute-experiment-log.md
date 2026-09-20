@@ -101,6 +101,10 @@ found a queue as proof.
   playback/reference pairs, four September 16 bundles, three unique supplied
   shared chats (one supplied URL was repeated), and the directly observed AI
   Project conversation. Original Library downloads remain in private intake.
+- The September 18 Dev and AI v4 playback/reference pairs and the two
+  Project-Library session bundles produced on September 19–20; no separately
+  supplied shared chats. Library row downloads were performed through Safari
+  MCP in list view, then validated locally as canonical queue/reference pairs.
 - The live `Weekday TLDR Queues` Task conversation/configuration, the July
   21-24 Task Update emails, the July 24 manual queue-generation control, and
   the live Project settings/sources inspected on July 26.
@@ -2257,3 +2261,34 @@ routine for future successful commute saves.
 The July 22 Kiro and Claude Code subagents pages are the first recovery examples
 of this approach. Future successful bundles should preserve the exact capture
 so the same enrichment happens without transcript archaeology.
+
+### September 19–20 Dev and AI Recovery Result
+
+Two original Project-Library session bundles were retrieved after the prior
+September 18 intake: a September 19 afternoon Dev continuation and a September
+20 recovered AI session. Their separately retrieved September 18 v4
+playback/reference pairs canonically matched both embedded snapshots, covering
+19 queue items. The Dev bundle was `partial`; the AI bundle was `recovered`.
+The deterministic orchestration command does not yet accept v4 reference files,
+so it reported two pair-comparison warnings even though the pair-aware strict
+validator passed both bundles. That command gap is workflow evidence, not a
+reason to treat the source pairs as unresolved.
+
+The sessions contained three explicit saves: Martin Fowler's _I don't like
+LLMs_, _LLM Classification Is Feature Engineering_, and Agora's Git-backed
+collective-research record. They also preserved a high-priority proposal to
+test whether GPT Live can use Python to select literal v4 playback text and
+whether that extraction can be bound to spoken output without regeneration.
+No such binding is assumed from Python access alone. The AI session additionally
+reaffirmed that a question about depth is not classifier feedback.
+
+Library retrieval through the Safari MCP works reliably from **list view**:
+use the row-level three-dot action menu and select **Download** before opening a
+preview. Preview-oriented export paths can produce a different artifact flow.
+
+Two unique shared-chat URLs were supplied after publication (one URL was
+repeated). Safari MCP reading confirmed the queue-reopen failures, attachment
+fallback, Notion discussion, and final handoffs, but each share was an excerpt
+rather than the extended Martin Fowler, classifier, or Agora exchanges described
+by the bundles. They corroborate the bounded bundle record; they do not replace
+the missing full discussion transcript.
