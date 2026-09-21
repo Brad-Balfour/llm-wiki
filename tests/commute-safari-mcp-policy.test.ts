@@ -42,16 +42,18 @@ test('daily commute skill preserves detailed diagnostics and exact Safari cleanu
 
   assert.match(normalized, /compact private qualification ledger for #151 and #155/i);
   assert.match(normalized, /connection\/authentication; bundle inventory\/download/i);
-  assert.match(normalized, /detailed, evidence-backed findings/i);
+  assert.match(normalized, /detailed, evidence-backed, sanitized findings/i);
   assert.match(normalized, /timing, errors, and available token or usage evidence/i);
   assert.match(
     normalized,
-    /Exclude raw chats, credentials, private intake, account identifiers, personal details/i
+    /Sanitize by excluding raw chats, credentials, private intake, account identifiers, personal details/i
   );
   assert.match(normalized, /inventory each Library location independently in List View/i);
   assert.match(normalized, /Use each exact row's three-dot menu/i);
   assert.match(normalized, /Project Sources view as independent from the main Library/i);
-  assert.match(normalized, /queue rows and validated v4 reference rows/i);
-  assert.match(normalized, /exact queue, v4 reference, and bundle downloads/i);
-  assert.match(normalized, /every targeted queue and v4 reference row is absent/i);
+  assert.match(normalized, /separate explicit authorization for that exact reference/i);
+  assert.match(normalized, /otherwise leave it pending/i);
+  assert.match(normalized, /Remove a v4 reference download only when/i);
+  assert.match(normalized, /separately authorized targeted v4 reference row is absent/i);
+  assert.match(normalized, /every unrelated Project source remains/i);
 });
