@@ -219,12 +219,19 @@ test('daily commute completion cannot omit a required Project update', async () 
     readFile('AGENTS.md', 'utf8'),
   ]);
 
-  for (const instructions of [skill, agents]) {
-    const normalized = instructions.replace(/\s+/g, ' ');
-    assert.match(normalized, /say exactly which Project prompt or document needs to be updated/i);
-    assert.match(normalized, /without waiting for Brad to (?:request|ask)/i);
-    assert.match(normalized, /exact .*prompt in one copyable block/i);
-    assert.match(normalized, /until Brad confirms/i);
+  const normalizedSkill = skill.replace(/\s+/g, ' ');
+  const normalizedAgents = agents.replace(/\s+/g, ' ');
+
+  assert.match(
+    normalizedAgents,
+    /say exactly which Project prompt or document needs to be updated/i
+  );
+  assert.match(normalizedAgents, /until the agent applies and verifies it/i);
+  assert.match(normalizedSkill, /identify the exact merged or review-ready prompt/i);
+  assert.match(normalizedSkill, /use SafariDriver MCP to apply the verified merged version/i);
+  assert.match(normalizedSkill, /Do not ask Brad to perform or confirm this synchronization/i);
+
+  for (const normalized of [normalizedSkill, normalizedAgents]) {
     assert.match(normalized, /never call the .*complete|do not call the .*complete/i);
     assert.match(normalized, /do not change the PR's draft\/ready state/i);
     assert.match(normalized, /ready for review is compatible/i);
@@ -237,10 +244,10 @@ test('daily commute cleanup covers both Library locations and Downloads', async 
   const skill = await readFile('.codex/skills/process-daily-commute/SKILL.md', 'utf8');
   const normalized = skill.replace(/\s+/g, ' ');
 
-  assert.match(normalized, /main ChatGPT Library, delete only the exact queue rows/i);
+  assert.match(normalized, /inspect both the main ChatGPT Library and the `LLM-Wiki-Car` Project/i);
   assert.match(
     normalized,
-    /`LLM-Wiki-Car` Project Library folder, separately delete only the exact commute-session bundle rows/i
+    /delete each exact validated matching transient row wherever it exists/i
   );
   assert.match(
     normalized,
@@ -248,6 +255,6 @@ test('daily commute cleanup covers both Library locations and Downloads', async 
   );
   assert.match(
     normalized,
-    /Verify that every targeted queue row is absent from the main ChatGPT Library, every targeted bundle row is absent from the `LLM-Wiki-Car` Project Library folder, and every targeted Downloads file is absent/i
+    /Verify that every targeted queue, validated v4 reference, and bundle row is absent from both Library locations, every unrelated Project source remains, and every targeted Downloads file is absent/i
   );
 });
