@@ -2,9 +2,8 @@
 
 Date: 2026-07-16
 
-Status: planning record for the next design session. It records observed
-behavior and product decisions; it does **not** change the active OpenSpec
-contract by itself.
+Status: historical planning record. Current behavior is owned by the schemas,
+code, tests, Project prompts, and runbooks; this document does not change them.
 
 ## Product Direction
 
@@ -214,8 +213,8 @@ data model.
 1. **Observe tomorrow's scheduled Task run.** Record whether the known-good
    acceptance signals occur. Do not assume today's missing output proves the
    Task integration is impossible.
-2. **Write the planning revision.** Reconcile this document with the active
-   OpenSpec change and choose the session-bundle/recovery contract before
+2. **Write the planning revision.** Reconcile this document with the stable
+   schemas and runbooks and choose the session-bundle/recovery contract before
    several agents modify adjacent files.
 3. **Build a narrow import vertical slice.** A single valid self-contained
    commute bundle should reconcile locally, retrieve one saved URL, and produce

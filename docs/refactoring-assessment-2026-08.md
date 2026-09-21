@@ -175,8 +175,8 @@ is not currently executed by tests.
 result, and retry characterization before moving logic. Keep worktree/branch
 and structured-result behavior unchanged.  
 **Validation:** focused phase tests with injected filesystem, process, and
-clock dependencies; unchanged fixtures and error text; `npm run check`; strict
-validation of both active OpenSpec changes if requirements change.
+clock dependencies; unchanged fixtures and error text; `npm run check`; update
+and validate the stable schema, prompt, runbook, and test owners if requirements change.
 **Issue:** #96.
 
 ### 3. Make active commands import-safe and fail-fast
@@ -225,8 +225,7 @@ test; one move per commit; `npm run check`.
 `src/commute/validate-session-bundle.ts`, `src/commute/validate-queue.ts`,
 `tests/session-bundle.test.ts`, `tests/session-contract-fixtures.test.ts`,
 `tests/preflight.test.ts`, `schema/commute-session-bundle-v1.schema.json`,
-`schema/tldr-commute-queue-v2.schema.json`, and the matching active OpenSpec
-requirements.
+`schema/tldr-commute-queue-v2.schema.json`, and the matching focused tests.
 **Expected benefit:** one malformed artifact can report all independent defects
 in one pass instead of creating a fix-run-fix loop.  
 **Risk:** medium-high because ordering, wording, and fail-soft boundaries are
@@ -234,7 +233,7 @@ observable behavior.
 **Dependencies:** #85 must first show repeated validation reruns or user
 recovery requests.  
 **Validation:** explicit error ordering and completeness fixtures; no loss of
-independently valid sessions; strict OpenSpec validation.
+independently valid sessions; schema and focused contract validation.
 
 ### 6. Low-priority structural hygiene
 

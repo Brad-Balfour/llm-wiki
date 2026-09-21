@@ -34,18 +34,12 @@ wiki. Exact commute `wiki_this` captures authorize the maintainer to propose
 wiki changes directly in a PR; do not invent review queues, permissions,
 attestations, or confirmation flags.
 
-The active planning contracts are:
-
-- `openspec/changes/bootstrap-llm-wiki-mvp/` for retained TLDR parsing,
-  classifier/routing, queue, and runtime behavior; and
-- `openspec/changes/commute-wiki-operating-loop/` for journey boundaries J1-J6
-  (scheduled queue output through wiki-maintainer PR).
-
-For commute planning, read both changes and follow the compatibility map in
-`commute-wiki-operating-loop/design.md`; when they conflict, the operating-loop
-change governs. The session-bundle importer and direct maintainer PR are the
-only supported post-commute path. Treat removed handoff/compiler behavior and
-archived changes as history, not current direction.
+Current requirements live with the system they govern: schemas and focused
+tests define artifact contracts, source and tests define deterministic behavior,
+`chatgpt-project/` defines Project and Voice behavior, and focused runbooks
+define operator procedures. The session-bundle importer and direct maintainer
+PR are the only supported post-commute path. Treat removed handoff/compiler
+behavior as history, not current direction.
 
 ## Repository map
 
@@ -60,7 +54,7 @@ archived changes as history, not current direction.
 | `wiki/`                                  | GitHub Pages content and entry template.                          |
 | `tests/fixtures/` and `tests/`           | Node test fixtures and focused contract coverage.                 |
 | `docs/` and `chatgpt-project/`           | Operator runbooks and project prompts; keep commands accurate.    |
-| `.claude/`, `.codex/`, `.github/skills/` | OpenSpec integrations; use the matching workflow when it applies. |
+| `.claude/`, `.codex/`, `.github/skills/` | Agent-specific workflow instructions.                            |
 
 ## Environment and commands
 
@@ -73,9 +67,27 @@ archived changes as history, not current direction.
 - Check formatting: `npm run format:check`.
 - Validate the Jekyll content: `npm run validate:site`.
 - Run the complete local gate for implementation changes: `npm run check`.
-- For an active OpenSpec change, run strict validation for every change whose
-  requirements are touched. J1-J6 work normally validates both
-  `bootstrap-llm-wiki-mvp` and `commute-wiki-operating-loop`.
+
+## Planning substantial work
+
+Use GitHub issues for planned work and keep plans proportional to the risk. A
+small bug may need only a clear outcome and regression test. Before substantial
+or uncertain implementation, record the relevant parts of this structure in an
+issue or focused runbook:
+
+1. problem or opportunity and evidence;
+2. intended user-visible or operational outcome;
+3. included work and affected files;
+4. constraints and behavior that must not regress;
+5. alternatives or decisions still requiring resolution;
+6. explicit non-goals;
+7. ordered implementation steps;
+8. automated tests and manual checks;
+9. acceptance criteria; and
+10. dependencies, follow-ups, or questions that require Brad's decision.
+
+Do not create a parallel master specification. Update the stable owner when a
+requirement changes, and use the issue and pull request for planning and history.
 
 `dist/`, `node_modules/`, coverage output, and `.private/` are generated or
 local-only. Do not edit or commit them.

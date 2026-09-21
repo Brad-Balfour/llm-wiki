@@ -114,7 +114,7 @@ actual `model`, canonical `reasoning_effort` (Light maps to `low`), and `phases`
 | `acquisition`              | Library queues/bundles, shared chats, downloads, initial hashing                                                       |
 | `evidence_processing`      | Decode, normalize, validate, compare queues, audit coverage, reconcile, decide classifier evidence and durable actions |
 | `repository_work`          | Source research, wiki/log synthesis, tracked edits, local review                                                       |
-| `verification_publication` | Tests, lint, format, site, OpenSpec, diff checks, commit/push/PR, issue routing, CI, review/rework                     |
+| `verification_publication` | Tests, lint, format, site, schema and diff checks, commit/push/PR, issue routing, CI, review/rework                    |
 | `cleanup_finalization`     | Pull merged main, cleanup/verification, finalization, handoff preparation                                              |
 
 Every phase object requires `phase`, RFC3339 `started_at` and `completed_at`,

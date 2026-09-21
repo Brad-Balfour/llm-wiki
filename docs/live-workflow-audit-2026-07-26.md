@@ -1,4 +1,4 @@
-# Live Workflow And OpenSpec Audit — 2026-07-26
+# Live Workflow And Planning Audit — 2026-07-26
 
 This audit reconciles the active plans with the signed-in ChatGPT Project,
 scheduled conversation, Project settings, Project sources, recent commute
