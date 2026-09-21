@@ -181,6 +181,13 @@ does not cover chats, prompts, unrelated Project source documents, schemas,
 normalized `.private/` intake, or artifacts whose completed-use evidence is
 ambiguous.
 
+Always use SafariDriver MCP for signed-in ChatGPT Library and Project work in
+this workflow. If it appears unavailable, check once more; if it is still
+unavailable or unhealthy, ask Brad specifically to toggle the SafariDriver MCP
+off and on. Do not substitute integrated browser, computer-use, or ChatGPT Work
+tooling for this authenticated path. User sign-in and a platform-enforced
+user-only control remain genuine blockers, not authorization prompts.
+
 For every daily commute intake:
 
 1. Validate each queue and bundle, compare every embedded snapshot with the

@@ -3,8 +3,12 @@ import { readFile } from 'node:fs/promises';
 import test from 'node:test';
 
 test('daily commute skill defines the SafariDriver authentication and reconnect boundary', async () => {
-  const skill = await readFile('.codex/skills/process-daily-commute/SKILL.md', 'utf8');
+  const [skill, agents] = await Promise.all([
+    readFile('.codex/skills/process-daily-commute/SKILL.md', 'utf8'),
+    readFile('AGENTS.md', 'utf8'),
+  ]);
   const normalized = skill.replace(/\s+/g, ' ');
+  const normalizedAgents = agents.replace(/\s+/g, ' ');
 
   assert.match(normalized, /Always use SafariDriver MCP for Library acquisition/i);
   assert.match(normalized, /check its availability once more/i);
@@ -25,6 +29,18 @@ test('daily commute skill defines the SafariDriver authentication and reconnect 
   assert.match(
     normalized,
     /Do not silently switch to integrated browser, computer-use, or ChatGPT Work tooling/i
+  );
+  assert.match(
+    normalizedAgents,
+    /Always use SafariDriver MCP for signed-in ChatGPT Library and Project work/i
+  );
+  assert.match(
+    normalizedAgents,
+    /ask Brad specifically to toggle the SafariDriver MCP off and on/i
+  );
+  assert.match(
+    normalizedAgents,
+    /Do not substitute integrated browser, computer-use, or ChatGPT Work tooling/i
   );
 });
 
