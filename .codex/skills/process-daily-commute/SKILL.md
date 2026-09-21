@@ -19,6 +19,18 @@ reopens the experiment. The procedures in
 `docs/commute-performance-experiment.md` are retained as historical guidance
 for existing records, not as a daily requirement.
 
+For the first representative commute after the SafariDriver procedure changes,
+keep one compact private qualification ledger for #151 and #155. Record actual
+model/effort, beginning and ending five-hour/weekly meter readings when
+available, active time, excluded human/merge waiting, workload, Safari tool
+calls, retries and retry time, and already-available rollout token counters at
+these boundaries: connection/authentication; bundle inventory/download;
+declared queue/reference inventory/download; validation/import; shared-chat
+audit; repository work; checks/publication/issues; cleanup/reconnect; and
+handoff. This is a bounded Safari workflow qualification, not a restart of the
+retired #85 or #119 comparison. Do not reopen long rollout or task histories
+during the constrained run solely to obtain counters.
+
 ## Publication scope and communication
 
 Follow the risk-tiered publication policy in `AGENTS.md`. Content- and
@@ -45,10 +57,28 @@ When Brad names a commute date or says "today's commute," treat missing file
 attachments as a retrieval task, not a reason to ask him to download and attach
 the artifacts. Use the signed-in ChatGPT web Library before requesting files:
 
+Use SafariDriver MCP for Library acquisition when it is available, and always
+when Brad scopes the run to Safari MCP. Before any Library action, start with
+`list_tabs`. Switch to the candidate ChatGPT tab and prove authentication by
+successfully opening Library or the named Project and reading a signed-in-only
+control or content row; a ChatGPT URL in the tab inventory is not enough. An
+ordinary Safari window is not proof that SafariDriver controls an authenticated
+tab: the driver may launch a separate Safari process with isolated sign-in
+state. If the controlled tab shows the login page or no authenticated ChatGPT
+tab exists, say that the driver session is isolated, open ChatGPT in the
+driver-created tab, and ask Brad to sign in there. Keep that Safari process open
+for the whole run. If its MCP transport closes, start a new driver connection,
+inspect `list_tabs`, and repeat the signed-in-only page check before proceeding.
+Never promise that a new driver will attach to another Safari process or inherit
+its cookies. When Brad requires Safari MCP, do not silently switch to integrated
+browser, computer-use, or ChatGPT Work tooling; report the exact missing
+condition. Normal public-source research may still use web retrieval, local
+validation may use the shell, and repository work may use Git and GitHub.
+
 1. Resolve relative dates in `America/New_York` and form `YYYYMMDD`.
-2. Open the `LLM-Wiki-Car` folder in ChatGPT Library. Bound discovery from the
-   last successfully recorded commute intake through the requested time, then
-   inventory both canonical files matching
+2. Open the `LLM-Wiki-Car` folder in ChatGPT Library and switch to **List
+   View**. Bound discovery from the last successfully recorded commute intake
+   through the requested time, then inventory both canonical files matching
    `YYYYMMDDHHmm-(morning|evening)-commute-session-bundle.txt` and plausible
    bundle rows whose displayed name is missing, noncanonical, contradictory, or
    Library-suffixed. Use the displayed Modified value, nearby dated rows, and
@@ -56,27 +86,34 @@ the artifacts. Use the signed-in ChatGPT web Library before requesting files:
    filename as semantic session identity before validation. Record every
    displayed filename exactly, including a Library duplicate suffix such as
    ` (1)`.
-3. Retrieve every matching bundle with the Library row's original `Download`
-   action. Do not use copied or scraped preview text as the artifact: the
-   rendered preview can remove JSON escape characters while the original file
-   remains valid. Use previews only to inspect or identify a row. Do not select
-   only the newest morning or evening file: multiple same-period bundles may
-   represent different queues or sessions. Preserve identical downloads as
-   duplicate provenance; preserve non-identical files for independent
-   validation.
+3. Before opening a preview, use each exact row's three-dot menu and choose
+   **Download**. Retrieve bundles first. Direct download is the normal path
+   because it preserves the supplied artifact. If the exact row cannot be
+   downloaded after a bounded retry, complete DOM-rendered content may be saved
+   as a recovery artifact only when it can be checked by the same schema,
+   pair/hash, and canonical-snapshot validation as a download. Record the
+   recovery method and reject truncated, altered, or invalid rendered content;
+   do not claim that original-byte access is universally required when the DOM
+   recovery validates. Do not select only the newest morning or evening file:
+   multiple same-period bundles may represent different queues or sessions.
+   Preserve identical downloads as duplicate provenance; preserve non-identical
+   files for independent validation.
 4. Read each bundle's `queue_snapshot.filename`, then retrieve that exact
-   canonical queue from the main ChatGPT Library. Deduplicate repeated queue
-   names after retrieval. Do not infer the queue from the bundle's period,
-   timestamp, topic, or nearby filenames. When a malformed bundle cannot expose
-   its declared queue name, search the main Library's bounded intake inventory
-   and any source dates established by bounded session evidence. Inventory the
-   exact dated candidates (`YYYYMMDD-tldr.txt`, `YYYYMMDD-tldr-dev.txt`,
-   `YYYYMMDD-tldr-ai.txt`, and `YYYYMMDD-tldr-fintech.txt`) for every relevant
-   source date; do not limit fallback discovery to the requested or export date.
-   Keep the mapping unresolved until validation or bounded conversation evidence
-   establishes it.
-5. Retrieve each exact queue with its Library row's original `Download` action
-   as well; the same preview-text restriction applies.
+   canonical queue from the main ChatGPT Library. For queue v4, also retrieve
+   the matching `-reference.txt` row and validate the playback/reference pair.
+   Deduplicate repeated queue/reference names after retrieval. Do not infer the
+   queue from the bundle's period, timestamp, topic, or nearby filenames. When
+   a malformed bundle cannot expose its declared queue name, search the main
+   Library's bounded intake inventory and any source dates established by
+   bounded session evidence. Inventory the exact dated candidates
+   (`YYYYMMDD-tldr.txt`, `YYYYMMDD-tldr-dev.txt`, `YYYYMMDD-tldr-ai.txt`, and
+   `YYYYMMDD-tldr-fintech.txt`) and their v4 reference siblings for every
+   relevant source date; do not limit fallback discovery to the requested or
+   export date. Keep the mapping unresolved until validation or bounded
+   conversation evidence establishes it.
+5. Retrieve each exact queue/reference through its List View row menu as well.
+   Use the same direct-download default and validated DOM recovery boundary as
+   the bundle rows.
 6. Store the retrieved artifacts with the normalized private intake under
    `.private/`, recording Library location, displayed filename, displayed
    Modified value, and local path. Treat browser downloads as untrusted inputs
@@ -125,10 +162,15 @@ only when the intended action or target genuinely cannot be determined.
    evidence and label commute-derived comparisons, implications, hypotheses,
    and preferences as synthesis or discussion context. Cross-check the finished
    wiki diff against the conversation-coverage ledger.
-2. Add sanitized, evidence-backed findings to the experiment log or other
-   canonical tracked memory. Preserve classifier and workflow annotations even
-   when the malformed bundle omitted them but the canonical queue and bounded
-   conversation evidence establish them exactly.
+2. Add detailed, evidence-backed findings to the experiment log or other
+   canonical tracked memory. Include useful operational results, timing, errors,
+   and available token or usage evidence. Exclude raw chats, credentials,
+   private intake, account identifiers, personal details, and other genuinely
+   private material; do not remove diagnostic detail merely to call the record
+   sanitized. Preserve
+   classifier and workflow annotations even when the malformed bundle omitted
+   them but the canonical queue and bounded conversation evidence establish
+   them exactly.
 3. Search all open issues before creating a new destination. Route every
    material commute-flow observation to every relevant existing issue in the
    same run rather than choosing only one umbrella issue. Include date, artifact
@@ -201,29 +243,32 @@ deletions pending. Do not ask twice for the same confirmed deletion batch.
    If the run has a justified no-change result and no PR, cleanup may begin only
    after the complete no-change handoff is recorded.
 2. Resolve cleanup targets from the private retrieval manifest and inventory
-   each Library location independently. In the main ChatGPT Library, delete
-   only the exact queue rows consumed by the completed run. In the
+   each Library location independently in List View. Use each exact row's
+   three-dot menu. In the main ChatGPT Library, delete only the exact queue rows
+   and validated v4 reference rows consumed by the completed run. In the
    `LLM-Wiki-Car` Project Library folder, separately delete only the exact
    commute-session bundle rows consumed by that run. A successful deletion in
    one location does not establish deletion of its matching copy in the other.
+   Treat the Project Sources view as independent from the main Library and
+   preserve unrelated Project sources.
    Do not delete the Project Library folder itself, shared chats, Project source
    documents, schemas, prompts, unrelated dated artifacts, or a plausible row
    that was not validated into the final intake.
-3. In `~/Downloads`, remove only the exact queue and bundle downloads created
-   or verified during this run. Match filenames and, when duplicate suffixes or
-   pre-existing same-name files exist, confirm content against the private
-   intake before removing them. Prefer moving local files to Trash; never use a
-   broad glob or recursive deletion.
+3. In `~/Downloads`, remove only the exact queue, v4 reference, and bundle
+   downloads created or verified during this run. Match filenames and, when
+   duplicate suffixes or pre-existing same-name files exist, confirm content
+   against the private intake before removing them. Prefer moving local files
+   to Trash; never use a broad glob or recursive deletion.
 4. Keep the normalized `.private/` intake, coverage ledger, and retrieval
    manifest as the durable audit and recovery record. Library and Downloads are
    transient copies; `.private/` is not part of this cleanup request.
 5. Reopen and inventory both Library locations after deletion. Verify that
-   every targeted queue row is absent from the main ChatGPT Library, every
-   targeted bundle row is absent from the `LLM-Wiki-Car` Project Library
-   folder, and every targeted Downloads file is absent. Then append the exact
-   targets, deletion time, and per-location verification result to the private
-   retrieval manifest. Report partial failures precisely and leave unmatched
-   or ambiguous files untouched.
+   every targeted queue and v4 reference row is absent from the main ChatGPT
+   Library, every targeted bundle row is absent from the `LLM-Wiki-Car` Project
+   Library folder, and every targeted Downloads file is absent. Then append the
+   exact targets, deletion time, and per-location verification result to the
+   private retrieval manifest. Report partial failures precisely and leave
+   unmatched or ambiguous files untouched.
 
 When cleaning historical residue, build the allowlist from merged repository
 history plus preserved private intake. A matching date or artifact-shaped name

@@ -248,6 +248,6 @@ test('daily commute cleanup covers both Library locations and Downloads', async 
   );
   assert.match(
     normalized,
-    /Verify that every targeted queue row is absent from the main ChatGPT Library, every targeted bundle row is absent from the `LLM-Wiki-Car` Project Library folder, and every targeted Downloads file is absent/i
+    /Verify that every targeted queue and v4 reference row is absent from the main ChatGPT Library, every targeted bundle row is absent from the `LLM-Wiki-Car` Project Library folder, and every targeted Downloads file is absent/i
   );
 });
