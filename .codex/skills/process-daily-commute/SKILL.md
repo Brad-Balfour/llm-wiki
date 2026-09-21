@@ -57,9 +57,11 @@ When Brad names a commute date or says "today's commute," treat missing file
 attachments as a retrieval task, not a reason to ask him to download and attach
 the artifacts. Use the signed-in ChatGPT web Library before requesting files:
 
-Use SafariDriver MCP for Library acquisition when it is available, and always
-when Brad scopes the run to Safari MCP. Before any Library action, start with
-`list_tabs`. Switch to the candidate ChatGPT tab and prove authentication by
+Always use SafariDriver MCP for Library acquisition. If it appears unavailable,
+check its availability once more. If it is still unavailable or unhealthy, stop
+and ask Brad specifically to toggle the SafariDriver MCP off and on to restart
+it. Before any Library action, start with `list_tabs`. Switch to the candidate
+ChatGPT tab and prove authentication by
 successfully opening Library or the named Project and reading a signed-in-only
 control or content row; a ChatGPT URL in the tab inventory is not enough. An
 ordinary Safari window is not proof that SafariDriver controls an authenticated
@@ -70,10 +72,14 @@ driver-created tab, and ask Brad to sign in there. Keep that Safari process open
 for the whole run. If its MCP transport closes, start a new driver connection,
 inspect `list_tabs`, and repeat the signed-in-only page check before proceeding.
 Never promise that a new driver will attach to another Safari process or inherit
-its cookies. When Brad requires Safari MCP, do not silently switch to integrated
-browser, computer-use, or ChatGPT Work tooling; report the exact missing
-condition. Normal public-source research may still use web retrieval, local
-validation may use the shell, and repository work may use Git and GitHub.
+its cookies.
+
+### SafariDriver MCP has no browser fallback
+
+Do not silently switch to integrated browser, computer-use, or ChatGPT Work
+tooling; report the exact missing condition. Normal public-source research may
+still use web retrieval, local validation may use the shell, and repository work
+may use Git and GitHub.
 
 1. Resolve relative dates in `America/New_York` and form `YYYYMMDD`.
 2. Open the `LLM-Wiki-Car` folder in ChatGPT Library and switch to **List

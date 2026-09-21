@@ -6,6 +6,12 @@ test('daily commute skill defines the SafariDriver authentication and reconnect 
   const skill = await readFile('.codex/skills/process-daily-commute/SKILL.md', 'utf8');
   const normalized = skill.replace(/\s+/g, ' ');
 
+  assert.match(normalized, /Always use SafariDriver MCP for Library acquisition/i);
+  assert.match(normalized, /check its availability once more/i);
+  assert.match(
+    normalized,
+    /ask Brad specifically to toggle the SafariDriver MCP off and on to restart it/i
+  );
   assert.match(normalized, /Before any Library action, start with `list_tabs`/i);
   assert.match(
     normalized,
@@ -15,9 +21,10 @@ test('daily commute skill defines the SafariDriver authentication and reconnect 
   assert.match(normalized, /separate Safari process with isolated sign-in state/i);
   assert.match(normalized, /driver-created tab, and ask Brad to sign in/i);
   assert.match(normalized, /If its MCP transport closes.*repeat the signed-in-only page check/i);
+  assert.match(normalized, /### SafariDriver MCP has no browser fallback/i);
   assert.match(
     normalized,
-    /do not silently switch to integrated browser, computer-use, or ChatGPT Work tooling/i
+    /Do not silently switch to integrated browser, computer-use, or ChatGPT Work tooling/i
   );
 });
 
