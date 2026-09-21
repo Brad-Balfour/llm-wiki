@@ -60,15 +60,27 @@ test('daily commute skill preserves detailed diagnostics and exact Safari cleanu
   assert.match(normalized, /Project Sources view as independent from the main Library/i);
   assert.match(normalized, /validated v4-reference, and session-bundle artifacts/i);
   assert.match(normalized, /do not ask Brad for additional per-run or per-artifact authorization/i);
-  assert.match(normalized, /exact queue and validated v4 reference rows/i);
+  assert.match(
+    normalized,
+    /every exact queue, validated v4 reference, and commute-session bundle/i
+  );
+  assert.match(normalized, /inspect both the main ChatGPT Library and the `LLM-Wiki-Car` Project/i);
+  assert.match(normalized, /wherever it exists/i);
   assert.match(normalized, /exact queue, validated v4 reference, and bundle downloads/i);
-  assert.match(normalized, /every targeted queue and validated v4 reference row is absent/i);
+  assert.match(
+    normalized,
+    /every targeted queue, validated v4 reference, and bundle row is absent from both Library locations/i
+  );
   assert.match(normalized, /every unrelated Project source remains/i);
 });
 
 test('daily commute workflow does not ask for repeat authorization', async () => {
-  const skill = await readFile('.codex/skills/process-daily-commute/SKILL.md', 'utf8');
+  const [skill, agents] = await Promise.all([
+    readFile('.codex/skills/process-daily-commute/SKILL.md', 'utf8'),
+    readFile('AGENTS.md', 'utf8'),
+  ]);
   const normalized = skill.replace(/\s+/g, ' ');
+  const normalizedAgents = agents.replace(/\s+/g, ' ');
 
   assert.match(normalized, /workflow authorizes merging its qualifying PR/i);
   assert.match(
@@ -81,4 +93,13 @@ test('daily commute workflow does not ask for repeat authorization', async () =>
   assert.doesNotMatch(normalized, /until Brad confirms it was applied/i);
   assert.doesNotMatch(normalized, /obtain any deletion authorization/i);
   assert.doesNotMatch(normalized, /leave only the exact browser deletions pending/i);
+  assert.match(
+    normalizedAgents,
+    /action-time confirmation for an exact target covered by the standing authorization, confirm it and proceed/i
+  );
+  assert.match(
+    normalizedAgents,
+    /Stop only for a platform-enforced user-only control or an ambiguous target/i
+  );
+  assert.doesNotMatch(normalizedAgents, /leave only the exact browser deletions pending/i);
 });

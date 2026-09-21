@@ -253,13 +253,13 @@ Do not pause for or request another confirmation.
    after the complete no-change handoff is recorded.
 2. Resolve cleanup targets from the private retrieval manifest and inventory
    each Library location independently in List View. Use each exact row's
-   three-dot menu. In the main ChatGPT Library, delete only the exact queue and
-   validated v4 reference rows consumed by the completed run. In the
-   `LLM-Wiki-Car` Project Library folder, separately delete only the exact
-   commute-session bundle rows consumed by that run. A successful deletion in
-   one location does not establish deletion of its matching copy in the other.
-   Treat the Project Sources view as independent from the main Library and
-   preserve unrelated Project sources.
+   three-dot menu. For every exact queue, validated v4 reference, and
+   commute-session bundle consumed by the completed run, inspect both the main
+   ChatGPT Library and the `LLM-Wiki-Car` Project Library/Sources view. Delete
+   each exact validated matching transient row wherever it exists. A successful
+   deletion in one location does not establish deletion of its matching copy in
+   the other. Treat the Project Sources view as independent from the main
+   Library and preserve unrelated Project sources.
    Do not delete the Project Library folder itself, shared chats, Project source
    documents, schemas, prompts, unrelated dated artifacts, or a plausible row
    that was not validated into the final intake.
@@ -272,14 +272,12 @@ Do not pause for or request another confirmation.
    manifest as the durable audit and recovery record. Library and Downloads are
    transient copies; `.private/` is not part of this cleanup request.
 5. Reopen and inventory the main Library and the `LLM-Wiki-Car` Project Sources
-   view after deletion. Verify that every targeted queue and validated v4
-   reference row is absent from the main ChatGPT Library, every targeted bundle
-   row is absent from the Project
-   Library/Sources view, every unrelated Project source remains, and every
-   targeted Downloads file is absent. Then append the exact targets, deletion
-   time, and per-location verification result to the private retrieval manifest.
-   Report partial failures precisely and leave unmatched or ambiguous files
-   untouched.
+   view after deletion. Verify that every targeted queue, validated v4 reference,
+   and bundle row is absent from both Library locations, every unrelated Project
+   source remains, and every targeted Downloads file is absent. Then append the
+   exact targets, deletion time, and per-location verification result to the
+   private retrieval manifest. Report partial failures precisely and leave
+   unmatched or ambiguous files untouched.
 
 When cleaning historical residue, build the allowlist from merged repository
 history plus preserved private intake. A matching date or artifact-shaped name

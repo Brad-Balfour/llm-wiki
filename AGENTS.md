@@ -231,10 +231,10 @@ For every daily commute intake:
    already-authorized exact artifact cleanup, and issue the final handoff
    without asking Brad to repeat authorization already recorded here. Report
    any mandatory environment safety confirmation precisely. If a browser UI
-   requires action-time deletion confirmation and Brad is away, finish all
-   independent publication, issue, local cleanup, and handoff work first;
-   leave only the exact browser deletions pending. Do not request a second
-   confirmation for the same exact deletion batch once it has been given.
+   presents action-time confirmation for an exact target covered by the standing
+   authorization, confirm it and proceed. Stop only for a platform-enforced
+   user-only control or an ambiguous target, and do not request another
+   authorization for the same exact deletion batch.
 
 If the day produces no justified tracked change, report an explicit no-change
 result with the validation and issue-routing evidence; do not manufacture a PR
