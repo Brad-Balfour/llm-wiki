@@ -2,14 +2,14 @@
 
 Personal LLM knowledge base and TLDR ingestion pipeline.
 
-This repository is the implementation repo. The planning contract is contained
-inside this repo under OpenSpec.
+This repository is the implementation repo. Current requirements live with the
+code, schemas, tests, prompts, and focused runbooks that implement them; GitHub
+issues hold planned work.
 
 ## Current Status
 
 The daily TLDR commute-to-wiki loop is operational:
 
-- OpenSpec has been initialized for Codex, GitHub Copilot, and Claude Code.
 - The TypeScript/Node runtime has focused parser, classifier, routing, commute,
   maintenance, and publishing tests.
 - TLDR text-file ingestion is implemented for pasted/exported email bodies,
@@ -28,15 +28,13 @@ Use Node 24 with npm 11. The runtime decision is recorded in `docs/runtime.md`,
 Project tooling should borrow practical conventions from the local sibling repos
 `../bradbalfour-dot-com` and `../bradbalfour-photography` where they fit this
 Node/TLDR project. Avoid copying frontend-, Astro-, Playwright-, Cloudflare-, or
-browser-specific configuration unless a later OpenSpec change introduces that
-surface area.
+browser-specific configuration unless planned work introduces that surface area.
 
 Common checks:
 
 ```bash
 npm run ci:install
 npm run check
-openspec validate bootstrap-llm-wiki-mvp --type change --strict
 ```
 
 Public wiki commands also run `npm run verify:publish` after generating output;
@@ -102,13 +100,7 @@ are deferred until the TLDR loop proves useful.
 
 ## Planning
 
-Primary planning artifacts live under:
-
-```text
-openspec/changes/bootstrap-llm-wiki-mvp/
-openspec/changes/commute-wiki-operating-loop/
-```
-
-Use OpenSpec artifacts as the implementation contract. The parent exploration
+Use GitHub issues for future work. `AGENTS.md` describes the proportional,
+tool-neutral planning structure for substantial changes. The parent exploration
 archive that seeded this repo is intentionally not required to understand or
 contribute to the implementation.

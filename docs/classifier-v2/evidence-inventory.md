@@ -41,8 +41,7 @@ the starting point, not proof that Voice always reads the strings correctly.
 - [Current generation instructions](../../chatgpt-project/queue-generation-v3.md),
   [classifier instructions](../../schema/classifier-instructions.md) and
   [interest profile](../../schema/interest-profile.md): baseline for the new files.
-- [Operating-loop design](../../openspec/changes/commute-wiki-operating-loop/design.md)
-  and [bootstrap design](../../openspec/changes/bootstrap-llm-wiki-mvp/design.md):
+- [Project runbook](../../chatgpt-project/README.md), schemas, and focused tests:
   preserve the working journeys while updating the specific changed requirements.
 
 The historical research archive in the parent workspace contains existing labels

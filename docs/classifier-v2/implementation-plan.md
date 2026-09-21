@@ -118,24 +118,13 @@ keep its live-status statements unchanged until deployment is confirmed. PR 5
 adds a concise report under `docs/classifier-v2/validation-results.md` only after
 results exist. Keep private inputs and per-article results outside Git.
 
-OpenSpec records the chosen behavior, not another approval process. Update the
-relevant existing files within the PR that changes the behavior:
-
-- PR 1: bootstrap `specs/commute-queue/spec.md`; operating-loop
-  `specs/queue-selection/spec.md`, `specs/session-bundle/spec.md`,
-  `specs/voice-session/spec.md`, `specs/commute-import/spec.md` and
-  `specs/scheduled-queue-output/spec.md`; the affected design/task statements;
-  and pre-render-queue-playback-text’s queue/Voice clauses where they mandate v3.
-- PRs 2–4: only the attribution, duplicate and literal-playback clauses changed
-  by those PRs, including their matching examples.
-- PR 5: bootstrap `specs/classifier-routing/spec.md` and
-  `specs/feedback-labels/spec.md`; replace the obsolete date-based holdout clause
-  with explicit development/final-check assignments. Update affected task text.
-
-These paths are under `openspec/changes/bootstrap-llm-wiki-mvp/`,
-`openspec/changes/commute-wiki-operating-loop/` and
-`openspec/changes/pre-render-queue-playback-text/`. Preserve unchanged behavior;
-no separate specification-only PR or external research phase is required.
+Update the stable owners within the PR that changes behavior. PR 1 updates the
+queue and session-bundle schemas, Project generation/export/Voice instructions,
+runtime readers, and focused tests. PRs 2–4 update only the attribution,
+duplicate, and literal-playback owners named in the table above. PR 5 updates
+the classifier profile, instructions, review tool, results, and focused tests.
+Preserve unchanged behavior; no separate specification-only PR or external
+research phase is required.
 
 ## Phase 0 — Prepare data and examples without delaying coding
 
@@ -335,8 +324,8 @@ files affected. After Brad approves a parent, merge it, rebase/retarget the chil
 onto updated main and check its diff. Address review changes through affected
 children in one pass rather than restarting the work.
 
-For each behavior PR run focused tests, then `npm run check`, `git diff --check`
-and strict validation of affected OpenSpec changes. Follow the existing repository
+For each behavior PR run focused tests, then `npm run check` and
+`git diff --check`. Follow the existing repository
 review policy once for the complete behavior change; do not add extra review
 rounds for unchanged code. Automated tests use invented data and no paid calls.
 

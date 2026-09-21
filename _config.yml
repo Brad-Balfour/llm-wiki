@@ -13,7 +13,6 @@ exclude:
   - dist
   - docs
   - node_modules
-  - openspec
   - package-lock.json
   - package.json
   - schema

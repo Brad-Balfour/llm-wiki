@@ -30,7 +30,7 @@ The implementation followed a review of:
 - issues #35, #66, and #68 about upstream classification and queue content;
 - the Queue v3 and session-bundle JSON schemas;
 - the existing Project instructions and prompt tests; and
-- both active OpenSpec changes.
+- the focused Project prompt tests.
 
 The July through September commutes repeatedly produced wrong spoken text even
 when the queue and bundle files were valid. Queue v3's prewritten
@@ -83,7 +83,7 @@ The chat is the only event record available before export. A spoken
 acknowledgment does not write a file. The new source does not revive the failed
 live-ledger design or promise silent storage.
 
-## OpenSpec correction
+## Requirement correction
 
 The old Voice requirement said Voice must not search the Project Library after
 reading began. That contradicted Brad's request to reopen the same queue before
@@ -120,8 +120,6 @@ Before handoff, run:
 
 ```sh
 npm run check
-openspec validate bootstrap-llm-wiki-mvp --strict
-openspec validate commute-wiki-operating-loop --strict
 git diff --check
 ```
 

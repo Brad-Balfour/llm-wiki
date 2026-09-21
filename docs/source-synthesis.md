@@ -2,7 +2,8 @@
 
 This implementation repo was seeded from a local exploration archive that is not
 part of the public repository. This file records the planning provenance for the
-initial OpenSpec change; it is not required reading for public users of the repo.
+initial repository plan; it is historical and not required reading for public
+users of the repo.
 
 ## Primary Source Themes
 

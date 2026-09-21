@@ -136,9 +136,9 @@ files; do not make him reattach artifacts already retrieved successfully.
 
 1. Inventory every retrieved or supplied queue, bundle, and shared-chat URL.
    Deduplicate repeated URLs without dropping distinct files or sessions.
-2. Read the active commute prompt, bundle schema and validator, relevant
-   OpenSpec change, and the recent experiment-log entries before interpreting
-   new evidence.
+2. Read the active commute prompt, relevant queue and bundle schemas, their
+   validators and focused tests, and the recent experiment-log entries before
+   interpreting new evidence.
 3. Validate each canonical queue and each bundle independently. Compare the
    embedded queue snapshot byte-for-semantic-field with the separately
    retrieved or supplied queue. Use shared chats only as bounded recovery
@@ -187,7 +187,7 @@ only when the intended action or target genuinely cannot be determined.
    comments. Keep a private feedback-to-issue matrix with the resulting issue
    and comment URLs.
 4. Treat mistakes and friction in this processing run as evidence. Add the
-   smallest durable prompt, instruction, specification, schema, test, or
+   smallest durable prompt, instruction, schema, test, or
    automation change that prevents recurrence.
 5. Distinguish observed product defects from normal user behavior and from
    contract gaps. Correct stale or inaccurate issue/PR comments instead of
@@ -212,8 +212,9 @@ only when the intended action or target genuinely cannot be determined.
    UI cannot be changed after the required MCP availability re-check, report the
    exact technical blocker rather than requesting permission. Update the
    repository's live-version record in the active PR or a focused follow-up.
-3. Run focused tests while iterating, then run `npm run check`, strict validation
-   for every touched OpenSpec change, and `git diff --check`. The repository's
+3. Run focused tests while iterating, then run `npm run check` and
+   `git diff --check`. Update and validate every touched stable schema, prompt,
+   source, test, or runbook owner. The repository's
    Node validation gate checks tracked skill frontmatter and structure as part
    of `npm run check`; do not invoke the system Python `quick_validate.py`.
 4. Commit only the intended tracked files, push the branch to `origin`, and open
