@@ -237,7 +237,10 @@ test('daily commute cleanup covers both Library locations and Downloads', async 
   const skill = await readFile('.codex/skills/process-daily-commute/SKILL.md', 'utf8');
   const normalized = skill.replace(/\s+/g, ' ');
 
-  assert.match(normalized, /main ChatGPT Library, delete only the exact queue rows/i);
+  assert.match(
+    normalized,
+    /main ChatGPT Library, delete only the exact queue and validated v4 reference rows/i
+  );
   assert.match(
     normalized,
     /`LLM-Wiki-Car` Project Library folder, separately delete only the exact commute-session bundle rows/i
@@ -248,6 +251,6 @@ test('daily commute cleanup covers both Library locations and Downloads', async 
   );
   assert.match(
     normalized,
-    /Verify that every targeted queue row and every separately authorized targeted v4 reference row is absent from the main ChatGPT Library, every targeted bundle row is absent from the Project Library\/Sources view, every unrelated Project source remains, and every targeted Downloads file is absent/i
+    /Verify that every targeted queue and validated v4 reference row is absent from the main ChatGPT Library, every targeted bundle row is absent from the Project Library\/Sources view, every unrelated Project source remains, and every targeted Downloads file is absent/i
   );
 });

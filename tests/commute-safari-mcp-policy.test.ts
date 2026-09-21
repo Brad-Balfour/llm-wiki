@@ -58,9 +58,10 @@ test('daily commute skill preserves detailed diagnostics and exact Safari cleanu
   assert.match(normalized, /inventory each Library location independently in List View/i);
   assert.match(normalized, /Use each exact row's three-dot menu/i);
   assert.match(normalized, /Project Sources view as independent from the main Library/i);
-  assert.match(normalized, /separate explicit authorization for that exact reference/i);
-  assert.match(normalized, /otherwise leave it pending/i);
-  assert.match(normalized, /Remove a v4 reference download only when/i);
-  assert.match(normalized, /separately authorized targeted v4 reference row is absent/i);
+  assert.match(normalized, /validated v4-reference, and session-bundle artifacts/i);
+  assert.match(normalized, /do not ask Brad for additional per-run or per-artifact authorization/i);
+  assert.match(normalized, /exact queue and validated v4 reference rows/i);
+  assert.match(normalized, /exact queue, validated v4 reference, and bundle downloads/i);
+  assert.match(normalized, /every targeted queue and validated v4 reference row is absent/i);
   assert.match(normalized, /every unrelated Project source remains/i);
 });

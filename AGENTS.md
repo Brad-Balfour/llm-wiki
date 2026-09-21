@@ -165,15 +165,17 @@ with shorthand such as "today's commute," treat that as a request to complete
 the full daily evidence loop. This is a recurring operating workflow, not a
 one-off file inspection. The request authorizes the normal repository and
 GitHub writes needed to finish that loop. It also authorizes read-only discovery
-and download of commute queue and session-bundle artifacts from Brad's signed-in
-ChatGPT Library for private local intake. It does not authorize changing or
-deleting unrelated private files. Brad has granted standing authorization to
-delete the exact queue and session-bundle artifacts consumed by a durably
-completed commute run after its PR merges, or after a complete no-change
-handoff when no PR was needed. This authorization covers matching transient
-copies in ChatGPT Library, the LLM-Wiki-Car Project Library, and Downloads; it
-does not cover chats, prompts, Project source documents, schemas, normalized
-`.private/` intake, or artifacts whose completed-use evidence is ambiguous.
+and download of commute queue, v4-reference, and session-bundle artifacts from
+Brad's signed-in ChatGPT Library for private local intake. It does not authorize
+changing or deleting unrelated private files. Brad has granted standing
+authorization to delete the exact queue, validated v4-reference, and
+session-bundle artifacts
+consumed by a durably completed commute run after its PR merges, or after a
+complete no-change handoff when no PR was needed. This authorization covers all
+matching transient copies in ChatGPT Library, the LLM-Wiki-Car Project Library,
+and Downloads without another confirmation; it does not cover chats, prompts,
+unrelated Project source documents, schemas, normalized `.private/` intake, or
+artifacts whose completed-use evidence is ambiguous.
 
 For every daily commute intake:
 

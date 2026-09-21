@@ -230,11 +230,11 @@ only when the intended action or target genuinely cannot be determined.
 ## Post-merge artifact cleanup
 
 Cleanup of transient source artifacts is destructive. `AGENTS.md` records
-Brad's standing authorization for the exact queue and session-bundle artifacts
-consumed by durably completed commute runs; this skill text alone is not
-authorization. Record the applicable standing or current-request authorization
-in the private retrieval manifest. Cleanup may begin only after processing is
-durably complete:
+Brad's standing authorization for the exact queue, validated v4-reference, and
+session-bundle artifacts consumed by durably completed commute runs. Record the
+standing authorization and exact targets in the private retrieval manifest; do
+not ask Brad for additional per-run or per-artifact authorization. Cleanup may
+begin only after processing is durably complete:
 
 After an authorized merge, pull `main` and verify the repository before cleanup.
 Complete already-authorized exact cleanup and the final handoff without asking
@@ -250,10 +250,8 @@ deletions pending. Do not ask twice for the same confirmed deletion batch.
    after the complete no-change handoff is recorded.
 2. Resolve cleanup targets from the private retrieval manifest and inventory
    each Library location independently in List View. Use each exact row's
-   three-dot menu. In the main ChatGPT Library, delete only the exact queue rows
-   consumed by the completed run. Delete a validated v4 reference row only when
-   the private manifest records separate explicit authorization for that exact
-   reference; otherwise leave it pending. In the
+   three-dot menu. In the main ChatGPT Library, delete only the exact queue and
+   validated v4 reference rows consumed by the completed run. In the
    `LLM-Wiki-Car` Project Library folder, separately delete only the exact
    commute-session bundle rows consumed by that run. A successful deletion in
    one location does not establish deletion of its matching copy in the other.
@@ -262,25 +260,23 @@ deletions pending. Do not ask twice for the same confirmed deletion batch.
    Do not delete the Project Library folder itself, shared chats, Project source
    documents, schemas, prompts, unrelated dated artifacts, or a plausible row
    that was not validated into the final intake.
-3. In `~/Downloads`, remove only the exact queue and bundle downloads created
-   or verified during this run. Remove a v4 reference download only when the
-   private manifest records separate explicit authorization for that exact
-   reference. Match filenames and, when duplicate suffixes or pre-existing
-   same-name files exist, confirm content against the private intake before
-   removing them. Prefer moving local files to Trash; never use a broad glob or
-   recursive deletion.
+3. In `~/Downloads`, remove only the exact queue, validated v4 reference, and
+   bundle downloads created or verified during this run. Match filenames and,
+   when duplicate suffixes or pre-existing same-name files exist, confirm
+   content against the private intake before removing them. Prefer moving local
+   files to Trash; never use a broad glob or recursive deletion.
 4. Keep the normalized `.private/` intake, coverage ledger, and retrieval
    manifest as the durable audit and recovery record. Library and Downloads are
    transient copies; `.private/` is not part of this cleanup request.
 5. Reopen and inventory the main Library and the `LLM-Wiki-Car` Project Sources
-   view after deletion. Verify that every targeted queue row and every
-   separately authorized targeted v4 reference row is absent from the main
-   ChatGPT Library, every targeted bundle row is absent from the Project
+   view after deletion. Verify that every targeted queue and validated v4
+   reference row is absent from the main ChatGPT Library, every targeted bundle
+   row is absent from the Project
    Library/Sources view, every unrelated Project source remains, and every
    targeted Downloads file is absent. Then append the exact targets, deletion
    time, and per-location verification result to the private retrieval manifest.
-   Report partial failures precisely and leave unmatched, unauthorized, or
-   ambiguous files untouched.
+   Report partial failures precisely and leave unmatched or ambiguous files
+   untouched.
 
 When cleaning historical residue, build the allowlist from merged repository
 history plus preserved private intake. A matching date or artifact-shaped name
