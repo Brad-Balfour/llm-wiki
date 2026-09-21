@@ -138,7 +138,12 @@ function findMarkdownFiles(directory) {
 }
 
 function findSkillFiles(directory) {
-  return findFiles(directory, (name) => name === 'SKILL.md');
+  return findFiles(directory, (name) => name === 'SKILL.md').catch((error) => {
+    if (error?.code === 'ENOENT') {
+      return [];
+    }
+    throw error;
+  });
 }
 
 function isYaml(name) {
