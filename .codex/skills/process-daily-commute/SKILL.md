@@ -33,10 +33,13 @@ during the constrained run solely to obtain counters.
 
 ## Publication scope and communication
 
-Follow the risk-tiered publication policy in `AGENTS.md`. Content- and
-evidence-only daily publication relies on deterministic gates and explicit
-merge authorization; it does not require a general-purpose AI review unless a
-gate or maintainer identifies ambiguity. Routine generated state updates need
+Follow the risk-tiered publication policy in `AGENTS.md`. Invoking this recurring
+workflow authorizes merging its qualifying PR after the required gates pass and
+performing required live Project synchronization. Do not ask for separate merge,
+deployment, Project-update, or cleanup permission. Content- and evidence-only
+daily publication relies on deterministic gates and does not require a
+general-purpose AI review unless a gate or maintainer identifies ambiguity.
+Routine generated state updates need
 at most one required latest-head review. Code, schema, routing, prompt, or
 workflow behavior changes need one latest-head review after local checks.
 
@@ -201,14 +204,14 @@ only when the intended action or target genuinely cannot be determined.
    `chatgpt-project/README.md`. Any changed live prompt or Project source creates
    a required ChatGPT Project prompt replacement or named source-document
    upload; never leave Brad to infer it from the diff.
-2. When that ChatGPT Project update is required, immediately provide the exact
-   merged or review-ready prompt in one copyable block, or list every exact
-   source file and its Project destination. Say exactly which Project prompt or
-   document needs to be updated. Do this without waiting for Brad to request it.
-   Repository and GitHub writes do not authorize changing the live Project UI,
-   so keep the required prompt replacement or source-document upload explicitly
-   unresolved until Brad confirms it was applied. Then update the repository's
-   live-version record in the active PR or a focused follow-up.
+2. When that ChatGPT Project update is required, identify the exact merged or
+   review-ready prompt or every exact source file and Project destination. After
+   the qualifying PR merges, use SafariDriver MCP to apply the verified merged
+   version in the live Project UI and verify the resulting prompt or source
+   listing. Do not ask Brad to perform or confirm this synchronization. If the
+   UI cannot be changed after the required MCP availability re-check, report the
+   exact technical blocker rather than requesting permission. Update the
+   repository's live-version record in the active PR or a focused follow-up.
 3. Run focused tests while iterating, then run `npm run check`, strict validation
    for every touched OpenSpec change, and `git diff --check`. The repository's
    Node validation gate checks tracked skill frontmatter and structure as part
@@ -224,8 +227,9 @@ only when the intended action or target genuinely cannot be determined.
    commit and validation evidence, resolve the thread, and request a fresh
    review only when the fix materially changes behavior.
 7. Wait for the latest-head CI checks and the review workflows required by the
-   applicable risk tier. Merge only with explicit user authorization and only
-   when checks and actionable review threads are clean.
+   applicable risk tier. When checks and actionable review threads are clean,
+   merge the qualifying commute PR under the standing authorization for this
+   workflow; do not pause to ask Brad again.
 
 ## Post-merge artifact cleanup
 
@@ -236,13 +240,12 @@ standing authorization and exact targets in the private retrieval manifest; do
 not ask Brad for additional per-run or per-artifact authorization. Cleanup may
 begin only after processing is durably complete:
 
-After an authorized merge, pull `main` and verify the repository before cleanup.
+After the gated merge, pull `main` and verify the repository before cleanup.
 Complete already-authorized exact cleanup and the final handoff without asking
 Brad to repeat authorization already recorded in `AGENTS.md`; report any
-mandatory environment safety confirmation precisely. If browser deletion needs
-action-time confirmation and Brad is away, finish independent publication,
-issue routing, local cleanup, and handoff first; leave only the exact browser
-deletions pending. Do not ask twice for the same confirmed deletion batch.
+mandatory environment safety confirmation precisely. If the browser presents an
+action-time confirmation for an exact authorized target, confirm it and proceed.
+Do not pause for or request another confirmation.
 
 1. If the run has a PR, do not delete anything until that exact PR is merged.
    An open, draft, closed-unmerged, or checks-pending PR leaves cleanup pending.
@@ -286,11 +289,11 @@ preservation, exact-match, verification, and audit rules as the current run.
 
 Keep the original task and worktree responsible for post-merge cleanup because
 its gitignored private manifest does not follow a new isolated worktree. If
-Codex is not active when the PR later merges, report cleanup as pending and ask
-Brad to resume that task. If the original context is unavailable, do not delete
-from a guessed target list: re-inventory the Library and Downloads, re-establish
-exact filenames and content matches, and obtain any deletion authorization not
-already recorded before removing anything.
+Codex is not active when the PR later merges, record cleanup as pending for the
+next run. If the original context is unavailable, do not delete from a guessed
+target list: re-inventory the Library and Downloads and re-establish exact
+filenames and content matches before removing anything under the standing
+authorization.
 
 ## Completion
 
@@ -298,14 +301,14 @@ Report the remote branch, commit, PR, CI/review state, issue updates, evidence
 counts, Library retrieval results, and any genuinely unresolved item. Explicitly
 report conversation coverage: substantive entries audited, wiki saves reflected
 with discussion context, classifier/quality annotations retained, workflow
-observations routed, issue comment URLs, and any excluded entries with reasons. Do not call the daily
-loop complete while a required ChatGPT Project prompt replacement or named
-source-document upload is unconfirmed. Keep that concrete update visible as a
-pre-merge checklist item, but do not change the PR's draft/ready
-state because of it; ready for review is compatible with pending confirmation
-of that concrete update. For every changed live prompt, return the exact file
-contents in one copyable block before handoff; never reconstruct them from
-memory and never make Brad remember to ask.
+observations routed, issue comment URLs, and any excluded entries with reasons.
+Do not call the daily loop complete while a required ChatGPT Project prompt
+replacement or named source-document upload is unapplied or unverified. Keep
+that concrete update visible as a pre-merge checklist item, but do not change the
+PR's draft/ready state because of it; ready for review is compatible with pending
+post-merge synchronization. For every changed live prompt, use the exact merged
+file contents; never reconstruct them from memory and never make Brad remember
+to ask or confirm.
 When a PR exists, make its clickable URL the final content in every completion
 handoff. Render it as a level-one Markdown heading with a bold linked label so it
 is large and cannot be buried; place no text, list item, or footer after it.

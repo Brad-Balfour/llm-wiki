@@ -136,9 +136,10 @@ Keep the PR as the publication record, review boundary, rollback point, and
 Pages trigger. Make review proportional to risk rather than adding automatic
 general-purpose review rounds.
 
-- Content- and evidence-only daily publication relies on deterministic gates
-  and explicit merge authorization. Do not require a general-purpose AI review
-  unless a gate or maintainer identifies ambiguity.
+- Content- and evidence-only daily publication relies on deterministic gates.
+  The request to run the recurring commute workflow authorizes merging its
+  qualifying PR after those gates pass. Do not require a general-purpose AI
+  review unless a gate or maintainer identifies ambiguity.
 - Routine generated provenance or state updates use deterministic gates first.
   Require at most one latest-head review when repository policy or a maintainer
   requires it.
@@ -164,18 +165,21 @@ When Brad supplies dated commute queues, session bundles, and shared-chat URLs
 with shorthand such as "today's commute," treat that as a request to complete
 the full daily evidence loop. This is a recurring operating workflow, not a
 one-off file inspection. The request authorizes the normal repository and
-GitHub writes needed to finish that loop. It also authorizes read-only discovery
-and download of commute queue, v4-reference, and session-bundle artifacts from
-Brad's signed-in ChatGPT Library for private local intake. It does not authorize
-changing or deleting unrelated private files. Brad has granted standing
+GitHub writes needed to finish that loop, merging its qualifying PR after
+required checks and reviews pass, and synchronizing required live ChatGPT
+Project prompts or source documents from the verified repository version. It
+also authorizes read-only discovery and download of commute queue, v4-reference,
+and session-bundle artifacts from Brad's signed-in ChatGPT Library for private
+local intake. It does not authorize changing or deleting unrelated private
+files. Brad has granted standing
 authorization to delete the exact queue, validated v4-reference, and
-session-bundle artifacts
-consumed by a durably completed commute run after its PR merges, or after a
-complete no-change handoff when no PR was needed. This authorization covers all
-matching transient copies in ChatGPT Library, the LLM-Wiki-Car Project Library,
-and Downloads without another confirmation; it does not cover chats, prompts,
-unrelated Project source documents, schemas, normalized `.private/` intake, or
-artifacts whose completed-use evidence is ambiguous.
+session-bundle artifacts consumed by a durably completed commute run after its
+PR merges, or after a complete no-change handoff when no PR was needed. This
+authorization covers all matching transient copies in ChatGPT Library, the
+LLM-Wiki-Car Project Library, and Downloads without another confirmation; it
+does not cover chats, prompts, unrelated Project source documents, schemas,
+normalized `.private/` intake, or artifacts whose completed-use evidence is
+ambiguous.
 
 For every daily commute intake:
 
@@ -208,9 +212,10 @@ For every daily commute intake:
    `chatgpt-project/README.md`. If a live prompt or Project source changed, say
    exactly which Project prompt or document needs to be updated. Without waiting
    for Brad to ask, provide the exact prompt in one copyable block or name every
-   exact source file and destination. Keep the update open until Brad confirms
-   it was applied, then update the tracked live-version record. Do not make Brad
-   infer or remember an external deployment step from a repository diff or PR.
+   exact source file and destination. Keep the update open until the agent
+   applies and verifies it, then update the tracked live-version record. Do not
+   make Brad infer, remember, or manually confirm an external deployment step
+   from a repository diff or PR.
 7. Run the relevant local validation, commit the tracked daily evidence, push
    the branch, and open a PR against the intended base. Use draft status only
    for a genuine unfinished item, not as a routine review delay. A local-only
@@ -222,7 +227,7 @@ For every daily commute intake:
    Project's prompt or documents still need to be updated. Keep the needed
    update visible before merge, but do not change the PR's draft/ready state
    because of it; ready for review is compatible with a pending Project update.
-9. After an authorized merge, pull `main`, verify the repository, complete any
+9. After the gated merge, pull `main`, verify the repository, complete any
    already-authorized exact artifact cleanup, and issue the final handoff
    without asking Brad to repeat authorization already recorded here. Report
    any mandatory environment safety confirmation precisely. If a browser UI
@@ -251,9 +256,11 @@ reopens the experiment. Preserve existing private measurements.
   this public repository. When requesting one, state that `llm-wiki` is public,
   the review is read-only, and the user has authorized sending the committed
   diff to Claude so the external-data reviewer has the relevant context.
-- Do not merge or deploy without explicit user authorization. A request to
-  create a PR authorizes a branch, commit, push, and review-ready PR unless a
-  genuine unfinished item requires draft status.
+- Do not merge or deploy without explicit user authorization. Invoking the
+  recurring commute workflow supplies that authorization for its qualifying PR
+  and required live Project synchronization; otherwise, a request to create a
+  PR authorizes only a branch, commit, push, and review-ready PR unless a genuine
+  unfinished item requires draft status.
 - Apply the commute publication risk tiers above before requesting or waiting
   for general-purpose AI review. When a review is required, wait for the latest
   head's review workflow to complete, inspect submitted reviews and unresolved

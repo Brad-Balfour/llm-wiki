@@ -10,14 +10,14 @@ test('commute publication policy keeps review proportional and updates brief', a
   ]);
 
   for (const policy of [agents, skill]) {
-    assert.match(policy, /Content- and\s+evidence-only daily publication/i);
+    assert.match(policy, /Content- and\s+evidence-only\s+daily publication/i);
     assert.match(policy, /one(?: required)? latest-head review/i);
     assert.match(policy, /materially changes behavior/i);
     assert.match(policy, /historical cleanup/i);
     assert.match(policy, /Do not (?:ask for|request an)\s+acknowledgment/i);
   }
 
-  assert.match(agents, /After an authorized merge, pull `main`, verify the repository/i);
+  assert.match(agents, /After the gated merge, pull `main`, verify the repository/i);
   assert.match(agents, /experiment ended after the September 15 Sol Medium run/i);
   assert.match(agents, /Use Sol Light\/Low for routine daily commutes/i);
   assert.match(agents, /Do not collect new experimental phase profiles/i);
@@ -25,11 +25,14 @@ test('commute publication policy keeps review proportional and updates brief', a
   assert.match(skill, /Do\s+not start a new phase profile or model-comparison run/i);
   assert.match(experimentGuide, /Historical operator guide/i);
   assert.match(experimentGuide, /resume profiling only if Brad explicitly reopens/i);
-  assert.match(agents, /Do not request a second\s+confirmation for the same exact deletion batch/i);
-  assert.match(skill, /If browser deletion needs\s+action-time confirmation and Brad is away/i);
+  assert.match(agents, /without another confirmation/i);
+  assert.match(
+    skill,
+    /action-time confirmation for an exact authorized target, confirm it and proceed/i
+  );
   assert.match(
     agents,
     /documentation-only or\s+mechanical review fix does not trigger another general-purpose review round/i
   );
-  assert.match(skill, /After an authorized merge, pull `main` and verify the repository/i);
+  assert.match(skill, /After the gated merge, pull `main` and verify the repository/i);
 });

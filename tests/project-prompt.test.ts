@@ -219,12 +219,19 @@ test('daily commute completion cannot omit a required Project update', async () 
     readFile('AGENTS.md', 'utf8'),
   ]);
 
-  for (const instructions of [skill, agents]) {
-    const normalized = instructions.replace(/\s+/g, ' ');
-    assert.match(normalized, /say exactly which Project prompt or document needs to be updated/i);
-    assert.match(normalized, /without waiting for Brad to (?:request|ask)/i);
-    assert.match(normalized, /exact .*prompt in one copyable block/i);
-    assert.match(normalized, /until Brad confirms/i);
+  const normalizedSkill = skill.replace(/\s+/g, ' ');
+  const normalizedAgents = agents.replace(/\s+/g, ' ');
+
+  assert.match(
+    normalizedAgents,
+    /say exactly which Project prompt or document needs to be updated/i
+  );
+  assert.match(normalizedAgents, /until the agent applies and verifies it/i);
+  assert.match(normalizedSkill, /identify the exact merged or review-ready prompt/i);
+  assert.match(normalizedSkill, /use SafariDriver MCP to apply the verified merged version/i);
+  assert.match(normalizedSkill, /Do not ask Brad to perform or confirm this synchronization/i);
+
+  for (const normalized of [normalizedSkill, normalizedAgents]) {
     assert.match(normalized, /never call the .*complete|do not call the .*complete/i);
     assert.match(normalized, /do not change the PR's draft\/ready state/i);
     assert.match(normalized, /ready for review is compatible/i);

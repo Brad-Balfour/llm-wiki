@@ -65,3 +65,20 @@ test('daily commute skill preserves detailed diagnostics and exact Safari cleanu
   assert.match(normalized, /every targeted queue and validated v4 reference row is absent/i);
   assert.match(normalized, /every unrelated Project source remains/i);
 });
+
+test('daily commute workflow does not ask for repeat authorization', async () => {
+  const skill = await readFile('.codex/skills/process-daily-commute/SKILL.md', 'utf8');
+  const normalized = skill.replace(/\s+/g, ' ');
+
+  assert.match(normalized, /workflow authorizes merging its qualifying PR/i);
+  assert.match(
+    normalized,
+    /Do not ask for separate merge, deployment, Project-update, or cleanup permission/i
+  );
+  assert.match(normalized, /do not pause to ask Brad again/i);
+  assert.match(normalized, /Do not pause for or request another confirmation/i);
+  assert.doesNotMatch(normalized, /Merge only with explicit user authorization/i);
+  assert.doesNotMatch(normalized, /until Brad confirms it was applied/i);
+  assert.doesNotMatch(normalized, /obtain any deletion authorization/i);
+  assert.doesNotMatch(normalized, /leave only the exact browser deletions pending/i);
+});
