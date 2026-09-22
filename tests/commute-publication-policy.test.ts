@@ -21,6 +21,14 @@ test('commute publication policy keeps review proportional and updates brief', a
   assert.match(agents, /experiment ended after the September 15 Sol Medium run/i);
   assert.match(agents, /Use Sol Light\/Low for routine daily commutes/i);
   assert.match(agents, /Do not collect new experimental phase profiles/i);
+  assert.match(
+    agents,
+    /Adjudicate bundle item actions against the full conversation before storing\s+classifier labels/i
+  );
+  assert.match(
+    agents,
+    /A negative assessment of an article alone does not\s+establish an interest or depth correction/i
+  );
   assert.match(skill, /experiment ended after the September 15 Sol Medium run/i);
   assert.match(skill, /Do\s+not start a new phase profile or model-comparison run/i);
   assert.match(experimentGuide, /Historical operator guide/i);

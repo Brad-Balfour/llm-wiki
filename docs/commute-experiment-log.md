@@ -105,6 +105,10 @@ found a queue as proof.
   Project-Library session bundles produced on September 19–20; no separately
   supplied shared chats. Library row downloads were performed through Safari
   MCP in list view, then validated locally as canonical queue/reference pairs.
+- The four September 21 General, Dev, AI, and Fintech v4 playback/reference
+  pairs; four September 22 session bundles; and four distinct supplied shared
+  chats. The original Library downloads and conversation coverage record are
+  retained in private intake.
 - The live `Weekday TLDR Queues` Task conversation/configuration, the July
   21-24 Task Update emails, the July 24 manual queue-generation control, and
   the live Project settings/sources inspected on July 26.
@@ -2292,3 +2296,46 @@ fallback, Notion discussion, and final handoffs, but each share was an excerpt
 rather than the extended Martin Fowler, classifier, or Agora exchanges described
 by the bundles. They corroborate the bounded bundle record; they do not replace
 the missing full discussion transcript.
+
+### September 22 Four-Edition Commute Result
+
+Four September 22 session bundles declared the September 21 General, Dev, AI,
+and Fintech queues, respectively. All four separately downloaded v4
+playback/reference pairs passed daily set validation. Each bundle passed strict
+validation against its declared pair, including canonical snapshot comparison.
+The General and Fintech bundles report `recovered` integrity; Dev and AI report
+`partial`. Import accepted all four bundles with no unresolved captures. The
+original import yielded two Dev item actions, 20 quality incidents, one general
+capture in each session, and no wiki saves. Four distinct shared chats supplied
+conversation context, including the export retries and attachment fallback.
+
+The one exact classifier correction is Dev item 1, **Why building a Rust LSP is
+hard**: Brad explicitly asked to record that Rust is not much of an interest.
+The canonical reference had `maybe` interest at 0.63 and `in_depth` at 0.72;
+the private queue-bound record corrects interest to `uninterested` and routes
+it to `skip`, retaining the depth value. The bundle also marked Dev item 6,
+**The Death of the Button**, as `uninterested` from “It's BS.” The complete
+conversation shows Brad criticizing the article's lack of a concrete design
+target, without asking for classifier feedback. That phrase is retained as a
+negative article assessment and excluded from the adjudicated classifier
+record. A structurally valid bundle can therefore still overstate user intent.
+
+Across all four sessions, Voice repeatedly struggled to reopen Monday's queues
+in the Project subfolder, even after Brad identified the location; General, AI,
+and Fintech needed manual attachment or an export retry. It repeatedly claimed
+to be checking or to have accessed a file without a corresponding visible
+retrieval. Several item reads substituted, shortened, or embellished the
+prepared `item_playback` text. The General fusion item gained unsupported
+details; AI started individual items instead of the requested sweep; Fintech
+truncated items 4–7 and mispronounced SaaS despite a correction. In Dev, the
+assistant read an “Author lookup failed” placeholder aloud after identifying a
+visible author. Some source-article analysis was claimed without visible
+retrieval; the commute discussion is evidence of Brad's questions and the
+assistant's behavior, not independent evidence for those article claims.
+
+Brad clarified that a playback comparison should first answer whether the
+spoken content substantially differs from the stored text, rather than focus
+on punctuation. The AI discussion also distinguished untrusted webpage content
+from agent instructions; it did not ask to save a wiki entry or create a new
+classifier label. The full conversation coverage and exact artifact hashes are
+private. This run changed no live Project prompt or source document.

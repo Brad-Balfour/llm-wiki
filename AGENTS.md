@@ -211,6 +211,10 @@ For every daily commute intake:
 2. Reconcile the day into the correct evidence channels: wiki-maintenance
    candidates, exact classifier feedback, product/quality incidents, general
    captures, duplicate/prior-awareness signals, and unresolved evidence.
+   Adjudicate bundle item actions against the full conversation before storing
+   classifier labels. A negative assessment of an article alone does not
+   establish an interest or depth correction, even when the bundle marks it
+   `mark_uninterested`.
 3. Preserve the private normalized intake under `.private/`, then add the
    sanitized durable findings to the experiment log or other appropriate
    tracked memory. When adding or changing a dated experiment-log result, update
