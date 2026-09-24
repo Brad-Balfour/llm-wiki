@@ -109,6 +109,9 @@ found a queue as proof.
   pairs; four September 22 session bundles; and four distinct supplied shared
   chats. The original Library downloads and conversation coverage record are
   retained in private intake.
+- The September 22 General v4 playback/reference pair, September 23 evening
+  bundle, and one complete shared chat. Exact Library downloads, hashes,
+  validation results, and conversation coverage are retained in private intake.
 - The live `Weekday TLDR Queues` Task conversation/configuration, the July
   21-24 Task Update emails, the July 24 manual queue-generation control, and
   the live Project settings/sources inspected on July 26.
@@ -172,6 +175,7 @@ retrieve sources, and preserve history after the drive.
 | Sep. 14    | Three-session v4.1 transition intake, bounded newline repair, and Agents API save             | Validate three playback/reference pairs and bundles, self-heal legacy newline-bearing v4 playback during bounded intake, retain one exact depth correction, and preserve the saved Agents API discussion.               | The September 14 General pair and bundle were strict-valid. The older September 11 AI and Dev artifacts matched their embedded snapshots byte-for-byte but carried 13 playback fields generated before v4.1 newline removal; bounded repair normalized and revalidated them. Intake accepted all three sessions with one wiki candidate, one correction, eight incidents, and no unresolved items. |
 | Sep. 15    | Five-session v4 intake, producer-validation failure, and three source-grounded saves          | Validate five playback/reference pairs and bundles, reconcile five complete chats, preserve three explicit wiki saves, and separate a positive playback-context result from classifier corrections.                       | All five embedded snapshots matched 50 downloaded queue items. Four bundles were strict-valid; General was rejected because one reference context was not an opening source excerpt. Intake retained three wiki candidates, four bundled incidents, two positive general captures, no exact classifier correction, and three deterministic unresolved items. |
 | Sep. 16    | Four-session v4 intake and two discussion-enriched saves                                      | Validate a prior-day AI catch-up pair and three current pairs and bundles, reconcile three supplied chats plus the observed AI Project chat, and preserve explicit saves and workflow feedback.                 | All four pairs and bundles passed strict validation and their snapshots matched 32 downloaded items. The General bundle omitted a chat-proven save; Voice still lost exact Library files and interrupted sweep/export flow. No exact classifier correction was made. |
+| Sep. 23    | General v4 playback and export-visibility audit                                               | Validate the prior-day two-item General pair and evening bundle, then traverse the complete shared chat to adjudicate playback and export observations.                                                         | The pair and recovered bundle passed strict validation and the canonical snapshot matched. The chat confirms premature sweep completion, a headline-only first item attempt, and a missing visible export link despite the bundle appearing in Library. No wiki save or classifier correction was requested. |
 
 ### September 16 Four-Session And Chat-Reconciliation Result
 
@@ -2339,3 +2343,33 @@ on punctuation. The AI discussion also distinguished untrusted webpage content
 from agent instructions; it did not ask to save a wiki entry or create a new
 classifier label. The full conversation coverage and exact artifact hashes are
 private. This run changed no live Project prompt or source document.
+
+### September 23 General Playback and Export Result
+
+SafariDriver's signed-in Library List View supplied one evening session bundle
+and its declared September 22 General v4 playback/reference pair through exact
+row-menu downloads. The pair passed strict validation for two items. The
+recovered bundle passed strict validation and its embedded snapshot matched the
+separately downloaded pair. Import accepted one session: two bundled quality
+incidents, three navigation events, no wiki maintenance candidates, no
+classifier feedback, and no unresolved capture. The one supplied shared chat
+was traversed from the first through the last of its 11 prompts, accounting for
+substantive corrections and export observations separately from routine
+playback commands.
+
+Voice announced the queue finished after only the two-headline sweep. Brad
+corrected that state and asked for item one. The first item-one attempt then
+stopped after its title; Brad explicitly identified the failure to read the
+stored `item_playback`. A second attempt read the substantial item-one text.
+Item two was interrupted, then resumed from “two of two” and completed. The
+spoken item descriptions after those recoveries were substantively aligned
+with the stored playback; ordinary speech normalization is not the incident.
+
+At the end, Voice twice promised a downloadable bundle without showing a link
+in the shared chat. Brad switched to text and verified that the bundle existed
+in Library. This proves artifact creation and a separate chat-link visibility
+failure; the conversation does not establish whether Voice mode itself caused
+the absent link. There was no explicit save, interest/depth correction, or
+discussion that warrants a wiki page. This is further evidence for the existing
+Voice playback/export mechanism issue, not grounds for another wording-only
+Project prompt change. No live Project prompt or source document changed.
