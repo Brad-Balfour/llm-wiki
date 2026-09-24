@@ -10,7 +10,7 @@ created: 2026-09-16
 updated: 2026-09-24
 confidence: medium
 # prettier-ignore
-provenance: [{"source_item_id":"1a0aa73e4e492655-02","url":"https://typesafe.ai/blog/introducing-system-one-models-and-jev"},{"source_item_id":"dev-01","url":"https://archerhume.com/posts/jevs-architecture-unmasked"}]
+provenance: [{"source_item_id":"1a0aa73e4e492655-02","url":"https://typesafe.ai/blog/introducing-system-one-models-and-jev"},{"source_item_id":"20260922-tldr-dev:dev-01","url":"https://archerhume.com/posts/jevs-architecture-unmasked"}]
 ---
 
 # Structured Decision Models
@@ -72,7 +72,7 @@ LLM-Wiki-Car integration discussion.
 
 ### [Jev's Architecture Unmasked](https://archerhume.com/posts/jevs-architecture-unmasked)
 
-<!-- source-item-id: dev-01 -->
+<!-- source-item-id: 20260922-tldr-dev:dev-01 -->
 
 Archer Hume, 2026-09-17. Explicitly saved during the September 23–24 Dev
 commute with a request to retain the discussion and first-use cautions. The

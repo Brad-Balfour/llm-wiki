@@ -10,7 +10,7 @@ created: 2026-09-24
 updated: 2026-09-24
 confidence: medium
 # prettier-ignore
-provenance: [{"source_item_id":"dev-010","url":"https://arize.com/blog/building-tools-for-ai-agents/"}]
+provenance: [{"source_item_id":"20260924-tldr-dev:dev-010","url":"https://arize.com/blog/building-tools-for-ai-agents/"}]
 ---
 
 # Agent Tool Boundaries
@@ -48,7 +48,7 @@ source verification; the published article was checked separately.
 
 ### [What changes when AI agents use your software](https://arize.com/blog/building-tools-for-ai-agents/)
 
-<!-- source-item-id: dev-010 -->
+<!-- source-item-id: 20260924-tldr-dev:dev-010 -->
 
 Aaron Winston, Arize, September 2026. The source URL redirects in presentation
 to this title and discusses Ivan Burazin's experience and proposed engineering

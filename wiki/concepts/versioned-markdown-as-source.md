@@ -10,7 +10,7 @@ created: 2026-09-24
 updated: 2026-09-24
 confidence: medium
 # prettier-ignore
-provenance: [{"source_item_id":"dev-03","url":"https://htmx.org/essays/markdown-in-src"}]
+provenance: [{"source_item_id":"20260922-tldr-dev:dev-03","url":"https://htmx.org/essays/markdown-in-src"}]
 ---
 
 # Versioned Markdown as Source
@@ -42,7 +42,7 @@ documents, code, and tests so the written intent does not become stale.
 
 ### [Markdown in /src](https://htmx.org/essays/markdown-in-src)
 
-<!-- source-item-id: dev-03 -->
+<!-- source-item-id: 20260922-tldr-dev:dev-03 -->
 
 Carson Gross, htmx, 2026-09-21. Explicitly saved during the September 23–24
 Dev commute with a request to retain the comparison and discussion.
