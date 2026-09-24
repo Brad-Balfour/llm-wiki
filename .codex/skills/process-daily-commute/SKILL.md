@@ -98,9 +98,11 @@ may use Git and GitHub.
 3. Before opening a preview, use each exact row's three-dot menu and choose
    **Download**. Retrieve bundles first. Direct download is the normal path
    because it preserves the supplied artifact. If the exact row cannot be
-   downloaded after a bounded retry, complete DOM-rendered content may be saved
-   as a recovery artifact only when it can be checked by the same schema,
-   pair/hash, and canonical-snapshot validation as a download. Record the
+   acted on while offscreen, scroll that row into view and open its own action
+   menu before counting the attempt as a download failure. If the row still
+   cannot be downloaded after a bounded retry, complete DOM-rendered content
+   may be saved as a recovery artifact only when it can be checked by the same
+   schema, pair/hash, and canonical-snapshot validation as a download. Record the
    recovery method and reject truncated, altered, or invalid rendered content;
    do not claim that original-byte access is universally required when the DOM
    recovery validates. Do not select only the newest morning or evening file:

@@ -112,6 +112,11 @@ found a queue as proof.
 - The September 22 General v4 playback/reference pair, September 23 evening
   bundle, and one complete shared chat. Exact Library downloads, hashes,
   validation results, and conversation coverage are retained in private intake.
+- Seven September 22–24 v4 playback/reference pairs declared by seven
+  September 24 session bundles, plus six complete shared chats. The September
+  22 Dev bundle has no supplied share URL; its detailed saves and discussion
+  are bundle-backed. Original downloads, hashes, strict validation, the
+  serialized conversation coverage, and the retrieval manifest are private.
 - The live `Weekday TLDR Queues` Task conversation/configuration, the July
   21-24 Task Update emails, the July 24 manual queue-generation control, and
   the live Project settings/sources inspected on July 26.
@@ -2373,3 +2378,71 @@ the absent link. There was no explicit save, interest/depth correction, or
 discussion that warrants a wiki page. This is further evidence for the existing
 Voice playback/export mechanism issue, not grounds for another wording-only
 Project prompt change. No live Project prompt or source document changed.
+
+### September 24 Seven-Session Commute Result
+
+SafariDriver's authenticated Library List View supplied seven September 24
+bundles: `202609240721`, `202609240820`, `202609241757`, `202609241807`,
+`202609241813`, `202609241825`, and `202609241836` with the canonical
+`-morning` or `-evening-commute-session-bundle.txt` suffix. Their declared
+queues were the September 22 Dev and AI, September 23 General, Dev, and AI,
+and September 24 General and Dev editions. All seven exact v4
+playback/reference pairs passed pair validation (50 queue items total). All
+seven bundles passed strict validation and canonical comparison with their
+separately downloaded pairs. Import accepted seven sessions, with three wiki
+maintenance candidates, 48 navigation events, 24 quality incidents, 16
+general captures, no classifier feedback, and no unresolved captures. Two
+bundles report `recovered` integrity and five `partial`; neither status is
+silently promoted to a complete event record.
+
+The six shared chats were read through their serialized first-to-last message
+paths because the rendered page hid earlier turns. They contain 91 actual
+user turns. The morning September 22 Dev bundle has no supplied share URL, so
+its two explicit saves and surrounding questions remain bundle-backed: _Jev's
+Architecture Unmasked_ and _Markdown in /src_. The former discussion asked
+whether Jev's probabilities reflect a distinct decision path and how to test
+calibration, option order, and question isolation before workplace use; the
+source's sparse-backbone explanation remains a hypothesis. The latter
+compared durable, co-located Markdown intent with spec-driven processes such
+as Spec Kit and OpenSpec. Brad explicitly asked to retain the discussion with
+both saves. The same bundle records that a proposed Gortex save was withdrawn;
+item 8 was not published. It also retains a requested clickable URL for the
+Linear CI article for manual Slack sharing; no Slack message was authorized.
+The September 24 Dev chat supplies the third explicit save, _Building Tools
+for AI Agents_, with a request for author, publication, and full-source
+takeaways. The Arize source was checked separately because the commute
+assistant's claimed source lookup was not independent proof.
+
+Across the six chats, Voice repeatedly broke the exact v4 `sweep_playback`
+and `item_playback` contract despite valid source pairs. The September 22 AI
+session stopped its sweep after two of nine, substituted a different model
+name in item 1, repeated item 3 on `next`, and replaced item 4 with an
+unrelated summary. The September 23 General, Dev, and AI sessions had
+shortened or paraphrased playback and needed export retries or a missing-link
+correction. The September 24 General sweep stopped after its first headline.
+In the September 24 Dev session, the assistant admitted paraphrasing item 2;
+Brad also reported item 4 was not spoken and requested its exact reread.
+Several assistants announced commute completion before producing a visible
+download. These are playback and export incidents, not evidence for
+classifier labels or another wording-only prompt revision. No live Project
+prompt or source document changed in this result.
+
+The bounded SafariDriver qualification used `gpt-6-sol` at low effort. This
+task started at 22:50:50 UTC with five-hour and weekly meters at 0% and 47%
+used. The driver opened an isolated signed-out Safari tab; Brad signed in to
+that process, after which authenticated Library controls were verified at
+22:54 UTC. Bundle retrieval reached a 22:56 UTC checkpoint; queue/reference
+retrieval reached 23:03 UTC; full shared-chat recovery and source review were
+underway at 23:13 UTC; seven-session import finished at 23:15 UTC. Account-wide
+usage at those checkpoints was 3%/48%, 7%/49%, 15%/50%, and 18%/50%,
+respectively. The first available rollout counter near start was 31,187 total
+tokens (14,336 cached input, 219 output); near the bundle checkpoint it was
+1,167,810 total (1,117,056 cached input, 2,702 output); near the pair
+checkpoint 3,738,661 total (3,658,112 cached input, 7,367 output); near the
+chat/source checkpoint 8,498,522 total (8,354,432 cached input, 17,485
+output); and near import 10,116,058 total (9,927,040 cached input, 19,606
+output). Output includes reasoning tokens. These are cumulative traffic
+counters, largely cached input, and meter changes are account-wide rather than
+a per-task bill. The private ledger records exact sampling timestamps,
+retrieval retries, human sign-in waiting, publication, cleanup, and final
+handoff once those phases finish.

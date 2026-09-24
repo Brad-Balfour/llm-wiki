@@ -7,10 +7,10 @@ aliases: ["System One Models", "Jev"]
 tags: ["ai-agents", "structured-output", "decision-making", "workflow-design"]
 wiki_slug: structured-decision-models
 created: 2026-09-16
-updated: 2026-09-16
+updated: 2026-09-24
 confidence: medium
 # prettier-ignore
-provenance: [{"source_item_id":"1a0aa73e4e492655-02","url":"https://typesafe.ai/blog/introducing-system-one-models-and-jev"}]
+provenance: [{"source_item_id":"1a0aa73e4e492655-02","url":"https://typesafe.ai/blog/introducing-system-one-models-and-jev"},{"source_item_id":"20260922-tldr-dev:dev-01","url":"https://archerhume.com/posts/jevs-architecture-unmasked"}]
 ---
 
 # Structured Decision Models
@@ -45,6 +45,21 @@ Brad also asked about direct use during Live Voice. This source does not prove
 a working ChatGPT Voice plugin or tool integration. That is a separate
 feasibility question from post-commute use through an API or local workflow.
 
+The September 23–24 Dev discussion examined whether Jev is a distinct decision
+model or an LLM merely returning numbers, and how a team should first test it.
+The saved follow-up essay reports black-box API probes, including question
+isolation, shared-context behavior, option-order sensitivity, and probabilities
+read without ordinary token-by-token text generation. These observations do not
+reveal the implementation uniquely. In particular, its proposed sparse
+mixture-of-experts backbone is an inference, not a verified design.
+
+For a first workplace trial, the discussion suggested a small labeled set from
+one real decision workflow. Check calibration against outcomes, permute answer
+order, and test whether sibling questions can influence one another. Compare
+error, latency, and cost with the existing path before applying score
+thresholds. This is an evaluation plan, not a conclusion that Jev is suitable
+for the commute workflow.
+
 ## Source Notes
 
 ### [Introducing System One Models & Jev](https://typesafe.ai/blog/introducing-system-one-models-and-jev)
@@ -54,6 +69,15 @@ feasibility question from post-commute use through an API or local workflow.
 Diogo Almeida, TypeSafe AI. Explicitly saved during the September 16 AI
 commute with a request to retain the surrounding pricing, deployment, and
 LLM-Wiki-Car integration discussion.
+
+### [Jev's Architecture Unmasked](https://archerhume.com/posts/jevs-architecture-unmasked)
+
+<!-- source-item-id: 20260922-tldr-dev:dev-01 -->
+
+Archer Hume, 2026-09-17. Explicitly saved during the September 23–24 Dev
+commute with a request to retain the discussion and first-use cautions. The
+essay separates API observations from architectural hypotheses; the source
+does not prove Jev's internal model family or training recipe.
 
 ## Related
 
