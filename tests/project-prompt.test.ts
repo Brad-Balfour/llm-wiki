@@ -9,32 +9,35 @@ test('ChatGPT Project instructions fit the 8,000-character limit', async () => {
   assert.ok(characterCount <= 8_000, `Project prompt has ${characterCount} characters`);
 });
 
-test('ChatGPT Project instructions say exactly how to read the queue JSON', async () => {
+test('ChatGPT Project instructions route playback through the Python Project source', async () => {
   const prompt = await readFile('chatgpt-project/CHATGPT_CAR_QUEUE_PROMPT.md', 'utf8');
 
-  assert.match(prompt, /Prompt 5\.0 Candidate for Queue v4/);
-  assert.match(prompt, /The main file will contain/);
-  assert.match(prompt, /a top-level `sweep_playback` string/);
-  assert.match(prompt, /an `items` array whose objects each contain an `item_playback` string/);
-  assert.match(prompt, /read the complete\s+value of `sweep_playback` exactly as written/);
-  assert.match(
-    prompt,
-    /Find the requested object in the `items` array and read the value of\s+its `item_playback` field out loud exactly as written/
-  );
-  assert.match(prompt, /Do not add, remove, rewrite, explain, or summarize any of the text/);
-  assert.match(prompt, /After reading an item, pause and wait/);
+  assert.match(prompt, /Prompt 5\.1 Candidate for Queue v4/);
+  assert.match(prompt, /Project source `voice-playback\.py`/);
+  assert.match(prompt, /Load the Project source `voice-playback\.py` into the code tool/);
+  assert.match(prompt, /select_playback\(main, action, current_position, target_position\)/);
+  assert.match(prompt, /begin, next, previous, repeat, or a numbered jump/);
+  assert.match(prompt, /Speak the complete string\s+the function returns, unchanged/);
   assert.match(prompt, /After reading the final item, say\s+`Finished <filename>\.`/);
-  assert.match(prompt, /open the matching `-reference\.txt` file/);
-  assert.match(prompt, /original-description request reads the complete\s+literal `description`/);
+  assert.match(prompt, /do not require another `next`/);
+  assert.match(prompt, /When Brad wants to discuss an article, answer normally/);
+  assert.match(prompt, /Discussion does not change it/);
 });
 
-test('ChatGPT Project instructions reopen the same queue before every item', async () => {
+test('ChatGPT Project instructions reopen the exact file and defer reference access', async () => {
   const prompt = await readFile('chatgpt-project/CHATGPT_CAR_QUEUE_PROMPT.md', 'utf8');
 
-  assert.match(prompt, /When Brad asks you to read an item, reopen the same main queue file/);
-  assert.match(prompt, /Do this every time Brad\s+asks for another item/);
-  assert.match(prompt, /whenever he returns to the queue after discussing an\s+article/);
-  assert.match(prompt, /Do\s+not switch to another queue file/);
+  assert.match(prompt, /YYYYMMDD-tldr-dev\.txt/);
+  assert.match(prompt, /YYYYMMDD-tldr-ai\.txt/);
+  assert.match(prompt, /YYYYMMDD-tldr-fintech\.txt/);
+  assert.match(prompt, /reopen the same main file in the\s+Project Library/);
+  assert.match(prompt, /including after discussing an article/);
+  assert.match(prompt, /If the code\s+session resets, reload the Python source/);
+  assert.match(prompt, /open the matching `-reference\.txt` file/);
+  assert.match(prompt, /original-description request, read the complete literal\s+`description`/);
+  assert.match(prompt, /Do not load the reference to start a queue or for ordinary\s+playback/);
+  assert.match(prompt, /At\s+export, open the matching reference if needed/);
+  assert.doesNotMatch(prompt, /main_sha256|Verify that its/);
 });
 
 test('session-export contains the note and bundle instructions removed from the main prompt', async () => {
@@ -150,10 +153,9 @@ test('v4 candidate reconciles repeated coverage across all daily editions', asyn
 });
 
 test('v4 candidate prepares literal context for unclear headlines', async () => {
-  const [generation, task, voice, schema] = await Promise.all([
+  const [generation, task, schema] = await Promise.all([
     readFile('chatgpt-project/queue-generation-v4.md', 'utf8'),
     readFile('chatgpt-project/WEEKDAY_TLDR_QUEUE_TASK_PROMPT_V4.md', 'utf8'),
-    readFile('chatgpt-project/CHATGPT_CAR_QUEUE_PROMPT.md', 'utf8'),
     readFile('schema/tldr-commute-reference-v4.schema.json', 'utf8'),
   ]);
 
@@ -169,8 +171,6 @@ test('v4 candidate prepares literal context for unclear headlines', async () => 
   );
   assert.match(generation, /complete excerpt sentence/);
   assert.match(task, /classification labels unchanged by this presentation step/);
-  assert.match(voice, /literal context excerpt or an update prefix/);
-  assert.match(voice, /without changing the announced depth label/);
   assert.match(schema, /"playback_context"/);
   assert.match(schema, /"unusually_long_excerpt"/);
   assert.ok(schema.includes('"pattern": "[.!?]'));

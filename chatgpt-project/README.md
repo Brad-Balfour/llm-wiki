@@ -25,7 +25,7 @@ not change the live Project automatically.
 ## Classifier v2 candidate (not installed)
 
 The review stack prepares Queue v4, generation-instruction and weekday Task
-revisions 4.1, and Prompt 5.0 without changing the live Project. After the full
+revisions 4.1, and Prompt 5.1 without changing the live Project. After the full
 stack is approved, replace the Project Instructions with
 `CHATGPT_CAR_QUEUE_PROMPT.md`; replace `queue-generation-v3.md` and the v3 queue
 schema with `queue-generation-v4.md` revision 4.1,
@@ -38,6 +38,26 @@ the candidate classifier/profile replacements: `interest-profile.md` version
 2.1 and `classifier-instructions.md` version `classifier-instructions.v2`. Keep
 the Task's weekday 11 a.m. America/New_York schedule and all unrelated working
 Project sources.
+
+Prompt 5.1 is a draft playback experiment for #100/#153. Alongside the v4
+playback files and `session-export.md`, add `chatgpt-project/voice-playback.py` to Project
+Sources, then replace Project Instructions with the exact tracked
+`CHATGPT_CAR_QUEUE_PROMPT.md`. The Project source is Python code for the code
+tool to load and run; retrieval of a source file alone does not execute it.
+Test on iPhone Live that the code tool can read the complete source and exact
+playback file, reopen that same file for each playback command, return the
+selected string for begin, next, previous, repeat, and a numbered jump, and
+speak that string without changing it. Test a normal article discussion
+between playback turns and open the reference only for details or export. If any required file or the
+code tool is unavailable in Live, do not install Prompt 5.1 as the working
+playback procedure. The draft PR does not change the live Project. To roll
+back a later pilot from the non-Python v4 candidate, restore Prompt 5.0 from
+Git commit `b52d4f2` at `chatgpt-project/CHATGPT_CAR_QUEUE_PROMPT.md` and
+remove only `voice-playback.py` from Sources. If the pilot instead replaced
+live Prompt 4.2 directly, restore Prompt 4.2 from commit `6a505b9` and its
+matching v3 Project sources. Record the actual installed versions before any
+pilot so the rollback follows that exact starting state. Preserve unrelated
+Project files.
 
 Until Brad confirms those replacements, Queue v3, Prompt 4.2, profile 1.4,
 classifier instructions v1, and the v3 Task body remain the live versions.

@@ -32,8 +32,8 @@ routing rules v1 and session bundle v1. `chatgpt-project/README.md` records the
 installed Project sources. Confirm that record against available live evidence;
 do not claim a new file is installed merely because it is committed.
 
-**This release:** queue v4 uses a playback/reference pair; Voice Prompt 5.0 reads
-it; the candidate classifier instructions are v2 and the calibrated profile is
+**This release:** queue v4 uses a playback/reference pair; Voice Prompt 5.1 reads
+the main file through the `voice-playback.py` Project source; the candidate classifier instructions are v2 and the calibrated profile is
 2.1. Routing thresholds remain unchanged. Keep session bundle v1’s outer fields
 and accept a v4 snapshot as described below. Retain old v2/v3 readers and files.
 These are planned version labels, not claims about the current Project.
@@ -339,7 +339,8 @@ artifact files or unrelated Project sources.
 
 | Destination                | Exact replacement                                                                                                                         |
 | -------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
-| Project Instructions field | Contents of `chatgpt-project/CHATGPT_CAR_QUEUE_PROMPT.md` for Prompt 5.0                                                                  |
+| Project Instructions field | Contents of `chatgpt-project/CHATGPT_CAR_QUEUE_PROMPT.md` for Prompt 5.1                                                                  |
+| Project Sources            | Add `chatgpt-project/voice-playback.py` for Prompt 5.1                                                                                    |
 | Project Sources            | Replace `queue-generation-v3.md` with `queue-generation-v4.md` revision 4.1; replace the active queue-v3 schema with both v4 schema files |
 | Project Sources            | Replace `session-export.md` and `commute-session-bundle-v1.schema.json` with the compatible versions from PR 1                            |
 | Project Sources            | Replace `classifier-instructions.md` and `interest-profile.md` with the accepted candidate versions                                       |
