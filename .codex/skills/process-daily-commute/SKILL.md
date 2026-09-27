@@ -48,6 +48,10 @@ identifies ambiguity.
 Routine generated state updates need
 at most one required latest-head review. Code, schema, routing, prompt, or
 workflow behavior changes need one latest-head review after local checks.
+Wait for the required Codex review to complete. Triage every Codex and other
+inline comment; fix valid findings in the PR, reply with the fix and evidence,
+and resolve the thread. Explain a declined finding in its thread. Refresh
+reviews and unresolved threads immediately before any authorized merge.
 
 Batch findings from one review round into one fix commit. Request another full
 review only when a fix materially changes behavior or invalidates the prior
@@ -101,7 +105,12 @@ all results against the canonical intake before publishing.
 
 When Brad names a commute date or says "today's commute," treat missing file
 attachments as a retrieval task, not a reason to ask him to download and attach
-the artifacts. Use the signed-in ChatGPT web Library before requesting files:
+the artifacts. First use exact original files already present in the private
+intake or available as explicit ChatGPT chat attachments through `read_thread`,
+when their provenance and contents can be validated. A generated
+`sandbox:/mnt/data/` link in a chat is not itself a local attachment. Do not
+search unrelated chats or local folders hoping for a hidden Project mount. For
+files only in ChatGPT Library or Project Sources, use the signed-in UI:
 
 Use SafariDriver MCP for authenticated ChatGPT main-Library and Project
 Library/Sources access, including necessary Project updates and exact cleanup.

@@ -157,6 +157,10 @@ general-purpose review rounds.
   requires it.
 - Code, schema, routing, prompt, workflow, or other behavior changes receive
   one review of the latest complete head after local checks.
+- Wait for required Codex review to complete. Triage every Codex and other
+  inline comment; fix valid findings, reply with evidence, and resolve those
+  threads. Explain declined findings in their threads. Refresh the comments
+  immediately before any authorized merge.
 - Changes to agent instructions or commute policy also require Brad's review
   before merge. A recurring commute request alone does not authorize merging
   those policy changes.
@@ -200,6 +204,9 @@ Use direct web retrieval for public article URLs. Use signed-in SafariDriver
 MCP for ChatGPT main-Library and Project Library/Sources retrieval, updates,
 and exact cleanup when live access is needed. Local repository copies are not
 a live Project Library mount; no direct Project file API has been established.
+Exact original files already in private local intake or explicitly attached to
+a ChatGPT chat can be read directly when provenance and contents validate;
+generated `sandbox:/mnt/data/` links alone do not provide Codex file access.
 Do not open public articles in SafariDriver for ordinary source reading.
 If SafariDriver MCP appears unavailable for main-Library retrieval, check its
 availability once more; if it is still unavailable or unhealthy, ask Brad
