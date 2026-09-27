@@ -14,25 +14,21 @@ test('ChatGPT Project instructions route playback through the Python Project sou
 
   assert.match(prompt, /Prompt 5\.1 Candidate for Queue v4/);
   assert.match(prompt, /Project source `voice-playback\.py`/);
-  assert.match(prompt, /complete Python\s+source into the code tool/);
-  assert.match(prompt, /select_playback\(main, reference, filename, action, current_position,/);
-  assert.match(prompt, /begin, next, previous, repeat, or a requested item number/);
-  assert.match(prompt, /Speak only the\s+returned string, complete and unchanged/);
-  assert.match(prompt, /If the function raises an\s+error, report it and stop playback/);
-  assert.match(prompt, /When Brad asks to discuss an article, answer normally/);
-  assert.match(prompt, /Discussion does not change it/);
+  assert.match(prompt, /Python source into the code\s+tool once for this queue/);
+  assert.match(prompt, /select_playback\(main, action, current_position, target_position\)/);
+  assert.match(prompt, /begin, next, previous, repeat, or a numbered jump/);
+  assert.match(prompt, /Speak only the string the function returns, complete and unchanged/);
+  assert.match(prompt, /When Brad wants to discuss an article, answer normally/);
+  assert.match(prompt, /Discussion does not change the\s+position/);
 });
 
-test('ChatGPT Project instructions rebind the exact queue for every playback command', async () => {
+test('ChatGPT Project instructions keep playback lean and open reference only for details', async () => {
   const prompt = await readFile('chatgpt-project/CHATGPT_CAR_QUEUE_PROMPT.md', 'utf8');
 
-  assert.match(prompt, /playback file and its matching `-reference\.txt` file/);
-  assert.match(
-    prompt,
-    /Reopen the same exact pair and call the function again for every\s+playback command/
-  );
-  assert.match(prompt, /including after a discussion/);
-  assert.match(prompt, /Never substitute a nearby\s+date or newsletter/);
+  assert.match(prompt, /If the code session resets, reload them/);
+  assert.match(prompt, /Never substitute another queue or speak from memory/);
+  assert.match(prompt, /open the matching `-reference\.txt` file then/);
+  assert.match(prompt, /this file is not needed for playback/);
 });
 
 test('session-export contains the note and bundle instructions removed from the main prompt', async () => {

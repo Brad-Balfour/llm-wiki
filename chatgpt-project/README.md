@@ -39,19 +39,19 @@ the candidate classifier/profile replacements: `interest-profile.md` version
 the Task's weekday 11 a.m. America/New_York schedule and all unrelated working
 Project sources.
 
-Prompt 5.1 is a draft playback experiment for #100/#153. Alongside the v4 pair
-and `session-export.md`, add `chatgpt-project/voice-playback.py` to Project
+Prompt 5.1 is a draft playback experiment for #100/#153. Alongside the v4
+playback files and `session-export.md`, add `chatgpt-project/voice-playback.py` to Project
 Sources, then replace Project Instructions with the exact tracked
 `CHATGPT_CAR_QUEUE_PROMPT.md`. The Project source is Python code for the code
 tool to load and run; retrieval of a source file alone does not execute it.
 Test on iPhone Live that the code tool can read the complete source and exact
-playback/reference pair, return the selected string for begin, next, previous,
+playback file, return the selected string for begin, next, previous,
 repeat, and a numbered jump, and speak that string without changing it. Test a
 normal article discussion between playback turns. If any required file or the
 code tool is unavailable in Live, do not install Prompt 5.1 as the working
 playback procedure. The draft PR does not change the live Project. To roll
 back a later pilot, restore the previously verified Project Instructions and
-remove only `voice-playback.py` from Sources; keep the v4 pair, export source,
+remove only `voice-playback.py` from Sources; keep the v4 files, export source,
 and unrelated Project files.
 
 Until Brad confirms those replacements, Queue v3, Prompt 4.2, profile 1.4,
