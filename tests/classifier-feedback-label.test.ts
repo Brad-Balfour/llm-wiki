@@ -43,7 +43,7 @@ test('binds v4 corrections using producer versions from the reference root', asy
   const mainFilename = input.queue_filename;
   const mode = input.original.consumption_depth === 'in_depth' ? 'In depth' : 'Headline only';
   const prefix = `1 of 1. ${mode}. ${input.title}`;
-  const description = 'Sanitized fixture description.';
+  const description = 'Example fixture description.';
   const main = {
     sweep_playback: prefix,
     items: [
@@ -57,7 +57,7 @@ test('binds v4 corrections using producer versions from the reference root', asy
     queue_version: 'tldr-commute-queue.v4',
     main_filename: mainFilename,
     main_sha256: playbackFileFingerprint(main),
-    newsletter: 'Sanitized Fixture',
+    newsletter: 'Example Fixture',
     edition_date: '2026-07-01',
     source_email: {
       gmail_message_id: 'fixture-message',
@@ -91,7 +91,7 @@ test('binds v4 corrections using producer versions from the reference root', asy
         source_occurrences: [
           {
             occurrence_id: `fixture-${input.source_item_id}`,
-            newsletter: 'Sanitized Fixture',
+            newsletter: 'Example Fixture',
             source_item_id: input.source_item_id,
             source_order: 1,
             title: input.title,
@@ -117,8 +117,8 @@ test('binds v4 corrections using producer versions from the reference root', asy
         consumption_depth: input.original.consumption_depth,
         depth_score: input.original.depth_score,
         commute_behavior: input.original.route,
-        signals: ['sanitized_fixture'],
-        reason: 'Sanitized original classifier reason.',
+        signals: ['example_fixture'],
+        reason: 'Example original classifier reason.',
         classified_at: '2026-07-01T11:00:00Z',
         routed_at: '2026-07-01T11:00:01Z',
       },
@@ -356,15 +356,15 @@ function queueInput(inputs: ClassifierFeedbackLabelInput[]): { filename: string;
   const items = inputs.map((input, index) => ({
     source_item_id: input.source_item_id,
     title: input.title,
-    summary: 'Sanitized fixture summary.',
+    summary: 'Example fixture summary.',
     url: input.url,
     interest_level: input.original.interest_level,
     interest_score: input.original.interest_score,
     consumption_depth: input.original.consumption_depth,
     depth_score: input.original.depth_score,
     commute_behavior: input.original.route,
-    signals: ['sanitized_fixture'],
-    reason: 'Sanitized original classifier reason.',
+    signals: ['example_fixture'],
+    reason: 'Example original classifier reason.',
     profile_version: input.profile_version,
     prompt_version: input.prompt_version,
     provider: input.provider,
@@ -383,7 +383,7 @@ function queueInput(inputs: ClassifierFeedbackLabelInput[]): { filename: string;
     filename: queueFilename,
     text: JSON.stringify({
       queue_version: 'tldr-commute-queue.v2',
-      newsletter: 'Sanitized Fixture',
+      newsletter: 'Example Fixture',
       edition_date: '2026-07-01',
       source_email: {
         gmail_message_id: 'fixture-message',

@@ -11,7 +11,9 @@ or other downstream behavior.
 
 ## Input
 
-The classifier receives sanitized item metadata only:
+The classifier receives only the parsed editorial-item fields listed below, not
+the full newsletter body or Gmail delivery metadata. This field-selection
+contract does not redact public source facts:
 
 - `classifier_item_id`
 - `source_item_id`

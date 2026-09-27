@@ -11,7 +11,7 @@ commute, wiki, stream-log, review, or discard fields.
 
 Routing code may use:
 
-- Sanitized parsed item metadata.
+- The selected, parsed editorial-item fields defined by the parser contract.
 - Validated classifier fields: `interest_level`, `interest_score`,
   `consumption_depth`, `depth_score`, `signals`, and `reason`.
 - Application metadata: `profile_version`, `prompt_version`, `provider`, `model`,
@@ -110,8 +110,9 @@ Send items to review when:
   or ambiguous or unbound wiki publication. An exact item-bound `wiki this`
   capture becomes a maintenance candidate instead of a review record.
 
-Review records should preserve enough sanitized context for manual inspection and
-include parser, classifier, and routing metadata.
+Review records should preserve the relevant parsed item context needed for
+manual inspection and include parser, classifier, and routing metadata. This is
+a field-selection boundary, not a redaction pass over public source text.
 
 ## Discard
 
@@ -130,9 +131,10 @@ Default stream-log candidates:
 - `interested/headline_only`
 - reviewed `maybe/headline_only`
 
-Stream-log entries must be sanitized item-level metadata only. Do not include raw
-Gmail body text, wrapper text, subscription text, credentials, private notes, or
-unreviewed sensitive content.
+Stream-log entries contain parsed item-level metadata only. Do not include full
+Gmail body or delivery-wrapper text, subscription boilerplate, credentials,
+private notes, or unreviewed sensitive content. Public article facts do not need
+redaction because they arrived through email.
 
 ## Audit Metadata
 
