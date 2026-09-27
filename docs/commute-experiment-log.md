@@ -117,6 +117,12 @@ found a queue as proof.
   22 Dev bundle has no supplied share URL; its detailed saves and discussion
   are bundle-backed. Original downloads, hashes, strict validation, the
   serialized conversation coverage, and the retrieval manifest are private.
+- Three September 25 commute bundles, their three declared v4 playback /
+  reference pairs (including the September 24 AI pair), a supporting September
+  24 Fintech pair matched to one supplied share, and four complete shared-chat
+  traversals. Strict bundle/pair validation, SHA-256 hashes, serialized chat
+  captures, a source-page capture retrieved with SafariDriver, and the
+  conversation-coverage and performance ledgers are retained privately.
 - The live `Weekday TLDR Queues` Task conversation/configuration, the July
   21-24 Task Update emails, the July 24 manual queue-generation control, and
   the live Project settings/sources inspected on July 26.
@@ -2446,3 +2452,46 @@ counters, largely cached input, and meter changes are account-wide rather than
 a per-task bill. The private ledger records exact sampling timestamps,
 retrieval retries, human sign-in waiting, publication, cleanup, and final
 handoff once those phases finish.
+
+### September 25 Three-Session Commute and SafariDriver Qualification
+
+SafariDriver's signed-in `LLM-Wiki-Car` Library List View supplied three
+session bundles. Their exact declared pairs were the September 25 Dev and
+General queues and the September 24 AI queue. All three pairs passed strict v4
+validation; all three bundles passed strict validation with queue snapshots
+matching the separately downloaded canonical files. A combined validation
+attempt across source dates was rejected by the daily-pair invariant and
+rerun as separate date sets. The importer accepted three sessions: one
+maintenance candidate, one exact `promote_to_in_depth` correction for General
+item 1, eight quality incidents, four general captures, and no unresolved
+items. The correction remains classifier feedback; no depth label was inferred
+from a negative article opinion.
+
+Four complete shared chats were recovered through SafariDriver. The Dev chat
+contains the exact save of Julie Zhuo's personal-AI essay with its discussion
+and request to preserve the original URL. SafariDriver retrieved the Medium
+article after the local source fetcher hit DNS `ENOTFOUND`; no queue summary
+substituted for the article. The General chat explicitly promoted the Waymo
+article to in-depth. The supplied Fintech chat matched item 3 of the separately
+downloaded September 24 Fintech queue; it had no matching bundle in this
+intake. The AI and Dev conversations also confirm queue-bound playback,
+interrupted reads, unrelated substitute content, premature completion, and
+export-link friction. These observations route to existing issue #100 and do
+not create new classifier labels. The one saved article is recorded in
+`wiki/concepts/personal-ai-consumer-product-design.md`.
+
+This qualification began at 2026-09-27 02:47:52 UTC with five-hour / weekly
+account meters at 2% / 0% used. At 03:21:51 UTC they were 9% / 1% used. The
+account-wide change is +7 and +1 percentage points, not a per-task bill. The
+known 57-second sign-in wait is excluded from active-time measurement. Timed
+phase observations include 1:59 for bundle inventory/download, 2:30 for the
+six declared queue/reference downloads, 0:58 for validation/import, and 10:14
+for the first complete four-chat audit. A later exact Fintech pair and article
+source check took about 6:07. The local maintainer HTTP attempt returned
+`ENOTFOUND` in 0:13 and stopped before agent launch. The SafariDriver-recovered
+maintainer was launched explicitly as `gpt-6-luna` at medium reasoning; its
+available run counter reported 66,557 tokens. That count covers only this
+source-to-wiki-maintenance run, not the root task or all browser interactions.
+No rollout counter was available for the root task or other phases, and none
+was reconstructed by reopening a long history. The private ledger also records
+the approximate Safari-call count and retrieval retry.
