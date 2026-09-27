@@ -14,10 +14,7 @@ test('daily commute skill defines the SafariDriver authentication and reconnect 
     normalized,
     /Use SafariDriver MCP for authenticated ChatGPT main-Library and Project Library\/Sources access/i
   );
-  assert.match(
-    normalized,
-    /Use direct web retrieval for public articles and shared chats first/i
-  );
+  assert.match(normalized, /Use direct web retrieval for public articles and shared chats first/i);
   assert.match(normalized, /no direct Project file API has been established/i);
   assert.match(normalized, /use signed-in SafariDriver to apply the verified version/i);
   assert.match(normalized, /call the web retrieval tool directly with that URL/i);
@@ -87,14 +84,14 @@ test('daily commute skill preserves detailed diagnostics and exact Safari cleanu
   const normalized = skill.replace(/\s+/g, ' ');
 
   assert.match(normalized, /compact private timeline for #151 and #155/i);
-  assert.match(normalized, /separate rows for authentication, each Library inventory\/download group/i);
+  assert.match(
+    normalized,
+    /separate rows for authentication, each Library inventory\/download group/i
+  );
   assert.match(normalized, /do not leave an unexplained residual/i);
   assert.match(normalized, /detailed, evidence-backed findings/i);
   assert.match(normalized, /timing, errors, and available token or usage evidence/i);
-  assert.match(
-    normalized,
-    /Exclude nonpublic personal identifying information about any person/i
-  );
+  assert.match(normalized, /Exclude nonpublic personal identifying information about any person/i);
   assert.match(normalized, /main ChatGPT Library independently in List View/i);
   assert.match(normalized, /Use each exact row's three-dot menu/i);
   assert.match(normalized, /Use signed-in SafariDriver for Project Library\/Sources cleanup/i);
@@ -121,7 +118,10 @@ test('daily commute workflow does not ask for repeat authorization', async () =>
   const normalizedAgents = agents.replace(/\s+/g, ' ');
 
   assert.match(normalized, /workflow authorizes merging its qualifying content PR/i);
-  assert.match(normalized, /Changes to agent instructions or commute policy require Brad's review before merge/i);
+  assert.match(
+    normalized,
+    /Changes to agent instructions or commute policy require Brad's review before merge/i
+  );
   assert.match(normalized, /Do not pause for or request another confirmation/i);
   assert.doesNotMatch(normalized, /Merge only with explicit user authorization/i);
   assert.doesNotMatch(normalized, /until Brad confirms it was applied/i);
