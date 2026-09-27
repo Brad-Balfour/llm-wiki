@@ -49,6 +49,8 @@ class VoicePlaybackTest(unittest.TestCase):
         with self.assertRaises(ValueError):
             module.select_playback(self.main, "jump", 0, 3)
         with self.assertRaises(ValueError):
+            module.select_playback(self.main, "jump", 0, 0)
+        with self.assertRaises(ValueError):
             module.select_playback(self.main, "next", 3)
         with self.assertRaises(ValueError):
             module.select_playback(self.main, "unknown")

@@ -13,6 +13,8 @@ def select_playback(main, action, current_position=0, target_position=None):
         position = max(0, current_position - 1)
     elif action == "jump":
         position = target_position
+        if type(position) is not int or not 1 <= position <= len(items):
+            raise ValueError("position outside queue")
     else:
         raise ValueError("unknown playback action")
 
