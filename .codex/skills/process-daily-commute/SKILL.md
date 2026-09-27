@@ -56,17 +56,56 @@ narrate routine tool calls, or repeat unchanged polling state.
 
 ## Retrieve Library intake
 
+### Public article and shared-chat URLs
+
+For every supplied public article URL that may support a wiki entry, call the
+web retrieval tool directly with that URL and use its retrieved page as source
+evidence. Do not search for the article first, open Safari, or use SafariDriver
+for public-source reading. This should be one quick retrieval per independent
+URL; if it fails, try one reasonable direct fetch retry and then report the
+specific inaccessible source. Do not turn public-source retrieval into a browser
+workflow.
+
+Shared-chat URLs are not part of routine intake auditing. Rely on validated
+queue and session-bundle evidence unless a bundle is missing or malformed, an
+item action or claim conflicts with the canonical queue, a specific material
+fact is ambiguous, or Brad asks for the audit. When one of those conditions
+applies, first try a direct web read of the exact shared URL and inspect only the
+relevant passage plus enough surrounding context to resolve the question. Never
+use SafariDriver for shared chats. If web retrieval fails, record the bounded
+unresolved question; do not perform a full chat audit by default.
+
+### Delegation and context
+
+Use Codex collaborator subagents for independent source reading, duplicate and
+cross-link review, issue discovery, and bounded analysis when that work can run
+in parallel. Send each agent only the exact URL, item, or question it needs;
+ask it to return concise evidence, conclusions, and file/line references rather
+than copied source text or full tool output. Keep authenticated Library
+acquisition, canonical intake validation, final cross-source reconciliation,
+shared-file editing, publication, and cleanup under one owner. Do not launch a
+nested `codex exec` maintainer process and call it a subagent: it has a separate
+CLI task context, but its large result still returns to the parent. Give editing
+agents isolated worktrees and non-overlapping file ownership; the parent checks
+all results against the canonical intake before publishing.
+
 When Brad names a commute date or says "today's commute," treat missing file
 attachments as a retrieval task, not a reason to ask him to download and attach
 the artifacts. Use the signed-in ChatGPT web Library before requesting files:
 
-Always use SafariDriver MCP for Library acquisition. If it appears unavailable,
+Use SafariDriver MCP only for signed-in ChatGPT main-Library acquisition. It is
+not the tool for public article reads, shared chats, or Project Library/Sources
+access. For Project Library retrieval or cleanup, use the direct method
+established by Brad's separate investigation; if no method is established,
+report that limitation and leave that Project-specific work pending. Do not
+silently fall back to SafariDriver for Project access. If SafariDriver MCP
+appears unavailable,
 check its availability once more. If it is still unavailable or unhealthy, stop
 and ask Brad specifically to toggle the SafariDriver MCP off and on to restart
-it. Before any Library action, start with `list_tabs`. Switch to the candidate
-ChatGPT tab and prove authentication by
-successfully opening Library or the named Project and reading a signed-in-only
-control or content row; a ChatGPT URL in the tab inventory is not enough. An
+it. Before any main-Library action, start with `list_tabs`. Switch to the
+candidate ChatGPT tab and prove authentication by successfully opening the
+main Library and reading a signed-in-only control or content row; a ChatGPT URL
+in the tab inventory is not enough. An
 ordinary Safari window is not proof that SafariDriver controls an authenticated
 tab: the driver may launch a separate Safari process with isolated sign-in
 state. If the controlled tab shows the login page or no authenticated ChatGPT
@@ -77,12 +116,12 @@ inspect `list_tabs`, and repeat the signed-in-only page check before proceeding.
 Never promise that a new driver will attach to another Safari process or inherit
 its cookies.
 
-### SafariDriver MCP has no browser fallback
+### Signed-in main-Library access has no browser fallback
 
 Do not silently switch to integrated browser, computer-use, or ChatGPT Work
-tooling; report the exact missing condition. Normal public-source research may
-still use web retrieval, local validation may use the shell, and repository work
-may use Git and GitHub.
+tooling for signed-in main-Library retrieval; report the exact missing
+condition. Public source reading must use direct web retrieval. Local validation
+may use the shell, and repository work may use Git and GitHub.
 
 1. Resolve relative dates in `America/New_York` and form `YYYYMMDD`.
 2. Open the `LLM-Wiki-Car` folder in ChatGPT Library and switch to **List
@@ -173,13 +212,15 @@ only when the intended action or target genuinely cannot be determined.
    evidence and label commute-derived comparisons, implications, hypotheses,
    and preferences as synthesis or discussion context. Cross-check the finished
    wiki diff against the conversation-coverage ledger.
-2. Add detailed, evidence-backed, sanitized findings to the experiment log or
-   other canonical tracked memory. Include useful operational results, timing,
-   errors, and available token or usage evidence. Sanitize by excluding raw
-   chats, credentials, private intake, account identifiers, personal details,
-   and other genuinely private material; do not remove diagnostic detail merely
-   to call the record sanitized. Preserve
-   classifier and workflow annotations even when the malformed bundle omitted
+2. Add detailed, evidence-backed findings to the experiment log or other
+   canonical tracked memory. Include useful operational results, timing, errors,
+   and available token or usage evidence. For tracked/public records, retain
+   public source facts and operational details. Remove only Brad's PII,
+   credentials, and account identifiers from tracked records. Keep raw intake
+   in `.private/` and record concise findings with source references instead of
+   copying full transcripts. Do not redact public article or newsletter content
+   merely because it arrived by email. Preserve classifier and workflow annotations
+   even when the malformed bundle omitted
    them but the canonical queue and bounded conversation evidence establish
    them exactly.
 3. Search all open issues before creating a new destination. Route every
@@ -208,11 +249,11 @@ only when the intended action or target genuinely cannot be determined.
    upload; never leave Brad to infer it from the diff.
 2. When that ChatGPT Project update is required, identify the exact merged or
    review-ready prompt or every exact source file and Project destination. After
-   the qualifying PR merges, use SafariDriver MCP to apply the verified merged
-   version in the live Project UI and verify the resulting prompt or source
-   listing. Do not ask Brad to perform or confirm this synchronization. If the
-   UI cannot be changed after the required MCP availability re-check, report the
-   exact technical blocker rather than requesting permission. Update the
+   the qualifying PR merges, use the direct method established for Project
+   updates to apply the verified version in the live Project UI. Never use
+   SafariDriver for Project updates. Do not ask Brad to perform or confirm this
+   synchronization. If no direct method is established or the UI cannot be
+   changed, report the exact technical blocker. Update the
    repository's live-version record in the active PR or a focused follow-up.
 3. Run focused tests while iterating, then run `npm run check` and
    `git diff --check`. Update and validate every touched stable schema, prompt,
@@ -255,14 +296,13 @@ Do not pause for or request another confirmation.
    If the run has a justified no-change result and no PR, cleanup may begin only
    after the complete no-change handoff is recorded.
 2. Resolve cleanup targets from the private retrieval manifest and inventory
-   each Library location independently in List View. Use each exact row's
-   three-dot menu. For every exact queue, validated v4 reference, and
-   commute-session bundle consumed by the completed run, inspect both the main
-   ChatGPT Library and the `LLM-Wiki-Car` Project Library/Sources view. Delete
-   each exact validated matching transient row wherever it exists. A successful
-   deletion in one location does not establish deletion of its matching copy in
-   the other. Treat the Project Sources view as independent from the main
-   Library and preserve unrelated Project sources.
+   main ChatGPT Library independently in List View. Use each exact row's
+   three-dot menu. Delete each exact validated queue, v4 reference, and
+   commute-session bundle consumed by the completed run from that Library.
+   Project Library/Sources retrieval and cleanup must use the direct method
+   established by Brad's separate investigation; if none is established, leave
+   Project cleanup pending and report it. Do not use SafariDriver for Project
+   Library/Sources access. Preserve unrelated Project sources.
    Do not delete the Project Library folder itself, shared chats, Project source
    documents, schemas, prompts, unrelated dated artifacts, or a plausible row
    that was not validated into the final intake.
@@ -274,10 +314,11 @@ Do not pause for or request another confirmation.
 4. Keep the normalized `.private/` intake, coverage ledger, and retrieval
    manifest as the durable audit and recovery record. Library and Downloads are
    transient copies; `.private/` is not part of this cleanup request.
-5. Reopen and inventory the main Library and the `LLM-Wiki-Car` Project Sources
-   view after deletion. Verify that every targeted queue, validated v4 reference,
-   and bundle row is absent from both Library locations, every unrelated Project
-   source remains, and every targeted Downloads file is absent. Then append the
+5. Reopen and inventory the main Library after deletion. Verify that every
+   targeted queue, validated v4 reference, and bundle row is absent there and
+   every targeted Downloads file is absent. If an established direct Project
+   Library method is available, also verify Project copies and unrelated source
+   preservation. Then append the
    exact targets, deletion time, and per-location verification result to the
    private retrieval manifest. Report partial failures precisely and leave
    unmatched or ambiguous files untouched.

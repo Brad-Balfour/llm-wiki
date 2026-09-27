@@ -14,14 +14,14 @@ import type { ParsedTldrItem } from '../src/tldr/parser-contract.js';
 const execFileAsync = promisify(execFile);
 const EXTRACTED_AT = '2026-07-06T00:00:00.000Z';
 
-test('parser extracts sanitized non-sponsor editorial items with stable ids', async () => {
+test('parser extracts non-sponsor editorial items with stable ids', async () => {
   const body = await readFile(
-    resolve(process.cwd(), 'tests/fixtures/tldr/source-text/sanitized-real-shaped-tldr.txt'),
+    resolve(process.cwd(), 'tests/fixtures/tldr/source-text/newsletter-sample.txt'),
     'utf8'
   );
   const records = JSON.parse(
     await readFile(
-      resolve(process.cwd(), 'tests/fixtures/expected/parser/minimal-sanitized-tldr.json'),
+      resolve(process.cwd(), 'tests/fixtures/expected/parser/minimal-sample.json'),
       'utf8'
     )
   ) as ParsedTldrItem[];
@@ -141,10 +141,10 @@ test('parser skips sponsor copy that resembles a section heading within an item 
   );
 });
 
-test('file ingestion command writes sanitized item and review outputs', async () => {
+test('file ingestion command writes parsed item and review outputs', async () => {
   const records = JSON.parse(
     await readFile(
-      resolve(process.cwd(), 'tests/fixtures/expected/parser/minimal-sanitized-tldr.json'),
+      resolve(process.cwd(), 'tests/fixtures/expected/parser/minimal-sample.json'),
       'utf8'
     )
   ) as ParsedTldrItem[];
@@ -155,7 +155,7 @@ test('file ingestion command writes sanitized item and review outputs', async ()
   await execFileAsync(process.execPath, [
     resolve(process.cwd(), 'dist/src/tldr/ingest-file.js'),
     '--input',
-    resolve(process.cwd(), 'tests/fixtures/tldr/source-text/sanitized-real-shaped-tldr.txt'),
+    resolve(process.cwd(), 'tests/fixtures/tldr/source-text/newsletter-sample.txt'),
     '--output',
     outputPath,
     '--review-output',

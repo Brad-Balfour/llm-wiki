@@ -6,7 +6,7 @@
   },
   {
     "id": "whitespace-padded-queue-filename",
-    "change": { "queue_filename": " 20260701-sanitized-feedback.txt " },
+    "change": { "queue_filename": " 20260701-fixture-feedback.txt " },
     "error": "queue_filename must not have leading or trailing whitespace"
   },
   {

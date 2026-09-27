@@ -1,7 +1,7 @@
 [
   {
     "schema_version": "classifier-feedback-label.v1",
-    "queue_filename": "20260701-sanitized-feedback.txt",
+    "queue_filename": "20260701-fixture-feedback.txt",
     "source_item_id": "fixture-robotics-01",
     "title": "Practical Robotics Systems",
     "url": "https://example.com/practical-robotics",
@@ -30,7 +30,7 @@
   },
   {
     "schema_version": "classifier-feedback-label.v1",
-    "queue_filename": "20260701-sanitized-feedback.txt",
+    "queue_filename": "20260701-fixture-feedback.txt",
     "source_item_id": "fixture-service-02",
     "title": "A Proprietary Model Service",
     "url": "https://example.com/model-service",
