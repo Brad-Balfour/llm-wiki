@@ -1,0 +1,58 @@
+import hashlib
+import importlib.util
+import json
+import unittest
+from pathlib import Path
+
+
+SCRIPT = Path(__file__).resolve().parents[1] / "chatgpt-project" / "voice-playback.py"
+spec = importlib.util.spec_from_file_location("voice_playback", SCRIPT)
+module = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(module)
+
+
+class VoicePlaybackTest(unittest.TestCase):
+    def setUp(self):
+        self.main = {
+            "sweep_playback": "1 of 2. Headline only. First 2 of 2. In depth. Second",
+            "items": [
+                {"item_playback": "1 of 2. Headline only. First"},
+                {"item_playback": "2 of 2. In depth. Second Exact description."},
+            ],
+        }
+        canonical = json.dumps(self.main, ensure_ascii=False, separators=(",", ":"))
+        self.reference = {
+            "queue_version": "tldr-commute-queue.v4",
+            "main_filename": "20260925-tldr.txt",
+            "main_sha256": "sha256:" + hashlib.sha256(canonical.encode()).hexdigest(),
+            "total_items": 2,
+            "items": [{"position": 1}, {"position": 2}],
+        }
+
+    def test_selects_literal_sweep_and_explicit_position(self):
+        self.assertEqual(
+            module.select_playback(self.main, self.reference, "20260925-tldr.txt"),
+            self.main["sweep_playback"],
+        )
+        self.assertEqual(
+            module.select_playback(self.main, self.reference, "20260925-tldr.txt", 2),
+            self.main["items"][1]["item_playback"],
+        )
+
+    def test_rejects_wrong_file_hash_and_position(self):
+        for change in ("filename", "hash", "position"):
+            reference = json.loads(json.dumps(self.reference))
+            if change == "filename":
+                reference["main_filename"] = "other.txt"
+            elif change == "hash":
+                reference["main_sha256"] = "sha256:" + "0" * 64
+            else:
+                reference["items"][1]["position"] = 3
+            with self.subTest(change=change), self.assertRaises(ValueError):
+                module.select_playback(self.main, reference, "20260925-tldr.txt", 2)
+        with self.assertRaises(ValueError):
+            module.select_playback(self.main, self.reference, "20260925-tldr.txt", 3)
+
+
+if __name__ == "__main__":
+    unittest.main()
