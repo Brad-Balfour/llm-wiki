@@ -55,7 +55,7 @@ test('daily commute skill defines the SafariDriver authentication and reconnect 
     normalizedAgents,
     /Exclude nonpublic personal identifying information about any person/i
   );
-  assert.match(normalizedAgents, /public article facts or newsletter content/i);
+  assert.match(normalizedAgents, /public article facts and public newsletter content/i);
   assert.match(normalizedAgents, /Do not perform a routine full-chat audit/i);
   assert.match(
     normalizedAgents,

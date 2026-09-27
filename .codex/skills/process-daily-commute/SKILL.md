@@ -41,9 +41,10 @@ This is a bounded Safari workflow qualification, not a restart of #85 or #119.
 Follow the risk-tiered publication policy in `AGENTS.md`. Invoking this recurring
 workflow authorizes merging its qualifying content PR after the required gates
 pass and performing required live Project synchronization. Changes to agent
-instructions or commute policy require Brad's review before merge. Content-
-and evidence-only daily publication relies on deterministic gates and does not require a
-general-purpose AI review unless a gate or maintainer identifies ambiguity.
+instructions or commute policy require Brad's review before merge.
+Content- and evidence-only daily publication relies on deterministic gates and
+does not require a general-purpose AI review unless a gate or maintainer
+identifies ambiguity.
 Routine generated state updates need
 at most one required latest-head review. Code, schema, routing, prompt, or
 workflow behavior changes need one latest-head review after local checks.
