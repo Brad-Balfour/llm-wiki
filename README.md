@@ -48,8 +48,9 @@ npm run ingest:tldr -- --input path/to/tldr-body.txt --output /tmp/tldr-items.js
 
 Use `--input - --source gmail-manual --source-message-id <gmail-message-id>`
 when pasting or streaming a manually confirmed Gmail connector body. The command
-writes sanitized item-level JSON and review records; it does not persist raw
-email bodies.
+writes parsed item-level JSON and review records from the newsletter's editorial
+items. It does not persist the full email body or its delivery wrapper; this is
+input selection, not PII redaction.
 
 Validate and reconcile self-contained post-commute session bundles with the
 current commands documented in `chatgpt-project/README.md`.

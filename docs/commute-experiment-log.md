@@ -2048,7 +2048,7 @@ parsed candidate set before trusting a low `total_items` value.
 The surviving queue records are not sufficient to locate the first failed
 boundary. They omit rejected items and report profile, classifier-prompt, and
 route versions that do not match the committed source identifiers. A useful
-diagnostic run must retain a private sanitized sidecar containing every parsed
+diagnostic run must retain a private diagnostic sidecar containing every parsed
 candidate, its classifier output, validation status, and derived route. The
 July 28 omissions should then become a hand-annotated interest/depth coverage
 set so parser recall, classifier recall, and routing can be measured separately.
