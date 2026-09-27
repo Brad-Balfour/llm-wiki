@@ -10,25 +10,31 @@ test('daily commute skill defines the SafariDriver authentication and reconnect 
   const normalized = skill.replace(/\s+/g, ' ');
   const normalizedAgents = agents.replace(/\s+/g, ' ');
 
-  assert.match(normalized, /Use SafariDriver MCP only for signed-in ChatGPT main-Library acquisition/i);
-  assert.match(normalized, /not the tool for public article reads, shared chats, or Project Library\/Sources access/i);
+  assert.match(
+    normalized,
+    /Use SafariDriver MCP only for signed-in ChatGPT main-Library acquisition/i
+  );
+  assert.match(
+    normalized,
+    /not the tool for public article reads, shared chats, or Project Library\/Sources access/i
+  );
   assert.match(normalized, /Do not silently fall back to SafariDriver for Project access/i);
   assert.match(normalized, /Never use SafariDriver for Project updates/i);
   assert.match(normalized, /call the web retrieval tool directly with that URL/i);
   assert.match(normalized, /Shared-chat URLs are not part of routine intake auditing/i);
   assert.match(normalized, /inspect only the relevant passage plus enough surrounding context/i);
   assert.match(normalized, /Use Codex collaborator subagents for independent source reading/i);
-  assert.match(normalized, /Do not launch a nested `codex exec` maintainer process and call it a subagent/i);
+  assert.match(
+    normalized,
+    /Do not launch a nested `codex exec` maintainer process and call it a subagent/i
+  );
   assert.match(normalized, /check its availability once more/i);
   assert.match(
     normalized,
     /ask Brad specifically to toggle the SafariDriver MCP off and on to restart it/i
   );
   assert.match(normalized, /Before any main-Library action, start with `list_tabs`/i);
-  assert.match(
-    normalized,
-    /prove authentication by successfully opening the main Library/i
-  );
+  assert.match(normalized, /prove authentication by successfully opening the main Library/i);
   assert.match(normalized, /a ChatGPT URL in the tab inventory is not enough/i);
   assert.match(normalized, /separate Safari process with isolated sign-in state/i);
   assert.match(normalized, /driver-created tab, and ask Brad to sign in/i);
@@ -38,10 +44,19 @@ test('daily commute skill defines the SafariDriver authentication and reconnect 
     normalized,
     /Do not silently switch to integrated browser, computer-use, or ChatGPT Work tooling/i
   );
-  assert.match(normalizedAgents, /SafariDriver MCP is for signed-in ChatGPT main-Library retrieval only/i);
+  assert.match(
+    normalizedAgents,
+    /SafariDriver MCP is for signed-in ChatGPT main-Library retrieval only/i
+  );
   assert.match(normalizedAgents, /Do not use it to read public articles or shared-chat URLs/i);
-  assert.match(normalizedAgents, /Do not use it for Project Library\/Sources retrieval or cleanup/i);
-  assert.match(normalizedAgents, /Remove only Brad's PII, credentials, and account identifiers from tracked records/i);
+  assert.match(
+    normalizedAgents,
+    /Do not use it for Project Library\/Sources retrieval or cleanup/i
+  );
+  assert.match(
+    normalizedAgents,
+    /Remove only Brad's PII, credentials, and account identifiers from tracked records/i
+  );
   assert.match(normalizedAgents, /public article facts or newsletter content/i);
   assert.match(normalizedAgents, /Do not perform a routine full-chat audit/i);
   assert.match(
@@ -86,7 +101,10 @@ test('daily commute skill preserves detailed diagnostics and exact Safari cleanu
   assert.match(normalized, /Do not use SafariDriver for Project Library\/Sources access/i);
   assert.match(normalized, /validated v4-reference, and session-bundle artifacts/i);
   assert.match(normalized, /do not ask Brad for additional per-run or per-artifact authorization/i);
-  assert.match(normalized, /Delete each exact validated queue, v4 reference, and commute-session bundle consumed by the completed run from that Library/i);
+  assert.match(
+    normalized,
+    /Delete each exact validated queue, v4 reference, and commute-session bundle consumed by the completed run from that Library/i
+  );
   assert.match(normalized, /exact queue, validated v4 reference, and bundle downloads/i);
   assert.match(
     normalized,

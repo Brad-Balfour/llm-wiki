@@ -228,7 +228,10 @@ test('daily commute completion cannot omit a required Project update', async () 
   );
   assert.match(normalizedAgents, /until the agent applies and verifies it/i);
   assert.match(normalizedSkill, /identify the exact merged or review-ready prompt/i);
-  assert.match(normalizedSkill, /use the direct method established for Project updates to apply the verified version/i);
+  assert.match(
+    normalizedSkill,
+    /use the direct method established for Project updates to apply the verified version/i
+  );
   assert.match(normalizedSkill, /Never use SafariDriver for Project updates/i);
   assert.match(normalizedSkill, /Do not ask Brad to perform or confirm this synchronization/i);
 
@@ -245,7 +248,10 @@ test('daily commute cleanup uses approved Library access and exact Downloads tar
   const skill = await readFile('.codex/skills/process-daily-commute/SKILL.md', 'utf8');
   const normalized = skill.replace(/\s+/g, ' ');
 
-  assert.match(normalized, /Use SafariDriver MCP only for signed-in ChatGPT main-Library acquisition/i);
+  assert.match(
+    normalized,
+    /Use SafariDriver MCP only for signed-in ChatGPT main-Library acquisition/i
+  );
   assert.match(normalized, /use the direct method established by Brad's separate investigation/i);
   assert.match(normalized, /leave Project cleanup pending and report it/i);
   assert.match(
