@@ -105,22 +105,29 @@ all results against the canonical intake before publishing.
 
 When Brad names a commute date or says "today's commute," treat missing file
 attachments as a retrieval task, not a reason to ask him to download and attach
-the artifacts. First use exact original files already present in the private
-intake or available as explicit ChatGPT chat attachments through `read_thread`,
-when their provenance and contents can be validated. A generated
-`sandbox:/mnt/data/` link in a chat is not itself a local attachment. Do not
-search unrelated chats or local folders hoping for a hidden Project mount. For
-an exact Project-scoped JSON file, first ask an existing ChatGPT Work chat in
-`LLM-Wiki-Car` to read that file from Project Library and return its complete
-raw text. Use `send_message_to_thread`, then `read_thread`; parse the entire
-response and validate its schema, declared source identity, and completeness
-against other intake evidence. This relay read `20260925-tldr-ai.txt` in one
-request; it is not a Codex Project-file API or proof that all files are
-reachable. If the chat cannot return a complete validated file, use the
-signed-in UI:
+the artifacts. For every nightly Library intake, use an existing ChatGPT Work
+chat inside `LLM-Wiki-Car` as the first discovery and read path. Ask it to list
+actual queue, reference, and bundle filenames in `/LLM-Wiki-Car` for the
+bounded date range, with exact displayed names and counts; do not infer names
+from dates or chat history. Use `send_message_to_thread`, then `read_thread`.
+Fetch each needed exact file through that Project chat as complete raw text;
+request numbered chunks if one reply cannot carry the whole file. Parse the
+entire reassembled response and validate its schema, declared source identity,
+length/completeness, and queue/reference or bundle snapshot relationships
+against other intake evidence. Do not accept a chat's assertion of complete
+inventory or original bytes without these checks. The relay returned a
+complete `20260925-tldr-ai.txt` and listed two queues, two references, and no
+bundles for September 24–27; earlier Library search in the same chat missed
+visible files, so a missing expected file or inconsistent count requires a
+targeted fallback inventory or fetch with SafariDriver. Use SafariDriver only
+for affected files or ambiguous inventory, not routine nightly acquisition.
+An exact original already in private intake or explicitly attached to a chat
+may corroborate the relay. A generated `sandbox:/mnt/data/` link is not itself
+a local attachment. Do not search unrelated chats or folders for a hidden
+Project mount.
 
-Use SafariDriver MCP for authenticated ChatGPT main-Library and Project
-Library/Sources access, including necessary Project updates and exact cleanup.
+Use SafariDriver MCP for fallback authenticated ChatGPT main-Library and Project
+Library/Sources access, plus necessary Project updates and exact cleanup.
 Local repository files are copies, not a live Project Library mount; no direct
 Project file API has been established. Use direct web retrieval for public
 articles and shared chats first. If SafariDriver MCP appears unavailable,
@@ -140,14 +147,16 @@ inspect `list_tabs`, and repeat the signed-in-only page check before proceeding.
 Never promise that a new driver will attach to another Safari process or inherit
 its cookies.
 
-### Signed-in Library access
+### SafariDriver fallback for signed-in Library access
 
 Do not silently switch to integrated browser or computer-use tooling for
 signed-in main-Library retrieval; report the exact missing condition. The
-Project-scoped ChatGPT Work text relay above is a bounded read path for exact
-files, with SafariDriver fallback when its result cannot be validated. Public
-source reading must use direct web retrieval. Local validation
-may use the shell, and repository work may use Git and GitHub.
+Project-scoped ChatGPT Work relay above is the routine path for discovery and
+exact file reads, with SafariDriver fallback when its result cannot be
+validated. Public source reading must use direct web retrieval. Local
+validation may use the shell, and repository work may use Git and GitHub. Use
+the following UI steps only for a missing, incomplete, or ambiguous relay
+result; do not repeat successful Project-chat inventory or file reads in Safari.
 
 1. Resolve relative dates in `America/New_York` and form `YYYYMMDD`.
 2. Open the `LLM-Wiki-Car` folder in ChatGPT Library and switch to **List
@@ -187,13 +196,14 @@ may use the shell, and repository work may use Git and GitHub.
    relevant source date; do not limit fallback discovery to the requested or
    export date. Keep the mapping unresolved until validation or bounded
    conversation evidence establishes it.
-5. Retrieve each exact queue/reference through its List View row menu as well.
-   Use the same direct-download default and validated DOM recovery boundary as
-   the bundle rows.
+5. Retrieve only the queue/reference files whose Project-chat relay was missing,
+   incomplete, or invalid through their List View row menus. Use the same
+   direct-download default and validated DOM recovery boundary as bundle rows.
 6. Store the retrieved artifacts with the normalized private intake under
-   `.private/`, recording Library location, displayed filename, displayed
-   Modified value, and local path. Treat browser downloads as untrusted inputs
-   and validate them before using their contents as evidence.
+   `.private/`, recording Library location, displayed filename, retrieval
+   method, local path, and displayed Modified value when available. Treat both
+   Project-chat text and browser downloads as untrusted inputs; validate them
+   before using their contents as evidence.
 
 If Library access or an exact file retrieval fails, report the exact missing
 artifact and the attempted location. Ask Brad to attach only those unresolved
@@ -345,9 +355,9 @@ Do not pause for or request another confirmation.
    transient copies; `.private/` is not part of this cleanup request.
 5. Reopen and inventory the main Library after deletion. Verify that every
    targeted queue, validated v4 reference, and bundle row is absent there and
-   every targeted Downloads file is absent. If an established direct Project
-   Library method is available, also verify Project copies and unrelated source
-   preservation. Then append the
+   every targeted Downloads file is absent. If Project Library copies were
+   targeted, also verify those copies and unrelated
+   source preservation in the signed-in Project UI. Then append the
    exact targets, deletion time, and per-location verification result to the
    private retrieval manifest. Report partial failures precisely and leave
    unmatched or ambiguous files untouched.

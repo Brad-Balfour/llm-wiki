@@ -200,25 +200,30 @@ does not cover chats, prompts, unrelated Project source documents, schemas,
 normalized `.private/` intake, or artifacts whose completed-use evidence is
 ambiguous.
 
-Use direct web retrieval for public article URLs. Use signed-in SafariDriver
-MCP for ChatGPT main-Library and Project Library/Sources retrieval, updates,
-and exact cleanup when live access is needed. Local repository copies are not
-a live Project Library mount; no direct Project file API has been established.
+Use direct web retrieval for public article URLs. For nightly intake from the
+`LLM-Wiki-Car` Library folder, first ask an existing ChatGPT Work chat in that
+Project to list exact queue, reference, and bundle filenames for the bounded
+date range, then return the complete text of each needed file. Use
+`send_message_to_thread` and `read_thread`; parse and validate each result.
+Use signed-in SafariDriver MCP only when this relay misses an expected file,
+returns incomplete content, or leaves inventory ambiguous. SafariDriver also
+handles required Project updates and exact cleanup. Local repository copies
+are not a live Project Library mount; no direct Project file API has been
+established.
 Exact original files already in private local intake or explicitly attached to
 a ChatGPT chat can be read directly when provenance and contents validate;
 generated `sandbox:/mnt/data/` links alone do not provide Codex file access.
-For an exact Project-scoped JSON file, a ChatGPT Work chat in `LLM-Wiki-Car`
-can return its full raw text through `send_message_to_thread` and
-`read_thread`; parse and validate the entire result before using it. This
-worked for `20260925-tldr-ai.txt`, but does not establish a general Project
-file API or guarantee every file can be relayed. Use SafariDriver when the
-relay is incomplete or cannot be validated.
+This relay returned complete, parseable `20260925-tldr-ai.txt` content and a
+bounded folder inventory, but does not guarantee every file is exposed. Check
+expected queue/reference pairs, bundle declarations, and prior intake before
+accepting an inventory as complete. Request numbered chunks for files too long
+for one reply and validate the reassembled result.
 Do not open public articles in SafariDriver for ordinary source reading.
 If SafariDriver MCP appears unavailable for main-Library retrieval, check its
 availability once more; if it is still unavailable or unhealthy, ask Brad
 specifically to toggle the SafariDriver MCP off and on. Do not substitute
-integrated browser, computer-use, or ChatGPT Work tooling for main-Library
-retrieval. User sign-in and a platform-enforced user-only control remain genuine
+integrated browser or computer-use tooling for main-Library retrieval. User
+sign-in and a platform-enforced user-only control remain genuine
 blockers, not authorization prompts.
 
 For every daily commute intake:

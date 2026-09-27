@@ -250,7 +250,7 @@ test('daily commute cleanup uses approved Library access and exact Downloads tar
 
   assert.match(
     normalized,
-    /Use SafariDriver MCP for authenticated ChatGPT main-Library and Project Library\/Sources access/i
+    /Use SafariDriver MCP for fallback authenticated ChatGPT main-Library and Project Library\/Sources access/i
   );
   assert.match(normalized, /Use signed-in SafariDriver for Project Library\/Sources cleanup/i);
   assert.match(normalized, /Preserve unrelated Project sources/i);
