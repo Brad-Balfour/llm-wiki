@@ -29,7 +29,9 @@ putting off.
   an understandable choice. Trust depends on both the request and the product's
   reliability.
 - Make personalization actionable: remember an ongoing goal, notice a relevant
-  opportunity, and offer a useful next step.
+  opportunity, and offer a useful next step. Zhuo's examples include a multi-day
+  search for a childhood anime's Mandarin-dubbed cassette tapes and a timely
+  suggestion to translate an interview with a film director she had discussed.
 - Give people a low-effort way to discover possible tasks, while keeping
   suggestions relevant and easy to dismiss. An additional content feed can add
   distraction without helping finish a goal.
@@ -46,12 +48,15 @@ putting off.
 <!-- source-item-id: dev-005 -->
 
 Julie Zhuo's essay uses Meta's Muse as a personal product-design case study.
-Her examples include an agent pursuing a hard-to-find item across several days,
-just-in-time requests for email or payment access, proactive task ideas, and
-the difficulty of tracking multiple conversations. She also describes
-irrelevant recommendations, friction at a CAPTCHA, and a content feed she found
-less useful than expected. The piece reports roughly a week and a half of the
-author's own use; it is not a controlled study of adoption or product
+She describes delegating a search for cassette tapes of the 1980s anime
+_Triton of the Sea_, dubbed in Mandarin. Muse found a listing days later, then
+worked around the seller's China-only shipping through a purchasing
+middleman; a CAPTCHA still required Zhuo to take over. She also describes
+Muse suggesting a translation of a director interview about a foreign film
+and proposing a viewing party. Other examples include just-in-time requests
+for email or payment access and the difficulty of tracking concurrent
+conversations. Zhuo reports roughly a week and a half of personal use; this is
+an experiential design essay, not a controlled study of adoption or product
 effectiveness.
 
 The September 25 commute discussion emphasized personalization and proactive
