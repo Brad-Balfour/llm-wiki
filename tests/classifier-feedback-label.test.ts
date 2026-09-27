@@ -16,7 +16,7 @@ import {
 } from '../src/classifier/feedback-label.js';
 
 const validFixturePath = 'tests/fixtures/expected/feedback/valid-corrections.json';
-const queueFilename = '20260701-sanitized-feedback.txt';
+const queueFilename = '20260701-fixture-feedback.txt';
 
 test('binds exact corrections to a validated queue and derives stable label ids', async () => {
   const inputs = await validInputs();

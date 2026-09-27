@@ -45,7 +45,7 @@ behavior as history, not current direction.
 
 | Path                                     | Purpose                                                           |
 | ---------------------------------------- | ----------------------------------------------------------------- |
-| `src/tldr/`                              | Parse and sanitize TLDR email text.                               |
+| `src/tldr/`                              | Normalize TLDR newsletter text and extract editorial items.       |
 | `src/classifier/`                        | Validate source-neutral model classification.                     |
 | `src/routing/`                           | Derive commute, wiki, stream-log, discard, and review behavior.   |
 | `src/commute/`                           | Validate and reconcile session bundles.                           |
@@ -193,31 +193,47 @@ does not cover chats, prompts, unrelated Project source documents, schemas,
 normalized `.private/` intake, or artifacts whose completed-use evidence is
 ambiguous.
 
-Always use SafariDriver MCP for signed-in ChatGPT Library and Project work in
-this workflow. If it appears unavailable, check once more; if it is still
-unavailable or unhealthy, ask Brad specifically to toggle the SafariDriver MCP
-off and on. Do not substitute integrated browser, computer-use, or ChatGPT Work
-tooling for this authenticated path. User sign-in and a platform-enforced
-user-only control remain genuine blockers, not authorization prompts.
+Use direct web retrieval for public article URLs. SafariDriver MCP is for
+signed-in ChatGPT main-Library retrieval only. Do not use it to read public
+articles or shared-chat URLs, and do not use it for Project Library/Sources
+retrieval or cleanup. Use the direct Project Library method established by
+Brad's separate investigation; otherwise report the exact Project Library
+limitation and leave that work pending.
+If SafariDriver MCP appears unavailable for main-Library retrieval, check its
+availability once more; if it is still unavailable or unhealthy, ask Brad
+specifically to toggle the SafariDriver MCP off and on. Do not substitute
+integrated browser, computer-use, or ChatGPT Work tooling for main-Library
+retrieval. User sign-in and a platform-enforced user-only control remain genuine
+blockers, not authorization prompts.
 
 For every daily commute intake:
 
 1. Validate each queue and bundle, compare every embedded snapshot with the
-   separately supplied canonical queue, and use shared chats only as bounded
-   recovery evidence. Capture the complete shared-chat conversation by reading
-   its serialized message sequence or traversing every prompt; a single rendered
-   DOM snapshot may be virtualized and omit early turns. Never invent missing
-   item identity or user intent.
+   separately supplied canonical queue, and normally rely on those validated
+   artifacts. Open a shared-chat URL only when the bundle is missing or
+   malformed, an item action or claim conflicts with the canonical queue, a
+   specific material fact remains ambiguous, or Brad explicitly requests an
+   audit. First try a direct web read of the exact URL. Read only the relevant
+   segment and enough surrounding context to resolve that question. Do not
+   perform a routine full-chat audit or use SafariDriver for shared chats. If
+   direct retrieval fails, record what is unresolved; do not infer intent.
 2. Reconcile the day into the correct evidence channels: wiki-maintenance
    candidates, exact classifier feedback, product/quality incidents, general
    captures, duplicate/prior-awareness signals, and unresolved evidence.
-   Adjudicate bundle item actions against the full conversation before storing
-   classifier labels. A negative assessment of an article alone does not
-   establish an interest or depth correction, even when the bundle marks it
+   Adjudicate bundle item actions against the canonical queue and, only when
+   needed under step 1, targeted conversation evidence before storing classifier
+   labels. A negative assessment of an article alone does not establish an
+   interest or depth correction, even when the bundle marks it
    `mark_uninterested`.
 3. Preserve the private normalized intake under `.private/`, then add the
-   sanitized durable findings to the experiment log or other appropriate
-   tracked memory. When adding or changing a dated experiment-log result, update
+   durable findings to the experiment log or other appropriate tracked memory.
+   For tracked/public records, retain public source facts and operational
+   details. Remove only Brad's PII, credentials, and account identifiers from
+   tracked records. Keep raw intake in `.private/` and record concise findings
+   with source references instead of copying full transcripts. Do not redact
+   public article facts or newsletter content merely because they arrived by
+   email.
+   When adding or changing a dated experiment-log result, update
    the `Evidence Sources` inventory in the same diff and cross-check its queue,
    bundle, and shared-chat counts against the result. Do not silently turn an
    interesting discussion into a wiki save or classifier label.

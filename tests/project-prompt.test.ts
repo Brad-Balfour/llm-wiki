@@ -228,7 +228,11 @@ test('daily commute completion cannot omit a required Project update', async () 
   );
   assert.match(normalizedAgents, /until the agent applies and verifies it/i);
   assert.match(normalizedSkill, /identify the exact merged or review-ready prompt/i);
-  assert.match(normalizedSkill, /use SafariDriver MCP to apply the verified merged version/i);
+  assert.match(
+    normalizedSkill,
+    /use the direct method established for Project updates to apply the verified version/i
+  );
+  assert.match(normalizedSkill, /Never use SafariDriver for Project updates/i);
   assert.match(normalizedSkill, /Do not ask Brad to perform or confirm this synchronization/i);
 
   for (const normalized of [normalizedSkill, normalizedAgents]) {
@@ -240,21 +244,18 @@ test('daily commute completion cannot omit a required Project update', async () 
   assert.doesNotMatch(skill, /If Brad requests the live Project prompt/);
 });
 
-test('daily commute cleanup covers both Library locations and Downloads', async () => {
+test('daily commute cleanup uses approved Library access and exact Downloads targets', async () => {
   const skill = await readFile('.codex/skills/process-daily-commute/SKILL.md', 'utf8');
   const normalized = skill.replace(/\s+/g, ' ');
 
-  assert.match(normalized, /inspect both the main ChatGPT Library and the `LLM-Wiki-Car` Project/i);
   assert.match(
     normalized,
-    /delete each exact validated matching transient row wherever it exists/i
+    /Use SafariDriver MCP only for signed-in ChatGPT main-Library acquisition/i
   );
+  assert.match(normalized, /use the direct method established by Brad's separate investigation/i);
+  assert.match(normalized, /leave Project cleanup pending and report it/i);
   assert.match(
     normalized,
-    /successful deletion in one location does not establish deletion of its matching copy in the other/i
-  );
-  assert.match(
-    normalized,
-    /Verify that every targeted queue, validated v4 reference, and bundle row is absent from both Library locations, every unrelated Project source remains, and every targeted Downloads file is absent/i
+    /Verify that every targeted queue, validated v4 reference, and bundle row is absent there and every targeted Downloads file is absent/i
   );
 });

@@ -10,7 +10,7 @@ created: 2026-09-26
 updated: 2026-09-26
 confidence: medium
 # prettier-ignore
-provenance: [{"source_item_id":"dev-005","url":"https://joulee.medium.com/what-will-make-personal-ai-go-big-e92fbb10aba9"}]
+provenance: [{"source_item_id":"20260925-tldr-dev:dev-005","url":"https://joulee.medium.com/what-will-make-personal-ai-go-big-e92fbb10aba9"}]
 ---
 
 # Personal AI Consumer Product Design
@@ -45,7 +45,7 @@ putting off.
 
 ### [What will make personal AI go big?](https://joulee.medium.com/what-will-make-personal-ai-go-big-e92fbb10aba9)
 
-<!-- source-item-id: dev-005 -->
+<!-- source-item-id: 20260925-tldr-dev:dev-005 -->
 
 Julie Zhuo's essay uses Meta's Muse as a personal product-design case study.
 She describes delegating a search for cassette tapes of the 1980s anime
