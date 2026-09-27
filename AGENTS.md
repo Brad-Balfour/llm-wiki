@@ -157,6 +157,9 @@ general-purpose review rounds.
   requires it.
 - Code, schema, routing, prompt, workflow, or other behavior changes receive
   one review of the latest complete head after local checks.
+- Changes to agent instructions or commute policy also require Brad's review
+  before merge. A recurring commute request alone does not authorize merging
+  those policy changes.
 - Batch findings from one review round into one fix commit. Request another
   full review only when that fix materially changes behavior or invalidates the
   earlier review; documentation-only or mechanical fixes do not restart it.
@@ -193,12 +196,11 @@ does not cover chats, prompts, unrelated Project source documents, schemas,
 normalized `.private/` intake, or artifacts whose completed-use evidence is
 ambiguous.
 
-Use direct web retrieval for public article URLs. SafariDriver MCP is for
-signed-in ChatGPT main-Library retrieval only. Do not use it to read public
-articles or shared-chat URLs, and do not use it for Project Library/Sources
-retrieval or cleanup. Use the direct Project Library method established by
-Brad's separate investigation; otherwise report the exact Project Library
-limitation and leave that work pending.
+Use direct web retrieval for public article URLs. Use signed-in SafariDriver
+MCP for ChatGPT main-Library and Project Library/Sources retrieval, updates,
+and exact cleanup when live access is needed. Local repository copies are not
+a live Project Library mount; no direct Project file API has been established.
+Do not open public articles in SafariDriver for ordinary source reading.
 If SafariDriver MCP appears unavailable for main-Library retrieval, check its
 availability once more; if it is still unavailable or unhealthy, ask Brad
 specifically to toggle the SafariDriver MCP off and on. Do not substitute
@@ -215,8 +217,12 @@ For every daily commute intake:
    specific material fact remains ambiguous, or Brad explicitly requests an
    audit. First try a direct web read of the exact URL. Read only the relevant
    segment and enough surrounding context to resolve that question. Do not
-   perform a routine full-chat audit or use SafariDriver for shared chats. If
-   direct retrieval fails, record what is unresolved; do not infer intent.
+   perform a routine full-chat audit. A web-reader cache miss alone is not a
+   failed URL: try a direct HTTP fetch of that page once. If direct retrieval
+   still fails and the question is material, use SafariDriver for that chat as
+   a bounded fallback. If neither path works, record what is unresolved; do not infer
+   intent. Independent targeted chat reads may run in parallel subagents when
+   their access paths do not share mutable browser state.
 2. Reconcile the day into the correct evidence channels: wiki-maintenance
    candidates, exact classifier feedback, product/quality incidents, general
    captures, duplicate/prior-awareness signals, and unresolved evidence.
@@ -228,11 +234,12 @@ For every daily commute intake:
 3. Preserve the private normalized intake under `.private/`, then add the
    durable findings to the experiment log or other appropriate tracked memory.
    For tracked/public records, retain public source facts and operational
-   details. Remove only Brad's PII, credentials, and account identifiers from
-   tracked records. Keep raw intake in `.private/` and record concise findings
-   with source references instead of copying full transcripts. Do not redact
-   public article facts or newsletter content merely because they arrived by
-   email.
+   details. Exclude nonpublic personal identifying information about any person,
+   credentials, account identifiers, and nonpublic confidential work material from tracked records. Keep raw intake
+   in `.private/` and record concise findings with source references instead
+   of copying full transcripts. Assess content itself: public article facts
+   and public newsletter content are not private merely because they arrived
+   by email.
    When adding or changing a dated experiment-log result, update
    the `Evidence Sources` inventory in the same diff and cross-check its queue,
    bundle, and shared-chat counts against the result. Do not silently turn an
@@ -296,9 +303,11 @@ reopens the experiment. Preserve existing private measurements.
   the review is read-only, and the user has authorized sending the committed
   diff to Claude so the external-data reviewer has the relevant context.
 - Do not merge or deploy without explicit user authorization. Invoking the
-  recurring commute workflow supplies that authorization for its qualifying PR
-  and required live Project synchronization; otherwise, a request to create a
-  PR authorizes only a branch, commit, push, and review-ready PR unless a genuine
+  recurring commute workflow supplies that authorization for its qualifying
+  content PR and required live Project synchronization, except that agent
+  instruction and commute-policy changes require Brad's review before merge.
+  Otherwise, a request to create a PR authorizes only a branch, commit, push,
+  and review-ready PR unless a genuine
   unfinished item requires draft status.
 - Apply the commute publication risk tiers above before requesting or waiting
   for general-purpose AI review. When a review is required, wait for the latest
@@ -306,7 +315,10 @@ reopens the experiment. Preserve existing private measurements.
   threads, and address actionable findings in that PR or a clearly linked
   follow-up before publishing.
 - After opening or updating a PR, wait for required checks and apply the commute
-  risk tiers above. Inspect unresolved review threads. A documentation-only or
+  risk tiers above. Immediately before any merge, refresh submitted reviews
+  and all unresolved inline threads at the current head; never rely on a
+  previous snapshot while review is still arriving. Inspect unresolved review
+  threads. A documentation-only or
   mechanical review fix does not trigger another general-purpose review round;
   do not hold an otherwise merge-ready PR for an unrequired review.
 - After addressing a PR review comment, reply in that thread with the fix and

@@ -19,25 +19,30 @@ reopens the experiment. The procedures in
 `docs/commute-performance-experiment.md` are retained as historical guidance
 for existing records, not as a daily requirement.
 
-For the first representative commute after the SafariDriver procedure changes,
-keep one compact private qualification ledger for #151 and #155. Record actual
-model/effort, beginning and ending five-hour/weekly meter readings when
-available, active time, excluded human/merge waiting, workload, Safari tool
-calls, retries and retry time, and already-available rollout token counters at
-these boundaries: connection/authentication; bundle inventory/download;
-declared queue/reference inventory/download; validation/import; shared-chat
-audit; repository work; checks/publication/issues; cleanup/reconnect; and
-handoff. This is a bounded Safari workflow qualification, not a restart of the
-retired #85 or #119 comparison. Do not reopen long rollout or task histories
-during the constrained run solely to obtain counters.
+For the next measured commute, keep one compact private timeline for #151 and
+#155. At every step, record its start and end clock, model/effort, work unit,
+tool calls and retries. Sample five-hour/weekly meters and available token
+counters at the run's start, end, and natural major boundaries; do not add
+usage queries to every small step.
+Use separate rows for authentication, each Library inventory/download group,
+validation/import, each targeted chat recovery, each public-source fetch,
+wiki synthesis, repository edits, checks, PR/review/issue work, Project update,
+cleanup, and handoff. Record human/merge waits separately. When agents work in
+parallel, count each wall-clock interval once and note concurrent work in that
+row. Reconcile the union of timed active intervals plus excluded waits to the
+run's start/end clocks before reporting totals; do not leave an unexplained
+residual or assign it to a phase without timestamp evidence. Split source and
+chat work rather than combining them in one six-minute estimate. Mark missing
+meter/token readings unavailable instead of estimating them from wall time.
+This is a bounded Safari workflow qualification, not a restart of #85 or #119.
 
 ## Publication scope and communication
 
 Follow the risk-tiered publication policy in `AGENTS.md`. Invoking this recurring
-workflow authorizes merging its qualifying PR after the required gates pass and
-performing required live Project synchronization. Do not ask for separate merge,
-deployment, Project-update, or cleanup permission. Content- and evidence-only
-daily publication relies on deterministic gates and does not require a
+workflow authorizes merging its qualifying content PR after the required gates
+pass and performing required live Project synchronization. Changes to agent
+instructions or commute policy require Brad's review before merge. Content-
+and evidence-only daily publication relies on deterministic gates and does not require a
 general-purpose AI review unless a gate or maintainer identifies ambiguity.
 Routine generated state updates need
 at most one required latest-head review. Code, schema, routing, prompt, or
@@ -71,9 +76,13 @@ queue and session-bundle evidence unless a bundle is missing or malformed, an
 item action or claim conflicts with the canonical queue, a specific material
 fact is ambiguous, or Brad asks for the audit. When one of those conditions
 applies, first try a direct web read of the exact shared URL and inspect only the
-relevant passage plus enough surrounding context to resolve the question. Never
-use SafariDriver for shared chats. If web retrieval fails, record the bounded
-unresolved question; do not perform a full chat audit by default.
+relevant passage plus enough surrounding context to resolve the question. A
+cache miss alone does not show that a public share is inaccessible; try a
+direct HTTP fetch of the page once. Its HTML may contain the serialized
+conversation; extract only the passage needed. If direct retrieval still fails and the
+question matters, use SafariDriver for that chat as a bounded fallback. Record
+an unresolved question only if both paths fail. Independent targeted reads can
+run in parallel subagents when they do not share mutable browser state.
 
 ### Delegation and context
 
@@ -93,13 +102,11 @@ When Brad names a commute date or says "today's commute," treat missing file
 attachments as a retrieval task, not a reason to ask him to download and attach
 the artifacts. Use the signed-in ChatGPT web Library before requesting files:
 
-Use SafariDriver MCP only for signed-in ChatGPT main-Library acquisition. It is
-not the tool for public article reads, shared chats, or Project Library/Sources
-access. For Project Library retrieval or cleanup, use the direct method
-established by Brad's separate investigation; if no method is established,
-report that limitation and leave that Project-specific work pending. Do not
-silently fall back to SafariDriver for Project access. If SafariDriver MCP
-appears unavailable,
+Use SafariDriver MCP for authenticated ChatGPT main-Library and Project
+Library/Sources access, including necessary Project updates and exact cleanup.
+Local repository files are copies, not a live Project Library mount; no direct
+Project file API has been established. Use direct web retrieval for public
+articles and shared chats first. If SafariDriver MCP appears unavailable,
 check its availability once more. If it is still unavailable or unhealthy, stop
 and ask Brad specifically to toggle the SafariDriver MCP off and on to restart
 it. Before any main-Library action, start with `list_tabs`. Switch to the
@@ -116,7 +123,7 @@ inspect `list_tabs`, and repeat the signed-in-only page check before proceeding.
 Never promise that a new driver will attach to another Safari process or inherit
 its cookies.
 
-### Signed-in main-Library access has no browser fallback
+### Signed-in Library access
 
 Do not silently switch to integrated browser, computer-use, or ChatGPT Work
 tooling for signed-in main-Library retrieval; report the exact missing
@@ -190,14 +197,15 @@ files; do not make him reattach artifacts already retrieved successfully.
 5. Reconcile evidence into the repository's established channels: maintenance
    candidates, exact classifier feedback, quality incidents, general captures,
    duplicate/prior-awareness evidence, and unresolved evidence.
-6. Build a private conversation-coverage ledger before editing durable outputs.
+6. Build a private evidence-coverage ledger before editing durable outputs.
    Give every substantive user comment, correction, discussion point, save
-   request, workflow complaint, and export/recovery observation a disposition:
+   request, workflow complaint, and export/recovery observation present in the
+   validated bundle or any targeted chat recovery a disposition:
    exact wiki content, wiki synthesis/annotation, classifier feedback, quality
    incident, existing issue update, new issue, unresolved evidence, or no
    durable action with a recorded reason. Playback commands and social filler
-   may share one explicitly excluded category; never silently omit a substantive
-   turn.
+   may share one explicitly excluded category. Do not claim complete
+   conversation coverage from a bundle whose discussion fields are optional.
 
 Brad's words are natural-language intent, not a command grammar. Standardized
 enum values and schema terms are internal artifact vocabulary only. Interpret
@@ -211,18 +219,19 @@ only when the intended action or target genuinely cannot be determined.
    the item, not only the linked source. Ground source claims in retrieved
    evidence and label commute-derived comparisons, implications, hypotheses,
    and preferences as synthesis or discussion context. Cross-check the finished
-   wiki diff against the conversation-coverage ledger.
+   wiki diff against the evidence-coverage ledger.
 2. Add detailed, evidence-backed findings to the experiment log or other
    canonical tracked memory. Include useful operational results, timing, errors,
    and available token or usage evidence. For tracked/public records, retain
-   public source facts and operational details. Remove only Brad's PII,
-   credentials, and account identifiers from tracked records. Keep raw intake
-   in `.private/` and record concise findings with source references instead of
-   copying full transcripts. Do not redact public article or newsletter content
-   merely because it arrived by email. Preserve classifier and workflow annotations
-   even when the malformed bundle omitted
-   them but the canonical queue and bounded conversation evidence establish
-   them exactly.
+   public source facts and operational details. Exclude nonpublic personal
+   identifying information about any person, credentials, account identifiers,
+   and nonpublic confidential work material
+   from tracked records. Keep raw intake in `.private/` and record concise
+   findings with source references instead of copying full transcripts. Assess
+   the content itself: public article facts and public newsletter content are
+   not private merely because they arrived by email. Preserve classifier and
+   workflow annotations even when the malformed bundle omitted them but the
+   canonical queue and bounded conversation evidence establish them exactly.
 3. Search all open issues before creating a new destination. Route every
    material commute-flow observation to every relevant existing issue in the
    same run rather than choosing only one umbrella issue. Include date, artifact
@@ -249,11 +258,10 @@ only when the intended action or target genuinely cannot be determined.
    upload; never leave Brad to infer it from the diff.
 2. When that ChatGPT Project update is required, identify the exact merged or
    review-ready prompt or every exact source file and Project destination. After
-   the qualifying PR merges, use the direct method established for Project
-   updates to apply the verified version in the live Project UI. Never use
-   SafariDriver for Project updates. Do not ask Brad to perform or confirm this
-   synchronization. If no direct method is established or the UI cannot be
-   changed, report the exact technical blocker. Update the
+   the qualifying PR merges, use signed-in SafariDriver to apply the verified
+   version in the live Project UI and verify the result. Do not ask Brad to
+   perform or confirm this synchronization. If the UI cannot be changed, report
+   the exact technical blocker. Update the
    repository's live-version record in the active PR or a focused follow-up.
 3. Run focused tests while iterating, then run `npm run check` and
    `git diff --check`. Update and validate every touched stable schema, prompt,
@@ -267,13 +275,17 @@ only when the intended action or target genuinely cannot be determined.
    replacement or source-document upload without delaying a review-ready PR.
 5. Keep the PR body current with user impact, root cause, evidence counts,
    validation, and the latest head commit. Cross-link relevant issues.
-6. Inspect all required review threads. Fix actionable comments, reply with the
-   commit and validation evidence, resolve the thread, and request a fresh
-   review only when the fix materially changes behavior.
+6. Wait for required review workflows to finish. Inspect submitted reviews and
+   every inline thread at the current head. Fix actionable comments, reply with
+   the commit and validation evidence, resolve the thread, and request a fresh
+   review only when the fix materially changes behavior. Refresh reviews and
+   unresolved threads immediately before any merge; an earlier snapshot is
+   insufficient when comments may still arrive.
 7. Wait for the latest-head CI checks and the review workflows required by the
    applicable risk tier. When checks and actionable review threads are clean,
-   merge the qualifying commute PR under the standing authorization for this
-   workflow; do not pause to ask Brad again.
+   merge a qualifying content PR under the standing authorization for this
+   workflow. Wait for Brad's review before merging agent-instruction or
+   commute-policy changes.
 
 ## Post-merge artifact cleanup
 
@@ -299,10 +311,8 @@ Do not pause for or request another confirmation.
    main ChatGPT Library independently in List View. Use each exact row's
    three-dot menu. Delete each exact validated queue, v4 reference, and
    commute-session bundle consumed by the completed run from that Library.
-   Project Library/Sources retrieval and cleanup must use the direct method
-   established by Brad's separate investigation; if none is established, leave
-   Project cleanup pending and report it. Do not use SafariDriver for Project
-   Library/Sources access. Preserve unrelated Project sources.
+   Use signed-in SafariDriver for Project Library/Sources cleanup and verify
+   each exact target there. Preserve unrelated Project sources.
    Do not delete the Project Library folder itself, shared chats, Project source
    documents, schemas, prompts, unrelated dated artifacts, or a plausible row
    that was not validated into the final intake.

@@ -133,8 +133,8 @@ Default stream-log candidates:
 
 Stream-log entries contain parsed item-level metadata only. Do not include full
 Gmail body or delivery-wrapper text, subscription boilerplate, credentials,
-private notes, or unreviewed sensitive content. Public article facts do not need
-redaction because they arrived through email.
+private notes, or unreviewed sensitive content. Assess the content itself:
+public article facts are not private merely because they arrived through email.
 
 ## Audit Metadata
 
