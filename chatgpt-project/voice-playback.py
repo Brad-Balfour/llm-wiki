@@ -10,7 +10,9 @@ def select_playback(main, action, current_position=0, target_position=None):
     elif action == "next":
         position = current_position + 1
     elif action == "previous":
-        position = max(0, current_position - 1)
+        if current_position <= 1:
+            raise ValueError("already at first item")
+        position = current_position - 1
     elif action == "jump":
         position = target_position
         if type(position) is not int or not 1 <= position <= len(items):

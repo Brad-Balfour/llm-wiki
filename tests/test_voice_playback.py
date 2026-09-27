@@ -52,6 +52,10 @@ class VoicePlaybackTest(unittest.TestCase):
             module.select_playback(self.main, "jump", 0, 0)
         with self.assertRaises(ValueError):
             module.select_playback(self.main, "next", 3)
+        with self.assertRaisesRegex(ValueError, "already at first item"):
+            module.select_playback(self.main, "previous", 1)
+        with self.assertRaisesRegex(ValueError, "already at first item"):
+            module.select_playback(self.main, "previous", 0)
         with self.assertRaises(ValueError):
             module.select_playback(self.main, "unknown")
 

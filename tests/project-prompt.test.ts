@@ -17,7 +17,9 @@ test('ChatGPT Project instructions route playback through the Python Project sou
   assert.match(prompt, /Load the Project source `voice-playback\.py` into the code tool/);
   assert.match(prompt, /select_playback\(main, action, current_position, target_position\)/);
   assert.match(prompt, /begin, next, previous, repeat, or a numbered jump/);
-  assert.match(prompt, /Speak only the complete\s+string the function returns, unchanged/);
+  assert.match(prompt, /Speak the complete string\s+the function returns, unchanged/);
+  assert.match(prompt, /After reading the final item, say\s+`Finished <filename>\.`/);
+  assert.match(prompt, /do not require another `next`/);
   assert.match(prompt, /When Brad wants to discuss an article, answer normally/);
   assert.match(prompt, /Discussion does not change it/);
 });

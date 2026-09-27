@@ -51,9 +51,13 @@ speak that string without changing it. Test a normal article discussion
 between playback turns and open the reference only for details or export. If any required file or the
 code tool is unavailable in Live, do not install Prompt 5.1 as the working
 playback procedure. The draft PR does not change the live Project. To roll
-back a later pilot, restore the previously verified Project Instructions and
-remove only `voice-playback.py` from Sources; keep the v4 files, export source,
-and unrelated Project files.
+back a later pilot from the non-Python v4 candidate, restore Prompt 5.0 from
+Git commit `b52d4f2` at `chatgpt-project/CHATGPT_CAR_QUEUE_PROMPT.md` and
+remove only `voice-playback.py` from Sources. If the pilot instead replaced
+live Prompt 4.2 directly, restore Prompt 4.2 from commit `6a505b9` and its
+matching v3 Project sources. Record the actual installed versions before any
+pilot so the rollback follows that exact starting state. Preserve unrelated
+Project files.
 
 Until Brad confirms those replacements, Queue v3, Prompt 4.2, profile 1.4,
 classifier instructions v1, and the v3 Task body remain the live versions.
