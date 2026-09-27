@@ -10,7 +10,7 @@ import json
 from pathlib import Path
 
 
-def select_playback(main, reference, expected_filename, position=None):
+def select_playback(main, reference, expected_filename, action, current_position=0, target_position=None):
     if list(main) != ["sweep_playback", "items"]:
         raise ValueError("invalid playback object shape")
     items = main["items"]
@@ -40,10 +40,28 @@ def select_playback(main, reference, expected_filename, position=None):
     if "\n" in sweep or "\r" in sweep:
         raise ValueError("invalid sweep text")
 
-    if position is None:
+    if type(current_position) is not int or not 0 <= current_position <= len(items):
+        raise ValueError("current position outside verified queue")
+    if action == "begin":
         return sweep
+    if action == "next":
+        position = current_position + 1
+        if position > len(items):
+            return f"Finished {expected_filename}."
+    elif action == "previous":
+        position = current_position - 1
+        if position <= 0:
+            return sweep
+    elif action == "repeat":
+        if current_position == 0:
+            return sweep
+        position = current_position
+    elif action == "jump":
+        position = target_position
+    else:
+        raise ValueError("unknown playback action")
     if type(position) is not int or not 1 <= position <= len(items):
-        raise ValueError("position outside verified queue")
+        raise ValueError("target position outside verified queue")
     return items[position - 1]["item_playback"]
 
 
@@ -51,14 +69,17 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--playback", required=True, type=Path)
     parser.add_argument("--reference", required=True, type=Path)
-    selection = parser.add_mutually_exclusive_group(required=True)
-    selection.add_argument("--sweep", action="store_true")
-    selection.add_argument("--position", type=int)
+    parser.add_argument("--action", required=True, choices=("begin", "next", "previous", "repeat", "jump"))
+    parser.add_argument("--current-position", type=int, default=0)
+    parser.add_argument("--target-position", type=int)
     args = parser.parse_args()
     try:
         playback = json.loads(args.playback.read_text(encoding="utf-8"))
         reference = json.loads(args.reference.read_text(encoding="utf-8"))
-        result = select_playback(playback, reference, args.playback.name, args.position)
+        result = select_playback(
+            playback, reference, args.playback.name,
+            args.action, args.current_position, args.target_position,
+        )
     except (OSError, json.JSONDecodeError, TypeError, AttributeError, ValueError) as error:
         parser.exit(2, f"playback selection failed: {error}\n")
     print(result)

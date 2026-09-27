@@ -19,22 +19,6 @@ reopens the experiment. The procedures in
 `docs/commute-performance-experiment.md` are retained as historical guidance
 for existing records, not as a daily requirement.
 
-For #100/#153, a Python playback selector is an experiment, not live Voice
-policy. When Brad requests that experiment, run
-`chatgpt-project/voice-playback.py` against an exact v4 playback/reference pair
-with either `--sweep` or an explicit `--position N`. First verify its selected
-text locally. In a separate iPhone Live test, establish whether Live can access
-the same exact files, invoke the helper on each navigation turn, and speak the
-returned text without substitution, truncation, or paraphrase. Compare the
-visible helper output with the spoken turn and record any mismatch under #100.
-The helper has no persistent cursor; resolve next/back/jump against the verified
-position before each call. Current ChatGPT Voice documentation says Live cannot
-add files from ChatGPT Library; check whether manual attachment of the exact
-pair works in Brad's iPhone session before testing tool invocation. If it does
-not, record that product boundary and stop the pilot. Do not change the live
-Project prompt or treat local Python execution as proof of Live behavior before
-the end-to-end test.
-
 For the next measured commute, keep one compact private timeline for #151 and
 #155. At every step, record its start and end clock, model/effort, work unit,
 tool calls and retries. Sample five-hour/weekly meters and available token

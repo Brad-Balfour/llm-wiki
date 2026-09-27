@@ -29,14 +29,30 @@ class VoicePlaybackTest(unittest.TestCase):
             "items": [{"position": 1}, {"position": 2}],
         }
 
-    def test_selects_literal_sweep_and_explicit_position(self):
+    def test_begin_next_previous_repeat_and_jump_use_literal_strings(self):
         self.assertEqual(
-            module.select_playback(self.main, self.reference, "20260925-tldr.txt"),
+            module.select_playback(self.main, self.reference, "20260925-tldr.txt", "begin"),
             self.main["sweep_playback"],
         )
         self.assertEqual(
-            module.select_playback(self.main, self.reference, "20260925-tldr.txt", 2),
+            module.select_playback(self.main, self.reference, "20260925-tldr.txt", "next", 0),
+            self.main["items"][0]["item_playback"],
+        )
+        self.assertEqual(
+            module.select_playback(self.main, self.reference, "20260925-tldr.txt", "previous", 2),
+            self.main["items"][0]["item_playback"],
+        )
+        self.assertEqual(
+            module.select_playback(self.main, self.reference, "20260925-tldr.txt", "repeat", 1),
+            self.main["items"][0]["item_playback"],
+        )
+        self.assertEqual(
+            module.select_playback(self.main, self.reference, "20260925-tldr.txt", "jump", 0, 2),
             self.main["items"][1]["item_playback"],
+        )
+        self.assertEqual(
+            module.select_playback(self.main, self.reference, "20260925-tldr.txt", "next", 2),
+            "Finished 20260925-tldr.txt.",
         )
 
     def test_rejects_wrong_file_hash_and_position(self):
@@ -49,9 +65,9 @@ class VoicePlaybackTest(unittest.TestCase):
             else:
                 reference["items"][1]["position"] = 3
             with self.subTest(change=change), self.assertRaises(ValueError):
-                module.select_playback(self.main, reference, "20260925-tldr.txt", 2)
+                module.select_playback(self.main, reference, "20260925-tldr.txt", "jump", 0, 2)
         with self.assertRaises(ValueError):
-            module.select_playback(self.main, self.reference, "20260925-tldr.txt", 3)
+            module.select_playback(self.main, self.reference, "20260925-tldr.txt", "jump", 0, 3)
 
 
 if __name__ == "__main__":

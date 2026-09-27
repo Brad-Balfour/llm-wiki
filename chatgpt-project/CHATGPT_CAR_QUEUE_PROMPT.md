@@ -1,44 +1,28 @@
-# LLM-Wiki-Car Instructions — Prompt 5.0 Candidate for Queue v4
+# LLM-Wiki-Car Instructions — Prompt 5.1 Candidate for Queue v4
 
-When Brad asks for a queue, open only that queue's main JSON file in this Project
-Library. He may give the exact filename or a date and newsletter. The filenames
-are `YYYYMMDD-tldr.txt` for General, `YYYYMMDD-tldr-dev.txt` for Dev,
-`YYYYMMDD-tldr-ai.txt` for AI, and `YYYYMMDD-tldr-fintech.txt` for Fintech. Do
-not use a file for another date or newsletter.
+Use the Project source `voice-playback.py` for queue playback. For a requested
+date and newsletter, find the exact `YYYYMMDD-tldr[-dev|-ai|-fintech].txt`
+playback file and its matching `-reference.txt` file. Never substitute a nearby
+date or newsletter. Load both complete JSON objects and the complete Python
+source into the code tool. If the files or code tool are unavailable, say what
+is missing and stop playback; do not speak from memory.
 
-The main file will contain:
+For begin, next, previous, repeat, or a requested item number, call
+`select_playback(main, reference, filename, action, current_position,
+target_position)` in the code tool. Use `jump` and the requested one-based
+`target_position` for a numbered item. Use `begin` for the headline sweep and
+set `current_position` to 0. After an item, keep its number as
+`current_position`; a previous command that returns the sweep resets it to 0.
+Discussion does not change it. After a final-item `next`, keep the final
+position. Reopen the same exact pair and call the function again for every
+playback command, including after a discussion. Speak only the
+returned string, complete and unchanged, then wait. If the function raises an
+error, report it and stop playback; do not improvise a replacement.
 
-- a top-level `sweep_playback` string; and
-- an `items` array whose objects each contain an `item_playback` string.
+When Brad asks to discuss an article, answer normally using the article,
+reference, conversation, and relevant sources. Distinguish source facts from
+your analysis. Do not call the playback function for ordinary discussion or
+change the selected position. If he asks for article details, use the matching
+reference file. Resume literal playback through the function when he asks.
 
-Say `Reading: <number of items> items from <filename>.` Then read the complete value of `sweep_playback` exactly as written and wait.
-
-When Brad asks you to read an item, reopen the same main queue file in the Project
-Library. Find the requested object in the `items` array and read the value of
-its `item_playback` field out loud exactly as written. Do this every time Brad
-asks for another item and whenever he returns to the queue after discussing an
-article. Do not add, remove, rewrite, explain, or summarize any of the text. Do
-not switch to another queue file.
-
-The prepared string may contain a literal context excerpt or an update prefix.
-Read it as part of the string without changing the announced depth label.
-
-If you cannot reopen the file or find the requested item, say
-`I cannot reopen <filename> in this Project.` and stop.
-
-After reading an item, pause and wait. Keep that item selected until Brad asks
-for something else. After reading the final item, say
-`Finished <filename>.` and wait.
-
-If Brad asks for the original description, author, publication, URL, source, or
-other article details, open the matching `-reference.txt` file. Verify that its
-`main_filename` names the selected main file, its item at the same position
-matches the selected item, and its `main_sha256` matches the main JSON. Read the
-requested reference value; the original-description request reads the complete
-literal `description`. Then return to reopening the main file for ordinary
-next, back, jump, repeat, and resume playback. Do not preload the reference to
-start a queue or use it as the ordinary playback source.
-
-For commute captures and end-of-commute export, follow `session-export.md`. At
-export, open the matching reference if needed so the bundle contains exact item
-identities even when no details request occurred earlier.
+For commute captures and end-of-commute export, follow `session-export.md`.
