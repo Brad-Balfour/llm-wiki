@@ -12,17 +12,19 @@ test('daily commute skill defines the SafariDriver authentication and reconnect 
 
   assert.match(
     normalized,
-    /Use SafariDriver MCP only for signed-in ChatGPT main-Library acquisition/i
+    /Use SafariDriver MCP for authenticated ChatGPT main-Library and Project Library\/Sources access/i
   );
   assert.match(
     normalized,
-    /not the tool for public article reads, shared chats, or Project Library\/Sources access/i
+    /Use direct web retrieval for public articles and shared chats first/i
   );
-  assert.match(normalized, /Do not silently fall back to SafariDriver for Project access/i);
-  assert.match(normalized, /Never use SafariDriver for Project updates/i);
+  assert.match(normalized, /no direct Project file API has been established/i);
+  assert.match(normalized, /use signed-in SafariDriver to apply the verified version/i);
   assert.match(normalized, /call the web retrieval tool directly with that URL/i);
   assert.match(normalized, /Shared-chat URLs are not part of routine intake auditing/i);
   assert.match(normalized, /inspect only the relevant passage plus enough surrounding context/i);
+  assert.match(normalized, /direct HTTP fetch of the page once/i);
+  assert.match(normalized, /use SafariDriver for that chat as a bounded fallback/i);
   assert.match(normalized, /Use Codex collaborator subagents for independent source reading/i);
   assert.match(
     normalized,
@@ -39,23 +41,19 @@ test('daily commute skill defines the SafariDriver authentication and reconnect 
   assert.match(normalized, /separate Safari process with isolated sign-in state/i);
   assert.match(normalized, /driver-created tab, and ask Brad to sign in/i);
   assert.match(normalized, /If its MCP transport closes.*repeat the signed-in-only page check/i);
-  assert.match(normalized, /### Signed-in main-Library access has no browser fallback/i);
+  assert.match(normalized, /### Signed-in Library access/i);
   assert.match(
     normalized,
     /Do not silently switch to integrated browser, computer-use, or ChatGPT Work tooling/i
   );
   assert.match(
     normalizedAgents,
-    /SafariDriver MCP is for signed-in ChatGPT main-Library retrieval only/i
+    /signed-in SafariDriver MCP for ChatGPT main-Library and Project Library\/Sources retrieval/i
   );
-  assert.match(normalizedAgents, /Do not use it to read public articles or shared-chat URLs/i);
+  assert.match(normalizedAgents, /Use direct web retrieval for public article URLs/i);
   assert.match(
     normalizedAgents,
-    /Do not use it for Project Library\/Sources retrieval or cleanup/i
-  );
-  assert.match(
-    normalizedAgents,
-    /Remove only Brad's PII, credentials, and account identifiers from tracked records/i
+    /Exclude nonpublic personal identifying information about any person/i
   );
   assert.match(normalizedAgents, /public article facts or newsletter content/i);
   assert.match(normalizedAgents, /Do not perform a routine full-chat audit/i);
@@ -88,17 +86,18 @@ test('daily commute skill preserves detailed diagnostics and exact Safari cleanu
   const skill = await readFile('.codex/skills/process-daily-commute/SKILL.md', 'utf8');
   const normalized = skill.replace(/\s+/g, ' ');
 
-  assert.match(normalized, /compact private qualification ledger for #151 and #155/i);
-  assert.match(normalized, /connection\/authentication; bundle inventory\/download/i);
+  assert.match(normalized, /compact private timeline for #151 and #155/i);
+  assert.match(normalized, /separate rows for authentication, each Library inventory\/download group/i);
+  assert.match(normalized, /do not leave an unexplained residual/i);
   assert.match(normalized, /detailed, evidence-backed findings/i);
   assert.match(normalized, /timing, errors, and available token or usage evidence/i);
   assert.match(
     normalized,
-    /Remove only Brad's PII, credentials, and account identifiers from tracked records/i
+    /Exclude nonpublic personal identifying information about any person/i
   );
   assert.match(normalized, /main ChatGPT Library independently in List View/i);
   assert.match(normalized, /Use each exact row's three-dot menu/i);
-  assert.match(normalized, /Do not use SafariDriver for Project Library\/Sources access/i);
+  assert.match(normalized, /Use signed-in SafariDriver for Project Library\/Sources cleanup/i);
   assert.match(normalized, /validated v4-reference, and session-bundle artifacts/i);
   assert.match(normalized, /do not ask Brad for additional per-run or per-artifact authorization/i);
   assert.match(
@@ -121,12 +120,8 @@ test('daily commute workflow does not ask for repeat authorization', async () =>
   const normalized = skill.replace(/\s+/g, ' ');
   const normalizedAgents = agents.replace(/\s+/g, ' ');
 
-  assert.match(normalized, /workflow authorizes merging its qualifying PR/i);
-  assert.match(
-    normalized,
-    /Do not ask for separate merge, deployment, Project-update, or cleanup permission/i
-  );
-  assert.match(normalized, /do not pause to ask Brad again/i);
+  assert.match(normalized, /workflow authorizes merging its qualifying content PR/i);
+  assert.match(normalized, /Changes to agent instructions or commute policy require Brad's review before merge/i);
   assert.match(normalized, /Do not pause for or request another confirmation/i);
   assert.doesNotMatch(normalized, /Merge only with explicit user authorization/i);
   assert.doesNotMatch(normalized, /until Brad confirms it was applied/i);
@@ -140,5 +135,6 @@ test('daily commute workflow does not ask for repeat authorization', async () =>
     normalizedAgents,
     /Stop only for a platform-enforced user-only control or an ambiguous target/i
   );
+  assert.match(normalizedAgents, /Immediately before any merge, refresh submitted reviews/i);
   assert.doesNotMatch(normalizedAgents, /leave only the exact browser deletions pending/i);
 });

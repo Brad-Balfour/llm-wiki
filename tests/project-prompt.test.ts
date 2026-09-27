@@ -230,9 +230,9 @@ test('daily commute completion cannot omit a required Project update', async () 
   assert.match(normalizedSkill, /identify the exact merged or review-ready prompt/i);
   assert.match(
     normalizedSkill,
-    /use the direct method established for Project updates to apply the verified version/i
+    /use signed-in SafariDriver to apply the verified version in the live Project UI/i
   );
-  assert.match(normalizedSkill, /Never use SafariDriver for Project updates/i);
+  assert.match(normalizedSkill, /verify the result/i);
   assert.match(normalizedSkill, /Do not ask Brad to perform or confirm this synchronization/i);
 
   for (const normalized of [normalizedSkill, normalizedAgents]) {
@@ -250,10 +250,10 @@ test('daily commute cleanup uses approved Library access and exact Downloads tar
 
   assert.match(
     normalized,
-    /Use SafariDriver MCP only for signed-in ChatGPT main-Library acquisition/i
+    /Use SafariDriver MCP for authenticated ChatGPT main-Library and Project Library\/Sources access/i
   );
-  assert.match(normalized, /use the direct method established by Brad's separate investigation/i);
-  assert.match(normalized, /leave Project cleanup pending and report it/i);
+  assert.match(normalized, /Use signed-in SafariDriver for Project Library\/Sources cleanup/i);
+  assert.match(normalized, /Preserve unrelated Project sources/i);
   assert.match(
     normalized,
     /Verify that every targeted queue, validated v4 reference, and bundle row is absent there and every targeted Downloads file is absent/i
