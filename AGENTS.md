@@ -142,173 +142,29 @@ using the existing installation-confirmation procedure.
 - LLM enrichment may be optional, but deterministic URL and source ingestion
   must not require an API key or a paid model.
 
-## Commute publication policy
-
-Keep the PR as the publication record, review boundary, rollback point, and
-Pages trigger. Make review proportional to risk rather than adding automatic
-general-purpose review rounds.
-
-- Content- and evidence-only daily publication relies on deterministic gates.
-  The request to run the recurring commute workflow authorizes merging its
-  qualifying PR after those gates pass. Do not require a general-purpose AI
-  review unless a gate or maintainer identifies ambiguity.
-- Routine generated provenance or state updates use deterministic gates first.
-  Require at most one latest-head review when repository policy or a maintainer
-  requires it.
-- Code, schema, routing, prompt, workflow, or other behavior changes receive
-  one review of the latest complete head after local checks.
-- Wait for required Codex review to complete. Triage every Codex and other
-  inline comment; fix valid findings, reply with evidence, and resolve those
-  threads. Explain declined findings in their threads. Refresh the comments
-  immediately before any authorized merge.
-- Changes to agent instructions or commute policy also require Brad's review
-  before merge. A recurring commute request alone does not authorize merging
-  those policy changes.
-- Batch findings from one review round into one fix commit. Request another
-  full review only when that fix materially changes behavior or invalidates the
-  earlier review; documentation-only or mechanical fixes do not restart it.
-
-Keep a commute PR limited to the day’s evidence and the smallest directly
-necessary guard. Put substantial workflow refactors, historical cleanup, and
-unrelated product work in linked follow-up issues instead of extending the
-daily critical path.
-
-Use brief, non-interrupting milestone updates: intake validated (including a
-genuine evidence problem), PR ready (including checks and any action Brad must
-take), and merged and finished or concretely blocked. Do not request an
-acknowledgment or narrate routine tool calls and unchanged polling state.
-
 ## Recurring daily commute processing
 
-When Brad supplies dated commute queues, session bundles, and shared-chat URLs
-with shorthand such as "today's commute," treat that as a request to complete
-the full daily evidence loop. This is a recurring operating workflow, not a
-one-off file inspection. The request authorizes the normal repository and
-GitHub writes needed to finish that loop, merging its qualifying PR after
-required checks and reviews pass, and synchronizing required live ChatGPT
-Project prompts or source documents from the verified repository version. It
-also authorizes read-only discovery and download of commute queue, v4-reference,
-and session-bundle artifacts from Brad's signed-in ChatGPT Library for private
-local intake. It does not authorize changing or deleting unrelated private
-files. Brad has granted standing
-authorization to delete the exact queue, validated v4-reference, and
-session-bundle artifacts consumed by a durably completed commute run after its
-PR merges, or after a complete no-change handoff when no PR was needed. This
-authorization covers all matching transient copies in ChatGPT Library, the
-LLM-Wiki-Car Project Library, and Downloads without another confirmation; it
+When Brad asks to process a daily commute, use
+[the process-daily-commute skill](.codex/skills/process-daily-commute/SKILL.md).
+The skill owns intake, retrieval, reconciliation, publication gates, Project
+synchronization, and cleanup. Keep those procedures in the skill so they have
+one source of truth.
+
+A daily commute request authorizes the repository and GitHub writes needed to
+complete the run, merging a qualifying content PR after its required checks and
+reviews pass, and synchronizing required live ChatGPT Project prompts or source
+documents from the verified repository version. It also authorizes read-only
+discovery and download of commute queues, validated v4 references, and session
+bundles from Brad's signed-in ChatGPT Library for private intake.
+
+Brad has granted standing authorization to delete the exact queue, validated
+v4-reference, and session-bundle artifacts consumed by a durably completed
+commute run after its PR merges, or after a complete no-change handoff when no
+PR was needed. This covers matching transient copies in ChatGPT Library, the
+LLM-Wiki-Car Project Library, and Downloads without another confirmation. It
 does not cover chats, prompts, unrelated Project source documents, schemas,
 normalized `.private/` intake, or artifacts whose completed-use evidence is
 ambiguous.
-
-Use direct web retrieval for public article URLs. For nightly intake from the
-`LLM-Wiki-Car` Library folder, first ask an existing ChatGPT Work chat in that
-Project to list exact queue, reference, and bundle filenames for the bounded
-date range, then return the complete text of each needed file. Use
-`send_message_to_thread` and `read_thread`; parse and validate each result.
-Use signed-in SafariDriver MCP only when this relay misses an expected file,
-returns incomplete content, or leaves inventory ambiguous. SafariDriver also
-handles required Project updates and exact cleanup. Local repository copies
-are not a live Project Library mount; no direct Project file API has been
-established.
-Exact original files already in private local intake or explicitly attached to
-a ChatGPT chat can be read directly when provenance and contents validate;
-generated `sandbox:/mnt/data/` links alone do not provide Codex file access.
-This relay returned complete, parseable `20260925-tldr-ai.txt` content and a
-bounded folder inventory, but does not guarantee every file is exposed. Check
-expected queue/reference pairs, bundle declarations, and prior intake before
-accepting an inventory as complete. Request numbered chunks for files too long
-for one reply and validate the reassembled result.
-Do not open public articles in SafariDriver for ordinary source reading.
-If SafariDriver MCP appears unavailable for main-Library retrieval, check its
-availability once more; if it is still unavailable or unhealthy, ask Brad
-specifically to toggle the SafariDriver MCP off and on. Do not substitute
-integrated browser or computer-use tooling for main-Library retrieval. User
-sign-in and a platform-enforced user-only control remain genuine
-blockers, not authorization prompts.
-
-For every daily commute intake:
-
-1. Validate each queue and bundle, compare every embedded snapshot with the
-   separately supplied canonical queue, and normally rely on those validated
-   artifacts. Open a shared-chat URL only when the bundle is missing or
-   malformed, an item action or claim conflicts with the canonical queue, a
-   specific material fact remains ambiguous, or Brad explicitly requests an
-   audit. First try a direct web read of the exact URL. Read only the relevant
-   segment and enough surrounding context to resolve that question. Do not
-   perform a routine full-chat audit. A web-reader cache miss alone is not a
-   failed URL: try a direct HTTP fetch of that page once. If direct retrieval
-   still fails and the question is material, use SafariDriver for that chat as
-   a bounded fallback. If neither path works, record what is unresolved; do not infer
-   intent. Independent targeted chat reads may run in parallel subagents when
-   their access paths do not share mutable browser state.
-2. Reconcile the day into the correct evidence channels: wiki-maintenance
-   candidates, exact classifier feedback, product/quality incidents, general
-   captures, duplicate/prior-awareness signals, and unresolved evidence.
-   Adjudicate bundle item actions against the canonical queue and, only when
-   needed under step 1, targeted conversation evidence before storing classifier
-   labels. A negative assessment of an article alone does not establish an
-   interest or depth correction, even when the bundle marks it
-   `mark_uninterested`.
-3. Preserve the private normalized intake under `.private/`, then add the
-   durable findings to the experiment log or other appropriate tracked memory.
-   For tracked/public records, retain public source facts and operational
-   details. Exclude nonpublic personal identifying information about any person,
-   credentials, account identifiers, and nonpublic confidential work material from tracked records. Keep raw intake
-   in `.private/` and record concise findings with source references instead
-   of copying full transcripts. Assess content itself: public article facts
-   and public newsletter content are not private merely because they arrived
-   by email.
-   When adding or changing a dated experiment-log result, update
-   the `Evidence Sources` inventory in the same diff and cross-check its queue,
-   bundle, and shared-chat counts against the result. Do not silently turn an
-   interesting discussion into a wiki save or classifier label.
-4. Route every material recurring finding to its existing open GitHub issue
-   when one fits. Add an evidence-backed comment with the exact date, artifact
-   identity, observed behavior, boundary, and resulting PR. Avoid duplicating
-   an equivalent comment already on the issue. If no issue fits, keep the
-   finding visible in the PR and call out the missing issue explicitly. Do not
-   turn substantial workflow refactors, historical cleanup, or unrelated
-   product work into same-run implementation scope.
-5. Treat friction in the processing run itself as workflow evidence. When the
-   same omission or mistake could recur, add the smallest durable instruction,
-   test, or automation guard that makes the next daily pass simpler and safer.
-6. Compare the diff with the live Project instructions and source list in
-   `chatgpt-project/README.md`. If a live prompt or Project source changed, say
-   exactly which Project prompt or document needs to be updated. Without waiting
-   for Brad to ask, provide the exact prompt in one copyable block or name every
-   exact source file and destination. Keep the update open until the agent
-   applies and verifies it, then update the tracked live-version record. Do not
-   make Brad infer, remember, or manually confirm an external deployment step
-   from a repository diff or PR.
-7. Run the relevant local validation, commit the tracked daily evidence, push
-   the branch, and open a PR against the intended base. Use draft status only
-   for a genuine unfinished item, not as a routine review delay. A local-only
-   commit is not a completed daily commute handoff. Wait for the initial PR
-   checks and report their state.
-8. Cross-link the PR and issue comments, then finish with the remote branch,
-   commit, PR URL, validation result, issue updates, and any genuinely
-   unresolved evidence or next action. Never call the loop complete while the
-   Project's prompt or documents still need to be updated. Keep the needed
-   update visible before merge, but do not change the PR's draft/ready state
-   because of it; ready for review is compatible with a pending Project update.
-9. After the gated merge, pull `main`, verify the repository, complete any
-   already-authorized exact artifact cleanup, and issue the final handoff
-   without asking Brad to repeat authorization already recorded here. Report
-   any mandatory environment safety confirmation precisely. If a browser UI
-   presents action-time confirmation for an exact target covered by the standing
-   authorization, confirm it and proceed. Stop only for a platform-enforced
-   user-only control or an ambiguous target, and do not request another
-   authorization for the same exact deletion batch.
-
-If the day produces no justified tracked change, report an explicit no-change
-result with the validation and issue-routing evidence; do not manufacture a PR
-or public wiki content merely to make the loop look active.
-
-The #85 model/effort experiment ended after the September 15 Sol Medium run.
-Use Sol Light/Low for routine daily commutes. Escalate only when the evidence
-or task complexity warrants it. Do not collect new experimental phase profiles
-or delay a daily handoff for experiment bookkeeping unless Brad explicitly
-reopens the experiment. Preserve existing private measurements.
 
 ## Git and handoff
 
@@ -327,13 +183,13 @@ reopens the experiment. Preserve existing private measurements.
   Otherwise, a request to create a PR authorizes only a branch, commit, push,
   and review-ready PR unless a genuine
   unfinished item requires draft status.
-- Apply the commute publication risk tiers above before requesting or waiting
+- Apply the commute publication risk tiers in the skill before requesting or waiting
   for general-purpose AI review. When a review is required, wait for the latest
   head's review workflow to complete, inspect submitted reviews and unresolved
   threads, and address actionable findings in that PR or a clearly linked
   follow-up before publishing.
 - After opening or updating a PR, wait for required checks and apply the commute
-  risk tiers above. Immediately before any merge, refresh submitted reviews
+  risk tiers in the skill. Immediately before any merge, refresh submitted reviews
   and all unresolved inline threads at the current head; never rely on a
   previous snapshot while review is still arriving. Inspect unresolved review
   threads. A documentation-only or

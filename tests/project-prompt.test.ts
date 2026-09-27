@@ -222,11 +222,7 @@ test('daily commute completion cannot omit a required Project update', async () 
   const normalizedSkill = skill.replace(/\s+/g, ' ');
   const normalizedAgents = agents.replace(/\s+/g, ' ');
 
-  assert.match(
-    normalizedAgents,
-    /say exactly which Project prompt or document needs to be updated/i
-  );
-  assert.match(normalizedAgents, /until the agent applies and verifies it/i);
+  assert.match(normalizedAgents, /process-daily-commute skill/i);
   assert.match(normalizedSkill, /identify the exact merged or review-ready prompt/i);
   assert.match(
     normalizedSkill,
@@ -235,7 +231,7 @@ test('daily commute completion cannot omit a required Project update', async () 
   assert.match(normalizedSkill, /verify the result/i);
   assert.match(normalizedSkill, /Do not ask Brad to perform or confirm this synchronization/i);
 
-  for (const normalized of [normalizedSkill, normalizedAgents]) {
+  for (const normalized of [normalizedSkill]) {
     assert.match(normalized, /never call the .*complete|do not call the .*complete/i);
     assert.match(normalized, /do not change the PR's draft\/ready state/i);
     assert.match(normalized, /ready for review is compatible/i);
@@ -252,10 +248,13 @@ test('daily commute cleanup uses approved Library access and exact Downloads tar
     normalized,
     /Use SafariDriver MCP for fallback authenticated ChatGPT main-Library and Project Library\/Sources access/i
   );
-  assert.match(normalized, /Use signed-in SafariDriver for Project Library\/Sources cleanup/i);
+  assert.match(
+    normalized,
+    /Use signed-in SafariDriver for exact authorized Project Library\/Sources cleanup/i
+  );
   assert.match(normalized, /Preserve unrelated Project sources/i);
   assert.match(
     normalized,
-    /Verify that every targeted queue, validated v4 reference, and bundle row is absent there and every targeted Downloads file is absent/i
+    /every targeted queue, validated v4 reference, and bundle ID is absent and every targeted Downloads file is absent/i
   );
 });

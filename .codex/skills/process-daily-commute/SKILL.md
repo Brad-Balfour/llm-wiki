@@ -6,9 +6,9 @@ description: Process Brad's recurring daily commute intake end to end. Use when 
 # Process Daily Commute
 
 Treat the commute as a recurring evidence and improvement loop, not a one-off
-file review. Read the `Recurring daily commute processing` section of
-`AGENTS.md` first; it is the authoritative policy. Use this skill for execution
-order and completion checks.
+file review. `AGENTS.md` records standing authorization and repository-wide PR
+rules. This skill owns the commute procedure, publication gates, and completion
+checks.
 
 ## Model and performance guidance
 
@@ -38,10 +38,12 @@ This is a bounded Safari workflow qualification, not a restart of #85 or #119.
 
 ## Publication scope and communication
 
-Follow the risk-tiered publication policy in `AGENTS.md`. Invoking this recurring
+Use the risk-tiered publication policy here. Invoking this recurring
 workflow authorizes merging its qualifying content PR after the required gates
 pass and performing required live Project synchronization. Changes to agent
 instructions or commute policy require Brad's review before merge.
+Keep the PR as the publication record, review boundary, rollback point, and
+Pages trigger.
 Content- and evidence-only daily publication relies on deterministic gates and
 does not require a general-purpose AI review unless a gate or maintainer
 identifies ambiguity.
@@ -76,7 +78,8 @@ URL; if it fails, try one reasonable direct fetch retry and then report the
 specific inaccessible source. Do not turn public-source retrieval into a browser
 workflow.
 
-Shared-chat URLs are not part of routine intake auditing. Rely on validated
+Shared-chat URLs are not part of routine intake auditing. Do not perform a
+routine full-chat audit. Rely on validated
 queue and session-bundle evidence unless a bundle is missing or malformed, an
 item action or claim conflicts with the canonical queue, a specific material
 fact is ambiguous, or Brad asks for the audit. When one of those conditions
@@ -127,7 +130,7 @@ a local attachment. Do not search unrelated chats or folders for a hidden
 Project mount.
 
 Use SafariDriver MCP for fallback authenticated ChatGPT main-Library and Project
-Library/Sources access, plus necessary Project updates and exact cleanup.
+Library/Sources access, plus necessary Project Sources updates and cleanup.
 Local repository files are copies, not a live Project Library mount; no direct
 Project file API has been established. Use direct web retrieval for public
 articles and shared chats first. If SafariDriver MCP appears unavailable,
@@ -226,6 +229,10 @@ files; do not make him reattach artifacts already retrieved successfully.
 5. Reconcile evidence into the repository's established channels: maintenance
    candidates, exact classifier feedback, quality incidents, general captures,
    duplicate/prior-awareness evidence, and unresolved evidence.
+   Adjudicate bundle item actions against the canonical queue and targeted
+   conversation evidence, when needed, before storing classifier labels. A
+   negative assessment of an article alone does not establish an interest or
+   depth correction, even if the bundle marks it `mark_uninterested`.
 6. Build a private evidence-coverage ledger before editing durable outputs.
    Give every substantive user comment, correction, discussion point, save
    request, workflow complaint, and export/recovery observation present in the
@@ -261,6 +268,9 @@ only when the intended action or target genuinely cannot be determined.
    not private merely because they arrived by email. Preserve classifier and
    workflow annotations even when the malformed bundle omitted them but the
    canonical queue and bounded conversation evidence establish them exactly.
+   When adding or changing a dated experiment-log result, update its `Evidence
+   Sources` inventory in the same diff and cross-check queue, bundle, and
+   shared-chat counts against that result.
 3. Search all open issues before creating a new destination. Route every
    material commute-flow observation to every relevant existing issue in the
    same run rather than choosing only one umbrella issue. Include date, artifact
@@ -316,6 +326,10 @@ only when the intended action or target genuinely cannot be determined.
    workflow. Wait for Brad's review before merging agent-instruction or
    commute-policy changes.
 
+If the day produces no justified tracked change, report a complete no-change
+handoff with validation and issue-routing evidence. Do not manufacture a PR or
+public wiki content merely to make the loop look active.
+
 ## Post-merge artifact cleanup
 
 Cleanup of transient source artifacts is destructive. `AGENTS.md` records
@@ -331,17 +345,27 @@ Brad to repeat authorization already recorded in `AGENTS.md`; report any
 mandatory environment safety confirmation precisely. If the browser presents an
 action-time confirmation for an exact authorized target, confirm it and proceed.
 Do not pause for or request another confirmation.
+Stop only for a platform-enforced user-only control or ambiguous target.
 
 1. If the run has a PR, do not delete anything until that exact PR is merged.
    An open, draft, closed-unmerged, or checks-pending PR leaves cleanup pending.
    If the run has a justified no-change result and no PR, cleanup may begin only
    after the complete no-change handoff is recorded.
-2. Resolve cleanup targets from the private retrieval manifest and inventory
-   main ChatGPT Library independently in List View. Use each exact row's
-   three-dot menu. Delete each exact validated queue, v4 reference, and
-   commute-session bundle consumed by the completed run from that Library.
-   Use signed-in SafariDriver for Project Library/Sources cleanup and verify
-   each exact target there. Preserve unrelated Project sources.
+2. Resolve cleanup targets from the private retrieval manifest. For matching
+   files in the personal ChatGPT File Library `/LLM-Wiki-Car` folder, use the
+   same ChatGPT Work chat and its native `files__list` or `files__search` to
+   resolve each exact filename to a stable `libfile_` ID. Compare the returned
+   file content and metadata with the validated manifest, especially when a
+   name has duplicates or a Library suffix. Ask the chat to call
+   `files__manage_library` with `operation: "delete"` and only that exact file
+   ID, one authorized target at a time. Record its result and run a fresh
+   `files__list` to verify absence. This tool has no documented restore
+   operation, so never delete from a guessed name or a broad folder target.
+   If an ID cannot be resolved exactly, the tool is unavailable, or verification
+   is ambiguous, use signed-in SafariDriver for only the affected Library row.
+   The Work tool cannot detach Project knowledge or delete Project Sources;
+   use signed-in SafariDriver for exact authorized Project Library/Sources
+   cleanup and verify each target there. Preserve unrelated Project sources.
    Do not delete the Project Library folder itself, shared chats, Project source
    documents, schemas, prompts, unrelated dated artifacts, or a plausible row
    that was not validated into the final intake.
@@ -353,11 +377,12 @@ Do not pause for or request another confirmation.
 4. Keep the normalized `.private/` intake, coverage ledger, and retrieval
    manifest as the durable audit and recovery record. Library and Downloads are
    transient copies; `.private/` is not part of this cleanup request.
-5. Reopen and inventory the main Library after deletion. Verify that every
-   targeted queue, validated v4 reference, and bundle row is absent there and
+5. Re-list the main Library through the Work chat after deletion. Verify that
+   every targeted queue, validated v4 reference, and bundle ID is absent and
    every targeted Downloads file is absent. If Project Library copies were
-   targeted, also verify those copies and unrelated
-   source preservation in the signed-in Project UI. Then append the
+   targeted, also verify those copies and unrelated source preservation in the
+   signed-in Project UI. When SafariDriver handled a Library fallback, also
+   re-inventory those exact rows in its UI. Then append the
    exact targets, deletion time, and per-location verification result to the
    private retrieval manifest. Report partial failures precisely and leave
    unmatched or ambiguous files untouched.

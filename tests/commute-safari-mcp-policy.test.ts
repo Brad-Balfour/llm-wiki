@@ -45,22 +45,10 @@ test('daily commute skill defines the SafariDriver authentication and reconnect 
   assert.match(normalized, /Use `send_message_to_thread`, then `read_thread`/i);
   assert.match(normalized, /Parse the entire reassembled response and validate its schema/i);
   assert.match(normalized, /Use SafariDriver only for affected files or ambiguous inventory/i);
-  assert.match(
-    normalizedAgents,
-    /Use signed-in SafariDriver MCP only when this relay misses an expected file/i
-  );
-  assert.match(normalizedAgents, /Use direct web retrieval for public article URLs/i);
-  assert.match(
-    normalizedAgents,
-    /Exclude nonpublic personal identifying information about any person/i
-  );
-  assert.match(normalizedAgents, /public article facts and public newsletter content/i);
-  assert.match(normalizedAgents, /Do not perform a routine full-chat audit/i);
-  assert.match(
-    normalizedAgents,
-    /ask Brad specifically to toggle the SafariDriver MCP off and on/i
-  );
-  assert.match(normalizedAgents, /Do not substitute integrated browser or computer-use tooling/i);
+  assert.match(normalizedAgents, /process-daily-commute skill/i);
+  assert.match(normalized, /Exclude nonpublic personal identifying information about any person/i);
+  assert.match(normalized, /public article facts and public newsletter content/i);
+  assert.match(normalized, /Do not perform a routine full-chat audit/i);
 });
 
 test('daily commute skill uses List View row actions and bounded DOM recovery', async () => {
@@ -78,7 +66,7 @@ test('daily commute skill uses List View row actions and bounded DOM recovery', 
   assert.match(normalized, /do not claim that original-byte access is universally required/i);
 });
 
-test('daily commute skill preserves detailed diagnostics and exact Safari cleanup', async () => {
+test('daily commute skill preserves detailed diagnostics and exact Library cleanup', async () => {
   const skill = await readFile('.codex/skills/process-daily-commute/SKILL.md', 'utf8');
   const normalized = skill.replace(/\s+/g, ' ');
 
@@ -91,19 +79,18 @@ test('daily commute skill preserves detailed diagnostics and exact Safari cleanu
   assert.match(normalized, /detailed, evidence-backed findings/i);
   assert.match(normalized, /timing, errors, and available token or usage evidence/i);
   assert.match(normalized, /Exclude nonpublic personal identifying information about any person/i);
-  assert.match(normalized, /main ChatGPT Library independently in List View/i);
-  assert.match(normalized, /Use each exact row's three-dot menu/i);
-  assert.match(normalized, /Use signed-in SafariDriver for Project Library\/Sources cleanup/i);
-  assert.match(normalized, /validated v4-reference, and session-bundle artifacts/i);
-  assert.match(normalized, /do not ask Brad for additional per-run or per-artifact authorization/i);
+  assert.match(normalized, /native `files__list` or `files__search`/i);
+  assert.match(normalized, /`files__manage_library` with `operation: "delete"`/i);
   assert.match(
     normalized,
-    /Delete each exact validated queue, v4 reference, and commute-session bundle consumed by the completed run from that Library/i
+    /Use signed-in SafariDriver for exact authorized Project Library\/Sources cleanup/i
   );
+  assert.match(normalized, /validated v4-reference, and session-bundle artifacts/i);
+  assert.match(normalized, /do not ask Brad for additional per-run or per-artifact authorization/i);
   assert.match(normalized, /exact queue, validated v4 reference, and bundle downloads/i);
   assert.match(
     normalized,
-    /every targeted queue, validated v4 reference, and bundle row is absent there/i
+    /every targeted queue, validated v4 reference, and bundle ID is absent/i
   );
   assert.match(normalized, /Preserve unrelated Project sources/i);
 });
@@ -127,13 +114,14 @@ test('daily commute workflow does not ask for repeat authorization', async () =>
   assert.doesNotMatch(normalized, /obtain any deletion authorization/i);
   assert.doesNotMatch(normalized, /leave only the exact browser deletions pending/i);
   assert.match(
-    normalizedAgents,
-    /action-time confirmation for an exact target covered by the standing authorization, confirm it and proceed/i
+    normalized,
+    /action-time confirmation for an exact authorized target, confirm it and proceed/i
   );
   assert.match(
-    normalizedAgents,
-    /Stop only for a platform-enforced user-only control or an ambiguous target/i
+    normalized,
+    /Stop only for a platform-enforced user-only control or ambiguous target/i
   );
+  assert.match(normalizedAgents, /standing authorization to delete the exact queue/i);
   assert.match(normalizedAgents, /Immediately before any merge, refresh submitted reviews/i);
   assert.doesNotMatch(normalizedAgents, /leave only the exact browser deletions pending/i);
 });
