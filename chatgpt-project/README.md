@@ -45,9 +45,10 @@ Sources, then replace Project Instructions with the exact tracked
 `CHATGPT_CAR_QUEUE_PROMPT.md`. The Project source is Python code for the code
 tool to load and run; retrieval of a source file alone does not execute it.
 Test on iPhone Live that the code tool can read the complete source and exact
-playback file, return the selected string for begin, next, previous,
-repeat, and a numbered jump, and speak that string without changing it. Test a
-normal article discussion between playback turns. If any required file or the
+playback file, reopen that same file for each playback command, return the
+selected string for begin, next, previous, repeat, and a numbered jump, and
+speak that string without changing it. Test a normal article discussion
+between playback turns and open the reference only for details or export. If any required file or the
 code tool is unavailable in Live, do not install Prompt 5.1 as the working
 playback procedure. The draft PR does not change the live Project. To roll
 back a later pilot, restore the previously verified Project Instructions and
