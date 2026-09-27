@@ -110,7 +110,14 @@ intake or available as explicit ChatGPT chat attachments through `read_thread`,
 when their provenance and contents can be validated. A generated
 `sandbox:/mnt/data/` link in a chat is not itself a local attachment. Do not
 search unrelated chats or local folders hoping for a hidden Project mount. For
-files only in ChatGPT Library or Project Sources, use the signed-in UI:
+an exact Project-scoped JSON file, first ask an existing ChatGPT Work chat in
+`LLM-Wiki-Car` to read that file from Project Library and return its complete
+raw text. Use `send_message_to_thread`, then `read_thread`; parse the entire
+response and validate its schema, declared source identity, and completeness
+against other intake evidence. This relay read `20260925-tldr-ai.txt` in one
+request; it is not a Codex Project-file API or proof that all files are
+reachable. If the chat cannot return a complete validated file, use the
+signed-in UI:
 
 Use SafariDriver MCP for authenticated ChatGPT main-Library and Project
 Library/Sources access, including necessary Project updates and exact cleanup.
@@ -135,9 +142,11 @@ its cookies.
 
 ### Signed-in Library access
 
-Do not silently switch to integrated browser, computer-use, or ChatGPT Work
-tooling for signed-in main-Library retrieval; report the exact missing
-condition. Public source reading must use direct web retrieval. Local validation
+Do not silently switch to integrated browser or computer-use tooling for
+signed-in main-Library retrieval; report the exact missing condition. The
+Project-scoped ChatGPT Work text relay above is a bounded read path for exact
+files, with SafariDriver fallback when its result cannot be validated. Public
+source reading must use direct web retrieval. Local validation
 may use the shell, and repository work may use Git and GitHub.
 
 1. Resolve relative dates in `America/New_York` and form `YYYYMMDD`.

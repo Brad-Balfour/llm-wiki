@@ -207,6 +207,12 @@ a live Project Library mount; no direct Project file API has been established.
 Exact original files already in private local intake or explicitly attached to
 a ChatGPT chat can be read directly when provenance and contents validate;
 generated `sandbox:/mnt/data/` links alone do not provide Codex file access.
+For an exact Project-scoped JSON file, a ChatGPT Work chat in `LLM-Wiki-Car`
+can return its full raw text through `send_message_to_thread` and
+`read_thread`; parse and validate the entire result before using it. This
+worked for `20260925-tldr-ai.txt`, but does not establish a general Project
+file API or guarantee every file can be relayed. Use SafariDriver when the
+relay is incomplete or cannot be validated.
 Do not open public articles in SafariDriver for ordinary source reading.
 If SafariDriver MCP appears unavailable for main-Library retrieval, check its
 availability once more; if it is still unavailable or unhealthy, ask Brad

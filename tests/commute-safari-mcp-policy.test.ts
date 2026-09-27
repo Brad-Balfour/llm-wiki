@@ -39,10 +39,9 @@ test('daily commute skill defines the SafariDriver authentication and reconnect 
   assert.match(normalized, /driver-created tab, and ask Brad to sign in/i);
   assert.match(normalized, /If its MCP transport closes.*repeat the signed-in-only page check/i);
   assert.match(normalized, /### Signed-in Library access/i);
-  assert.match(
-    normalized,
-    /Do not silently switch to integrated browser, computer-use, or ChatGPT Work tooling/i
-  );
+  assert.match(normalized, /Do not silently switch to integrated browser or computer-use tooling/i);
+  assert.match(normalized, /Use `send_message_to_thread`, then `read_thread`/i);
+  assert.match(normalized, /parse the entire response and validate its schema/i);
   assert.match(
     normalizedAgents,
     /signed-in SafariDriver MCP for ChatGPT main-Library and Project Library\/Sources retrieval/i
