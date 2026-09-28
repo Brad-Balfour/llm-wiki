@@ -124,11 +124,14 @@ reference rows whose source dates are in that window, across every newsletter
 type, plus every bundle row for the requested session/export date and plausible
 noncanonical bundle rows modified during the intake window. Return exact
 displayed filenames, paths, modified values, counts, and pagination status; do
-not infer names from dates or chat history. If a folder-level or nonrecursive
-listing omits a known row or conflicts with visible counts, repeat the inventory
-recursively from the Library root, filter by the exact `/LLM-Wiki-Car` path,
-and follow pagination until there is no next cursor. A zero-bundle result from a
-nonrecursive listing is not a complete inventory.
+not infer names from dates or chat history. For a complete bundle inventory,
+start with a recursive listing from the Library root, filter by the exact
+`/LLM-Wiki-Car` path, and follow pagination until there is no next cursor. A
+folder-level or nonrecursive listing may supplement discovery, but it cannot
+establish that all in-scope bundles were found, even when it returns one or
+more rows without a count conflict. Accept a narrower listing as complete only
+when the Library tool explicitly guarantees descendant coverage and supplies a
+verifiable total for the relevant rows.
 
 Ask the Work chat to read every in-scope bundle first. For each bundle, use its
 `queue_snapshot.filename` to identify the exact queue; for v4, retrieve its
