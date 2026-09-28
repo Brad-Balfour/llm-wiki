@@ -40,11 +40,20 @@ test('daily commute skill defines the SafariDriver authentication and reconnect 
   assert.match(normalized, /If its MCP transport closes.*repeat the signed-in-only page check/i);
   assert.match(normalized, /### SafariDriver fallback for signed-in Library access/i);
   assert.match(normalized, /Do not silently switch to integrated browser or computer-use tooling/i);
-  assert.match(normalized, /For every nightly Library intake, use an existing ChatGPT Work chat/i);
-  assert.match(normalized, /list actual queue, reference, and bundle filenames/i);
+  assert.match(
+    normalized,
+    /Use an existing ChatGPT Work chat inside `LLM-Wiki-Car` as the first discovery and read path/i
+  );
+  assert.match(normalized, /keep three dates distinct: the requested processing date/i);
+  assert.match(normalized, /Include intervening calendar days, including weekends and holidays/i);
+  assert.match(normalized, /Do not use a fixed day-count lookback/i);
+  assert.match(normalized, /repeat the inventory recursively from the Library root/i);
+  assert.match(normalized, /inventory actual queue and reference rows/i);
   assert.match(normalized, /Use `send_message_to_thread`, then `read_thread`/i);
-  assert.match(normalized, /Parse the entire reassembled response and validate its schema/i);
-  assert.match(normalized, /Use SafariDriver only for affected files or ambiguous inventory/i);
+  assert.match(normalized, /Brad authorizes transferring the full raw contents/i);
+  assert.match(normalized, /Parse and validate the entire reassembled response/i);
+  assert.match(normalized, /interpret offsets as Unicode character positions/i);
+  assert.match(normalized, /Use SafariDriver only for the specific row/i);
   assert.match(normalizedAgents, /process-daily-commute skill/i);
   assert.match(normalized, /Exclude nonpublic personal identifying information about any person/i);
   assert.match(normalized, /public article facts and public newsletter content/i);

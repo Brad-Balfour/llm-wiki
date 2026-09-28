@@ -123,6 +123,12 @@ found a queue as proof.
   traversals. Strict bundle/pair validation, SHA-256 hashes, serialized chat
   captures, a source-page capture retrieved with SafariDriver, and the
   conversation-coverage and performance ledgers are retained privately.
+- The September 24 Fintech, September 25 AI, and September 28 General v4
+  playback/reference pairs; two September 28 session bundles; the wider
+  recursive Project Library inventory; and the bounded Friday AI chat read.
+  The morning bundle and first two pairs validate; the General pair and evening
+  bundle retain one strict attribution failure without editing original files.
+  Raw intake, retrieval comparisons, and coverage records remain private.
 - The live `Weekday TLDR Queues` Task conversation/configuration, the July
   21-24 Task Update emails, the July 24 manual queue-generation control, and
   the live Project settings/sources inspected on July 26.
@@ -2495,3 +2501,76 @@ source-to-wiki-maintenance run, not the root task or all browser interactions.
 No rollout counter was available for the root task or other phases, and none
 was reconstructed by reopening a long history. The private ledger also records
 the approximate Safari-call count and retrieval retry.
+
+### September 28 Wide-Date Commute Intake and Work-Read Recovery
+
+The requested processing date was Monday, September 28. The complete recursive
+Project Library inventory covered queue editions from Thursday, September 24
+through Monday, September 28, across all newsletter types, and every bundle row
+for the September 28 session/export date. It listed the September 24 Fintech
+queue, September 25 AI queue, and September 28 AI, Dev, Fintech, and General
+queues; there were no September 26–27 queue rows. The recursive listing found
+two September 28 bundles after the first nonrecursive listing omitted them. The
+morning bundle declares the September 24 Fintech queue; the evening bundle
+declares the September 28 General queue. The September 25 AI chat was also
+present, with no corresponding bundle row. The other three September 28 queue
+pairs remain unconsumed candidates because no matching bundle or bounded
+session evidence was found.
+
+The September 24 Fintech pair passed strict v4 validation (4 items), as did the
+September 25 AI pair (6 items). The September 28 General pair (8 items) failed
+strict validation: reference item 2 records publication `TestingCatalog` with
+`hostname_fallback`, while the validator requires `testingcatalog.com`. The
+evening bundle embeds that same pair and is rejected for the same reason. The
+original Library copies were not edited or silently repaired. The September 28
+morning bundle passed strict validation and canonically matched its separate
+Fintech pair; it reports `recovered` integrity, 4 item announcements, 3
+transitions, and 3 quality incidents. The evening bundle reports `partial`
+integrity and contains 8 announcements, 8 transitions, two classifier depth
+corrections, one wiki save, and two playback/completion incidents. The importer
+accepted the morning session and rejected the evening session, so its accepted
+record has no maintenance candidates or labels from the invalid bundle.
+
+The Friday AI shared chat was read through all five returned turns. It covered
+an item's relation to the Jev product and a position clarification; it added
+no classifier correction or save. Its exact queue pair validates, but the
+Library inventory has no matching bundle. The September 28 General save is
+preserved in the existing AI Product Experimentation page with the captured
+discussion: use the cheapest artifact to answer the biggest uncertainty, get
+feedback, discard or revise, and only then decide what deserves production
+engineering; normalize throwaway learning code, work across sequential team
+handoffs, and optimize question-to-feedback latency. The article URL could not
+be retrieved directly, so the page marks those points as discussion synthesis
+and does not present them as an independent summary of the full article.
+
+Two explicit General depth corrections are preserved as private held
+candidates: Waymo item `general-004` from `headline_only` to `in_depth`, and
+Tesla Optimus item `general-008` from `headline_only` to `in_depth`. The
+feedback is exact in the bundle. The Optimus comment also adds a topic-level
+preference for robot articles to use in-depth playback. Both preferences are
+preserved as future calibration evidence; no live classifier rule changed. The
+append-only label recorder requires a strict-valid complete pair, so the
+invalid pair was not bypassed to append score-bearing labels. The exact
+feedback and blocked validation boundary are routed to the existing classifier
+issues #35 and #66. The invalid published
+pair reopens #147 under its stated regression condition. Item 8's spoken
+sentence did not match its stored playback; completion omitted the required
+line and named the AI queue instead of the selected General queue. Those
+playback failures route to #100.
+
+The September 25 AI reference was read in the existing Work Project chat as two
+consecutive chunks: 12,926 characters matched the local download apart from
+the local file's final newline. Both September 28 bundles were also read in
+that chat and compared with their local downloads. The morning relay repeated
+one boundary space; removing that duplicate from the relay assembly produced
+matching content. The evening relay's 24,000–31,999 chunk was two characters
+short; a targeted read filled the exact gap. The assembled Work text matched
+the original contents for both bundles, including all events. No original file
+was changed. The private manifest records both native and SafariDriver
+retrieval steps. This run's
+Codex model/effort and rollout token counters were unavailable to the root task,
+despite the request for GPT-6 Luna Extra High. Account-wide usage samples were
+0%/22% at 22:24:52 UTC, 1%/22% at 22:31:18 and 22:34:46, 2%/22% at 22:58:51,
+4%/23% at 23:22:10, and 6%/23% at 23:44:06. These are account-wide
+snapshots, not a per-task bill; the private performance ledger records the
+samples and marks unavailable counters rather than estimating them.

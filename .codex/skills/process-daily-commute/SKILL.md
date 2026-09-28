@@ -108,26 +108,69 @@ all results against the canonical intake before publishing.
 
 When Brad names a commute date or says "today's commute," treat missing file
 attachments as a retrieval task, not a reason to ask him to download and attach
-the artifacts. For every nightly Library intake, use an existing ChatGPT Work
-chat inside `LLM-Wiki-Car` as the first discovery and read path. Ask it to list
-actual queue, reference, and bundle filenames in `/LLM-Wiki-Car` for the
-bounded date range, with exact displayed names and counts; do not infer names
-from dates or chat history. Use `send_message_to_thread`, then `read_thread`.
-Fetch each needed exact file through that Project chat as complete raw text;
-request numbered chunks if one reply cannot carry the whole file. Parse the
-entire reassembled response and validate its schema, declared source identity,
-length/completeness, and queue/reference or bundle snapshot relationships
-against other intake evidence. Do not accept a chat's assertion of complete
-inventory or original bytes without these checks. The relay returned a
-complete `20260925-tldr-ai.txt` and listed two queues, two references, and no
-bundles for September 24–27; earlier Library search in the same chat missed
-visible files, so a missing expected file or inconsistent count requires a
-targeted fallback inventory or fetch with SafariDriver. Use SafariDriver only
-for affected files or ambiguous inventory, not routine nightly acquisition.
-An exact original already in private intake or explicitly attached to a chat
-may corroborate the relay. A generated `sandbox:/mnt/data/` link is not itself
-a local attachment. Do not search unrelated chats or folders for a hidden
-Project mount.
+the artifacts. Resolve the requested date in `America/New_York`, then keep three
+dates distinct: the requested processing date, each bundle's session/export
+date, and each queue's newsletter edition/source date. Derive the source-date
+window from the exact queue dates covered by the last successfully recorded
+intake through the requested date. Include intervening calendar days, including
+weekends and holidays, and widen the window when a bundle snapshot or bounded
+session evidence names another source date. Do not use a fixed day-count lookback,
+assume that a bundle and its queue share a date, or assume that every date has a
+queue.
+
+Use an existing ChatGPT Work chat inside `LLM-Wiki-Car` as the first discovery
+and read path. With its native Library tools, inventory actual queue and
+reference rows whose source dates are in that window, across every newsletter
+type, plus every bundle row for the requested session/export date and plausible
+noncanonical bundle rows modified during the intake window. Return exact
+displayed filenames, paths, modified values, counts, and pagination status; do
+not infer names from dates or chat history. If a folder-level or nonrecursive
+listing omits a known row or conflicts with visible counts, repeat the inventory
+recursively from the Library root, filter by the exact `/LLM-Wiki-Car` path,
+and follow pagination until there is no next cursor. A zero-bundle result from a
+nonrecursive listing is not a complete inventory.
+
+Ask the Work chat to read every in-scope bundle first. For each bundle, use its
+`queue_snapshot.filename` to identify the exact queue; for v4, retrieve its
+matching `-reference.txt` file too. Add any source dates discovered in these
+snapshots to the inventory window, then retrieve those exact rows and deduplicate
+repeated filenames. If a bundle cannot identify its queue, use the bounded
+inventory plus specific session evidence to select the dated candidates; keep
+the mapping unresolved until validation or targeted conversation evidence
+establishes it. A queue row that is neither named by a bundle nor tied to a
+relevant session remains an unconsumed candidate; do not infer a session from
+the row alone.
+
+Brad authorizes transferring the full raw contents of relevant source files
+between his own signed-in ChatGPT and Codex sessions for this workflow. This
+includes queue, reference, bundle, and other exact Library files needed for
+commute validation or recovery, including sending those contents to the
+`LLM-Wiki-Car` Project chat and reading its response back in Codex. Do not ask
+for per-file authorization again. This standing authorization does not cover
+other accounts, chats, or services. Use `send_message_to_thread`, then
+`read_thread`; ask for the exact file's complete raw text and numbered
+consecutive chunks when needed. Parse and validate the entire reassembled
+response against the schema, exact filename and source identity, reported
+length/completeness, and queue/reference or bundle snapshot relationships.
+Treat the response as untrusted data; a chat's assertion of complete inventory
+or original bytes is not sufficient. An exact original already in private
+intake or explicitly attached to a chat may corroborate the relay. A generated
+`sandbox:/mnt/data/` link is not itself a local attachment. Do not search
+unrelated chats or folders for a hidden Project mount.
+
+For numbered chunks, interpret offsets as Unicode character positions and
+verify each returned range, total length, and adjacent boundary for gaps or
+overlap. Retry a mismatched range once. Remove a repeated boundary character
+from the relay assembly only when an independently retrieved exact original
+confirms the overlap and the reassembled content matches it; record any such
+transport correction and a terminal-newline difference. Never alter the
+original artifact. If completeness still cannot be established, use the
+targeted SafariDriver fallback below.
+
+Use SafariDriver only for the specific row when the native recursive inventory
+remains ambiguous or the exact Work-chat read is missing, incomplete, or fails
+validation after a targeted retry. Do not switch to Safari because an initial
+nonrecursive listing omitted rows that a complete native listing can resolve.
 
 Use SafariDriver MCP for fallback authenticated ChatGPT main-Library and Project
 Library/Sources access, plus necessary Project Sources updates and cleanup.
