@@ -47,7 +47,14 @@ test('daily commute skill defines the SafariDriver authentication and reconnect 
   assert.match(normalized, /keep three dates distinct: the requested processing date/i);
   assert.match(normalized, /Include intervening calendar days, including weekends and holidays/i);
   assert.match(normalized, /Do not use a fixed day-count lookback/i);
-  assert.match(normalized, /repeat the inventory recursively from the Library root/i);
+  assert.match(
+    normalized,
+    /For a complete bundle inventory, start with a recursive listing from the Library root/i
+  );
+  assert.match(
+    normalized,
+    /A folder-level or nonrecursive listing may supplement discovery, but it cannot establish that all in-scope bundles were found/i
+  );
   assert.match(normalized, /inventory actual queue and reference rows/i);
   assert.match(normalized, /Use `send_message_to_thread`, then `read_thread`/i);
   assert.match(normalized, /Brad authorizes transferring the full raw contents/i);
