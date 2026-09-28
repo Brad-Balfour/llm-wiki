@@ -7,10 +7,10 @@ aliases: ["The AI era requires a different kind of experimentation","Why is Chat
 tags: ["ai-products","product-experimentation","product-strategy","user-experience","desktop-apps","ai-adoption"]
 wiki_slug: ai-product-experimentation
 created: 2026-08-24
-updated: 2026-09-28
+updated: 2026-08-24
 confidence: medium
 # prettier-ignore
-provenance: [{"source_item_id":"url_fdff1c906a012550","url":"https://www.elenaverna.com/p/the-ai-era-requires-a-different-kind"},{"source_item_id":"url_67b7bc824509f52c","url":"https://allenpike.com/2025/why-is-chatgpt-so-good-claude/"},{"source_item_id":"general-006","url":"https://blog.ravi-mehta.com/p/ai-era-product-skills"}]
+provenance: [{"source_item_id":"url_fdff1c906a012550","url":"https://www.elenaverna.com/p/the-ai-era-requires-a-different-kind"},{"source_item_id":"url_67b7bc824509f52c","url":"https://allenpike.com/2025/why-is-chatgpt-so-good-claude/"}]
 ---
 
 # AI Product Experimentation
@@ -29,12 +29,6 @@ Elena Verna argues that playbooks optimized for slow development and minor surfa
 
 Allen Pike's comparison of Mac AI clients supplies a concrete product counterweight. ChatGPT's advantage is attributed less to a single technical stack than to sustained investment in stability, platform conventions, performance, and day-one feature support. The takeaway is not “native always wins”; it is that an AI model reaches users through a maintained product surface, and that surface can become the durable advantage.
 
-### Cheap learning loops need changed team mechanics
-
-The September 28 commute discussion of Ravi Mehta's product-skills article turned the cheap-prototyping idea into an operating loop: name the biggest uncertainty, build the least expensive artifact that can answer it, get feedback quickly, then discard or revise it before deciding what deserves production engineering. Product, design, and engineering can work on the same uncertainty instead of passing a detailed specification through sequential handoffs.
-
-Treat throwaway prototypes as normal and keep learning code separate from production code. Measure end-to-end time from a question to useful feedback, rather than optimizing each person's local task speed. As implementation gets cheaper, the bottlenecks shift toward choosing the right uncertainty, curating feedback, and reducing organizational delay. These points preserve the user's commute discussion and the newsletter description; the linked article itself could not be retrieved directly during this run, so they are discussion synthesis rather than an independent summary of the full text.
-
 ## Source Notes
 
 ### [The AI era requires a different kind of experimentation](https://www.elenaverna.com/p/the-ai-era-requires-a-different-kind)
@@ -48,12 +42,6 @@ Elena Verna, 2026-06-25. Critiques small, superficial, short-horizon experimenta
 <!-- source-item-id: url_67b7bc824509f52c -->
 
 Allen Pike, 2025-11-30. A product-strategy comparison of native and cross-platform AI desktop clients, centered on organizational priority and polish.
-
-### [Do my hard-won product skills still matter in the AI era?](https://blog.ravi-mehta.com/p/ai-era-product-skills)
-
-<!-- source-item-id: general-006 -->
-
-Ravi Mehta, discussed in the September 28, 2026 General commute. The saved discussion focused on inexpensive AI-assisted prototypes, shared work on uncertainty, throwaway learning code, and end-to-end feedback latency. The full article page was inaccessible to this run; see the preceding discussion-synthesis qualification.
 
 ## Related
 

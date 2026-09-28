@@ -2534,14 +2534,11 @@ record has no maintenance candidates or labels from the invalid bundle.
 The Friday AI shared chat was read through all five returned turns. It covered
 an item's relation to the Jev product and a position clarification; it added
 no classifier correction or save. Its exact queue pair validates, but the
-Library inventory has no matching bundle. The September 28 General save is
-preserved in the existing AI Product Experimentation page with the captured
-discussion: use the cheapest artifact to answer the biggest uncertainty, get
-feedback, discard or revise, and only then decide what deserves production
-engineering; normalize throwaway learning code, work across sequential team
-handoffs, and optimize question-to-feedback latency. The article URL could not
-be retrieved directly, so the page marks those points as discussion synthesis
-and does not present them as an independent summary of the full article.
+Library inventory has no matching bundle. The September 28 General save
+remains a retryable `insufficient_source` candidate because the article URL
+could not be retrieved. The queue summary and commute discussion do not
+substitute for retrieved source text under the wiki-maintainer contract, so
+this run made no public wiki edit for that item.
 
 Two explicit General depth corrections are preserved as private held
 candidates: Waymo item `general-004` from `headline_only` to `in_depth`, and
