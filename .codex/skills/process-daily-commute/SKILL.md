@@ -393,11 +393,14 @@ public wiki content merely to make the loop look active.
 ## Post-merge artifact cleanup
 
 Cleanup of transient source artifacts is destructive. `AGENTS.md` records
-Brad's standing authorization for the exact queue, validated v4-reference, and
-session-bundle artifacts consumed by durably completed commute runs. Record the
-standing authorization and exact targets in the private retrieval manifest; do
-not ask Brad for additional per-run or per-artifact authorization. Cleanup may
-begin only after processing is durably complete:
+Brad's standing authorization to delete the exact queue, validated
+v4-reference, and session-bundle artifacts listed as cleanup targets in the
+private retrieval manifest for durably completed commute runs. This applies to
+those exact artifacts whether validation succeeded, failed, or remained
+incomplete. Record the authorization and exact targets in
+the private retrieval manifest; do not ask Brad for additional per-run or
+per-artifact authorization. Preserve files outside the exact target list.
+Cleanup may begin only after processing is durably complete:
 
 After the gated merge, pull `main` and verify the repository before cleanup.
 Complete already-authorized exact cleanup and the final handoff without asking
@@ -427,10 +430,12 @@ Stop only for a platform-enforced user-only control or ambiguous target.
    use signed-in SafariDriver for exact authorized Project Library/Sources
    cleanup and verify each target there. Preserve unrelated Project sources.
    Do not delete the Project Library folder itself, shared chats, Project source
-   documents, schemas, prompts, unrelated dated artifacts, or a plausible row
-   that was not validated into the final intake.
+   documents, schemas, prompts, or unrelated dated artifacts outside the exact
+   manifest targets, regardless of filename similarity or validation status.
 3. In `~/Downloads`, remove only the exact queue, validated v4 reference, and
-   bundle downloads created or verified during this run. Match filenames and,
+   bundle downloads listed as cleanup targets in this run's manifest. This
+   exact-reference scope includes references that failed or never completed
+   validation. Match filenames and,
    when duplicate suffixes or pre-existing same-name files exist, confirm
    content against the private intake before removing them. Prefer moving local
    files to Trash; never use a broad glob or recursive deletion.
@@ -439,9 +444,11 @@ Stop only for a platform-enforced user-only control or ambiguous target.
    transient copies; `.private/` is not part of this cleanup request.
 5. Re-list the main Library through the Work chat after deletion. Verify that
    every targeted queue, validated v4 reference, and bundle ID is absent and
-   every targeted Downloads file is absent. If Project Library copies were
-   targeted, also verify those copies and unrelated source preservation in the
-   signed-in Project UI. When SafariDriver handled a Library fallback, also
+   every targeted Downloads file is absent. This exact-target verification
+   includes references regardless of their validation result. If Project
+   Library copies were targeted, also verify those copies and unrelated source
+   preservation in the signed-in Project UI. When SafariDriver handled a
+   Library fallback, also
    re-inventory those exact rows in its UI. Then append the
    exact targets, deletion time, and per-location verification result to the
    private retrieval manifest. Report partial failures precisely and leave

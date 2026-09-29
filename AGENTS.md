@@ -157,14 +157,16 @@ documents from the verified repository version. It also authorizes read-only
 discovery and download of commute queues, validated v4 references, and session
 bundles from Brad's signed-in ChatGPT Library for private intake.
 
-Brad has granted standing authorization to delete the exact queue, validated
-v4-reference, and session-bundle artifacts consumed by a durably completed
-commute run after its PR merges, or after a complete no-change handoff when no
-PR was needed. This covers matching transient copies in ChatGPT Library, the
-LLM-Wiki-Car Project Library, and Downloads without another confirmation. It
-does not cover chats, prompts, unrelated Project source documents, schemas,
-normalized `.private/` intake, or artifacts whose completed-use evidence is
-ambiguous.
+Brad has granted standing authorization to delete the exact queue,
+validated v4-reference, and session-bundle artifacts listed as cleanup targets
+in the retrieval manifest for a durably completed commute run after its PR
+merges, or after a complete no-change handoff when no PR was needed. This
+applies regardless of whether validation succeeded, failed, or remained
+incomplete. It covers
+matching transient copies in ChatGPT Library, the LLM-Wiki-Car Project Library,
+and Downloads without another confirmation. The manifest's exact target list
+sets the scope: do not remove other chats, prompts, Project source documents,
+schemas, or files, and preserve normalized `.private/` intake and audit records.
 
 ## Git and handoff
 
