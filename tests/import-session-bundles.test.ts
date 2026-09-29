@@ -6,6 +6,7 @@ import test from 'node:test';
 import {
   maintenanceCandidateKey,
   reconcileSessionBundles,
+  recordMaintenanceAttempts,
 } from '../src/commute/import-session-bundles.js';
 import {
   createRepairedQueueV4Snapshot,
@@ -37,8 +38,36 @@ test('reconciles a valid partial bundle without a second approval step', () => {
     source_item_id: 'tldr-demo-001',
     title: 'First exact headline',
     url: 'https://example.com/first',
+    newsletter_description: 'First summary',
     status: 'pending',
   });
+});
+
+test('keeps newsletter evidence for an inaccessible candidate without commute discussion', () => {
+  const intake = reconcileSessionBundles(
+    [{ filename: artifactFilename, text: validBundle }],
+    '2026-07-20T12:00:00.000Z'
+  );
+  const candidate = intake.maintenance_candidates[0];
+  assert.ok(candidate);
+  assert.equal(candidate.discussion, undefined);
+  assert.equal(candidate.newsletter_description, 'First summary');
+
+  const afterInaccessibleRetrieval = recordMaintenanceAttempts(intake, [
+    {
+      maintenance_key: candidate.maintenance_key,
+      source: 'retrieval',
+      status: 'inaccessible_source',
+      detail: 'The source page and initial retrieval routes were inaccessible.',
+      attempted_at: '2026-07-20T12:01:00.000Z',
+    },
+  ]);
+
+  assert.equal(afterInaccessibleRetrieval.maintenance_candidates[0]?.discussion, undefined);
+  assert.equal(
+    afterInaccessibleRetrieval.maintenance_candidates[0]?.newsletter_description,
+    'First summary'
+  );
 });
 
 test('carries evidence-backed discussion only with its exact wiki capture', () => {
@@ -360,6 +389,7 @@ test('recovers a malformed v1-shaped bundle from its named supplied queue', () =
     source_item_id: 'tldr-demo-002',
     title: 'Second exact headline',
     url: 'https://example.com/second',
+    newsletter_description: 'Second summary',
     status: 'pending',
   });
 });

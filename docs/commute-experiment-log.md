@@ -123,6 +123,14 @@ found a queue as proof.
   traversals. Strict bundle/pair validation, SHA-256 hashes, serialized chat
   captures, a source-page capture retrieved with SafariDriver, and the
   conversation-coverage and performance ledgers are retained privately.
+- The September 24 Fintech, September 25 AI, and September 28 General v4
+  playback/reference pairs; two September 28 session bundles; the wider
+  recursive Project Library inventory; and the bounded Friday AI chat read.
+  The morning bundle and first two pairs validate; the General pair and evening
+  bundle retain one strict attribution failure without editing original files.
+  Ravi Mehta's full article was recovered through the author's canonical page
+  and read with public web retrieval. Raw intake, retrieval comparisons, and
+  coverage records remain private.
 - The live `Weekday TLDR Queues` Task conversation/configuration, the July
   21-24 Task Update emails, the July 24 manual queue-generation control, and
   the live Project settings/sources inspected on July 26.
@@ -2495,3 +2503,88 @@ source-to-wiki-maintenance run, not the root task or all browser interactions.
 No rollout counter was available for the root task or other phases, and none
 was reconstructed by reopening a long history. The private ledger also records
 the approximate Safari-call count and retrieval retry.
+
+### September 28 Wide-Date Commute Intake and Work-Read Recovery
+
+The requested processing date was Monday, September 28. The complete recursive
+Project Library inventory covered queue editions from Thursday, September 24
+through Monday, September 28, across all newsletter types, and every bundle row
+for the September 28 session/export date. It listed the September 24 Fintech
+queue, September 25 AI queue, and September 28 AI, Dev, Fintech, and General
+queues; there were no September 26–27 queue rows. The recursive listing found
+two September 28 bundles after the first nonrecursive listing omitted them. The
+morning bundle declares the September 24 Fintech queue; the evening bundle
+declares the September 28 General queue. The September 25 AI chat was also
+present, with no corresponding bundle row. The other three September 28 queue
+pairs remain unconsumed candidates because no matching bundle or bounded
+session evidence was found.
+
+The September 24 Fintech pair passed strict v4 validation (4 items), as did the
+September 25 AI pair (6 items). The September 28 General pair (8 items) failed
+strict validation: reference item 2 records publication `TestingCatalog` with
+`hostname_fallback`, while the validator requires `testingcatalog.com`. The
+evening bundle embeds that same pair and is rejected for the same reason. The
+original Library copies were not edited or silently repaired. The September 28
+morning bundle passed strict validation and canonically matched its separate
+Fintech pair; it reports `recovered` integrity, 4 item announcements, 3
+transitions, and 3 quality incidents. The evening bundle reports `partial`
+integrity and contains 8 announcements, 8 transitions, two classifier depth
+corrections, one wiki save, and two playback/completion incidents. The importer
+accepted the morning session and rejected the evening session, so its accepted
+record has no maintenance candidates or labels from the invalid bundle.
+
+The Friday AI shared chat was read through all five returned turns. It covered
+an item's relation to the Jev product and a position clarification; it added
+no classifier correction or save. Its exact queue pair validates, but the
+Library inventory has no matching bundle. The September 28 General save
+targeted Ravi Mehta's "Do my hard-won product skills still matter in the AI
+era?" The direct Substack URL initially failed retrieval. A title-and-author
+search found Mehta's canonical article page; following its link to the Substack
+post exposed the full article. We updated the existing AI Product
+Experimentation page with claims supported by the article and kept the
+commute's concrete uncertainty-to-feedback loop explicitly labeled as
+discussion-derived. The source note preserves the date-qualified queue item ID
+and original article URL. The source was recoverable through ordinary source
+discovery, so the failed direct lookup was not a reason to leave the save with
+no public result.
+
+Two explicit General depth corrections are preserved as private held
+candidates: Waymo item `general-004` from `headline_only` to `in_depth`, and
+Tesla Optimus item `general-008` from `headline_only` to `in_depth`. The
+feedback is exact in the bundle. The Optimus comment also adds a topic-level
+preference for robot articles to use in-depth playback. Both preferences are
+preserved as future calibration evidence; no live classifier rule changed. The
+append-only label recorder requires a strict-valid complete pair, so the
+invalid pair was not bypassed to append score-bearing labels. The exact
+feedback and blocked validation boundary are routed to the existing classifier
+issues #35 and #66. The invalid published
+pair reopens #147 under its stated regression condition. Item 8's spoken
+sentence did not match its stored playback; completion omitted the required
+line and named the AI queue instead of the selected General queue. Those
+playback failures route to #100.
+
+The September 25 AI reference was read in the existing Work Project chat as two
+consecutive chunks: 12,926 characters matched the local download apart from
+the local file's final newline. Both September 28 bundles were also read in
+that chat and compared with their local downloads. The morning relay repeated
+one boundary space; removing that duplicate from the relay assembly produced
+matching content. The evening relay's 24,000–31,999 chunk was two characters
+short; a targeted read filled the exact gap. The assembled Work text matched
+the original contents for both bundles, including all events. No original file
+was changed. The private manifest records both native and SafariDriver
+retrieval steps. Brad stated that the root commute run used GPT-6 Luna Extra
+High; record the model and effort as user-reported, not as a requested setting.
+The root turn started at 22:24:06 UTC on September 28 and completed at 00:05:43
+UTC on September 29. Its recorded duration was 6,096.081 seconds. The trace
+contains 392 command/MCP calls with 230.648 seconds summed per-call elapsed
+time (211 command executions: 80.943 seconds; 181 MCP calls: 149.705 seconds).
+This is a sum of call durations, and concurrent calls may overlap. The turn
+readback provides no per-call start/end clocks, so per-step and phase durations
+cannot be allocated without estimation; gross turn time also does not separate
+human waits. Root rollout token counters were unavailable. Account-wide usage
+samples were 0%/22% at 22:24:52 UTC, 1%/22% at 22:31:18 and 22:34:46, 2%/22%
+at 22:58:51, 4%/23% at 23:22:10, 6%/23% at 23:44:06, 10%/24% at 23:50:50,
+11%/24% at 00:03:25 on September 29, and 12%/24% at 00:04:57. These are
+account-wide snapshots, not a per-task bill; the private performance ledger
+records the reported model, available turn/tool timing, and unavailable phase
+and token measurements without estimating them.

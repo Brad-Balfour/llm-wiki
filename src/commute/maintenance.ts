@@ -8,7 +8,12 @@
  */
 
 import { requireHttpUrl } from '../shared/url.js';
-import { requireRecord, requireString, requireStringArray } from '../shared/validate.js';
+import {
+  optionalString,
+  requireRecord,
+  requireString,
+  requireStringArray,
+} from '../shared/validate.js';
 import { createHash } from 'node:crypto';
 import type { EventEvidence } from './session-bundle.js';
 
@@ -43,6 +48,7 @@ export interface MaintenanceCandidate {
   source_item_id: string;
   title: string;
   url: string;
+  newsletter_description?: string;
   status: 'pending';
   discussion?: DiscussionContext;
 }
@@ -94,6 +100,10 @@ export interface MaintenanceLatestResult {
 /** Parse a persisted maintenance candidate from any prior record. */
 export function parseMaintenanceCandidate(candidate: unknown, field: string): MaintenanceCandidate {
   const record = requireRecord(candidate, field);
+  const newsletterDescription = optionalString(
+    record.newsletter_description,
+    `${field}.newsletter_description`
+  );
   return {
     maintenance_key: requireString(record.maintenance_key, `${field}.maintenance_key`),
     session_id: requireString(record.session_id, `${field}.session_id`),
@@ -101,6 +111,9 @@ export function parseMaintenanceCandidate(candidate: unknown, field: string): Ma
     source_item_id: requireString(record.source_item_id, `${field}.source_item_id`),
     title: requireString(record.title, `${field}.title`),
     url: requireMaintenanceHttpUrl(record.url, `${field}.url`),
+    ...(newsletterDescription === undefined
+      ? {}
+      : { newsletter_description: newsletterDescription }),
     status: 'pending',
     ...optionalDiscussionContext(record.discussion, `${field}.discussion`),
   };

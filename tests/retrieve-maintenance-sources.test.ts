@@ -364,4 +364,15 @@ test('rejects a maintenance candidate with a non-HTTP or missing identity', () =
     () => parseMaintenanceCandidate({ ...valid, title: '  ' }, 'field'),
     /field\.title must be a non-empty string/
   );
+  assert.equal(
+    parseMaintenanceCandidate(
+      { ...valid, newsletter_description: 'A short newsletter summary.' },
+      'field'
+    ).newsletter_description,
+    'A short newsletter summary.'
+  );
+  assert.throws(
+    () => parseMaintenanceCandidate({ ...valid, newsletter_description: ' ' }, 'field'),
+    /field\.newsletter_description must be a non-empty string/
+  );
 });

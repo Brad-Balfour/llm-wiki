@@ -32,7 +32,7 @@ Use stable source item ids and keep cross-edition duplicate instances distinct
 when a fixture is intended to exercise validation behavior.
 
 `wiki-maintenance-cases.json` covers deterministic retrieval/result-recording
-boundaries and manual PR review expectations for inaccessible URLs, duplicate
-concepts, material updates to existing concepts, and useful link-only changes.
-The semantic wiki decision remains agent-driven and is reviewed in the
-resulting PR.
+boundaries and manual PR review expectations for inaccessible URLs with
+fallback and partial-evidence handling, duplicate concepts, material updates
+to existing concepts, and useful link-only changes. The semantic wiki decision
+remains agent-driven and is reviewed in the resulting PR.
