@@ -17,7 +17,17 @@ test('daily commute skill defines the SafariDriver authentication and reconnect 
   assert.match(normalized, /Use direct web retrieval for public articles and shared chats first/i);
   assert.match(normalized, /no direct Project file API has been established/i);
   assert.match(normalized, /use signed-in SafariDriver to apply the verified version/i);
-  assert.match(normalized, /call the web retrieval tool directly with that URL/i);
+  assert.match(
+    normalized,
+    /start with the exact URL and use readable page content as source evidence/i
+  );
+  assert.match(normalized, /search the exact title with the author or publisher/i);
+  assert.match(normalized, /Use partial evidence when it can support a useful update/i);
+  assert.match(normalized, /Do not present a summary or discussion as the article's own claims/i);
+  assert.match(
+    normalized,
+    /use `insufficient_source` only when the evidence at hand cannot support a useful, accurate update/i
+  );
   assert.match(normalized, /Shared-chat URLs are not part of routine intake auditing/i);
   assert.match(normalized, /inspect only the relevant passage plus enough surrounding context/i);
   assert.match(normalized, /direct HTTP fetch of the page once/i);

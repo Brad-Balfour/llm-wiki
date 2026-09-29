@@ -3,7 +3,7 @@
   "cases": [
     {
       "id": "inaccessible-url",
-      "description": "An inaccessible saved URL remains observable and retryable without invented synthesis.",
+      "description": "An inaccessible saved URL gets fallback attempts and remains eligible for a useful, grounded partial update.",
       "boundary": "retrieval",
       "maintenance_key": "fixture:inaccessible-url",
       "requested_url": "https://example.com/unavailable",
@@ -11,8 +11,9 @@
       "detail": "HTTP 404",
       "expected_attempt_status": "inaccessible_source",
       "review_checks": [
-        "No detailed summary is inferred from the queue headline.",
-        "No filler page or PR is created from the inaccessible source alone."
+        "The maintainer records distinct fallback routes and any readable excerpts.",
+        "A useful partial update can use exact item discussion or newsletter text when it is attributed accurately.",
+        "Detailed article claims are not inferred from the queue headline alone."
       ]
     },
     {

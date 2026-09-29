@@ -43,6 +43,15 @@ test('builds a maintainer prompt with no intermediate approval gate', () => {
   assert.match(prompt, /item-bound discussion record/);
   assert.match(prompt, /Do not infer or borrow discussion from another saved item/);
   assert.match(prompt, /incorporated, omitted as unsupported, or left unresolved/);
+  assert.match(prompt, /A failed direct fetch is the start of source discovery/);
+  assert.match(prompt, /try the strongest distinct targeted fallback routes/);
+  assert.match(prompt, /an exact newsletter excerpt, or another captured summary/);
+  assert.match(
+    prompt,
+    /Never present discussion or a newsletter summary as the article's own text/
+  );
+  assert.match(prompt, /A partial, clearly scoped update is preferable to a no-op/);
+  assert.doesNotMatch(prompt, /with a retrieved source/);
   assert.match(prompt, /create one GitHub PR with gh/);
   assert.match(prompt, /\/private\/sources\.json/);
   assert.match(prompt, /Use per-candidate status "pr_created" only/);

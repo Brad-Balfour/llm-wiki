@@ -70,13 +70,27 @@ narrate routine tool calls, or repeat unchanged polling state.
 
 ### Public article and shared-chat URLs
 
-For every supplied public article URL that may support a wiki entry, call the
-web retrieval tool directly with that URL and use its retrieved page as source
-evidence. Do not search for the article first, open Safari, or use SafariDriver
-for public-source reading. This should be one quick retrieval per independent
-URL; if it fails, try one reasonable direct fetch retry and then report the
-specific inaccessible source. Do not turn public-source retrieval into a browser
-workflow.
+For every supplied public article URL that may support a wiki entry, start with
+the exact URL and use readable page content as source evidence. Do not use
+SafariDriver for public-source reading. If the first route fails, continue with
+the most useful distinct routes available: search the exact title with the
+author or publisher, check the author's or publisher's canonical site and follow
+its article link, and consider a credible syndication, archive, or readable
+alternate rendering. Do not repeat the same failed request unchanged. Stop
+when the needed content is available or the remaining routes are repetitive,
+unlikely to help, or disproportionate to the candidate's value. Record the
+routes tried, the accessible portions, and what remains unavailable.
+
+Use partial evidence when it can support a useful update. An exact newsletter
+excerpt, saved summary, or item-bound commute discussion can support a narrow
+note even when the full article remains inaccessible, provided the page
+identifies which points come from the newsletter, which come from the
+discussion, and which come from the article. Do not present a summary or
+discussion as the article's own claims, and do not derive detailed claims from a
+headline alone. Keep the candidate retryable when useful source material may
+become available later; use `insufficient_source` only when the evidence at
+hand cannot support a useful, accurate update. Public-source recovery should
+stay a bounded research step rather than becoming a prolonged browser session.
 
 Shared-chat URLs are not part of routine intake auditing. Do not perform a
 routine full-chat audit. Rely on validated
