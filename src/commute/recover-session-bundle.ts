@@ -28,6 +28,7 @@ export interface RecoveredWikiCapture {
   sourceItemId: string;
   title: string;
   url: string;
+  newsletterDescription?: string;
   discussion?: RecoveredDiscussion;
 }
 
@@ -197,6 +198,9 @@ export function recoverSessionBundleWithSuppliedQueue(
         sourceItemId: item.sourceItemId,
         title: item.title,
         url: item.url,
+        ...(item.newsletterDescription === undefined
+          ? {}
+          : { newsletterDescription: item.newsletterDescription }),
         userWords,
         ...(discussion === undefined ? {} : { discussion }),
       });
@@ -208,6 +212,9 @@ export function recoverSessionBundleWithSuppliedQueue(
       sourceItemId: item.sourceItemId,
       title: item.title,
       url: item.url,
+      ...(item.newsletterDescription === undefined
+        ? {}
+        : { newsletterDescription: item.newsletterDescription }),
       ...(discussion === undefined ? {} : { discussion }),
     });
   }
@@ -282,6 +289,7 @@ interface ExactQueueItem {
   sourceItemId: string;
   title: string;
   url: string;
+  newsletterDescription?: string;
 }
 
 function declaredQueueName(bundle: Record<string, unknown>): string {
@@ -589,7 +597,14 @@ function parseQueueItem(candidate: unknown, index: number): ExactQueueItem {
   );
   const title = requiredString(item.title, `Recovery queue items[${index}].title`);
   const url = requiredString(item.url, `Recovery queue items[${index}].url`);
-  return { position: index + 1, sourceItemId, title, url };
+  const newsletterDescription = item.summary ?? item.description;
+  return {
+    position: index + 1,
+    sourceItemId,
+    title,
+    url,
+    ...(typeof newsletterDescription === 'string' ? { newsletterDescription } : {}),
+  };
 }
 
 function isWikiCapture(event: Record<string, unknown>): boolean {

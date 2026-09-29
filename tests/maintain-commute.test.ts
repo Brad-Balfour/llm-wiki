@@ -45,7 +45,12 @@ test('builds a maintainer prompt with no intermediate approval gate', () => {
   assert.match(prompt, /incorporated, omitted as unsupported, or left unresolved/);
   assert.match(prompt, /A failed direct fetch is the start of source discovery/);
   assert.match(prompt, /try the strongest distinct targeted fallback routes/);
-  assert.match(prompt, /an exact newsletter excerpt, or another captured summary/);
+  assert.match(
+    prompt,
+    /an exact item-bound commute discussion or the candidate's `newsletter_description`/
+  );
+  assert.match(prompt, /candidate's `newsletter_description`/);
+  assert.match(prompt, /Treat `newsletter_description` only as the newsletter's summary/);
   assert.match(
     prompt,
     /Never present discussion or a newsletter summary as the article's own text/

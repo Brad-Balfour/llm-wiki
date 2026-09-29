@@ -292,6 +292,9 @@ export function reconcileSessionBundles(
               source_item_id: capture.sourceItemId,
               title: capture.title,
               url: capture.url,
+              ...(capture.newsletterDescription === undefined
+                ? {}
+                : { newsletter_description: capture.newsletterDescription }),
               status: 'pending',
               ...(capture.discussion === undefined
                 ? {}
@@ -480,6 +483,10 @@ export function reconcileSessionBundles(
             );
             if (!maintenanceKeys.has(maintenanceKey)) {
               maintenanceKeys.add(maintenanceKey);
+              const newsletterDescription = queueItemNewsletterDescription(
+                bundle,
+                event.item.source_item_id
+              );
               result.maintenance_candidates.push({
                 maintenance_key: maintenanceKey,
                 session_id: bundle.session.session_id,
@@ -487,6 +494,9 @@ export function reconcileSessionBundles(
                 source_item_id: event.item.source_item_id,
                 title: event.item.title,
                 url: event.item.url,
+                ...(newsletterDescription === undefined
+                  ? {}
+                  : { newsletter_description: newsletterDescription }),
                 status: 'pending',
                 ...(event.discussion === undefined
                   ? {}
@@ -875,6 +885,22 @@ function queueItemConsumptionDepth(
     if (item.source_item_id === sourceItemId) {
       return typeof item.consumption_depth === 'string' ? item.consumption_depth : undefined;
     }
+  }
+  return undefined;
+}
+
+function queueItemNewsletterDescription(
+  bundle: CommuteSessionBundle,
+  sourceItemId: string
+): string | undefined {
+  const items = queueMetadataRecord(bundle.queue_snapshot.queue).items;
+  if (!Array.isArray(items)) return undefined;
+  for (const candidate of items) {
+    if (typeof candidate !== 'object' || candidate === null || Array.isArray(candidate)) continue;
+    const item = candidate as Record<string, unknown>;
+    if (item.source_item_id !== sourceItemId) continue;
+    const description = item.summary ?? item.description;
+    return typeof description === 'string' ? description : undefined;
   }
   return undefined;
 }
