@@ -131,6 +131,15 @@ found a queue as proof.
   Ravi Mehta's full article was recovered through the author's canonical page
   and read with public web retrieval. Raw intake, retrieval comparisons, and
   coverage records remain private.
+- Six September 28-29 v4 playback/reference pairs from the complete recursive
+  Library inventory, three September 29 session bundles, targeted Dev and AI
+  Project-chat passages, and the public personal-site article for one Dev
+  attribution report. The three bundles declare the September 28 Dev, AI, and
+  Fintech pairs; September 29 General, Dev, and AI pairs remain unconsumed
+  candidates. Original SafariDriver downloads corroborate all three bundles
+  and the invalid Fintech reference. Private intake retains the Work ZIP, its
+  truncated Dev entry, exact downloads, hashes, validation/import output,
+  coverage matrix, and timed tool/usage record.
 - The live `Weekday TLDR Queues` Task conversation/configuration, the July
   21-24 Task Update emails, the July 24 manual queue-generation control, and
   the live Project settings/sources inspected on July 26.
@@ -2588,3 +2597,63 @@ at 22:58:51, 4%/23% at 23:22:10, 6%/23% at 23:44:06, 10%/24% at 23:50:50,
 account-wide snapshots, not a per-task bill; the private performance ledger
 records the reported model, available turn/tool timing, and unavailable phase
 and token measurements without estimating them.
+
+### September 29 Three-Session Intake and File-Transfer Validation
+
+The requested processing date was September 29. A complete recursive native
+Library listing covered six v4 queue/reference pairs from September 28-29 and
+three September 29 bundles. The bundles declare the September 28 Dev, AI, and
+Fintech editions. The September 29 General, Dev, and AI pairs had no matching
+bundle or bounded session evidence, so they remain unconsumed candidates.
+There were no September 28 General or September 29 Fintech rows in the complete
+inventory.
+
+The Dev pair validates with 12 items. Its 24-event bundle passes strict
+validation with `recovered` integrity and matches the separately obtained
+pair. The importer accepted it and retained four quality incidents: failed
+author lookup for a clearly identified personal-site article, a Voice glitch
+during a Wi-Fi-to-cellular handoff, a reference-description request initially
+treated as a hangup request, and the uninformative headline-only Floci item.
+The targeted Dev chat confirms that Brad asked to record the Floci problem as
+classifier feedback and then requested its reference description. This is
+non-score-bearing quality evidence: the user did not state an exact corrected
+interest or depth value. The canonical personal-site article identifies its
+author, so the attribution problem has a focused follow-up in #169.
+
+The AI pair validates with nine items, but its 22-event bundle is rejected:
+event 21 records a `next` transition beyond the final item. A targeted chat
+read shows Brad did say “next” after item nine and the assistant responded with
+the required finished line; the export represented that normal completion as
+an invalid transition. The AI bundle also reports missing depth labels in the
+initial spoken sweep and a contradictory yes/no response. The Fintech pair and
+its 12-event bundle are rejected because reference item eight adds
+`headline_context` to an `in_depth` item. That bundle reports one Voice
+playback interruption and the user's clarification that he had not requested
+a stop. The separate, unconsumed September 29 General pair also fails strict
+validation: its item-eight hostname-fallback publication does not equal
+`proofsandprompts.com`. These defects remain in the original artifacts; the
+importer accepted one session and rejected two. Across all three bundles,
+there were no explicit wiki saves, exact classifier label corrections, or
+general captures.
+
+The initial ChatGPT Work ZIP contained all 15 intake filenames, but its Dev
+bundle ended mid-JSON after 46,342 characters. A targeted Work-chat tail made a
+strict-valid reconstruction, then an independent SafariDriver row download
+verified the original 50,831-byte bundle. The reconstruction omitted two
+boundary whitespace characters and the final newline; no original was edited.
+SafariDriver downloads also showed that the AI and Fintech ZIP bundle entries
+matched their originals apart from final newlines, and that the Fintech
+reference matched byte-for-byte. This is a concrete packaging defect in the
+Work handoff, not a reason to weaken schema validation. The private manifest
+retains both transport and original-file hashes.
+
+Brad reported GPT-6 Sol Light/low for this run. The account-wide five-hour and
+weekly meters began at 0% and 27% used at 23:26:14 UTC. At the 01:46:58 UTC
+prepublication checkpoint they were 47% and 34% used. The root rollout's
+latest preceding counter was 24,312,590 cumulative tokens: 24,265,134 input,
+24,038,528 cached input, and 47,456 output. These are traffic counters, not
+newly generated tokens or a per-task bill. The private timeline records each
+substep's clock and available meter/token samples, tool calls, retries, and
+excluded waits. It separates the inactive intervals between user turns and
+the Work-chat, sign-in, download, and merge waits from active work; the gross
+clock span is not reported as active processing time.
