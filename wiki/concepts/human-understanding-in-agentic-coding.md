@@ -7,10 +7,10 @@ aliases: ["Understanding is the new bottleneck","Code explainers","Literate diff
 tags: ["ai-agents","software-engineering","code-comprehension","code-review","developer-workflow","human-oversight","collaboration"]
 wiki_slug: human-understanding-in-agentic-coding
 created: 2026-08-16
-updated: 2026-09-03
+updated: 2026-09-30
 confidence: medium
 # prettier-ignore
-provenance: [{"source_item_id":"1a00013ac9bf7ecf-03","url":"https://www.geoffreylitt.com/2026/07/02/understanding-is-the-new-bottleneck?utm_source=tldrdev"},{"source_item_id":"1a066fbd74e24644-05","url":"https://martinfowler.com/rachels-ramblings/code-review.html?utm_source=tldrdev"}]
+provenance: [{"source_item_id":"1a00013ac9bf7ecf-03","url":"https://www.geoffreylitt.com/2026/07/02/understanding-is-the-new-bottleneck?utm_source=tldrdev"},{"source_item_id":"1a066fbd74e24644-05","url":"https://martinfowler.com/rachels-ramblings/code-review.html?utm_source=tldrdev"},{"source_item_id":"20260929-tldr:general-005","url":"https://addyo.substack.com/p/the-code-nobody-reads"}]
 ---
 
 # Human Understanding in Agentic Coding
@@ -109,6 +109,106 @@ depending on every engineer to inspect every generated diff. That approach
 still requires explicit risk criteria, observable tests, shared design work,
 and escalation when confidence is low.
 
+## Independent Verification and Ownership
+
+Addy Osmani argues that reducing human line reading requires trustworthy
+replacement checks and deliberate preservation of review's other functions.
+Tests need an authority outside the implementation: a specification, reference
+implementation, proof, or other independent oracle. A second agent may share
+the first agent's assumptions. Human review can scale with consequence, while
+humans retain approval and the power to refuse shipment.
+
+His practical advice spans individual and team responsibilities: understand
+intent, explain the change, disclose review limits, retain coding skill, budget
+for comprehension, mentor deliberately, keep approval artifacts manageable,
+measure outcomes, and match accountability with authority. This is not a single
+seven-item checklist. His economics compare checking unread work with undoing
+missed failures; adoption timelines remain predictions. Upstream assumptions,
+interfaces, and requirements still need judgment. Agent-maintainable code and
+valuable verification artifacts do not remove that obligation.
+
+The existing caution still applies: these arguments do not prove that selective
+review is equally safe in every system.
+
+## Saved Commute Discussion: Practical Questions
+
+The September 29–30 discussion explored Osmani's argument in detail. The
+following is discussion-derived analysis and a proposed experiment, rather than
+an additional process prescribed by the article.
+
+### Replace Each Function of Review
+
+The first question was what explicitly replaces traditional review. Separate
+bug finding from explanation, knowledge transfer, team norms, and mentoring.
+An automated first pass can supply findings without teaching a teammate how the
+system works. Pair planning, walkthroughs, an engineer explaining the change
+back to another person, and explicit conventions address different needs.
+A passing suite alone does not demonstrate shared understanding.
+
+### Test Order Is Different from Test Authority
+
+The discussion challenged whether TDD supplies enough independence. Writing
+tests first does not help if both tests and implementation encode the same
+mistaken assumptions. Ask where the expected behavior comes from and who can
+challenge it; merely assigning two agents is not an independent oracle.
+
+A lightweight startup experiment was proposed: a human writes or approves the
+specification, Sol generates tests and edge cases, and Claude implements from
+the same specification. The assistant proposed initially withholding the full
+test set and retaining some edge cases for a later check. These are hypotheses
+about reducing correlated errors, not proven guarantees. Ambiguous
+specifications can mislead both models; clarity and consequential cases matter
+more than the provider split. Keep extra friction proportional to risk rather
+than turning every small change into a slow ceremony.
+
+### Blast Radius Includes Business and User Consequences
+
+Brad rejected a narrow interpretation that treats blast radius as only
+security or authorization. Core business rules, user-visible behavior,
+incorrect state transitions, and consequential data writes can merit attention
+alongside security-sensitive code. Risk and mitigation are the useful framing.
+
+Two distinct triage decisions follow: which PR deserves scarce human attention,
+and which parts of that PR deserve deeper inspection. The discussion proposed
+an agent-produced risk map covering impact, likelihood, reversibility,
+observability, novelty, and confidence in the checks. Inspect decision logic,
+interfaces, state transitions, writes, and gaps in evidence; avoid relying only
+on a fixed list of sensitive files. This risk-map proposal is commute synthesis,
+not an Osmani scoring formula.
+
+### Make Approval Judgeable
+
+Brad asked whether the article supplies a metric for a human-sized approval.
+It offers a qualitative constraint rather than a universal line count or time
+limit: a person needs a sufficiently small, explainable artifact to make a
+meaningful judgment. Disclose what was personally inspected, what agents or
+checks covered, and what remains uncertain. Split review surfaces when a single
+approval would hide more than the reviewer can assess.
+
+A [2013 Microsoft study](https://www.microsoft.com/en-us/research/wp-content/uploads/2016/02/ICSE202013-codereview.pdf)
+classified 78 of 570 review comments as defect-related, about 14%. This is one
+study's classification, not a general defect-detection rate or evidence that
+all remaining review effort is disposable. It helps explain why replacing bug
+finding alone would leave other review functions unaddressed.
+
+### Check Upstream Intent without Inventing a Rigid Process
+
+The resumed discussion asked whether upstream independence requires a second
+specification team, exhaustive business-rule detail, or broad problem framing.
+No such mandatory second-team process was established. The useful checks focus
+on intent, constraints, interfaces, units, and assumptions whose failure would
+be consequential. A small boundary error can matter as much as a mistaken
+product goal. Humans still need to judge whether the result is worth building,
+works for its users, and will hold up.
+
+The remaining walkthrough connected competitive pressure with recovery cost,
+verification oracles with domain-specific caution, and reliability with the
+surrounding system of monitoring, flags, and rollback. It also examined code
+structure for future agent maintainers, sharing specifications, tests, and
+failure histories, and the risk of blaming a human who cannot refuse a release.
+These remain evaluation questions; the discussion did not establish universal
+adoption dates, regulatory permission, or a completed implementation decision.
+
 ## Source Notes
 
 ### [Understanding is the new bottleneck](https://www.geoffreylitt.com/2026/07/02/understanding-is-the-new-bottleneck?utm_source=tldrdev)
@@ -131,6 +231,16 @@ reasoning earlier, automating deterministic checks, and reserving human review
 for exceptional risk. The qualification that this is a scalability argument
 rather than proof of equal safety preserves Brad's commute skepticism and the
 requested back-and-forth discussion.
+
+### [The Code Nobody Reads](https://addyo.substack.com/p/the-code-nobody-reads)
+
+<!-- source-item-id: 20260929-tldr:general-005 -->
+
+Addy Osmani, September 28, 2026; TLDR General September 29, item 3. Direct public
+reading grounds the source summary. Targeted recovery of the September 29–30
+shared conversation establishes the explicit save and repeated requests to
+preserve this discussion, omitted by the later bundle. The original URL remains
+available for manual sharing.
 
 ## Related
 
