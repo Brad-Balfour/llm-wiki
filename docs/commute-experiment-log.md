@@ -147,7 +147,7 @@ found a queue as proof.
   each terminal newline. Numbered Unicode bundle relays, independent full-text
   SHA-256 checks, validation/import output, coverage and issue matrices, and
   performance counters are retained privately. The public Cloudflare `cf`
-  announcement was read directly; no shared-chat audit was needed.
+  announcement was read directly. A later user-identified omission prompted targeted recovery of one complete General shared chat; its original HTML, decoded messages, coverage ledger and qualitative author feedback are private.
 - The live `Weekday TLDR Queues` Task conversation/configuration, the July
   21-24 Task Update emails, the July 24 manual queue-generation control, and
   the live Project settings/sources inspected on July 26.
@@ -2726,3 +2726,64 @@ it, the unsuccessful ZIP handoff to a separate Codex chat without Files tools,
 and the successful in-chat JSON-string relay. These retrieval costs are part
 of the measured result, not omitted from the performance record. Final timing,
 cleanup and comparison totals belong to the post-merge private handoff.
+
+### September 30 Targeted Recovery of the Earlier General Discussion
+
+After PR #171 merged, Brad identified the missing Addy Osmani save and requested
+complete conversation coverage before cleanup. Cleanup was held. The supplied
+shared URL first returned a web cache miss; one direct HTTP fetch succeeded and
+contained the serialized conversation. The recovered share has 404 distinct
+user/assistant text-bearing message IDs, including 108 unique user messages.
+Serialized duplicates were deduplicated by exact message ID; the original HTML
+remains private and unchanged. Its title is `Commute TLDR Briefing`. The
+conversation includes Voice discussion on September 29 and resumed discussion
+on September 30, plus an intervening prior-run Library/JSON detour. The share
+does not establish a split into separate chats.
+
+The exact September 29 General item3 is `general-005`, Addy Osmani's
+“The Code Nobody Reads.” Brad explicitly requested its wiki save and positive
+author feedback, then repeatedly asked for all detailed discussion to be
+preserved in both the wiki and bundle. The September30 General bundle begins
+at item4 and omits those requests. Its statement that the visible transcript
+begins there is a limitation of export recovery, not evidence that the earlier
+discussion did not occur. The original queue's unrelated item8 attribution
+failure remains unchanged. The newly recovered save is tied to exact canonical
+item identity and explicit chat wording; no numeric interest or depth correction
+is inferred. Issue #172 records this export-coverage defect and the required
+recovery/cleanup boundary.
+
+The existing Human Understanding in Agentic Coding page now preserves the
+source and question-driven discussion: replacing bug detection versus mentoring
+and shared context; TDD test order versus independent test authority; a
+lightweight Sol-generated-tests/Claude-implementation experiment; blast radius
+beyond security; triage across PRs and within a PR; qualitative approval-size
+limits; upstream intent, interfaces, units and business rules; and accountability
+with authority. Cross-family testing and risk maps are labeled commute synthesis,
+not Osmani's prescribed process. Source re-reading corrected the assistant's
+claim of one enumerated seven-item practice section and kept economic arguments,
+study figures and adoption forecasts within their actual evidence boundaries.
+The original article URL is preserved for the user's manual sharing request;
+no workplace message was sent.
+
+Other General discussion is retained as user questions and opinions in the
+private journal and coverage ledger, without inventing additional saves: agents
+as interfaces versus generative UI; separate browser/web and phone-app control
+constraints; current browser form-filling reliability; the multiplayer-AI
+article's lack of concrete immediate implementation takeaways; and the perceived
+utility limit of Airbound's one-kilogram payload. Assistant-added source details
+were not adopted as article facts without verification. Negative article opinions
+do not create classifier labels. Playback/source-quality evidence includes a
+repeated transition, pause mishandling, failed re-retrieval despite earlier
+full-text claims, an unanswered mobile-control question, and a full-summary
+request answered with a short summary; these belong to existing issue #100.
+The positive Addy author preference is retained as non-score-bearing classifier
+feedback for #66.
+
+Every unique user message in the recovered share has a private disposition.
+Prior-run file-transfer/control messages are recognized as already recorded
+September29 operational evidence, not new commute captures. Playback/navigation,
+social filler and two unavailable-instruction placeholders have explicit exclusion
+reasons. Dev's exact save and two website reminders remain in the original
+validated bundle; a complete Dev conversation check is pending a shared URL.
+This recovery is part of the same measured run; its time, token traffic, user
+waits and account-meter samples remain in the original worktree's private audit.
