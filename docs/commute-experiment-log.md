@@ -147,7 +147,7 @@ found a queue as proof.
   each terminal newline. Numbered Unicode bundle relays, independent full-text
   SHA-256 checks, validation/import output, coverage and issue matrices, and
   performance counters are retained privately. The public Cloudflare `cf`
-  announcement was read directly. A later user-identified omission prompted targeted recovery of one complete General shared chat; its original HTML, decoded messages, coverage ledger and qualitative author feedback are private.
+  announcement was read directly. A later user-identified omission prompted targeted recovery of complete General and Dev shared chats (404 and 104 distinct user/assistant messages; 108 and 26 user messages). Their original HTML, decoded messages, coverage ledgers and qualitative feedback are private.
 - The live `Weekday TLDR Queues` Task conversation/configuration, the July
   21-24 Task Update emails, the July 24 manual queue-generation control, and
   the live Project settings/sources inspected on July 26.
@@ -2784,6 +2784,42 @@ Prior-run file-transfer/control messages are recognized as already recorded
 September29 operational evidence, not new commute captures. Playback/navigation,
 social filler and two unavailable-instruction placeholders have explicit exclusion
 reasons. Dev's exact save and two website reminders remain in the original
-validated bundle; a complete Dev conversation check is pending a shared URL.
+validated bundle; the subsequently supplied Dev shared URL has now been checked completely.
 This recovery is part of the same measured run; its time, token traffic, user
 waits and account-meter samples remain in the original worktree's private audit.
+
+### September 30 Dev Conversation Verification and Cleanup Status
+
+The supplied Dev share is titled `Start TLDR Commute`. A direct web read returned
+a cache miss; one direct HTTP fetch succeeded. All 104 distinct user/assistant
+messages, including 26 user messages, were checked against the canonical queue
+and bundle. Together with the General audit, all 134 user messages have private
+dispositions. No additional wiki save, numeric classifier correction, bug report,
+or unfulfilled reminder was found. The Cloudflare save and its planning context
+are published in PR #171; the two separate website evaluation issues are
+[personal website #75](https://github.com/Brad-Balfour/bradbalfour-dot-com/issues/75)
+and [photography #29](https://github.com/Brad-Balfour/bradbalfour-photography/issues/29).
+
+Two omitted discussions add qualitative context: for `dev-003`, Brad had already
+used `/design-sync` twice and requested advanced gotchas instead of basic process
+instructions; for `dev-004`, he requested concrete differentiation from familiar
+AI coding commentary. These are retained in
+[issue #66](https://github.com/Brad-Balfour/llm-wiki/issues/66#issuecomment-5923723690),
+without invented score corrections or wiki saves.
+[Issue #172](https://github.com/Brad-Balfour/llm-wiki/issues/172#issuecomment-5923724208)
+records the omitted discussion and complete two-conversation coverage. Detailed
+assistant source claims from these unsaved items remain unverified discussion
+context. Navigation, acknowledgments and the unavailable custom-instruction
+placeholder have explicit exclusion reasons.
+
+Both content PRs (#171 and #173) are merged and primary `main` was verified
+clean. The user's conditional cleanup approval is satisfied by the completed
+conversation audit. At 02:48 UTC on October 1, the six exact processed Downloads
+files were content-checked against private intake, moved to Trash and verified
+absent from Downloads. Normalized private intake remains preserved. Native Work
+Library cleanup was dispatched with the six exact stable IDs; no deletion or
+absence-verification response has yet returned. Project Sources inspection and
+any necessary cleanup require sign-in in the isolated SafariDriver session,
+which still shows the signed-out ChatGPT page. No Library or Project deletion
+is claimed without verification. No live prompt or source-document update was
+required by the content changes.
