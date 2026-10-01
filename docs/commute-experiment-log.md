@@ -140,6 +140,14 @@ found a queue as proof.
   and the invalid Fintech reference. Private intake retains the Work ZIP, its
   truncated Dev entry, exact downloads, hashes, validation/import output,
   coverage matrix, and timed tool/usage record.
+- The September 29 General and Dev v4 playback/reference pairs and two
+  September 30 evening bundles, acquired through the existing ChatGPT Work
+  chat. Complete recursive Library discovery covered September 28–30; the
+  four pair files match preserved exact originals except the Work read omits
+  each terminal newline. Numbered Unicode bundle relays, independent full-text
+  SHA-256 checks, validation/import output, coverage and issue matrices, and
+  performance counters are retained privately. The public Cloudflare `cf`
+  announcement was read directly; no shared-chat audit was needed.
 - The live `Weekday TLDR Queues` Task conversation/configuration, the July
   21-24 Task Update emails, the July 24 manual queue-generation control, and
   the live Project settings/sources inspected on July 26.
@@ -2657,3 +2665,64 @@ substep's clock and available meter/token samples, tool calls, retries, and
 excluded waits. It separates the inactive intervals between user turns and
 the Work-chat, sign-in, download, and merge waits from active work; the gross
 clock span is not reported as active processing time.
+
+### September 30 Two-Session Intake and Cloudflare CLI Evaluation
+
+The requested processing date was September 30. Native recursive Library
+inventory followed three root pages (200, 200, and 113 entries, with no final
+cursor), then filtered 72 exact `/LLM-Wiki-Car` descendants. It found six
+queue/reference pairs from September 29–30, two September 30 bundles, and no
+plausible noncanonical bundles in the intake window. No September 28 pair or
+September 29–30 Fintech pair remained. The two bundles declare September 29
+General and Dev; September 29 AI and all three September 30 pairs remain
+unconsumed candidates. No session was inferred from a queue row alone.
+
+Both bundles were transferred through the existing ChatGPT Work chat as
+numbered Unicode ranges. General has 33,698 characters and Dev 46,536; their
+reassembled complete-text SHA-256 hashes equal the independently reported
+Files reads. One General raw-text range contained 11,001 characters instead of
+11,000. Its one targeted retry as a JSON string returned exactly the requested
+range; no boundary character was silently removed. Current Library reads of
+the four queue/reference files match preserved exact originals apart from one
+terminal newline, and both embedded snapshots match those pairs semantically.
+
+The nine-item Dev pair and its 20-event partial bundle pass strict validation.
+The eight-item General pair and its 11-event recovered bundle fail the existing
+item-eight hostname-fallback attribution check: publication must equal
+`proofsandprompts.com`. This is the same original pair observed as unconsumed
+on September 29, now explicitly selected by a September 30 session. The
+original artifacts remain unchanged. Import accepts Dev and rejects General,
+retaining one wiki maintenance candidate, no classifier labels, no quality
+incidents, no general captures, and no unresolved captures in accepted evidence.
+
+The Dev capture saves Cloudflare's `cf` CLI announcement and its migration
+planning discussion. Direct public-source reading supports the open-beta
+status, future Wrangler maintenance sequence, Vite migration path, retained
+Wrangler delegation for other Worker build paths, and changed configuration
+semantics. The wiki keeps repository-specific evaluation questions separate
+from article claims. Both website repositories currently use static Astro
+builds with Pages Functions, so Workers migration documentation does not alone
+establish their compatibility. The explicit request produced separate
+evaluation issues in `bradbalfour-dot-com` #75 and
+`bradbalfour-photography` #29; no migration issue was created in `llm-wiki`.
+
+Coverage is limited to the two exported bundles: 31 events, one substantive
+wiki capture with its questions, conclusions, requested emphasis and discussion,
+and 30 excluded playback/navigation/session-boundary events. General's
+recovered history begins at item four; Dev is partial. Optional discussion
+fields do not establish complete conversation coverage. No targeted shared-chat
+recovery was justified by a conflicting save, label or material claim.
+
+This measured run uses GPT-6.1 Sol at medium effort, confirmed by root runtime
+metadata. The first available account meters were 1% five-hour and 39% weekly
+at 01:43:36 UTC on October 1 (September 30 in New York); at the validated-intake
+boundary, 02:06:05 UTC, they were 30% and 43%. These are account-wide readings,
+not a per-task bill. No daily meter is exposed. Root cumulative token traffic
+is available, including repeated cached input; Work-chat token counters are
+unavailable. The private timeline records actual clocks, outer tool calls,
+retries, model/effort, usage boundaries and excluded waits. It records the
+raw-transfer approval rejection, the explicit user authorization that resolved
+it, the unsuccessful ZIP handoff to a separate Codex chat without Files tools,
+and the successful in-chat JSON-string relay. These retrieval costs are part
+of the measured result, not omitted from the performance record. Final timing,
+cleanup and comparison totals belong to the post-merge private handoff.
