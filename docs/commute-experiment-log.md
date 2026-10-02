@@ -148,6 +148,15 @@ found a queue as proof.
   SHA-256 checks, validation/import output, coverage and issue matrices, and
   performance counters are retained privately. The public Cloudflare `cf`
   announcement was read directly. A later user-identified omission prompted targeted recovery of complete General and Dev shared chats (404 and 104 distinct user/assistant messages; 108 and 26 user messages). Their original HTML, decoded messages, coverage ledgers and qualitative feedback are private.
+- The September 29 AI and September 30 General v4 playback/reference pairs,
+  three October 1 morning Library bundle rows representing two distinct sessions,
+  and the canonical Vercel article used to verify one attribution incident.
+  Native Work inventory enumerated 518 active Library rows across three pages,
+  ending with a null cursor. Complete file contents, normalized bundles, semantic
+  comparisons, validation/import results, coverage and issue matrices, and timing
+  counters remain private. Two supplied shared-chat URLs were retained as recovery
+  candidates but were not read because no conflicting save or material ambiguity
+  required recovery.
 - The live `Weekday TLDR Queues` Task conversation/configuration, the July
   21-24 Task Update emails, the July 24 manual queue-generation control, and
   the live Project settings/sources inspected on July 26.
@@ -2823,3 +2832,59 @@ any necessary cleanup require sign-in in the isolated SafariDriver session,
 which still shows the signed-out ChatGPT page. No Library or Project deletion
 is claimed without verification. No live prompt or source-document update was
 required by the content changes.
+
+### October 1 Two-Session Intake and Work Retrieval Result
+
+Native ChatGPT Work discovery found `202610010716-morning-commute-session-bundle.txt`,
+`202610010730-morning-commute-session-bundle.txt`, and the content-identical
+`202610010730-morning-commute-session-bundle(1).txt`. These represent two sessions,
+not three commutes. Their declared source editions are September 29 AI and
+September 30 General. Both complete v4 pairs and the two normalized bundles pass
+strict validation; the importer accepts the two sessions and rejects the duplicate
+session ID without dropping its provenance. Neither session contains a wiki save,
+item action, classifier correction, or unresolved capture. No wiki entry was
+manufactured from ordinary playback.
+
+The 32 distinct bundle events have private dispositions: four quality incidents
+and one general capture reach durable memory and relevant issues; 27 playback,
+navigation, and session-boundary events are explicitly excluded. This is complete
+bundle-event coverage, not a claim of full conversation coverage: AI is recovered,
+General is partial, and optional discussion fields do not establish a complete
+transcript. The supplied shares were not routinely audited. No material conflict
+required targeted chat recovery.
+
+The AI bundle records that no `select_playback()` call was made for its recorded
+next commands and that the closing announcement named September 30 AI instead
+of the selected September 29 file. This is reported session evidence, not an
+independent execution trace or proof that the live Python safeguard succeeded.
+Brad's hesitation about the Python experiment is retained for #153 and #159;
+playback and wrong-filename observations also reach #100. General records an
+end-of-commute request being answered by a search for remaining September 29
+queues instead of the requested September 30 bundle; the corrected request and
+result are preserved for #100. No live prompt or Project source changed.
+
+For AI item `ai-004`, the canonical reference records `No authors listed`, while
+[Vercel's State of agent skills](https://vercel.com/blog/state-of-agent-skills)
+identifies Amelia Charles, Andrew Qu, and Jonathan Hefner. Direct public-page
+reading independently confirmed the attribution incident. The original queue
+remains unchanged. This source-quality finding reaches #169; it is not an
+interest/depth correction or a new wiki save.
+
+The root runtime confirms `gpt-6.1-sol` at low effort. At 00:39:47 UTC on October 2
+(October 1 in New York), account meters were 0% five-hour and 52% weekly used;
+at the validated-intake boundary, 01:11:15 UTC, they were 13% and 54%. These are
+account-wide readings, not a per-task bill. Available root token counters include
+repeated cached input; Work token counters are unavailable. The private timeline
+separates user-input gaps, active intervals, tool retries, and machine waits.
+
+The initial combined Work response and one complete compact bundle retry exceeded
+the readback tool's fixed 20,000-character limit. Complete session/event envelopes
+and individual canonical file reads resolved the transport limit. AI's complete
+embedded snapshot was also available in the compact response prefix; General's
+normalized snapshot uses the separately retrieved canonical pair after Work
+reported a semantic match. No byte-fidelity requirement, ZIP, or numbered chunk
+protocol was imposed. Two automatic transfer rejections preceded a redundant user
+confirmation despite standing authorization; that avoidable friction and the
+bounded recovery are retained for #151. Historical timing comparison remains a
+comparison of existing records, not a restarted model experiment. Final timing,
+publication and exact-target cleanup results belong to the private closeout.
