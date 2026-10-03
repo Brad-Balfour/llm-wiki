@@ -7,10 +7,10 @@ aliases: ["System One Models", "Jev"]
 tags: ["ai-agents", "structured-output", "decision-making", "workflow-design"]
 wiki_slug: structured-decision-models
 created: 2026-09-16
-updated: 2026-09-24
+updated: 2026-10-02
 confidence: medium
 # prettier-ignore
-provenance: [{"source_item_id":"1a0aa73e4e492655-02","url":"https://typesafe.ai/blog/introducing-system-one-models-and-jev"},{"source_item_id":"20260922-tldr-dev:dev-01","url":"https://archerhume.com/posts/jevs-architecture-unmasked"}]
+provenance: [{"source_item_id":"1a0aa73e4e492655-02","url":"https://typesafe.ai/blog/introducing-system-one-models-and-jev"},{"source_item_id":"20260922-tldr-dev:dev-01","url":"https://archerhume.com/posts/jevs-architecture-unmasked"},{"source_item_id":"dev-002","url":"https://magazine.sebastianraschka.com/p/classifier-history-and-jev"},{"source_item_id":"dev-011","url":"https://swapniltalekar.substack.com/p/jev-and-the-return-of-the-classifiers"}]
 ---
 
 # Structured Decision Models
@@ -60,7 +60,56 @@ error, latency, and cost with the existing path before applying score
 thresholds. This is an evaluation plan, not a conclusion that Jev is suitable
 for the commute workflow.
 
+## Classification Interfaces and Application Thresholds
+
+Sebastian Raschka's September 29 survey traces text classification from
+bag-of-words through embeddings, recurrent/convolutional networks, and
+transformer classification heads to generated labels. It describes Jev as a
+general classification interface; a specialized classifier may still be better
+at high volume. Choice returns a label, probabilities, and a concentration-based
+confidence measure, which differs from the winning class probability. Noul
+returns a yes probability for each independent question; Score supports ordinal
+rubrics. These outputs need calibration checks on representative held-out labels.
+The model's proprietary internals remain unverified.
+
+The October 2 Dev discussion saved both this survey and the separate
+_Jev and the Return of the Classifiers_ item. Its practical synthesis separates
+model output from application policy:
+
+- A yes/no probability need not include a separate uncertainty or null state.
+  That does not imply every Jev interface returns only one number.
+- Two cutoffs can map low probabilities to automatic negatives, high
+  probabilities to automatic positives, and the middle to human or slower-model
+  review. Escalation is application logic, not a special model output.
+- A cutoff means sufficiently reliable for that action, not definitely correct.
+  A single threshold can suffice when the question itself is whether a human
+  should be involved.
+- Tune thresholds to validation outcomes and the asymmetric costs of misses,
+  false alarms, interruptions, and review. Cheap inference does not eliminate
+  labeling, calibration, monitoring, or human effort.
+
+The discussion considered both personal and workplace decisions; it establishes
+an evaluation approach, not permission to deploy on confidential work data.
+
 ## Source Notes
+
+### [Language Models for Text Classification: From Bag-of-Words to Jev](https://magazine.sebastianraschka.com/p/classifier-history-and-jev)
+
+<!-- source-item-id: dev-002 -->
+
+Sebastian Raschka, 2026-09-29. Read directly for the October 2 explicit save.
+The survey separates classification interfaces, empirical testing, and unknown
+internals. Its experiments do not prove production calibration for this project.
+
+### [Jev and the Return of the Classifiers](https://swapniltalekar.substack.com/p/jev-and-the-return-of-the-classifiers)
+
+<!-- source-item-id: dev-011 -->
+
+Explicitly saved with the probability and threshold discussion. The exact URL,
+an alternate rendering, exact-title search, and publisher homepage did not
+provide a readable article. The section above preserves commute synthesis;
+it does not attribute unverified detailed claims to this article. The source
+remains retryable.
 
 ### [Introducing System One Models & Jev](https://typesafe.ai/blog/introducing-system-one-models-and-jev)
 
@@ -80,6 +129,8 @@ essay separates API observations from architectural hypotheses; the source
 does not prove Jev's internal model family or training recipe.
 
 ## Related
+
+- {% include wiki-related-link.md slug="llm-classification-as-feature-engineering" %}
 
 - {% include wiki-related-link.md slug="deterministic-agent-workflows" %}
 - {% include wiki-related-link.md slug="agent-context-handoff" %}

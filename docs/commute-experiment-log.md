@@ -157,6 +157,17 @@ found a queue as proof.
   counters remain private. Two supplied shared-chat URLs were retained as recovery
   candidates but were not read because no conflicting save or material ambiguity
   required recovery.
+- Four October 2 session bundles declaring September 30 Dev, October 1 AI,
+  October 1 Fintech, and October 2 General v4 pairs. Native Work recursive
+  discovery covered 528 active Library rows over three pages (200, 200, 128),
+  ending with a null cursor; 80 rows belonged to `/LLM-Wiki-Car`. Canonical
+  file reads, recovered bundle envelopes, validation/import results, coverage,
+  issue routing, and usage timing remain private. One targeted General share
+  read bound an otherwise unbound keynote save; the other three supplied shares
+  were not routinely audited. Public source reads cover Quesma, Raschka,
+  Osmani, the official Rails World event and video catalog, and the LIFT arXiv
+  attribution. Swapnil's article body and the keynote transcript remain
+  unavailable; their saved discussion is explicitly labeled synthesis.
 - The live `Weekday TLDR Queues` Task conversation/configuration, the July
   21-24 Task Update emails, the July 24 manual queue-generation control, and
   the live Project settings/sources inspected on July 26.
@@ -2888,3 +2899,83 @@ confirmation despite standing authorization; that avoidable friction and the
 bounded recovery are retained for #151. Historical timing comparison remains a
 comparison of existing records, not a restarted model experiment. Final timing,
 publication and exact-target cleanup results belong to the private closeout.
+
+### October 2 Four-Session Intake and Saved Discussion
+
+The four exports are `202610020710-morning-commute-session-bundle.txt`,
+`202610021738-evening-commute-session-bundle.txt`,
+`202610021741-evening-commute-session-bundle.txt`, and
+`202610021934-evening-commute-session-bundle.txt`. They declare September 30
+Dev, October 1 AI, October 1 Fintech, and October 2 General respectively.
+All four restored bundles pass strict validation against their canonical pairs;
+the combined importer accepts four distinct sessions and matches all four
+queue comparisons with no unresolved capture. Session/export dates and newsletter dates are kept separate. The complete
+recursive Work inventory found no additional plausible bundle rows; October 2
+has no Fintech pair. Other unconsumed pairs remain outside the cleanup allowlist.
+
+The 48 bundle events have private dispositions: four item-bound wiki actions,
+one general keynote save, and six quality incidents are substantive; 37
+playback/navigation/session-boundary events are excluded with reasons. This
+covers bundle events and the targeted General keynote passage, not every turn
+of all four conversations. Optional discussion fields and partial/recovered
+integrity do not establish full conversation coverage. No classifier-score or
+interest/depth correction is inferred from article discussion.
+
+Dev's two Jev saves update Structured Decision Models, preserving classification
+interfaces, probability interpretation, application-level escalation, one- versus
+two-threshold policies, and validation against asymmetric error/review costs.
+The Raschka article was read directly. Swapnil's exact URL, an alternate
+rendering, exact-title/site search, and publisher homepage yielded no readable
+body; useful bundle-backed discussion is retained as synthesis and the source
+remains retryable. The Opus guide was read directly and updates Long-Running
+Agent Harnesses with stop/continue rules, mid-run steering, persistent task
+state through compaction, and parent verification of subagent evidence. The
+three evidence states—confirmed, checked but not found, and could not verify—
+are commute synthesis, not a claimed quotation from the guide.
+
+General's transcript save adds Agent Transcript Archiving with the engineering
+logs/traces analogy, capture path, security boundaries, and the distinction
+between Claude Code's reported local 30-day deletion window and an organization
+archive policy. Its unbound original-keynote save required targeted recovery.
+The exact share returned a cache miss on the initial web route and two retries;
+one direct HTTP fetch recovered the relevant passage and closing video handoff.
+DHH's Rails World 2026 opening keynote is now saved with the requested questions
+and discussion summary, plus its shareable video link. Official event and video
+catalog metadata confirm the identity and broad topics. No readable keynote
+transcript was retrieved; narrated statistics, probability estimates, and
+specific chapter claims are not promoted as verified source facts. The
+conversation's probability and architecture corrections remain visible as
+cautions rather than silently preserving the earlier erroneous claims.
+
+Dev records paraphrased playback, invented prepared context, an unsupported
+lookup-failure claim after a voice/app restart, and Brad's identification of the
+resumed problem as a Voice response issue. Fintech records a wrong three-headline
+sweep, followed by the correct six-item sweep after Brad's correction. General
+records appended Pi Durable context, an unsupported Inflection Pi comparison,
+and an incorrect final article/depth label. These are session observations,
+not independent execution traces proving which Python calls ran. AI records
+`No authors listed` for LIFT; the exact arXiv page independently identifies Dor
+Tirosh, Ido Amos, and Mor Geva. Original queue metadata is preserved and this is
+an attribution incident, not a classifier correction or new wiki save.
+
+Native Work supplied useful contents without ZIP or byte-fidelity requirements.
+One complete compact AI bundle exceeded readback's 20,000-character ceiling;
+complete event envelopes plus separate canonical file reads resolved it.
+Work explicitly compared omitted snapshots with the canonical pairs. The large
+Dev reference was read in two item ranges to fit that observed transport bound.
+Local normalization restores snapshots without inventing events or discussion.
+
+The processing runtime records `gpt-6.1-sol` at low effort. Starting account
+meters were 1% five-hour and 0% weekly used. Available root counters include
+repeated cached input; Work counters are unavailable. Private measurements keep
+all timed tool substeps, natural-boundary meter samples, source/chat work, and
+excluded human waits separately. An initial automatic transfer rejection was
+retried with the supplied standing authorization and still rejected until a
+redundant direct confirmation. A later premature stop mistook lagged readback
+for missing Work output; Brad's correction recovered the complete inventory.
+That avoidable stop and its exclusive user-input gap are recorded separately,
+not hidden in active-time estimates. The appropriate guard is the existing
+bounded retry/readback procedure: an incomplete view is unverified evidence,
+not proof that a file or result is absent. No policy or live Project prompt was
+changed. Final publication and exact-target cleanup results are in the private
+closeout.
