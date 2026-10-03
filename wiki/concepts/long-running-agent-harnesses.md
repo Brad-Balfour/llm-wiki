@@ -7,10 +7,10 @@ aliases: ["The Coming Loop","Hidden Technical Debt of AI Systems: Agent Harness"
 tags: ["ai-agents","agent-harnesses","long-running-agents","software-factories","verification","context-management","feedback-loops"]
 wiki_slug: long-running-agent-harnesses
 created: 2026-08-24
-updated: 2026-09-14
+updated: 2026-10-02
 confidence: medium
 # prettier-ignore
-provenance: [{"source_item_id":"url_1fbd37ebeb0805e9","url":"https://openai.com/index/codex-maxxing-long-running-work/"},{"source_item_id":"url_d3b96db102288163","url":"https://leehanchung.github.io/blogs/2026/05/08/hidden-technical-debt-agent-harness/"},{"source_item_id":"url_2eece697b1d063df","url":"https://lucumr.pocoo.org/2026/6/23/the-coming-loop/"},{"source_item_id":"url_7e29fd14ca16f2a8","url":"https://www.latent.space/p/autoresearch-introspection"},{"source_item_id":"url_6becd8bc303db51e","url":"https://yegge.ai/essays/the-shape-of-things-to-come/"},{"source_item_id":"url_050f975f8d6191b8","url":"https://addyo.substack.com/p/software-factories-light-and-dark"},{"source_item_id":"1a042ecbb2412172-06","url":"https://scott-fryxell.github.io/blog/the-harness-is-the-thing/"},{"source_item_id":"1a0480e09f24878f-13","url":"https://habitat-thinking.github.io/ai-literacy-superpowers/plugins/ai-literacy-superpowers/explanation/harness-engineering/"},{"source_item_id":"1a0903454aaa91c2-06","url":"https://openai.com/index/introducing-the-agents-api/"}]
+provenance: [{"source_item_id":"url_1fbd37ebeb0805e9","url":"https://openai.com/index/codex-maxxing-long-running-work/"},{"source_item_id":"url_d3b96db102288163","url":"https://leehanchung.github.io/blogs/2026/05/08/hidden-technical-debt-agent-harness/"},{"source_item_id":"url_2eece697b1d063df","url":"https://lucumr.pocoo.org/2026/6/23/the-coming-loop/"},{"source_item_id":"url_7e29fd14ca16f2a8","url":"https://www.latent.space/p/autoresearch-introspection"},{"source_item_id":"url_6becd8bc303db51e","url":"https://yegge.ai/essays/the-shape-of-things-to-come/"},{"source_item_id":"url_050f975f8d6191b8","url":"https://addyo.substack.com/p/software-factories-light-and-dark"},{"source_item_id":"1a042ecbb2412172-06","url":"https://scott-fryxell.github.io/blog/the-harness-is-the-thing/"},{"source_item_id":"1a0480e09f24878f-13","url":"https://habitat-thinking.github.io/ai-literacy-superpowers/plugins/ai-literacy-superpowers/explanation/harness-engineering/"},{"source_item_id":"1a0903454aaa91c2-06","url":"https://openai.com/index/introducing-the-agents-api/"},{"source_item_id":"dev-004","url":"https://claude.dev/blog/getting-the-most-out-of-opus-5-5/"}]
 ---
 
 # Long-Running Agent Harnesses
@@ -30,6 +30,26 @@ A long-running agent harness keeps a goal alive beyond one model turn by preserv
 An agent normally stops when its own turn-level reasoning says it is done. A harness can keep the task alive by checking external state and then continuing the session, starting a fresh one with retained evidence, or routing the work elsewhere. This makes the completion contract an engineering artifact rather than a conversational impression.
 
 The most durable state is usually simple and inspectable: an accepted plan, a list of remaining work, test output, repository history, and explicit blockers. OpenAI's long-running-work guide emphasizes verifiable decomposition and persistent workspaces. Armin Ronacher similarly describes queues and outer loops that decide whether a model's apparent stopping point is actually the end.
+
+## Stop Conditions, Steering, and Evidence
+
+Addy Osmani's Opus 5.5 guide makes the long-run contract explicit: define done,
+name the conditions that require input, and continue when those conditions do
+not apply. Follow-up constraints can steer work already underway; an updated
+task file carries progress through context summarization. Delegation also has
+an acceptance gate: the parent checks each subagent's evidence before using its
+result. Research should state what could not be confirmed and where it looked.
+
+The October 2 Dev discussion requested these general lessons beyond the model
+named in the article. Its synthesis is an inspectable record of the original
+objective, accepted steering, completed work, remaining work, and blockers.
+Compaction should preserve that record rather than reset the objective.
+
+Findings distinguish three states: **confirmed**, **checked but not found in a
+bounded search**, and **could not verify**. This taxonomy comes from the commute
+discussion. It prevents missing access or an incomplete search from becoming a
+confident negative claim. Mid-run corrections should update the task state;
+they need not discard useful work or start a fresh session.
 
 ## Harnesses Should Be Replaceable
 
@@ -115,6 +135,16 @@ Short, low-blast-radius loops can earn unattended operation when they have fast,
 Steve Yegge's Wheelhouse account is a vivid practitioner report about persistent identities, task graphs, high token consumption, and large agent fleets. Its predictions about the end of CI/CD or human code review are speculative, and its extraordinary throughput and cost claims are self-reported. The durable lesson is to measure the operating system around the agents—work supply, state, convergence, verification, and cost—not to assume one bespoke setup generalizes.
 
 ## Source Notes
+
+### [Getting the most out of Opus 5.5 in Claude and Claude Code](https://claude.dev/blog/getting-the-most-out-of-opus-5-5/)
+
+<!-- source-item-id: dev-004 -->
+
+Addy Osmani, 2026-09-22. Read directly for the October 2 save of the article and
+surrounding discussion. Completion rules, follow-up steering, persistent task
+files, and verification of delegated evidence are durable workflow guidance.
+Reported model performance is not independent evidence for this project's
+historical comparison.
 
 ### [Codex-maxxing for long-running work](https://openai.com/index/codex-maxxing-long-running-work/)
 
