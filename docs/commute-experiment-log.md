@@ -168,6 +168,17 @@ found a queue as proof.
   Osmani, the official Rails World event and video catalog, and the LIFT arXiv
   attribution. Swapnil's article body and the keynote transcript remain
   unavailable; their saved discussion is explicitly labeled synthesis.
+- Five October 4–5 exports covering four commutes, with October 2 Dev/AI
+  and October 5 General/Dev canonical v4 pairs. Native Work recursively listed
+  539 active rows over three pages, final cursor null; 81 were under
+  `/LLM-Wiki-Car`. Twelve queue/reference rows cover October 2–5; no October 3
+  or 4 edition files were found. Four October 5 AI/Fintech rows remain
+  unconsumed and outside cleanup. Complete Work contents, original event
+  envelopes, restored snapshots, strict validation, exact item checks, coverage,
+  issue routing, and usage records remain private. One targeted October 4
+  shared-chat recovery checked an omitted aggregate wiki-save reminder;
+  individual save identities remain unavailable. Strands release, repository,
+  checkpoint, and AWS affiliation sources were read directly.
 - The live `Weekday TLDR Queues` Task conversation/configuration, the July
   21-24 Task Update emails, the July 24 manual queue-generation control, and
   the live Project settings/sources inspected on July 26.
@@ -2979,3 +2990,82 @@ bounded retry/readback procedure: an incomplete view is unverified evidence,
 not proof that a file or result is absent. No policy or live Project prompt was
 changed. Final publication and exact-target cleanup results are in the private
 closeout.
+
+### October 5 Weekend Intake, Source Defect, and Decision-Model Save
+
+Native Work found five exports: `202610041207-evening-commute-session-bundle.txt`,
+`202610041211-evening-commute-session-bundle.txt`,
+`202610050715-morning-commute-session-bundle.txt`,
+`202610051816-evening-commute-session-bundle.txt`, and
+`202610051853-evening-commute-session-bundle.txt`. The two Sunday exports
+represent the same October 4 Dev commute despite differing session IDs; they
+retain distinct provenance. Monday's three commutes declare October 2 AI,
+October 5 General, and October 5 Dev. Weekend discovery was included rather
+than assuming a weekday-only intake window.
+
+The three Monday bundles pass canonical-pair import and snapshot comparison.
+Both Sunday exports are strictly rejected because October 2 Dev item `dev-002`
+uses publication `sterlingfreeman.net` with `hostname_fallback`, while its
+resolved URL hostname is `blog.sterlingfreeman.net`. Work reports both embedded
+snapshots equal the separately read canonical pair. The producer defect is
+preserved; original reference metadata is not silently repaired. Every
+item-bound event in all five exports matches its canonical source ID, title,
+and URL. Sunday observations are retained as independently identity-checked
+evidence, not falsely reported as a successful strict import.
+
+The private ledger dispositions all 74 exported events: 16 quality-incident
+records, one explicit wiki action, one general discussion capture, and one
+unresolved wiki reminder; 55 playback/navigation/boundary events are excluded
+with reasons. Sunday duplicate incident records are provenance for one commute,
+not additional independent observations. Optional bundle discussion fields do
+not establish full conversation coverage. The targeted Sunday share contains
+Brad's reminder to retain previously marked wiki items, but no item-specific
+save utterance. Missing save identities remain unresolved rather than inferred
+from discussion. Its direct web route and cache retry failed; one HTTP fetch
+recovered the relevant passage. The other supplied shares were not routinely
+audited.
+
+October 2 Dev's Weave Router headline needs explanatory context. Recovered
+Sunday discussion also preserves the folder-structure correction (roles versus
+component abstraction layers, not separate CSS/JS/HTML folders), Brad's concern
+that dependency-based placement may only become clear after implementation and
+needs enforcement, and his view that the Props framing overstates a semantic
+variant distinction. These are qualitative discussion and presentation feedback;
+no numeric interest/depth correction or wiki save is invented. Sunday item 9
+was paraphrased, and item 11 substituted unsupported claims for the actual
+Turbopuffer storage/index description. Those substituted claims are quality
+incidents, not article facts or evidence proving a Python execution trace.
+
+Monday AI's explicit Strands Decider 2B save updates Structured Decision Models
+with Amazon/AWS affiliation, Apache-2.0 code and v19 weights, local deployment,
+and the distinction between downloadable access and hardware/hosted-inference
+costs. The exact release and primary licensing/affiliation sources support the
+addition. Its AIM computational-experiment, Kev authorship/foundation, and
+Navier–Stokes/self-organization discussions remain bundle-reported context,
+not independently verified article conclusions or additional save requests.
+AI also records an invented prepared-context label.
+
+Monday General reports a nonverbatim sweep, in-depth/headline-only/in-depth
+ordering, and a retained TLDR tracking link with failed attribution. Dev
+records missing prefixes, incomplete item strings, headline-only Mailflare
+placed after in-depth items, and the corrected diagnosis that Mailflare's
+context was present in the queue but truncated in playback. The request for
+stronger verbatim playback language is retained for prompt review; no live
+Project instruction or source changes in this content publication. General's
+jump event points at item 2 while its words request item 3; this export identity
+inconsistency is preserved as a reconciliation observation, not a new action.
+
+This run uses GPT-6.1 Sol at low effort. Starting account meters at 23:01:31 UTC
+were 1% five-hour and 9% weekly used; the validated-intake boundary at 23:25:23
+was 20% and 12%. These are account-wide readings. Token traffic includes repeated
+cached input; Work token counters remain unavailable. The private timeline
+separates tool intervals, parallel source/recovery work, machine waits, and any
+exclusive user wait. Initial readback lag prompted premature Safari sign-in
+friction; native Work subsequently completed. The fixed 20,000-character
+readback ceiling truncated complete replies. A larger allowance was rejected
+by the tool contract; reading the already-produced Work response in the signed-in
+browser recovered all canonical contents without further file reads, ZIPs, or
+numbered chunks. Browser text rendering escaped JSON; exact DOM text resolved
+the resulting parse failures. Retrieval and response transport dominated this
+boundary, not wiki synthesis. The existing bounded retry and observed-problem
+fallback rules are sufficient; no new daily phase experiment was started.
