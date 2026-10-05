@@ -7,10 +7,10 @@ aliases: ["System One Models", "Jev"]
 tags: ["ai-agents", "structured-output", "decision-making", "workflow-design"]
 wiki_slug: structured-decision-models
 created: 2026-09-16
-updated: 2026-10-02
+updated: 2026-10-05
 confidence: medium
 # prettier-ignore
-provenance: [{"source_item_id":"1a0aa73e4e492655-02","url":"https://typesafe.ai/blog/introducing-system-one-models-and-jev"},{"source_item_id":"20260922-tldr-dev:dev-01","url":"https://archerhume.com/posts/jevs-architecture-unmasked"},{"source_item_id":"dev-002","url":"https://magazine.sebastianraschka.com/p/classifier-history-and-jev"},{"source_item_id":"dev-011","url":"https://swapniltalekar.substack.com/p/jev-and-the-return-of-the-classifiers"}]
+provenance: [{"source_item_id":"1a0aa73e4e492655-02","url":"https://typesafe.ai/blog/introducing-system-one-models-and-jev"},{"source_item_id":"20260922-tldr-dev:dev-01","url":"https://archerhume.com/posts/jevs-architecture-unmasked"},{"source_item_id":"dev-002","url":"https://magazine.sebastianraschka.com/p/classifier-history-and-jev"},{"source_item_id":"dev-011","url":"https://swapniltalekar.substack.com/p/jev-and-the-return-of-the-classifiers"},{"source_item_id":"ai-010","url":"https://strandsagents.com/blog/introducing-strands-decider/"}]
 ---
 
 # Structured Decision Models
@@ -91,6 +91,24 @@ model output from application policy:
 The discussion considered both personal and workplace decisions; it establishes
 an evaluation approach, not permission to deploy on confidential work data.
 
+## Strands Decider: Open Weights and Operating Costs
+
+The October 5 AI commute explicitly saved Amazon Strands Decider 2B with
+its AWS relationship and free/open-source status. The October 1 release
+presents a constrained decision model: a pointer head scores the supplied
+options in one pass instead of generating an open-ended answer. This makes
+its interface useful for routing and classification; representative validation
+is still needed before trusting its decisions.
+
+The Strands Labs project is affiliated with Amazon/AWS. Its code repository
+and the release's v19 model checkpoint specify Apache-2.0 licensing. The
+weights can be downloaded and run locally; AWS hosting is not required.
+“Free to download” does not mean zero operating cost: local inference consumes
+hardware resources, and a separately hosted LLM or cloud service can carry
+its own charges. The release example's Bedrock LLM is a separate component
+from Decider. These distinctions answer the saved commute questions without
+assuming that AWS affiliation makes every part of an application free.
+
 ## Source Notes
 
 ### [Language Models for Text Classification: From Bag-of-Words to Jev](https://magazine.sebastianraschka.com/p/classifier-history-and-jev)
@@ -127,6 +145,19 @@ Archer Hume, 2026-09-17. Explicitly saved during the September 23–24 Dev
 commute with a request to retain the discussion and first-use cautions. The
 essay separates API observations from architectural hypotheses; the source
 does not prove Jev's internal model family or training recipe.
+
+### [Introducing Strands Decider](https://strandsagents.com/blog/introducing-strands-decider/)
+
+<!-- source-item-id: ai-010 -->
+
+Marc Brooker, Mike Chambers, and Fabio Nonato de Paula, 2026-10-01. Read
+directly for the October 5 explicit save. The [code repository](https://github.com/strands-labs/strands-decider)
+and [v19 checkpoint](https://huggingface.co/StrandsAgents/strands-decider-2B-hobson-v19)
+verify Apache-2.0 licensing; the [AWS Strands Labs announcement](https://aws.amazon.com/blogs/opensource/introducing-strands-labs-get-hands-on-today-with-state-of-the-art-experimental-approaches-to-agentic-development/)
+confirms affiliation. The release describes v19; later repository versions
+are not silently attributed to that article. Cost distinctions above are
+practical synthesis of the deployment choices, not a claim of free hosted
+inference.
 
 ## Related
 
