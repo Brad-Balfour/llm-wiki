@@ -8,6 +8,18 @@ found a queue as proof.
 
 ## Evidence Sources
 
+- October 7 processing: ten October 6–7 bundle exports representing six
+  commutes, six separately recovered v4 playback/reference pairs (October 5 AI
+  and Fintech, October 6 General and AI, October 7 General and Dev), and two
+  targeted reads among six supplied shared-chat URLs. Native Work recursively
+  enumerated 556 Library rows across three pages and 90 rows in LLM-Wiki-Car.
+  The source-date inventory includes intervening weekend dates since the last
+  completed intake; no additional unconsumed October 2–4 artifact was found.
+  Public sources include the exact Decisions, Decision Model Gold Rush,
+  software-factory, Framefields, Codemode and Mastra pages, plus bounded
+  Instinct announcement recovery. Private raw evidence and coverage ledgers
+  remain outside Git.
+
 - The six shared conversation transcripts supplied for July 22, including the
   General and Dev commute sessions, their restart/export attempts, and the
   earlier failed bundle-producing session.
@@ -3069,3 +3081,87 @@ numbered chunks. Browser text rendering escaped JSON; exact DOM text resolved
 the resulting parse failures. Retrieval and response transport dominated this
 boundary, not wiki synthesis. The existing bounded retry and observed-problem
 fallback rules are sufficient; no new daily phase experiment was started.
+
+## October 7: Six Commutes, Duplicate Exports, and Recovered Saves
+
+Ten exports are not ten independent commutes. All six canonical v4 pairs
+validate. Nine bundles independently validate; October 6 General fails at
+`events[16]` because its next transition moves beyond the final queue item.
+The defect is preserved rather than repaired. All 135 item-bound event
+identities match separately recovered canonical items. Bulk reconciliation
+accepts six exports and rejects four: two repeated session identities, the
+invalid General bundle, and a filename collision between initial and recovered
+October 7 General snapshots. These rejection reasons do not erase the
+independently inspected evidence.
+
+The ten exports contain 173 event records: 18 boundaries, 71 announcements,
+53 playback transitions, 17 quality records, three general captures, and 11
+item actions. Overlapping exports repeat observations; 17 quality records are
+not 17 independent incidents. Ten wiki action records resolve to six unique
+saves: Instinct, the software factory, Framefields, Decisions, Decision Model
+Gold Rush, and Codemode. The remaining action describes an article as useless
+without a concrete payment/attribution mechanism. That assessment does not
+establish disinterest, despite its exported `mark_uninterested` label. No
+numeric classifier label is created.
+
+Private coverage accounts for every event and 89 nested discussion points
+(262 rows), excluding 142 navigation/boundary records from substantive review.
+Targeted original-chat recovery audits 43 substantive October 6 AI turns
+and 23 October 7 General turns; four AI and 18 General playback/social/context
+turns are explicitly excluded. These counts overlap the exports and must not
+be added as unique observations. Optional bundle discussion fields do not
+establish complete conversation coverage. The other four supplied shares
+were not routinely audited. Direct web reads and cache retries failed for
+the two needed shares; one direct HTTP fetch each recovered relevant passages.
+
+The AI recovery preserves Instinct's explicit qualitative `headline_only` to
+`in_depth` correction, original announcement links, shared-agent identity,
+authorization, revocation, membership and isolation questions. Range relevance
+is retained as conceptual product synthesis, without confidential work material.
+The software-factory discussion initially fabricated Kent Bennett material,
+then briefly withdrew the save for that material. Brad later pasted the actual
+article and renewed the save. The wiki now distinguishes six platform blocks,
+eight example workflow stages, historical build sequence and article order.
+Framefields is saved with its actual name and beta/license limitations.
+
+The General recovery restores Decisions, which the reconstructed 19:11 export
+omitted. Its rubric, Jev comparison, provider facade and calibration discussion
+join the Gold Rush save. The phrase “had shipped integrations” was materially
+shortened in playback; its timing implication is retained. Codemode includes
+harness versus environment authority, code isolation versus tool permissions,
+and the Mastra comparison. Mastra's June 9 launch predates Ronacher's October 6
+post; the opened sources do not substantiate the conversation's beta qualifier.
+The Stack Overflow discussion remains qualitative capture; inconsistent survey
+figures are not published as verified statistics or an additional save.
+
+Playback/export observations include omitted or changed wording, spoken URLs
+when unwanted, retrieval stalls, repeated recovery exports, missing earlier
+saves, and statements about Python Live without an execution trace. They are
+quality or contract evidence, not proof of execution or additional user labels.
+Existing issues cover acquisition, reconciliation, export validation, playback,
+source fidelity, classifier depth, author lookup, decision evaluation, usage,
+and cleanup; no new umbrella issue or policy change is justified.
+
+The run uses GPT-6.1 Sol Low. Native Work retrieved the files; complete initial
+replies exceeded Codex's 20,000-character readback ceiling. Specific retries
+recovered compact event envelopes and canonical semantic contents; four large
+references required logical item groups after observed truncation. No ZIP or
+byte-accuracy requirement was introduced. Safari sign-in friction was not a
+file-content blocker once native Work completed. Public X announcement reads
+returned 403; the Instinct page labels the secondary evidence and unverified
+protocol/security details. No performance claims were independently benchmarked.
+
+Account usage began at 1% five-hour / 0% weekly, reached at least 98% / 15%
+before interruption, and reset to 0% / 0% before resumption. The inactive reset
+interval from 00:45:57.064 to 01:59:28.960 UTC October 8 is excluded from net
+time. Measurements are segmented across the reset rather than subtracted
+across it. Root and collaborator token traffic includes cached input as a
+subset of input; native Work counters and per-call billing are unavailable.
+The private timeline retains tool substeps, overlapping research, exact
+observable counters, historical workload comparisons, and final cleanup
+results. Account meters are shared observations, not isolated model billing.
+
+This is content and evidence publication. Live Project prompts and source
+documents are unchanged, so no Project replacement is required. Exact
+post-merge cleanup targets are ten bundles and twelve canonical files; October
+6 Dev and October 7 AI pairs remain unconsumed and must be preserved.

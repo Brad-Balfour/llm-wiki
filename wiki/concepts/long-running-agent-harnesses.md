@@ -7,10 +7,10 @@ aliases: ["The Coming Loop","Hidden Technical Debt of AI Systems: Agent Harness"
 tags: ["ai-agents","agent-harnesses","long-running-agents","software-factories","verification","context-management","feedback-loops"]
 wiki_slug: long-running-agent-harnesses
 created: 2026-08-24
-updated: 2026-10-02
+updated: 2026-10-07
 confidence: medium
 # prettier-ignore
-provenance: [{"source_item_id":"url_1fbd37ebeb0805e9","url":"https://openai.com/index/codex-maxxing-long-running-work/"},{"source_item_id":"url_d3b96db102288163","url":"https://leehanchung.github.io/blogs/2026/05/08/hidden-technical-debt-agent-harness/"},{"source_item_id":"url_2eece697b1d063df","url":"https://lucumr.pocoo.org/2026/6/23/the-coming-loop/"},{"source_item_id":"url_7e29fd14ca16f2a8","url":"https://www.latent.space/p/autoresearch-introspection"},{"source_item_id":"url_6becd8bc303db51e","url":"https://yegge.ai/essays/the-shape-of-things-to-come/"},{"source_item_id":"url_050f975f8d6191b8","url":"https://addyo.substack.com/p/software-factories-light-and-dark"},{"source_item_id":"1a042ecbb2412172-06","url":"https://scott-fryxell.github.io/blog/the-harness-is-the-thing/"},{"source_item_id":"1a0480e09f24878f-13","url":"https://habitat-thinking.github.io/ai-literacy-superpowers/plugins/ai-literacy-superpowers/explanation/harness-engineering/"},{"source_item_id":"1a0903454aaa91c2-06","url":"https://openai.com/index/introducing-the-agents-api/"},{"source_item_id":"dev-004","url":"https://claude.dev/blog/getting-the-most-out-of-opus-5-5/"}]
+provenance: [{"source_item_id":"url_1fbd37ebeb0805e9","url":"https://openai.com/index/codex-maxxing-long-running-work/"},{"source_item_id":"url_d3b96db102288163","url":"https://leehanchung.github.io/blogs/2026/05/08/hidden-technical-debt-agent-harness/"},{"source_item_id":"url_2eece697b1d063df","url":"https://lucumr.pocoo.org/2026/6/23/the-coming-loop/"},{"source_item_id":"url_7e29fd14ca16f2a8","url":"https://www.latent.space/p/autoresearch-introspection"},{"source_item_id":"url_6becd8bc303db51e","url":"https://yegge.ai/essays/the-shape-of-things-to-come/"},{"source_item_id":"url_050f975f8d6191b8","url":"https://addyo.substack.com/p/software-factories-light-and-dark"},{"source_item_id":"1a042ecbb2412172-06","url":"https://scott-fryxell.github.io/blog/the-harness-is-the-thing/"},{"source_item_id":"1a0480e09f24878f-13","url":"https://habitat-thinking.github.io/ai-literacy-superpowers/plugins/ai-literacy-superpowers/explanation/harness-engineering/"},{"source_item_id":"1a0903454aaa91c2-06","url":"https://openai.com/index/introducing-the-agents-api/"},{"source_item_id":"dev-004","url":"https://claude.dev/blog/getting-the-most-out-of-opus-5-5/"},{"source_item_id":"20261007-tldr:general-014","url":"https://lucumr.pocoo.org/2026/10/6/codemode/"}]
 ---
 
 # Long-Running Agent Harnesses
@@ -209,9 +209,47 @@ token-and-tool billing without an additional Agents API fee. The corresponding
 documents the customer-run executor, outbound connection, credentials, and
 isolation requirements.
 
+## Generated Code Can Orchestrate Harness Tools
+
+[Armin Ronacher's October 6 Codemode article](https://lucumr.pocoo.org/2026/10/6/codemode/)
+describes generated JavaScript composing tool calls beside the harness.
+Pi uses a restricted QuickJS/WASM runtime without direct network, filesystem,
+or timers; tools bridge to the separate target execution environment.
+One example fetches 100 GitHub issues, classifies them concurrently with Jev,
+retains structured results, and returns a selected subset. This illustrates
+composition, not measured classification performance. Model APIs, MCP tool
+discovery, images, and subagent coordination require harness interfaces rather
+than an assumption that every operation is an ordinary shell command.
+
+[Mastra introduced Code Mode on June 9](https://mastra.ai/blog/introducing-code-mode),
+before Ronacher's post, which does not mention Mastra. Its `createCodeMode()`
+helper supplies a tool and generated instructions; the default tool is
+`execute_typescript`. The launch article documents `@mastra/core@1.38.0` and
+suggests E2B, Modal, or Daytona for production. The saved conversation's “beta”
+qualification is not established by the opened sources.
+
+[Current Mastra docs](https://mastra.ai/docs/agents/code-mode) distinguish
+scoped `external_*` functions from host-side tools retaining validation,
+request context, and tracing. Default `LocalSandbox` uses host Node and host
+privileges; other transports provide different isolation. Those current
+options should not all be attributed to the June launch, and the word sandbox
+alone does not establish Pi-equivalent restrictions.
+[AgentController](https://mastra.ai/docs/harness/agent-controller) manages
+interactive sessions, approvals, models, and subagents; it is a separate system.
+
+The October 7 wiki request explicitly saves the back-and-forth about where code
+runs, harness versus environment authority, sandboxing, MCP, and the Mastra
+comparison. The comparison is commute synthesis, not a relationship asserted
+by Ronacher. Separate code isolation from the permissions and effects of each
+called tool. Generated orchestration can batch mechanical work and return
+compact evidence, but does not itself provide durable execution, retries,
+permission checks, or recovery. No comparative benchmark was performed.
+
 ## Related
 
 - {% include wiki-related-link.md slug="review-driven-software-factories" %}
 - {% include wiki-related-link.md slug="deterministic-agent-workflows" %}
 - {% include wiki-related-link.md slug="agent-autonomy-boundaries" %}
 - {% include wiki-related-link.md slug="agent-context-handoff" %}
+
+<!-- source-item-id: 20261007-tldr:general-014 -->

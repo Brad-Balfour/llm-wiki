@@ -7,10 +7,10 @@ aliases: ["System One Models", "Jev"]
 tags: ["ai-agents", "structured-output", "decision-making", "workflow-design"]
 wiki_slug: structured-decision-models
 created: 2026-09-16
-updated: 2026-10-05
+updated: 2026-10-07
 confidence: medium
 # prettier-ignore
-provenance: [{"source_item_id":"1a0aa73e4e492655-02","url":"https://typesafe.ai/blog/introducing-system-one-models-and-jev"},{"source_item_id":"20260922-tldr-dev:dev-01","url":"https://archerhume.com/posts/jevs-architecture-unmasked"},{"source_item_id":"dev-002","url":"https://magazine.sebastianraschka.com/p/classifier-history-and-jev"},{"source_item_id":"dev-011","url":"https://swapniltalekar.substack.com/p/jev-and-the-return-of-the-classifiers"},{"source_item_id":"ai-010","url":"https://strandsagents.com/blog/introducing-strands-decider/"}]
+provenance: [{"source_item_id":"1a0aa73e4e492655-02","url":"https://typesafe.ai/blog/introducing-system-one-models-and-jev"},{"source_item_id":"20260922-tldr-dev:dev-01","url":"https://archerhume.com/posts/jevs-architecture-unmasked"},{"source_item_id":"dev-002","url":"https://magazine.sebastianraschka.com/p/classifier-history-and-jev"},{"source_item_id":"dev-011","url":"https://swapniltalekar.substack.com/p/jev-and-the-return-of-the-classifiers"},{"source_item_id":"ai-010","url":"https://strandsagents.com/blog/introducing-strands-decider/"},{"source_item_id":"20261007-tldr:general-007","url":"https://developers.openai.com/api/docs/guides/decisions"},{"source_item_id":"20261007-tldr:general-009","url":"https://swapniltalekar.substack.com/p/the-decision-model-gold-rush"}]
 ---
 
 # Structured Decision Models
@@ -159,9 +159,56 @@ are not silently attributed to that article. Cost distinctions above are
 practical synthesis of the deployment choices, not a claim of free hosted
 inference.
 
+## Rubrics, Calibration, and Provider Adapters
+
+The October 7 commute saved both [OpenAI Decisions](https://developers.openai.com/api/docs/guides/decisions)
+and Swapnil Talekar's [The Decision Model Gold Rush](https://swapniltalekar.substack.com/p/the-decision-model-gold-rush).
+OpenAI documents predicate, choice, and score questions over shared input.
+A score question defines ordered `levels` with descriptions; the response can
+include a fractional score, probabilities, confidence, or a refusal. Defining
+rubric levels in the request is different from asking for an unconstrained
+explanation and parsing a number afterward.
+
+Talekar's October 6 article argues for selection on representative production
+data: calibration, accuracy, latency, actual volume costs, deployment location,
+and replacement effort. It reports a 400-decision DecideBench and Jev results
+of 98% accuracy at $32 per million tasks. These are the article's reported
+figures, not measurements reproduced here or expected results for TLDR.
+Rapid integration uptake establishes adoption, not correctness. Its phrase
+“had shipped integrations” matters to the claimed timeline; shortening it
+changes that claim.
+
+The saved discussion asks how OpenAI's questions and rubric levels compare with
+Jev's state/question/criteria interface, and whether either could serve the
+TLDR classifier. A provider-neutral facade is a proposed application design:
+keep one domain contract and implement explicit provider adapters. Preserve
+choice labels, ordinal ordering, probabilities, confidence definitions,
+refusals, provider/version metadata, and errors; do not assume these APIs or
+confidence values are interchangeable. A fractional score need not identify
+one discrete level, and confidence need not equal the winning probability.
+
+For evaluation, compare both providers on the same held-out TLDR examples,
+including difficult negatives and explicit user corrections. Measure accuracy,
+calibration by confidence bucket, latency, cost per decision, and failure rates.
+A model reporting 90% confidence should achieve roughly 90% correctness among
+comparable cases before that number drives automatic policy. Test thresholds
+and provider changes against the costs of missed saves and false corrections.
+Hosted versus local deployment changes data access and operating obligations;
+self-hosting substitutes compute and maintenance for provider charges.
+These are commute-derived evaluation and architecture proposals, not an
+implementation, benchmark result, or authorization to send confidential data.
+
+Both save requests include the surrounding discussion. The interrupted export
+omitted the Decisions save; the recovered export and targeted original chat
+retain it. The wiki preserves the rubric, facade, calibration, and deployment
+questions without treating reconstructed wording as verbatim dialogue.
+
 ## Related
 
 - {% include wiki-related-link.md slug="llm-classification-as-feature-engineering" %}
 
 - {% include wiki-related-link.md slug="deterministic-agent-workflows" %}
 - {% include wiki-related-link.md slug="agent-context-handoff" %}
+
+<!-- source-item-id: 20261007-tldr:general-007 -->
+<!-- source-item-id: 20261007-tldr:general-009 -->

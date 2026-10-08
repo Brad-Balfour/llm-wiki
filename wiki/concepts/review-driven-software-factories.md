@@ -7,10 +7,10 @@ aliases: ["Why Software Factories Fail","Human-in-the-loop software factories","
 tags: ["ai-agents","software-design","planning","code-review","context-management","documentation","workflow-automation","platform-engineering","governance","mcp"]
 wiki_slug: review-driven-software-factories
 created: 2026-07-25
-updated: 2026-09-15
+updated: 2026-10-07
 confidence: medium
 # prettier-ignore
-provenance: [{"source_item_id":"dev-20260724-01","url":"https://github.com/humanlayer/advanced-context-engineering-for-coding-agents/blob/main/wsff.md"},{"source_item_id":"19fd6c96b2d39a67-11","url":"https://github.blog/ai-and-ml/github-copilot/automating-cross-repo-documentation-with-github-agentic-workflows/?utm_source=tldrdev"},{"source_item_id":"19ffad638bac0403-02","url":"https://blog.cloudflare.com/astro-issue-triage/?utm_source=tldrdev"},{"source_item_id":"19ffffe9eeaeab99-06","url":"https://github.com/vercel-labs/eve-software-factory-template?utm_source=tldrnewsletter"},{"source_item_id":"19ffb53bd896ad92-11","url":"https://x.com/AlanaDLevin/status/2087526319999303784"},{"source_item_id":"1a01a57197aa438b-18","url":"https://techcrunch.com/2026/08/18/warps-new-system-is-an-out-of-the-box-software-factory-for-ai-development/?utm_source=tldrai"},{"source_item_id":"url_adf03cc09f382e8e","url":"https://www.warp.dev/factories/request-access"},{"source_item_id":"url_79e1f7b5ba46a169","url":"https://docs.warp.dev/factories/"},{"source_item_id":"url_80300d7978de226c","url":"https://docs.warp.dev/factories/infrastructure-and-security/"},{"source_item_id":"url_853c86ea5e82c5b4","url":"https://www.linkedin.com/blog/engineering/ai/qa-agent-reimagining-software-quality-with-ai-driven-autonomous-testing"},{"source_item_id":"url_f7ffc84157ac5d1c","url":"https://newsletter.posthog.com/p/code-review-tips"},{"source_item_id":"1a038ac5916976e5-05","url":"https://newsletter.port.io/p/how-uber-built-a-software-factory?utm_source=tldrnewsletter"},{"source_item_id":"1a03919a99717a24-09","url":"https://about.gitlab.com/blog/when-code-is-abundant/?utm_source=tldrai"},{"source_item_id":"url_74ac61e244043f10","url":"https://claude.com/blog/the-ai-native-sdlc-playbook"},{"source_item_id":"1a0a4ca47348bc23-04","url":"https://refactoringenglish.com/excerpts/write-an-effective-design-doc/"}]
+provenance: [{"source_item_id":"dev-20260724-01","url":"https://github.com/humanlayer/advanced-context-engineering-for-coding-agents/blob/main/wsff.md"},{"source_item_id":"19fd6c96b2d39a67-11","url":"https://github.blog/ai-and-ml/github-copilot/automating-cross-repo-documentation-with-github-agentic-workflows/?utm_source=tldrdev"},{"source_item_id":"19ffad638bac0403-02","url":"https://blog.cloudflare.com/astro-issue-triage/?utm_source=tldrdev"},{"source_item_id":"19ffffe9eeaeab99-06","url":"https://github.com/vercel-labs/eve-software-factory-template?utm_source=tldrnewsletter"},{"source_item_id":"19ffb53bd896ad92-11","url":"https://x.com/AlanaDLevin/status/2087526319999303784"},{"source_item_id":"1a01a57197aa438b-18","url":"https://techcrunch.com/2026/08/18/warps-new-system-is-an-out-of-the-box-software-factory-for-ai-development/?utm_source=tldrai"},{"source_item_id":"url_adf03cc09f382e8e","url":"https://www.warp.dev/factories/request-access"},{"source_item_id":"url_79e1f7b5ba46a169","url":"https://docs.warp.dev/factories/"},{"source_item_id":"url_80300d7978de226c","url":"https://docs.warp.dev/factories/infrastructure-and-security/"},{"source_item_id":"url_853c86ea5e82c5b4","url":"https://www.linkedin.com/blog/engineering/ai/qa-agent-reimagining-software-quality-with-ai-driven-autonomous-testing"},{"source_item_id":"url_f7ffc84157ac5d1c","url":"https://newsletter.posthog.com/p/code-review-tips"},{"source_item_id":"1a038ac5916976e5-05","url":"https://newsletter.port.io/p/how-uber-built-a-software-factory?utm_source=tldrnewsletter"},{"source_item_id":"1a03919a99717a24-09","url":"https://about.gitlab.com/blog/when-code-is-abundant/?utm_source=tldrai"},{"source_item_id":"url_74ac61e244043f10","url":"https://claude.com/blog/the-ai-native-sdlc-playbook"},{"source_item_id":"1a0a4ca47348bc23-04","url":"https://refactoringenglish.com/excerpts/write-an-effective-design-doc/"},{"source_item_id":"20261006-tldr-ai:ai-006","url":"https://www.theaithinker.com/p/how-to-build-an-ai-native-software"}]
 ---
 
 # Review-Driven Software Factories
@@ -463,6 +463,44 @@ Anthropic, 2026-08-21. Louis Claxton's first-party playbook is the article to
 which GitLab explicitly responds. It is included as related primary context for
 the saved GitLab source, not as a separate commute save.
 
+## Platform Blocks and a Staged Rollout
+
+[Adam Faik's October 5 software-factory article](https://www.theaithinker.com/p/how-to-build-an-ai-native-software)
+separates six platform blocks: model gateway, sandbox/DevPods, tool catalog and
+MCP gateway, context graph, harness/triggers, and identity/security gates.
+These are conceptual responsibilities, not the article's section order or a
+claim that every team needs six separately deployed services.
+
+Its change-flow example runs through idea, build, validation, review, CI,
+handoff, maintenance, and incident learning. The article reports Uber practices;
+this is not an independent audit of that production system. Its separate
+playbook comparison uses versioned intent, specification, plan, code/tests,
+PR, and incident records, with people accepting intent, plan, and merge.
+
+The rollout advice is to measure the queue, choose verifiable toil, try shadow
+operation, build only necessary platform pieces, enforce identity and review
+gates, and measure outcome cost alongside quality. Buy generic agent,
+gateway, sandbox, tracing, and reviewer capabilities; build company-specific
+context, warm code snapshots, tool catalog, SDLC blueprints, and gate policy.
+Use deterministic rules where sufficient and agents for exceptions.
+
+The October 6 saved discussion connects these blocks to tool permissions,
+sandboxing, build-versus-buy choices, developer adoption, and cost per merged
+PR. Useful implementation questions are where credentials live, which context
+is refreshed, what evidence reaches reviewers, and which boundary requires a
+person. Adoption should demonstrate relief from real toil while preserving
+useful developer tool choice; raw code volume is not the outcome metric.
+
+The commute also exposed a source-fidelity failure: inaccessible article text
+was replaced with improvised sections and ordering, and summarization continued
+when original wording was requested. Brad supplied the article and requested
+that the discussion be saved. The source is now recovered; platform components,
+example workflow stages, historical build sequence, and article section order
+must remain distinct. Targeted original-chat recovery confirms the temporary rejection of fabricated
+Kent Bennett material, the later article paste, and the renewed save request.
+The rejection applied to fabricated content, not the verified article. Original
+relevant turns are retained privately; redacted tool outputs remain unavailable.
+
 ## Related
 
 - {% include wiki-related-link.md slug="ai-native-software-engineering" %}
@@ -473,3 +511,5 @@ the saved GitLab source, not as a separate commute save.
 - {% include wiki-related-link.md slug="wide-exploration-narrow-delivery" %}
 - {% include wiki-related-link.md slug="human-understanding-in-agentic-coding" %}
 - {% include wiki-related-link.md slug="long-running-agent-harnesses" %}
+
+<!-- source-item-id: 20261006-tldr-ai:ai-006 -->
