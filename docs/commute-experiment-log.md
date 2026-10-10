@@ -8,6 +8,14 @@ found a queue as proof.
 
 ## Evidence Sources
 
+- October 9 processing: three October 8–9 bundles, three canonical v4
+  playback/reference pairs (October 7 AI, October 8 General and Dev), and no
+  shared-chat reads among two unique supplied URLs (one repeated URL removed).
+  Native Work recursively listed 551 Library rows over three pages, final
+  cursor null, with 85 rows under `/LLM-Wiki-Car`. Nine dated queue/reference
+  pairs cover October 6–9; six pairs remain unconsumed. Private intake retains
+  exact filenames, IDs, modified values, validation and coverage.
+
 - October 7 processing: ten October 6–7 bundle exports representing six
   commutes, six separately recovered v4 playback/reference pairs (October 5 AI
   and Fintech, October 6 General and AI, October 7 General and Dev), and two
@@ -3165,3 +3173,72 @@ This is content and evidence publication. Live Project prompts and source
 documents are unchanged, so no Project replacement is required. Exact
 post-merge cleanup targets are ten bundles and twelve canonical files; October
 6 Dev and October 7 AI pairs remain unconsumed and must be preserved.
+
+## October 9: Three Commutes and Continued Playback Drift
+
+The last completed intake was October 7, published in merged PR #180. Discovery
+covered intervening October 8–9 sessions and October 6–9 source editions,
+including previously unconsumed pairs. Three exports represent three commutes:
+October 8 morning uses October 7 AI; October 9 morning uses October 8 General;
+October 9 evening uses October 8 Dev. All three bundles independently validate,
+all three canonical v4 playback/reference pairs validate, and every embedded
+snapshot matches its separately retrieved pair. General and Dev also pass
+the combined daily-pair gate. No queue repair or invented event was required.
+
+The bundles contain 79 events: 31 announcements, 28 playback transitions, six
+session boundaries, ten quality incidents, and four general captures. No
+explicit wiki save, item action, or exact classifier correction is present.
+The private coverage ledger gives all 79 events a disposition: 65 playback,
+navigation and boundary records are excluded from substantive review; all 14
+substantive entries are audited. Two informational questions (Hark identity
+and the UMI abbreviation) lack a save request or an established answer in the
+bundle and remain private, without manufactured wiki content. A request to
+compare item six with prepared playback is retained as quality context. The
+remaining capture records the preference to wait for the upcoming model
+change and observe playback next week; it is not evidence that a model change
+has occurred and does not create an automation.
+
+October 8 AI records an unsupported paragraph about an Erdős discrepancy proof
+appended to item five, other wording/read-time omissions, and a delay before
+item six. This is exported playback-quality evidence, not a verified mathematical
+claim. October 9 General records a sweep stopping after item three, non-sweep
+text during retries, navigation latency and literal-playback doubts, an article
+about biology incorrectly framed as software, and a shortened final item.
+October 9 Dev records sweeps stopping after items one and three, an exported
+assistant acknowledgment that the required playback function had not run,
+and omitted title/read-time prefixes on item seven and later items. These
+observations belong to playback/source fidelity and Python execution issues,
+not classifier labels. The exports describe partial/recovered reconstruction
+from visible conversation without a separate contemporaneous event ledger.
+Their acceptance does not prove complete conversation coverage or actual code
+execution. No material save/action conflict or ambiguous publication claim
+required a shared-chat audit or public-source fetch.
+
+Workflow observations route to existing issues #100, #153 and #159. Acquisition
+and measurement friction route to #178, #96 and #151; cleanup results route
+to #179 after publication. No new policy or behavior change is needed in this
+content/evidence PR. Existing instructions already require exact playback,
+bounded recovery, and simple complete-file retrieval. Live Project instructions
+and source documents are unchanged; no Project replacement is required.
+
+This run uses user-reported GPT-6.1 Sol Low. The initial request incorrectly
+batched all raw files and Work withheld their contents because of the known
+readback ceiling. A retry produced a complete nine-file document. The maintainer
+prematurely stopped at Safari sign-in instead of trying one file per reply.
+Brad corrected that choice. A one-file retry then displayed a connection
+interruption; signed-in Safari recovered the already-produced complete document
+without ZIPs, chunk protocols or byte-accuracy requirements. Exact preview text
+parsed as JSON and passed the repository validators. The root records this
+friction in the private timeline rather than attributing it to wiki synthesis.
+No broader workflow refactor or historical experiment restart is justified.
+
+Starting account meters were 1% five-hour and 6% weekly used; the validated
+intake boundary was 20% and 9%. These shared account readings are not isolated
+model bills. Private telemetry retains root token counters, tool/retry rows,
+major-boundary meters, historical workload comparisons and excluded user/idle
+waits. Native Work token counters and per-step billing remain unavailable.
+
+Exact post-merge cleanup targets are three bundles and their six consumed
+canonical files. The October 6 Dev, October 8 AI/Fintech, and October 9
+General/Dev/AI pairs remain unconsumed and must be preserved. Normalized
+private evidence and unrelated Project sources are outside cleanup scope.
