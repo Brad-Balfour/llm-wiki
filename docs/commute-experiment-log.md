@@ -3319,6 +3319,9 @@ cover simple retrieval, literal playback and bounded recovery, so this content
 PR changes no prompt, schema, code or commute policy. No live Project prompt or
 source replacement is required.
 
+Duplicate/session reconciliation and reconstructed-evidence limitations route
+to #95.
+
 The account meter began at 1% five-hour and 0% weekly used and reached 40% / 6%
 at the validated intake boundary. These are shared-account observations, not
 per-step billing. The private timeline retains exact request/tool timestamps,
