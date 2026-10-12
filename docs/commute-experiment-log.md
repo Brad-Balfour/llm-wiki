@@ -8,6 +8,15 @@ found a queue as proof.
 
 ## Evidence Sources
 
+- October 11 processing: five October 10–11 bundle exports representing three
+  overlapping commute sequences; three canonical v4 playback/reference pairs
+  (October 8 AI and Fintech, October 9 General); zero shared-chat reads among
+  three supplied URLs. Native Work recursively listed 540 Library rows across
+  three pages, final cursor null, with 74 files under `/LLM-Wiki-Car`. The
+  source window widened from October 9–11 to October 8 after bundle mapping.
+  Private intake retains the identical noncanonical duplicate, all exact
+  identities, 75 event rows and five integrity notes.
+
 - October 9 processing: three October 8–9 bundles, three canonical v4
   playback/reference pairs (October 7 AI, October 8 General and Dev), and no
   shared-chat reads among two unique supplied URLs (one repeated URL removed).
@@ -3242,3 +3251,81 @@ Exact post-merge cleanup targets are three bundles and their six consumed
 canonical files. The October 6 Dev, October 8 AI/Fintech, and October 9
 General/Dev/AI pairs remain unconsumed and must be preserved. Normalized
 private evidence and unrelated Project sources are outside cleanup scope.
+
+## October 11: Weekend Catch-up and Overlapping General Exports
+
+The last completed intake was Friday October 9, merged as PR #182 at 02:54:51
+UTC October 10 (10:54:51 p.m. October 9 in New York). Recursive Library
+discovery covered October 9–11 and widened to October 8 when the first bundle
+named that source date. The complete listing had 540 rows over three pages
+(200/200/140), final cursor null, and 74 files under `/LLM-Wiki-Car`. Five
+bundle rows were retrieved, including a noncanonical
+`202610111040-morning-commute-session-bundle(1).txt` duplicate. No October 10–11
+source editions were found. October 9 Dev and AI remain unconsumed.
+
+The October 10 AI and Fintech exports use their October 8 editions. Three
+General exports describe overlapping playback of October 9 General, ending
+October 11; the 10:40 duplicate has identical semantic contents, while the 10:41
+export uses another session identifier and includes additional quality context.
+Its integrity note says playback began October 10 and ended October 11. Five
+exports therefore represent three commute sequences, rather than five
+independent commutes. The period label in a filename is not evidence of what
+time of day the commute actually occurred.
+
+All five bundles independently validate. All three canonical v4 pairs validate,
+and all five embedded snapshots match the separately retrieved canonical pairs.
+The combined import rejects the identical duplicate session ID explicitly; a
+second import of the four distinct artifacts accepts all four with no unresolved
+item. The duplicate is retained as provenance, with its own cleanup identity.
+The exports contain 75 event records, including ten substantive quality/capture
+records (seven quality incidents and three repeated general captures). Overlap
+means those ten records are not ten independent observations. The private
+coverage ledger retains every event, including quality context inside two
+item-announcement evidence fields and all five integrity notes. There are 63
+excluded playback/navigation/boundary rows, 12 rows with substantive or
+quality-annotation dispositions, and five additional integrity-limit rows. No
+explicit wiki save, item action, or exact classifier correction appears.
+Optional bundle discussion fields do not establish complete conversation
+coverage. None of the three supplied shared-chat URLs required a targeted read.
+
+AI records repeated sweep stops after one or two headlines. Fintech records an
+adoption/substance challenge to the Cloudflare micropayments article and a
+truncated Stuut playback ending at “into credit,” before the prepared “lending,
+and cross-border payments.” The adoption comment is a user assessment and a
+request for source scrutiny, not a verified market fact or an interest/depth
+correction. It is retained as qualitative calibration context without
+manufacturing a classifier label or wiki save.
+
+General records Brad's request to delegate Python playback selection to a GPT-6
+background agent on every command, an audio cutoff and replay of item three, and
+rewritten or condensed playback for Bootstrap, TSMC and the final mathematics
+item. The alternate export describes file search/materialization rather than
+visible `select_playback` calls. This is reconstructed observation, not proof of
+actual code execution or a complete tool trace. The delegation request is
+preserved as workflow preference; it does not prove delegation occurred.
+Playback, Python execution and instruction observations route to #100, #153 and
+#159; qualitative calibration context routes to #35 and #66.
+
+Acquisition used native Work full-file requests, one file at a time. The first
+indented reply exceeded Codex's 20,000-character readback ceiling; one compact
+full-file retry also exceeded it. Signed-in Safari then recovered the existing
+complete replies. Other native readbacks showed active or message-only state
+after a complete reply was visible in Work. An apparent connection interruption
+led to one unnecessary retry of the fifth export; a subsequent read revealed the
+earlier reply had completed. This is acquisition/readback evidence for #178 and
+bundle-size evidence for #181. No ZIPs, numbered chunks, byte-accuracy
+requirements, or full-chat audit were introduced. Existing instructions already
+cover simple retrieval, literal playback and bounded recovery, so this content
+PR changes no prompt, schema, code or commute policy. No live Project prompt or
+source replacement is required.
+
+The account meter began at 1% five-hour and 0% weekly used and reached 40% / 6%
+at the validated intake boundary. These are shared-account observations, not
+per-step billing. The private timeline retains exact request/tool timestamps,
+root token samples, historical model/workload comparisons and overlapping
+research. Native Work token counters and per-call billing are unavailable.
+Sign-in overlapped active retrieval, so it creates no exclusive user wait.
+
+Exact post-merge cleanup targets are the five bundle rows and six consumed
+canonical files. The four October 9 Dev/AI files and unrelated Project sources
+remain outside that allowlist. Normalized private evidence is preserved.
