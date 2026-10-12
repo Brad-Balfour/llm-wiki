@@ -7,10 +7,10 @@ aliases: ["System One Models", "Jev"]
 tags: ["ai-agents", "structured-output", "decision-making", "workflow-design"]
 wiki_slug: structured-decision-models
 created: 2026-09-16
-updated: 2026-10-07
+updated: 2026-10-12
 confidence: medium
 # prettier-ignore
-provenance: [{"source_item_id":"1a0aa73e4e492655-02","url":"https://typesafe.ai/blog/introducing-system-one-models-and-jev"},{"source_item_id":"20260922-tldr-dev:dev-01","url":"https://archerhume.com/posts/jevs-architecture-unmasked"},{"source_item_id":"dev-002","url":"https://magazine.sebastianraschka.com/p/classifier-history-and-jev"},{"source_item_id":"dev-011","url":"https://swapniltalekar.substack.com/p/jev-and-the-return-of-the-classifiers"},{"source_item_id":"ai-010","url":"https://strandsagents.com/blog/introducing-strands-decider/"},{"source_item_id":"20261007-tldr:general-007","url":"https://developers.openai.com/api/docs/guides/decisions"},{"source_item_id":"20261007-tldr:general-009","url":"https://swapniltalekar.substack.com/p/the-decision-model-gold-rush"}]
+provenance: [{"source_item_id":"1a0aa73e4e492655-02","url":"https://typesafe.ai/blog/introducing-system-one-models-and-jev"},{"source_item_id":"20260922-tldr-dev:dev-01","url":"https://archerhume.com/posts/jevs-architecture-unmasked"},{"source_item_id":"dev-002","url":"https://magazine.sebastianraschka.com/p/classifier-history-and-jev"},{"source_item_id":"dev-011","url":"https://swapniltalekar.substack.com/p/jev-and-the-return-of-the-classifiers"},{"source_item_id":"ai-010","url":"https://strandsagents.com/blog/introducing-strands-decider/"},{"source_item_id":"20261007-tldr:general-007","url":"https://developers.openai.com/api/docs/guides/decisions"},{"source_item_id":"20261007-tldr:general-009","url":"https://swapniltalekar.substack.com/p/the-decision-model-gold-rush"},{"source_item_id":"dev-003","url":"https://dejan.ai/blog/chrome-decisions-api-decisionmodel/"}]
 ---
 
 # Structured Decision Models
@@ -202,6 +202,28 @@ Both save requests include the surrounding discussion. The interrupted export
 omitted the Decisions save; the recovered export and targeted original chat
 retain it. The wiki preserves the rubric, facade, calibration, and deployment
 questions without treating reconstructed wording as verbatim dialogue.
+
+## Chrome Decisions: Local API, Interface and Engine
+
+The October 12 Dev commute explicitly saved [Dan Petrovic's October 8 article](https://dejan.ai/blog/chrome-decisions-api-decisionmodel/) and the discussion about browser-local decision inference. The canonical item is `dev-003`, position 5 of the October 9 queue.
+
+The [Chrome Built-in AI Team's explainer](https://github.com/explainers-by-googlers/decisions-api) describes an early proposal, not an API approved to ship. JavaScript uses `window.DecisionModel`, capability checking, model creation, `decide(input)` and destruction. Questions can be boolean, choices or ordinal scores; results expose labels, probabilities, confidence and score expectations. A constrained interface excludes open-ended generation without proving that its backend is a separately trained classifier.
+
+Petrovic's implementation snapshot reports experimental desktop code behind a flag and engine changes under review. It describes Gemma 4 scoring option tokens and EmbeddingGemma converting embedding similarity into probabilities, with the latter planned as default. Reported limits are text input, 1–16 questions, 2–26 choices and 2–9 rating levels. Confidence is reported as the largest probability without separate calibration. These are article-attributed findings: the linked Chromium review/source pages could not be independently read, so they do not establish generally available behavior, current installed backends or verified log-probability mechanics.
+
+Chrome's [official built-in AI overview](https://developer.chrome.com/docs/ai/built-in) lists Prompt, Summarizer, Writer, Rewriter, Proofreader, Translator and Language Detector. Its Gemini Nano description does not verify Nano as DecisionModel's engine or prove that all APIs share one model. Individual API release/experimental statuses were not verified in this run; inclusion in the overview does not establish availability on every browser/device.
+
+### Saved Discussion and Evaluation Questions
+
+Brad asked why decisions should run locally, whether page JavaScript can call the API, what other built-in AI APIs exist, and whether Decisions uses a system-one classifier or probabilities from the model serving Prompt. The recovered discussion considered latency, privacy and fewer cloud calls as motivations; it did not benchmark those benefits. Earlier assistant statements about model names and maturity remain conversation claims unless supported above.
+
+The Jev comparison is architectural synthesis: both expose bounded judgments to application code, but similar interfaces do not establish shared implementation, equivalent confidence definitions or an integration. Keep three questions separate: what JavaScript requests, which engine computes the scores, and how an application acts on them. In particular, the planned probability-scoring engines do not answer whether one installed model serves every Chrome API.
+
+For a project trial, follow the existing representative-label and calibration approach above. Capability-check on the actual browser/device, preserve backend/version evidence, and test decisions against held-out outcomes before applying automatic thresholds. This is a proposed evaluation, not a deployment or a claim that local inference has no operating cost.
+
+The partial bundle preserves these questions and the explicit save request but declares omitted dialogue. The first supplied share failed the website read and one cache retry; no complete verbatim back-and-forth is claimed.
+
+<!-- source-item-id: dev-003 -->
 
 ## Related
 

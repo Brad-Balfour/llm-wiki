@@ -8,6 +8,18 @@ found a queue as proof.
 
 ## Evidence Sources
 
+- October 12 processing: four October 12 exports representing two commutes,
+  including two identical noncanonical Dev duplicates; two canonical v4 pairs
+  (October 9 Dev and AI); one bounded share read plus one cache retry among
+  two supplied URLs. Both website reads failed; no readable share passage was
+  used. Native recursive root inventory: 541 rows, three pages, cursor null,
+  75 files under `/LLM-Wiki-Car`. Source editions October 8–12 were checked;
+  all four October 12 pairs remain unconsumed. Public evidence includes the
+  exact OpenUI/Thesys and DEJAN articles, Chrome's Decisions explainer and
+  official built-in AI overview. Native read/equality provenance, exact-row
+  downloads, 150 event records, 81 discussion entries and four integrity notes
+  remain private.
+
 - October 11 processing: five October 10–11 bundle exports representing three
   overlapping commute sequences; three canonical v4 playback/reference pairs
   (October 8 AI and Fintech, October 9 General); zero shared-chat reads among
@@ -3332,3 +3344,100 @@ Sign-in overlapped active retrieval, so it creates no exclusive user wait.
 Exact post-merge cleanup targets are the five bundle rows and six consumed
 canonical files. The four October 9 Dev/AI files and unrelated Project sources
 remain outside that allowlist. Normalized private evidence is preserved.
+
+## October 12: Friday Dev/AI Catch-up, Two Saves and Sweep Substitution
+
+The previous completed intake was PR #183, merged at 02:26:40 UTC October 12
+(10:26:40 p.m. October 11 in New York). That run completed the weekend catch-up
+since Friday PR #182. This inventory covered source editions October 8–12,
+including previously unconsumed October 9 Dev/AI pairs. Native Work's recursive
+root listing returned 541 rows across three pages (200/200/141), final cursor
+null, with 75 files under `/LLM-Wiki-Car`. It found four October 12 exports,
+the two Friday pairs and four unconsumed October 12 pairs; no October 10–11
+source edition was found. October 12 queues are candidates, not evidence of
+consumed sessions, and remain outside cleanup.
+
+Three 17:21 Dev rows have identical parsed JSON, including every field and
+array entry, as confirmed by native Files reads. The noncanonical `(1)` and
+`(2)` rows retain separate Library identities and normalized duplicate
+provenance. The 17:37 AI row represents another commute. Four exports therefore
+represent two October 12 commutes using Friday October 9 sources. Dev has
+14 queue items and AI has 12. All four bundles independently validate. Native independent reads confirmed
+all four canonical files fully equal to the two corresponding snapshots. Their
+already-acquired material contents were reused for normalized canonical files,
+with the independent read/equality evidence retained privately. Both v4 pairs
+and the combined daily-pair gate pass. The raw import explicitly rejects two
+duplicate session IDs; the two-session deduplicated import has no unresolved item.
+
+The exports contain 150 event records: eight session boundaries, 53
+announcements, 49 playback transitions, 34 quality records and six wiki actions.
+Duplication does not create six unique saves or 34 independent incidents. The
+two distinct sessions contain 68 events, including 16 quality incidents and two
+explicit wiki saves. The private coverage ledger accounts for all 150 raw
+events, 81 nested discussion entries and four integrity notes: 235 rows total,
+110 playback/navigation/boundary exclusions and 125 substantive, discussion
+or limitation dispositions. Optional discussion fields and reconstructed
+partial exports do not establish complete conversation coverage.
+
+Dev explicitly saves OpenUI's How ChatGPT Intelligent UI works and the Chrome
+Decisions API article, each with its back-and-forth. The new UI entry retains
+the recovered architectural questions and publisher correction. The Structured
+Decision Models update retains browser JavaScript, local inference motivations,
+related APIs, Jev comparison and model/interface questions. Both pages separate
+source-supported facts from discussion synthesis and identify verification
+limits. Individual related-API maturity statuses and omitted dialogue remain
+unasserted. No exact classifier correction is present.
+
+Dev records an incomplete 14-headline sweep, discussion audio interruptions,
+a repeated-takeaways answer that missed the actual question, incorrect OpenAI
+publisher attribution, and an item-eleven audio cutoff/replay. AI records
+repeated substitution of individual item strings for the top-level sweep,
+repetition despite corrections, no visible select_playback execution, an
+extraneous Finished message after the eventual sweep, added spoken navigation
+prompts and the Epoch/Epic pronunciation correction. These are playback,
+provenance, instruction and audio observations, not classifier labels or proof
+of actual Python execution. AI's sweep did not create individual visits to
+items 3–5; the recorded jump from cursor zero is a partial-history boundary,
+not invented navigation.
+
+The Dev bundle explicitly declares omitted transcript spans around detailed
+discussion. A bounded read of the first supplied share and one user-requested
+cache retry both failed. No readable passage established that share's mapping.
+Brad requested only the read-website route for shared chats, so no HTTP or
+Safari chat audit was added. Both explicit save identities and recovered
+questions/conclusions remain available in the bundle; wiki context is labeled
+reconstructed, with omitted dialogue unasserted. The second supplied share was
+not routinely audited. The remaining limitation is unavailable omitted dialogue,
+not an unresolved save identity or invented source claim.
+
+Acquisition used simple native Files requests. The first full-file request and
+one plain missing-content retry returned no usable contents; Work showed a
+connection interruption. Signed-in Safari downloaded only that exact Library
+row, and its complete JSON validated. The second distinct bundle similarly
+needed exact-row Download after native read/retry remained missing. No byte
+accuracy checks, hashes, ZIPs or numbered chunks were requested. Native reads
+confirmed full semantic equality for the two duplicate candidates, avoiding
+retransmission of already acquired contents. This preserves material facts
+and separate provenance without treating serialization equality as a gate.
+Native independent canonical reads confirmed full parsed-field equality to
+the already-transferred snapshots, avoiding another oversized reply. This is
+semantic content reuse with explicit provenance, not claimed original-byte
+retrieval. Acquisition/transport evidence routes to #178 and #181; duplicate,
+partial reconstruction and unavailable dialogue limitations route to #95/#172.
+Playback/discussion observations route to #100, #153 and #159; the Chrome/Jev
+evaluation distinctions route to #150. Timing and quota evidence route to
+#96/#151, and exact cleanup results to #179. No new policy or code guard is
+needed in this content PR; the existing requirements already govern retrieval,
+literal playback and honest coverage. Live Project instructions/source documents
+are unchanged, so no prompt replacement or source upload is required.
+
+Starting meters were 0% five-hour / 8% weekly; validated intake was 41% / 15%.
+These are shared-account observations, not isolated model bills. Runtime GPT-6.1
+Sol Low, private root/collaborator counters, exact tool substeps and concurrent
+source-research intervals are retained. Native Work token counters remain
+unavailable. No exclusive user-input wait occurred.
+
+Exact post-merge cleanup targets are four bundle identities and four consumed
+October 9 Dev/AI canonical identities, plus two matching bundle downloads. All
+eight October 12 queue/reference candidates, unrelated sources and normalized
+private evidence remain outside cleanup.
