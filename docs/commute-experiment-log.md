@@ -3441,3 +3441,13 @@ Exact post-merge cleanup targets are four bundle identities and four consumed
 October 9 Dev/AI canonical identities, plus two matching bundle downloads. All
 eight October 12 queue/reference candidates, unrelated sources and normalized
 private evidence remain outside cleanup.
+
+Late Codex/Copilot reviews of PR #184 identified unqualified queue-local wiki
+provenance IDs after the clean pre-merge review snapshot. The follow-up scopes
+both new provenance records and source markers to `20261009-tldr-dev:dev-001`
+and `20261009-tldr-dev:dev-003`, matching established v4 wiki conventions.
+Canonical queue-local IDs remain unchanged in private intake. The existing
+site gate detects a conflicting globally reused ID once a collision exists;
+it did not reject these first unqualified uses. The manual publication error
+and a possible earlier queue-scope check are recorded for #95. This is a
+content/provenance correction, not a schema or workflow policy change.

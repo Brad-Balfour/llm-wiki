@@ -10,7 +10,7 @@ created: 2026-09-16
 updated: 2026-10-12
 confidence: medium
 # prettier-ignore
-provenance: [{"source_item_id":"1a0aa73e4e492655-02","url":"https://typesafe.ai/blog/introducing-system-one-models-and-jev"},{"source_item_id":"20260922-tldr-dev:dev-01","url":"https://archerhume.com/posts/jevs-architecture-unmasked"},{"source_item_id":"dev-002","url":"https://magazine.sebastianraschka.com/p/classifier-history-and-jev"},{"source_item_id":"dev-011","url":"https://swapniltalekar.substack.com/p/jev-and-the-return-of-the-classifiers"},{"source_item_id":"ai-010","url":"https://strandsagents.com/blog/introducing-strands-decider/"},{"source_item_id":"20261007-tldr:general-007","url":"https://developers.openai.com/api/docs/guides/decisions"},{"source_item_id":"20261007-tldr:general-009","url":"https://swapniltalekar.substack.com/p/the-decision-model-gold-rush"},{"source_item_id":"dev-003","url":"https://dejan.ai/blog/chrome-decisions-api-decisionmodel/"}]
+provenance: [{"source_item_id":"1a0aa73e4e492655-02","url":"https://typesafe.ai/blog/introducing-system-one-models-and-jev"},{"source_item_id":"20260922-tldr-dev:dev-01","url":"https://archerhume.com/posts/jevs-architecture-unmasked"},{"source_item_id":"dev-002","url":"https://magazine.sebastianraschka.com/p/classifier-history-and-jev"},{"source_item_id":"dev-011","url":"https://swapniltalekar.substack.com/p/jev-and-the-return-of-the-classifiers"},{"source_item_id":"ai-010","url":"https://strandsagents.com/blog/introducing-strands-decider/"},{"source_item_id":"20261007-tldr:general-007","url":"https://developers.openai.com/api/docs/guides/decisions"},{"source_item_id":"20261007-tldr:general-009","url":"https://swapniltalekar.substack.com/p/the-decision-model-gold-rush"},{"source_item_id":"20261009-tldr-dev:dev-003","url":"https://dejan.ai/blog/chrome-decisions-api-decisionmodel/"}]
 ---
 
 # Structured Decision Models
@@ -223,7 +223,7 @@ For a project trial, follow the existing representative-label and calibration ap
 
 The partial bundle preserves these questions and the explicit save request but declares omitted dialogue. The first supplied share failed the website read and one cache retry; no complete verbatim back-and-forth is claimed.
 
-<!-- source-item-id: dev-003 -->
+<!-- source-item-id: 20261009-tldr-dev:dev-003 -->
 
 ## Related
 
