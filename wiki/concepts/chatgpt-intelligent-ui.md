@@ -10,7 +10,7 @@ created: 2026-10-12
 updated: 2026-10-12
 confidence: medium
 # prettier-ignore
-provenance: [{"source_item_id":"dev-001","url":"https://www.openui.com/blog/how-chatgpt-intelligent-ui-works"}]
+provenance: [{"source_item_id":"20261009-tldr-dev:dev-001","url":"https://www.openui.com/blog/how-chatgpt-intelligent-ui-works"}]
 ---
 
 # ChatGPT Intelligent UI
@@ -48,7 +48,7 @@ These are reconstructed discussion questions and preferences, not verbatim compl
 
 ### [How ChatGPT Intelligent UI works](https://www.openui.com/blog/how-chatgpt-intelligent-ui-works)
 
-<!-- source-item-id: dev-001 -->
+<!-- source-item-id: 20261009-tldr-dev:dev-001 -->
 
 October 9 TLDR Dev, position 3; explicit October 12 save with discussion context. Third-party observations need independent confirmation before becoming implementation or security guarantees.
 
