@@ -8,6 +8,18 @@ found a queue as proof.
 
 ## Evidence Sources
 
+- October 14 processing: seven October 13–14 exports representing six sessions,
+  including one identical noncanonical Fintech duplicate; six canonical v4 pairs
+  (October 12 General, Dev, AI and Fintech; October 13 General and Dev). Native
+  recursive root inventory covered 552 rows across six pages, pagination complete,
+  with 86 files under `/LLM-Wiki-Car`. Source dates October 9–14 were checked.
+  All 12 canonical files were independently read completely in Work and matched
+  the acquired snapshots semantically. Private intake retains 155 raw events,
+  19 nested discussion entries and seven integrity notes. Five unique supplied
+  share URLs (one duplicate removed) needed no targeted recovery. Public evidence
+  includes the exact Cockroach Labs article and indexed original-page content
+  from the browser-fingerprinting article; the latter qualifies a bundle allegation.
+
 - October 12 processing: four October 12 exports representing two commutes,
   including two identical noncanonical Dev duplicates; two canonical v4 pairs
   (October 9 Dev and AI); one bounded share read plus one cache retry among
@@ -3451,3 +3463,111 @@ site gate detects a conflicting globally reused ID once a collision exists;
 it did not reject these first unqualified uses. The manual publication error
 and a possible earlier queue-scope check are recorded for #95. This is a
 content/provenance correction, not a schema or workflow policy change.
+
+## October 14: Six Sessions, a Software Factory Save and Playback Substitution
+
+The latest completed intake was October 12 PR #184, followed by provenance
+correction PR #185, merged at 00:05:01 UTC October 13 (8:05 p.m. October 12 in
+New York). Friday PR #182 and weekend PR #183 were already consumed. This run
+checked source dates October 9–14, including intervening weekend dates, rather
+than reprocessing everything since Friday. The complete native root inventory
+found seven bundle rows and ten queue/reference pairs. October 9–11 rows are
+absent from the current Library; this is not evidence those editions never
+existed. October 13 AI and all three October 14 pairs remain unconsumed.
+
+The exact exports are `202610130719-morning-commute-session-bundle.txt`,
+`202610131858-evening-commute-session-bundle.txt`,
+`202610140744-morning-commute-session-bundle.txt`,
+`202610140904-morning-commute-session-bundle.txt`,
+`202610140904-morning-commute-session-bundle(1).txt`,
+`202610141818-evening-commute-session-bundle.txt` and
+`202610141845-evening-commute-session-bundle.txt`. Their snapshots identify
+October 12 General, Dev, AI and Fintech, then October 13 General and Dev.
+The AI export records a conversation spanning October 13–14; its session and
+export date use the morning completion. The duplicate Fintech row contains the
+same parsed JSON and retains its separate Library identity.
+
+All seven bundles independently pass structural validation. All six v4 pairs
+pass, including daily-pair gates for four October 12 pairs and two October 13
+pairs. Native complete reads independently confirmed all canonical fields and
+arrays match the snapshots; normalized canonical copies reuse that material
+with explicit provenance. This is semantic content reuse, not original-byte
+retrieval. The raw import explicitly rejects one duplicate session ID. The
+six-session import accepts every distinct session with no unresolved capture.
+
+There are 155 raw events: 110 playback/navigation/boundary entries, 31 quality
+records, 13 general captures and one explicit wiki save. Deduplication yields
+147 events, including 26 quality records and the same 13 captures and one save.
+The private coverage ledger has 181 rows: every raw event, 19 nested discussion
+entries and seven integrity notes. Its 110 playback/navigation/boundary rows
+are excluded from substantive action. All other rows have explicit content,
+issue, limitation or no-new-durable-action dispositions. Ordinary source
+questions, cancellation and discussion without a save do not become invented
+wiki saves or classifier labels. Partial/reconstructed bundles and optional
+fields do not establish full conversation coverage. No shared-chat read was
+needed among five unique supplied URLs. No exact classifier correction appears.
+
+The October 13 Dev save adds Cockroach Labs' MOLT Sinai account to
+Review-Driven Software Factories. The original article supports all eight
+requested controls: negative test demonstration, revised-plan review, structured
+handoffs, final process audit, append-only human precedents, review-loop circuit
+breakers, prompt-debt refactoring and bounded agent-generated work. The wiki
+separates reported operating results from local synthesis, retains human approval
+and unresolved-correctness caveats, and preserves the distinction between a
+running harness and manual agent steering. Its provenance is scoped to
+`20261012-tldr-dev:dev-003`. The original URL must also be surfaced in the
+handoff for the user's own sharing; no external message was requested.
+
+Across the sessions, reconstructed evidence records fragmented sweeps, false
+missing-file/string-ended explanations, delayed navigation, paraphrased or
+omitted descriptions, network interruptions and fabricated replacement articles.
+October 12 Dev item ten was replaced with an invented design-document item and
+invented author before correction. October 13 Dev records substitutions for
+items nine, eleven and twelve, plus earlier altered playback. These are playback
+and attribution observations, not canonical queue changes or classifier labels.
+Fintech explicitly distinguishes sweep fragments from individual visits; only
+its numbered item-three jump establishes a full item visit. Rendered punctuation
+and numeric-form differences are transcript observations, not an independent
+audio or byte-fidelity test. Reported absence of a Python call in reconstructed
+exports does not prove the complete execution history.
+
+October 12 General separately records a fabricated voice-interface description
+and an allegation that the stored fingerprinting article's headline did not
+match its URL. Source adjudication does not establish that second defect:
+indexed original-page content contains both the nickname heading “From now on
+I'll call you” and the article heading “Fingerprints are the new cookies.”
+The exact page reader failed, one HTTP request failed DNS, and an indexed
+original-content rendering supported this narrow distinction. Preserve the
+complaint and correction without publishing a confirmed producer defect. The
+jump event's item is correctly its origin; the next announcement is its target.
+
+Acquisition began with simple native Files requests and one missing-response
+retry. The complete recursive inventory eventually returned; stale active/idle
+readback initially obscured execution. Native Files could read complete bundles,
+but large outputs exceeded response limits, and Codex readback has a confirmed
+20,000-character ceiling. One plain complete-file retry established the limit;
+a smaller Fintech reply was visibly truncated at that ceiling. Signed-in Safari
+then downloaded the exact affected bundle rows. No ZIP, numbered chunks,
+transport hashes or byte-accuracy requirement was introduced. Canonical equality
+reads avoided retransferring already acquired snapshots. Safari used an isolated
+session that required sign-in; the exclusive wait is retained separately from
+net work. Acquisition observations route to #178/#181; reconstruction and honest
+adjudication to #95/#172; playback/execution/instruction observations to
+#100/#153/#159; invented attribution to #169. Timing and usage evidence route
+to #96/#151, and post-merge exact cleanup results to #179.
+
+Runtime context confirms GPT-6.1 Sol Low. Starting meters were 0% five-hour and
+0% weekly; the validated intake checkpoint was 21% / 3%. These shared-account
+samples are not per-step bills. Root/collaborator token traffic, cached input,
+exact tool intervals and retries remain private. Native Work token counters
+are unavailable. Historical comparisons retain workload and timing-definition
+differences rather than treating time per export as an isolated model effect.
+Existing requirements already cover literal playback, bounded retrieval and
+source adjudication, so this content PR introduces no policy or code change.
+Live Project instructions and source documents are unchanged; no prompt
+replacement or source upload is required.
+
+The exact post-merge cleanup allowlist is seven bundle identities plus twelve
+consumed canonical identities and seven matching local downloads. Eight
+unconsumed queue/reference candidates and all unrelated sources remain outside
+cleanup. Normalized private evidence, coverage and retrieval records are retained.

@@ -2,15 +2,15 @@
 type: concept
 title: 'Review-Driven Software Factories'
 # prettier-ignore
-aliases: ["Why Software Factories Fail","Human-in-the-loop software factories","Agentic documentation workflows","Foreman software factory","Hiring Agents Is the Easy Part","Warp Factories","Quality Assurance Agent","Stop being the code review bottleneck","How Uber built a software factory for agentic coding","When code is abundant","How to Write an Effective Software Design Document"]
+aliases: ["Why Software Factories Fail","Human-in-the-loop software factories","Agentic documentation workflows","Foreman software factory","Hiring Agents Is the Easy Part","Warp Factories","Quality Assurance Agent","Stop being the code review bottleneck","How Uber built a software factory for agentic coding","When code is abundant","How to Write an Effective Software Design Document","MOLT Sinai"]
 # prettier-ignore
 tags: ["ai-agents","software-design","planning","code-review","context-management","documentation","workflow-automation","platform-engineering","governance","mcp"]
 wiki_slug: review-driven-software-factories
 created: 2026-07-25
-updated: 2026-10-07
+updated: 2026-10-14
 confidence: medium
 # prettier-ignore
-provenance: [{"source_item_id":"dev-20260724-01","url":"https://github.com/humanlayer/advanced-context-engineering-for-coding-agents/blob/main/wsff.md"},{"source_item_id":"19fd6c96b2d39a67-11","url":"https://github.blog/ai-and-ml/github-copilot/automating-cross-repo-documentation-with-github-agentic-workflows/?utm_source=tldrdev"},{"source_item_id":"19ffad638bac0403-02","url":"https://blog.cloudflare.com/astro-issue-triage/?utm_source=tldrdev"},{"source_item_id":"19ffffe9eeaeab99-06","url":"https://github.com/vercel-labs/eve-software-factory-template?utm_source=tldrnewsletter"},{"source_item_id":"19ffb53bd896ad92-11","url":"https://x.com/AlanaDLevin/status/2087526319999303784"},{"source_item_id":"1a01a57197aa438b-18","url":"https://techcrunch.com/2026/08/18/warps-new-system-is-an-out-of-the-box-software-factory-for-ai-development/?utm_source=tldrai"},{"source_item_id":"url_adf03cc09f382e8e","url":"https://www.warp.dev/factories/request-access"},{"source_item_id":"url_79e1f7b5ba46a169","url":"https://docs.warp.dev/factories/"},{"source_item_id":"url_80300d7978de226c","url":"https://docs.warp.dev/factories/infrastructure-and-security/"},{"source_item_id":"url_853c86ea5e82c5b4","url":"https://www.linkedin.com/blog/engineering/ai/qa-agent-reimagining-software-quality-with-ai-driven-autonomous-testing"},{"source_item_id":"url_f7ffc84157ac5d1c","url":"https://newsletter.posthog.com/p/code-review-tips"},{"source_item_id":"1a038ac5916976e5-05","url":"https://newsletter.port.io/p/how-uber-built-a-software-factory?utm_source=tldrnewsletter"},{"source_item_id":"1a03919a99717a24-09","url":"https://about.gitlab.com/blog/when-code-is-abundant/?utm_source=tldrai"},{"source_item_id":"url_74ac61e244043f10","url":"https://claude.com/blog/the-ai-native-sdlc-playbook"},{"source_item_id":"1a0a4ca47348bc23-04","url":"https://refactoringenglish.com/excerpts/write-an-effective-design-doc/"},{"source_item_id":"20261006-tldr-ai:ai-006","url":"https://www.theaithinker.com/p/how-to-build-an-ai-native-software"}]
+provenance: [{"source_item_id":"dev-20260724-01","url":"https://github.com/humanlayer/advanced-context-engineering-for-coding-agents/blob/main/wsff.md"},{"source_item_id":"19fd6c96b2d39a67-11","url":"https://github.blog/ai-and-ml/github-copilot/automating-cross-repo-documentation-with-github-agentic-workflows/?utm_source=tldrdev"},{"source_item_id":"19ffad638bac0403-02","url":"https://blog.cloudflare.com/astro-issue-triage/?utm_source=tldrdev"},{"source_item_id":"19ffffe9eeaeab99-06","url":"https://github.com/vercel-labs/eve-software-factory-template?utm_source=tldrnewsletter"},{"source_item_id":"19ffb53bd896ad92-11","url":"https://x.com/AlanaDLevin/status/2087526319999303784"},{"source_item_id":"1a01a57197aa438b-18","url":"https://techcrunch.com/2026/08/18/warps-new-system-is-an-out-of-the-box-software-factory-for-ai-development/?utm_source=tldrai"},{"source_item_id":"url_adf03cc09f382e8e","url":"https://www.warp.dev/factories/request-access"},{"source_item_id":"url_79e1f7b5ba46a169","url":"https://docs.warp.dev/factories/"},{"source_item_id":"url_80300d7978de226c","url":"https://docs.warp.dev/factories/infrastructure-and-security/"},{"source_item_id":"url_853c86ea5e82c5b4","url":"https://www.linkedin.com/blog/engineering/ai/qa-agent-reimagining-software-quality-with-ai-driven-autonomous-testing"},{"source_item_id":"url_f7ffc84157ac5d1c","url":"https://newsletter.posthog.com/p/code-review-tips"},{"source_item_id":"1a038ac5916976e5-05","url":"https://newsletter.port.io/p/how-uber-built-a-software-factory?utm_source=tldrnewsletter"},{"source_item_id":"1a03919a99717a24-09","url":"https://about.gitlab.com/blog/when-code-is-abundant/?utm_source=tldrai"},{"source_item_id":"url_74ac61e244043f10","url":"https://claude.com/blog/the-ai-native-sdlc-playbook"},{"source_item_id":"1a0a4ca47348bc23-04","url":"https://refactoringenglish.com/excerpts/write-an-effective-design-doc/"},{"source_item_id":"20261006-tldr-ai:ai-006","url":"https://www.theaithinker.com/p/how-to-build-an-ai-native-software"},{"source_item_id":"20261012-tldr-dev:dev-003","url":"https://www.cockroachlabs.com/blog/experiment-running-hospital-code/"}]
 ---
 
 # Review-Driven Software Factories
@@ -500,6 +500,36 @@ must remain distinct. Targeted original-chat recovery confirms the temporary rej
 Kent Bennett material, the later article paste, and the renewed save request.
 The rejection applied to fabricated content, not the verified article. Original
 relevant turns are retained privately; redacted tool outputs remain unavailable.
+
+## A Teaching-Hospital Harness: MOLT Sinai
+
+[Adam Storm and Rafi Shamim's October 9 account](https://www.cockroachlabs.com/blog/experiment-running-hospital-code/)
+describes Cockroach Labs' MOLT Sinai, an issue-driven, multi-agent coding harness
+running in GitHub Actions. It reports over one million lines, seven reverts and
+more than $135,000 in model-token spending across five months. Human approval
+became mandatory after the first autonomous week. These are reported operating
+results, not independent measures of correctness or productivity. Db2 correctness
+remained under verification.
+
+Eight concrete controls connect the account to this topic:
+
+1. Demonstrate that a new test fails with its implementation disabled.
+2. Revise and re-review the plan when implementation changes its scope.
+3. Use structured I-PASS escalations; the receiving agent restates its understanding.
+4. Give a final process auditor responsibility for approvals, comments and CI.
+5. Keep human-authored precedents append-only.
+6. Escalate after four successive review rounds with new blockers or six substantive rounds; effectiveness remained preliminary.
+7. Refactor growing agent instructions as prompt debt.
+8. Throttle agent-generated research proposals and cap the awaiting-admission backlog at ten.
+
+**October 13 commute synthesis:** Brad explicitly requested this source under the
+Software Factory topic, including all eight takeaways. The discussion distinguishes
+a running harness from a person manually steering individual coding agents.
+The reconstructed discussion also raised bureaucracy and junior-engineer
+apprenticeship concerns. For this wiki's own workflow, these controls are evaluation candidates; this
+capture does not establish that implementing them here improves outcomes.
+
+<!-- source-item-id: 20261012-tldr-dev:dev-003 -->
 
 ## Related
 
