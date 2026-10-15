@@ -197,8 +197,18 @@ matching snapshots already acquired locally. Do not serialize one request and
 wait per file. A comparison must use the independently opened canonical file,
 not another copy of the bundle or sampled fields.
 
-When every field matches, reuse the acquired snapshot contents as normalized
-canonical copies, recording the independent Work read/comparison provenance.
+Require repository-equivalent schema and pair validation of the independently
+opened canonical files before reuse. This includes the v4 playback key order
+and prescribed playback fingerprint, not just equality of field values. Return
+a validation result for each actual canonical pair. Failed or unavailable
+canonical validation leaves that pair unresolved: download its exact rows and
+run the local validators on those files. Validating a reused snapshot cannot
+substitute for validating the independently opened canonical data. These are
+artifact-contract checks, not transport byte-fidelity requirements.
+
+When every field matches and canonical validation passes, reuse the acquired
+snapshot contents as normalized canonical copies, recording the independent
+Work read/comparison and validation provenance.
 This establishes semantic equality, not original-byte retrieval. Run the local
 schema, pair and bundle-snapshot checks on those copies. For a missing,
 incomplete, ambiguous or mismatching comparison, immediately download only the

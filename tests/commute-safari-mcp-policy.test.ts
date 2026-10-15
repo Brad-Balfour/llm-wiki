@@ -81,6 +81,14 @@ test('daily commute skill defines the SafariDriver authentication and reconnect 
     normalized,
     /Never silently replace a mismatching canonical file with its snapshot/i
   );
+  assert.match(
+    normalized,
+    /schema and pair validation of the independently opened canonical files before reuse/i
+  );
+  assert.match(
+    normalized,
+    /Failed or unavailable canonical validation leaves that pair unresolved/i
+  );
   assert.doesNotMatch(normalized, /interpret offsets as Unicode character positions/i);
   assert.match(normalizedAgents, /process-daily-commute skill/i);
   assert.match(normalized, /Exclude nonpublic personal identifying information about any person/i);
