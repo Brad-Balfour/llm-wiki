@@ -12,7 +12,7 @@ test('daily commute skill defines the SafariDriver authentication and reconnect 
 
   assert.match(
     normalized,
-    /Use SafariDriver MCP for fallback authenticated ChatGPT main-Library and Project Library\/Sources access/i
+    /Use SafariDriver MCP for authenticated ChatGPT main-Library and Project Library\/Sources access/i
   );
   assert.match(normalized, /Use direct web retrieval for public articles and shared chats first/i);
   assert.match(normalized, /no direct Project file API has been established/i);
@@ -48,11 +48,11 @@ test('daily commute skill defines the SafariDriver authentication and reconnect 
   assert.match(normalized, /separate Safari process with isolated sign-in state/i);
   assert.match(normalized, /driver-created tab, and ask Brad to sign in/i);
   assert.match(normalized, /If its MCP transport closes.*repeat the signed-in-only page check/i);
-  assert.match(normalized, /### SafariDriver fallback for signed-in Library access/i);
+  assert.match(normalized, /### SafariDriver exact-row downloads and recovery/i);
   assert.match(normalized, /Do not silently switch to integrated browser or computer-use tooling/i);
   assert.match(
     normalized,
-    /Use an existing ChatGPT Work chat inside `LLM-Wiki-Car` as the first discovery and read path/i
+    /Use ChatGPT Work inside `LLM-Wiki-Car` as the first discovery and read path/i
   );
   assert.match(normalized, /keep three dates distinct: the requested processing date/i);
   assert.match(normalized, /Include intervening calendar days, including weekends and holidays/i);
@@ -68,9 +68,28 @@ test('daily commute skill defines the SafariDriver authentication and reconnect 
   assert.match(normalized, /inventory actual queue and reference rows/i);
   assert.match(normalized, /Use `send_message_to_thread`, then `read_thread`/i);
   assert.match(normalized, /Brad authorizes transferring the full raw contents/i);
-  assert.match(normalized, /Parse and validate the entire reassembled response/i);
-  assert.match(normalized, /interpret offsets as Unicode character positions/i);
-  assert.match(normalized, /Use SafariDriver only for the specific row/i);
+  assert.match(
+    normalized,
+    /Download every in-scope session bundle from its exact main-Library List View row/i
+  );
+  assert.match(
+    normalized,
+    /Group all unique canonical queue\/reference pairs into one native Work request/i
+  );
+  assert.match(normalized, /reuse the acquired snapshot contents as normalized canonical copies/i);
+  assert.match(
+    normalized,
+    /Never silently replace a mismatching canonical file with its snapshot/i
+  );
+  assert.match(
+    normalized,
+    /schema and pair validation of the independently opened canonical files before reuse/i
+  );
+  assert.match(
+    normalized,
+    /Failed or unavailable canonical validation leaves that pair unresolved/i
+  );
+  assert.doesNotMatch(normalized, /interpret offsets as Unicode character positions/i);
   assert.match(normalizedAgents, /process-daily-commute skill/i);
   assert.match(normalized, /Exclude nonpublic personal identifying information about any person/i);
   assert.match(normalized, /public article facts and public newsletter content/i);

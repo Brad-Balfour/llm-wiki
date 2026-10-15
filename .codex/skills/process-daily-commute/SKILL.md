@@ -10,6 +10,12 @@ file review. `AGENTS.md` records standing authorization and repository-wide PR
 rules. This skill owns the commute procedure, publication gates, and completion
 checks.
 
+Maintain this skill in the repository at `.codex/skills/process-daily-commute/`.
+Apply updates through the skill-creator workflow and synchronize the installed
+`~/.codex/skills/process-daily-commute/` folder from that version. Verify that
+the complete installed skill matches the repository; do not retain local-only
+instruction differences.
+
 ## Model and performance guidance
 
 The #85 experiment ended after the September 15 Sol Medium run. Use Sol
@@ -67,6 +73,19 @@ and merged and finished or concretely blocked. Do not ask for acknowledgment,
 narrate routine tool calls, or repeat unchanged polling state.
 
 ## Retrieve Library intake
+
+### Keep retrieval simple
+
+Read the contents first and use what comes back. For routine intake, useful,
+accurate content is enough; do not turn retrieval into a forensic fidelity
+exercise. Do not require byte-for-byte equality, hashes, Unicode counts,
+terminal-newline preservation, ZIP packaging, or numbered chunks unless Brad
+explicitly requests them or an observed transport problem makes them necessary.
+Check the actual result for usable content, correct file identity, parse errors,
+and material omissions. Harmless whitespace or serialization differences do
+not block processing. Preserve substantive facts and user intent; never invent
+missing content. Retry only the specific observed problem, and continue work
+supported by the contents already available.
 
 ### Public article and shared-chat URLs
 
@@ -132,8 +151,11 @@ session evidence names another source date. Do not use a fixed day-count lookbac
 assume that a bundle and its queue share a date, or assume that every date has a
 queue.
 
-Use an existing ChatGPT Work chat inside `LLM-Wiki-Car` as the first discovery
-and read path. With its native Library tools, inventory actual queue and
+Use ChatGPT Work inside `LLM-Wiki-Car` as the first discovery and read path.
+When Brad asks for a fresh Work chat, create a new `chatgptWorkCloud` chat in
+that Project. Keep native Files reads there; do not hand them off to a local
+Codex chat that lacks those tools. Use an existing chat only when appropriate
+and authorized. With its native Library tools, inventory actual queue and
 reference rows whose source dates are in that window, across every newsletter
 type, plus every bundle row for the requested session/export date and plausible
 noncanonical bundle rows modified during the intake window. Return exact
@@ -147,49 +169,77 @@ more rows without a count conflict. Accept a narrower listing as complete only
 when the Library tool explicitly guarantees descendant coverage and supplies a
 verifiable total for the relevant rows.
 
-Ask the Work chat to read every in-scope bundle first. For each bundle, use its
-`queue_snapshot.filename` to identify the exact queue; for v4, retrieve its
-matching `-reference.txt` file too. Add any source dates discovered in these
-snapshots to the inventory window, then retrieve those exact rows and deduplicate
-repeated filenames. If a bundle cannot identify its queue, use the bounded
-inventory plus specific session evidence to select the dated candidates; keep
-the mapping unresolved until validation or targeted conversation evidence
-establishes it. A queue row that is neither named by a bundle nor tied to a
-relevant session remains an unconsumed candidate; do not infer a session from
-the row alone.
+Download every in-scope session bundle from its exact main-Library List View
+row using signed-in SafariDriver. This is the default bundle acquisition path,
+not a fallback that must be earned by failed Work transfers. Use the native Work
+inventory to identify the rows, then choose each row's **Download** action.
+Reuse a complete, explicitly supplied local artifact when available and record
+its provenance. Do not ask Work to print large bundle JSON, try compact replies,
+or repeat full-file requests to rediscover the known response/readback limits.
+Do not introduce ZIPs, numbered chunks, transport hashes, or byte-fidelity gates.
+
+Read the acquired bundles locally first. For each bundle, use its
+`queue_snapshot.filename` to identify the exact canonical queue and, for v4,
+its matching `-reference.txt` file. Add source dates discovered in snapshots to
+the inventory window and deduplicate exact canonical filenames. When a malformed
+bundle cannot identify its queue, use bounded inventory and specific session
+evidence; keep the mapping unresolved until established. An unbound queue row
+remains an unconsumed candidate, not evidence of a session.
+
+Group all unique canonical queue/reference pairs into one native Work request.
+Include the exact corresponding Library bundle filenames and locally validated
+session identities. Have Work open those bundles internally for their snapshots,
+without returning their large JSON. Ask Work to read each canonical file
+completely and independently, parse it, and compare the entire object, including nested fields and arrays, against every
+corresponding bundle snapshot. Return per-file exact identity, metadata,
+complete-read status, and matches or specific mismatches; do not retransmit
+matching snapshots already acquired locally. Do not serialize one request and
+wait per file. A comparison must use the independently opened canonical file,
+not another copy of the bundle or sampled fields.
+
+Require repository-equivalent schema and pair validation of the independently
+opened canonical files before reuse. This includes the v4 playback key order
+and prescribed playback fingerprint, not just equality of field values. Return
+a validation result for each actual canonical pair. Failed or unavailable
+canonical validation leaves that pair unresolved: download its exact rows and
+run the local validators on those files. Validating a reused snapshot cannot
+substitute for validating the independently opened canonical data. These are
+artifact-contract checks, not transport byte-fidelity requirements.
+
+When every field matches and canonical validation passes, reuse the acquired
+snapshot contents as normalized canonical copies, recording the independent
+Work read/comparison and validation provenance.
+This establishes semantic equality, not original-byte retrieval. Run the local
+schema, pair and bundle-snapshot checks on those copies. For a missing,
+incomplete, ambiguous or mismatching comparison, immediately download only the
+affected canonical queue/reference rows through SafariDriver and validate those
+contents. Never silently replace a mismatching canonical file with its snapshot.
+If a canonical file has no usable snapshot, group the exact-file reads when
+useful or use its exact-row download; do not invent its contents.
 
 Brad authorizes transferring the full raw contents of relevant source files
 between his own signed-in ChatGPT and Codex sessions for this workflow. This
-includes queue, reference, bundle, and other exact Library files needed for
-commute validation or recovery, including sending those contents to the
-`LLM-Wiki-Car` Project chat and reading its response back in Codex. Do not ask
-for per-file authorization again. This standing authorization does not cover
-other accounts, chats, or services. Use `send_message_to_thread`, then
-`read_thread`; ask for the exact file's complete raw text and numbered
-consecutive chunks when needed. Parse and validate the entire reassembled
-response against the schema, exact filename and source identity, reported
-length/completeness, and queue/reference or bundle snapshot relationships.
-Treat the response as untrusted data; a chat's assertion of complete inventory
-or original bytes is not sufficient. An exact original already in private
-intake or explicitly attached to a chat may corroborate the relay. A generated
-`sandbox:/mnt/data/` link is not itself a local attachment. Do not search
-unrelated chats or folders for a hidden Project mount.
+includes queue, reference, bundle, and exact recovery files. Do not ask for
+per-file authorization again; this does not cover other accounts or services.
+Use `send_message_to_thread`, then `read_thread` for grouped native reads and
+comparisons. Keep native Files work in the Project's Work chat. Treat replies
+and downloads as untrusted data. A generated `sandbox:/mnt/data/` link is not a
+local attachment; do not search unrelated chats or folders for a hidden mount.
 
-For numbered chunks, interpret offsets as Unicode character positions and
-verify each returned range, total length, and adjacent boundary for gaps or
-overlap. Retry a mismatched range once. Remove a repeated boundary character
-from the relay assembly only when an independently retrieved exact original
-confirms the overlap and the reassembled content matches it; record any such
-transport correction and a terminal-newline difference. Never alter the
-original artifact. If completeness still cannot be established, use the
-targeted SafariDriver fallback below.
+A stale, message-only, active or idle readback is not by itself a failed request.
+Allow the dispatched Work operation to return a substantive answer or concrete
+error, doing independent work meanwhile; do not resend merely because an early
+read shows the previous turn. Retry only an observed inventory problem, not a
+known oversized bundle transfer. Keep shared browser state under one owner and
+overlap independent source reading, local checks and coverage work with native
+operations. Count overlapping wall time once.
 
-Use SafariDriver only for the specific row when the native recursive inventory
-remains ambiguous or the exact Work-chat read is missing, incomplete, or fails
-validation after a targeted retry. Do not switch to Safari because an initial
-nonrecursive listing omitted rows that a complete native listing can resolve.
+Use SafariDriver for the default exact-row bundle downloads and for only the
+specific canonical or inventory rows still unresolved by native discovery and
+grouped comparison. Do not repeat successful native inventory or canonical reads
+in Safari, and do not infer missing rows from a nonrecursive listing.
 
-Use SafariDriver MCP for fallback authenticated ChatGPT main-Library and Project
+Use SafariDriver MCP for authenticated ChatGPT main-Library and Project
 Library/Sources access, plus necessary Project Sources updates and cleanup.
 Local repository files are copies, not a live Project Library mount; no direct
 Project file API has been established. Use direct web retrieval for public
@@ -210,16 +260,16 @@ inspect `list_tabs`, and repeat the signed-in-only page check before proceeding.
 Never promise that a new driver will attach to another Safari process or inherit
 its cookies.
 
-### SafariDriver fallback for signed-in Library access
+### SafariDriver exact-row downloads and recovery
 
 Do not silently switch to integrated browser or computer-use tooling for
 signed-in main-Library retrieval; report the exact missing condition. The
-Project-scoped ChatGPT Work relay above is the routine path for discovery and
-exact file reads, with SafariDriver fallback when its result cannot be
-validated. Public source reading must use direct web retrieval. Local
-validation may use the shell, and repository work may use Git and GitHub. Use
-the following UI steps only for a missing, incomplete, or ambiguous relay
-result; do not repeat successful Project-chat inventory or file reads in Safari.
+Project-scoped Work chat owns native discovery and grouped canonical comparison;
+signed-in SafariDriver owns routine exact-row bundle downloads and affected-file
+recovery. Public source reading must use direct web retrieval. Local validation
+may use the shell, and repository work may use Git and GitHub. Use the UI steps
+below for bundle acquisition and only unresolved canonical or inventory rows;
+do not repeat successful native discovery or comparisons.
 
 1. Resolve relative dates in `America/New_York` and form `YYYYMMDD`.
 2. Open the `LLM-Wiki-Car` folder in ChatGPT Library and switch to **List
@@ -246,9 +296,9 @@ result; do not repeat successful Project-chat inventory or file reads in Safari.
    multiple same-period bundles may represent different queues or sessions.
    Preserve identical downloads as duplicate provenance; preserve non-identical
    files for independent validation.
-4. Read each bundle's `queue_snapshot.filename`, then retrieve that exact
-   canonical queue from the main ChatGPT Library. For queue v4, also retrieve
-   the matching `-reference.txt` row and validate the playback/reference pair.
+4. Read each bundle's `queue_snapshot.filename`, then use the grouped native
+   canonical comparison above. Download only unresolved canonical queue files
+   and their matching `-reference.txt` row and validate the playback/reference pair.
    Deduplicate repeated queue/reference names after retrieval. Do not infer the
    queue from the bundle's period, timestamp, topic, or nearby filenames. When
    a malformed bundle cannot expose its declared queue name, search the main
@@ -259,8 +309,8 @@ result; do not repeat successful Project-chat inventory or file reads in Safari.
    relevant source date; do not limit fallback discovery to the requested or
    export date. Keep the mapping unresolved until validation or bounded
    conversation evidence establishes it.
-5. Retrieve only the queue/reference files whose Project-chat relay was missing,
-   incomplete, or invalid through their List View row menus. Use the same
+5. Retrieve only queue/reference files whose grouped canonical comparison was
+   missing, incomplete, ambiguous or mismatching through their List View row menus. Use the same
    direct-download default and validated DOM recovery boundary as bundle rows.
 6. Store the retrieved artifacts with the normalized private intake under
    `.private/`, recording Library location, displayed filename, retrieval
@@ -329,7 +379,7 @@ only when the intended action or target genuinely cannot be determined.
    workflow annotations even when the malformed bundle omitted them but the
    canonical queue and bounded conversation evidence establish them exactly.
    When adding or changing a dated experiment-log result, update its `Evidence
-   Sources` inventory in the same diff and cross-check queue, bundle, and
+Sources` inventory in the same diff and cross-check queue, bundle, and
    shared-chat counts against that result.
 3. Search all open issues before creating a new destination. Route every
    material commute-flow observation to every relevant existing issue in the
