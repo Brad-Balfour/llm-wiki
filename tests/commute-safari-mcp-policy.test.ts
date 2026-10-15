@@ -52,7 +52,7 @@ test('daily commute skill defines the SafariDriver authentication and reconnect 
   assert.match(normalized, /Do not silently switch to integrated browser or computer-use tooling/i);
   assert.match(
     normalized,
-    /Use an existing ChatGPT Work chat inside `LLM-Wiki-Car` as the first discovery and read path/i
+    /Use ChatGPT Work inside `LLM-Wiki-Car` as the first discovery and read path/i
   );
   assert.match(normalized, /keep three dates distinct: the requested processing date/i);
   assert.match(normalized, /Include intervening calendar days, including weekends and holidays/i);

@@ -10,6 +10,12 @@ file review. `AGENTS.md` records standing authorization and repository-wide PR
 rules. This skill owns the commute procedure, publication gates, and completion
 checks.
 
+Maintain this skill in the repository at `.codex/skills/process-daily-commute/`.
+Apply updates through the skill-creator workflow and synchronize the installed
+`~/.codex/skills/process-daily-commute/` folder from that version. Verify that
+the complete installed skill matches the repository; do not retain local-only
+instruction differences.
+
 ## Model and performance guidance
 
 The #85 experiment ended after the September 15 Sol Medium run. Use Sol
@@ -67,6 +73,19 @@ and merged and finished or concretely blocked. Do not ask for acknowledgment,
 narrate routine tool calls, or repeat unchanged polling state.
 
 ## Retrieve Library intake
+
+### Keep retrieval simple
+
+Read the contents first and use what comes back. For routine intake, useful,
+accurate content is enough; do not turn retrieval into a forensic fidelity
+exercise. Do not require byte-for-byte equality, hashes, Unicode counts,
+terminal-newline preservation, ZIP packaging, or numbered chunks unless Brad
+explicitly requests them or an observed transport problem makes them necessary.
+Check the actual result for usable content, correct file identity, parse errors,
+and material omissions. Harmless whitespace or serialization differences do
+not block processing. Preserve substantive facts and user intent; never invent
+missing content. Retry only the specific observed problem, and continue work
+supported by the contents already available.
 
 ### Public article and shared-chat URLs
 
@@ -132,8 +151,11 @@ session evidence names another source date. Do not use a fixed day-count lookbac
 assume that a bundle and its queue share a date, or assume that every date has a
 queue.
 
-Use an existing ChatGPT Work chat inside `LLM-Wiki-Car` as the first discovery
-and read path. With its native Library tools, inventory actual queue and
+Use ChatGPT Work inside `LLM-Wiki-Car` as the first discovery and read path.
+When Brad asks for a fresh Work chat, create a new `chatgptWorkCloud` chat in
+that Project. Keep native Files reads there; do not hand them off to a local
+Codex chat that lacks those tools. Use an existing chat only when appropriate
+and authorized. With its native Library tools, inventory actual queue and
 reference rows whose source dates are in that window, across every newsletter
 type, plus every bundle row for the requested session/export date and plausible
 noncanonical bundle rows modified during the intake window. Return exact
@@ -168,8 +190,7 @@ Group all unique canonical queue/reference pairs into one native Work request.
 Include the exact corresponding Library bundle filenames and locally validated
 session identities. Have Work open those bundles internally for their snapshots,
 without returning their large JSON. Ask Work to read each canonical file
-completely and independently, parse it, and
-compare the entire object, including nested fields and arrays, against every
+completely and independently, parse it, and compare the entire object, including nested fields and arrays, against every
 corresponding bundle snapshot. Return per-file exact identity, metadata,
 complete-read status, and matches or specific mismatches; do not retransmit
 matching snapshots already acquired locally. Do not serialize one request and
