@@ -15,7 +15,8 @@ found a queue as proof.
   canonical pairs were present across October 12–15; five pairs remain
   unconsumed. All three exact-row bundle downloads pass structural validation; all six
   canonical files were independently read in Work, then downloaded for local
-  contract validation because native validation results were missing.
+  contract validation after an incomplete native readback. The later complete
+  native reply also confirms all prescribed validation checks passed.
   Private evidence retains 44 events, seven nested discussion entries and three
   integrity notes. None of the three supplied share URLs required recovery.
   Public-source recovery directly read Mark Seemann's article and identified its
@@ -3605,8 +3606,11 @@ October 15; their queues are respectively October 13 AI, October 14 General and
 October 14 Dev. All three independently pass structural validation, and the raw
 import accepts three distinct sessions with no unresolved capture and no wiki
 maintenance candidate. All six independently opened canonical objects match their snapshots in Work.
-The response omitted canonical validation results, so all six exact canonical
-rows were downloaded. These independently acquired v4 pairs pass local schema,
+An early partial readback lacked canonical validation results, so all six exact
+canonical rows were downloaded prematurely. The later complete native response
+confirms all three pairs passed the supplied v4 schemas and complete Project
+preflight/daily-audit code, including key order and playback fingerprints. It did
+not run the repository executable. These independently downloaded pairs also pass local schema,
 key-order and fingerprint validation, including the two-pair October 14 daily
 gate. All three bundles pass comparison against the downloaded canonical pairs.
 
@@ -3648,8 +3652,11 @@ no wiki save is inferred from source discussion.
 Playback observations route to #100/#153/#159; attribution and original-source
 recovery to #169; reconstruction and classifier adjudication to #95/#172;
 acquisition observations to #178/#181; timing to #96/#151; exact cleanup to #179.
-Existing instructions already require literal playback, primary-source retrieval
-and intent adjudication, so this evidence-only change adds no policy or code.
+The early canonical-download fallback was a processing mistake: the Work reply
+was still arriving, not an established validation failure. Existing instructions
+already require waiting for substantive native results, literal playback,
+primary-source retrieval and intent adjudication, so this evidence-only change
+adds no policy or code.
 Live Project instructions and source documents are unchanged; no prompt
 replacement or source upload is required.
 
