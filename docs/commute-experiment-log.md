@@ -8,6 +8,19 @@ found a queue as proof.
 
 ## Evidence Sources
 
+- October 15 processing: three October 15 exports representing three sessions,
+  with snapshots for October 13 AI and October 14 General/Dev. Root-recursive
+  native Library discovery exhausted three pages (200, 200, 144 rows), covering
+  544 entries and 78 files plus the folder under `/LLM-Wiki-Car`. Eight dated
+  canonical pairs were present across October 12–15; five pairs remain
+  unconsumed. All three exact-row bundle downloads pass structural validation; all six
+  canonical files were independently read in Work, then downloaded for local
+  contract validation because native validation results were missing.
+  Private evidence retains 44 events, seven nested discussion entries and three
+  integrity notes. None of the three supplied share URLs required recovery.
+  Public-source recovery directly read Mark Seemann's article and identified its
+  Robert C. Martin links; both X pages returned 403.
+
 - October 14 processing: seven October 13–14 exports representing six sessions,
   including one identical noncanonical Fintech duplicate; six canonical v4 pairs
   (October 12 General, Dev, AI and Fintech; October 13 General and Dev). Native
@@ -3571,3 +3584,87 @@ The exact post-merge cleanup allowlist is seven bundle identities plus twelve
 consumed canonical identities and seven matching local downloads. Eight
 unconsumed queue/reference candidates and all unrelated sources remain outside
 cleanup. Normalized private evidence, coverage and retrieval records are retained.
+
+## October 15: Three Sessions, Sweep Failures and Primary-Source Recovery
+
+The last completed intake was October 14 PR #186, followed by retrieval-policy
+PR #187. Friday PR #182 and the intervening weekend/weekday intakes were already
+completed. This run checked source dates October 12–15 against that history.
+The complete native root inventory found three October 15 exports and eight
+canonical pairs. October 12 and October 13 General/Dev are absent from the
+current inventory; absence does not establish that those editions never existed.
+October 14 AI and all four October 15 pairs remain unconsumed. No additional
+recent noncanonical bundle or older session export appeared. A supplementary
+folder listing returned fewer rows than the complete recursive root listing;
+the repeated root listing agreed, and its exhausted pagination governs coverage.
+
+The exact exports are `202610150717-morning-commute-session-bundle.txt`,
+`202610151844-evening-commute-session-bundle.txt` and
+`202610151858-evening-commute-session-bundle.txt`. Their semantic session date is
+October 15; their queues are respectively October 13 AI, October 14 General and
+October 14 Dev. All three independently pass structural validation, and the raw
+import accepts three distinct sessions with no unresolved capture and no wiki
+maintenance candidate. All six independently opened canonical objects match their snapshots in Work.
+The response omitted canonical validation results, so all six exact canonical
+rows were downloaded. These independently acquired v4 pairs pass local schema,
+key-order and fingerprint validation, including the two-pair October 14 daily
+gate. All three bundles pass comparison against the downloaded canonical pairs.
+
+The private coverage ledger contains 54 rows: 44 events, seven nested discussion
+entries and three integrity notes. Thirty-six playback/navigation/boundary rows
+are excluded from separate durable content action. Seven quality incidents and
+one item action retain explicit dispositions. All exports are partial chat
+reconstructions; optional discussion fields do not establish full conversation
+coverage. There is no explicit wiki save. The AI bundle's `mark_uninterested`
+action preserves criticism of Seemann's response and a request for Martin's
+original source, rather than a demonstrated topic-interest correction. No
+classifier label is stored from that action. The raw annotation and discussion
+emphasis remain in private evidence. No shared-chat audit was necessary.
+
+AI and General both record Begin returning only the first headline rather than
+the stored sweep. General's restart then stopped after two of four entries.
+AI's corrected sweep appended a premature Finished notice; later Next received
+only an acknowledgment, without item three. The Dev export records a sweep and
+individual visits to items three through twelve, with no quality incident or
+save. Skipped individual visits during a sweep are ordinary navigation, not an
+invented defect. Reconstructed rendered speech does not independently establish
+audio fidelity or complete Python execution history.
+
+AI also records a temporary attribution misunderstanding: the article is Mark
+Seemann's [Releasing AI-generated software](https://blog.ploeh.dk/2026/10/12/releasing-ai-generated-software/),
+and the canonical reference already identifies him. Voice answered a question
+about Robert C. Martin without immediately correcting authorship, then corrected
+it. This is conversational attribution handling, not a canonical metadata defect.
+The article directly links [Martin's original statement](https://x.com/unclebobmartin/status/2080257779395154409)
+and [a later statement](https://x.com/unclebobmartin/status/2098432570887217520).
+Both X pages returned 403. Seemann reproduces Martin's concrete testing strategy
+(unit/Gherkin tests, QA, metrics, mutation testing and coverage), then questions
+whether engineering safeguards eliminate human responsibility. His article is
+not solely about legal accountability, and the reproduced strategy must be
+attributed to Seemann's rendering rather than an independently read X post.
+The original link is returned in the handoff to satisfy the commute request;
+no wiki save is inferred from source discussion.
+
+Playback observations route to #100/#153/#159; attribution and original-source
+recovery to #169; reconstruction and classifier adjudication to #95/#172;
+acquisition observations to #178/#181; timing to #96/#151; exact cleanup to #179.
+Existing instructions already require literal playback, primary-source retrieval
+and intent adjudication, so this evidence-only change adds no policy or code.
+Live Project instructions and source documents are unchanged; no prompt
+replacement or source upload is required.
+
+Runtime context verifies GPT-6.1 Sol Low. Starting account meters were 0%
+five-hour and 0% weekly; the bundle-acquisition checkpoint was 5%/1%.
+Shared-account samples are not isolated per-step bills. Exact root tool intervals,
+available cumulative token traffic and concurrent public-source work remain
+private; native Work counters and individual nested-tool token costs are
+unavailable. One initial cross-chat request was rejected by automatic approval
+review; Brad then explicitly authorized the named Project chat. SafariDriver's
+separate session required sign-in. Exclusive human waits are separated from net
+work, including machine waits. Historical comparisons preserve workload and
+timing-definition differences and do not restart the model experiment.
+
+The post-merge cleanup allowlist contains three bundle and six consumed canonical
+Library identities, plus nine matching Downloads files. The ten unconsumed
+canonical files and unrelated sources remain outside cleanup. Normalized private
+intake, provenance, coverage and retrieval/cleanup records are retained.
