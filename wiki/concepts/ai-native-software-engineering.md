@@ -2,15 +2,15 @@
 type: concept
 title: 'AI-Native Software Engineering'
 # prettier-ignore
-aliases: ["Control the ideas, not the code","Engineer away the slop","How building software is changing at Anthropic","AI-native fintech architecture","LLMs reward expertise","Agentic Code Quality","How I use AI in 2026","How teams build","How Well Do Agents Use Test and Verification Techniques?","If Coding Is Solved, What Now? Measuring Code Sloppiness","SlopCodeBench"]
+aliases: ["Control the ideas, not the code","Engineer away the slop","How building software is changing at Anthropic","AI-native fintech architecture","LLMs reward expertise","Agentic Code Quality","How I use AI in 2026","How teams build","How Well Do Agents Use Test and Verification Techniques?","If Coding Is Solved, What Now? Measuring Code Sloppiness","SlopCodeBench","Agentic Verification"]
 # prettier-ignore
 tags: ["ai-engineering","software-design","correctness","code-review","formal-verification","quality-gates","multi-agent-systems","fintech","compliance","auditability","domain-expertise","prompting","human-judgment","agentic-code","back-pressure"]
 wiki_slug: ai-native-software-engineering
 created: 2026-07-16
-updated: 2026-09-15
+updated: 2026-10-16
 confidence: high
 # prettier-ignore
-provenance: [{"source_item_id":"19f6057544b9bae7-06","url":"https://antirez.com/news/169"},{"source_item_id":"general-20260724-05","url":"https://ghuntley.com/slop/"},{"source_item_id":"19fadaee19e22a31-18","url":"https://newsletter.pragmaticengineer.com/p/inside-anthropic"},{"source_item_id":"19fb33942bb1cc3e-04","url":"https://hackernoon.com/what-fintech-founders-get-wrong-about-ai-native-development"},{"source_item_id":"19fcc720f38e999b-06","url":"https://www.seangoedecke.com/llms-reward-expertise/?utm_source=tldrnewsletter"},{"source_item_id":"19feb593f3d9a2d9-05","url":"https://addyo.substack.com/p/agentic-code-quality?utm_source=tldrnewsletter"},{"source_item_id":"1a0148c07c36290e-11","url":"https://blog.sshh.io/p/how-i-use-ai-in-2026-coding-writing?utm_source=tldrnewsletter"},{"source_item_id":"1a014a54dae9b027-09","url":"https://linear.app/data?utm_source=tldrdev"},{"source_item_id":"1a080bcb33cc0f31-01","url":"https://danluu.com/agentic-testing/"},{"source_item_id":"1a09fa599d2a0b5a-03","url":"https://earendil.com/posts/measuring-code-sloppiness/"},{"source_item_id":"url_slop_code_bench","url":"https://github.com/SprocketLab/slop-code-bench"}]
+provenance: [{"source_item_id":"19f6057544b9bae7-06","url":"https://antirez.com/news/169"},{"source_item_id":"general-20260724-05","url":"https://ghuntley.com/slop/"},{"source_item_id":"19fadaee19e22a31-18","url":"https://newsletter.pragmaticengineer.com/p/inside-anthropic"},{"source_item_id":"19fb33942bb1cc3e-04","url":"https://hackernoon.com/what-fintech-founders-get-wrong-about-ai-native-development"},{"source_item_id":"19fcc720f38e999b-06","url":"https://www.seangoedecke.com/llms-reward-expertise/?utm_source=tldrnewsletter"},{"source_item_id":"19feb593f3d9a2d9-05","url":"https://addyo.substack.com/p/agentic-code-quality?utm_source=tldrnewsletter"},{"source_item_id":"1a0148c07c36290e-11","url":"https://blog.sshh.io/p/how-i-use-ai-in-2026-coding-writing?utm_source=tldrnewsletter"},{"source_item_id":"1a014a54dae9b027-09","url":"https://linear.app/data?utm_source=tldrdev"},{"source_item_id":"1a080bcb33cc0f31-01","url":"https://danluu.com/agentic-testing/"},{"source_item_id":"1a09fa599d2a0b5a-03","url":"https://earendil.com/posts/measuring-code-sloppiness/"},{"source_item_id":"url_slop_code_bench","url":"https://github.com/SprocketLab/slop-code-bench"},{"source_item_id":"20261015-tldr:general-006","url":"https://addyo.substack.com/p/agentic-verification"}]
 ---
 
 # AI-Native Software Engineering
@@ -40,6 +40,79 @@ organization-specific AST check, or a pre-commit gate.
 - Formal methods and deterministic system testing may become easier to apply as
   tooling improves, but availability of tools does not eliminate the need for
   engineering judgment or evidence.
+
+## Agentic Verification: Make Correctness Executable
+
+[Addy Osmani's October 14 article in Elevate](https://addyo.substack.com/p/agentic-verification)
+argues that verification increasingly limits agent-assisted development. Give
+agents independent feedback before human review; people still decide what ships.
+His practical recommendations are:
+
+- Maintain a small set of meaningful end-to-end user journeys. Screenshots,
+  traces and the exact failed step make failures actionable. Exercise local
+  and deployed environments; a launch/observe CLI and feature map help agents
+  inspect the running product.
+- Use properties for round trips, conserved values, idempotency and equivalence.
+  fast-check, Hypothesis and proptest generate inputs and shrink failures.
+  Preserve the minimized counterexample as a regression. Start with a small
+  pure function; write the invariant in ordinary language first.
+- Compare old and replacement systems on randomized inputs or sampled traffic.
+  Normalize irrelevant differences and document intentional behavior changes.
+- Keep the inner loop fast, isolated and repeatable with seeded randomness,
+  frozen clocks and controlled networking. Concise failures preserve attention;
+  heavier checks belong before integration.
+- Define success before coding, scrutinize generated tests, and turn recurring
+  mistakes into durable checks. The article also mentions Lean/TLA+ for difficult
+  state and concurrency models.
+
+These are recommendations and reported experience, not a controlled comparison
+of models or engineering productivity.
+
+### October 16 Saved Discussion and Implementation Synthesis
+
+Brad had already read the article and explicitly requested a detailed capture,
+including practical verification patterns and the original source. The session
+bundle preserves both source-informed discussion and an assistant-proposed
+three-layer implementation model. The following operational organization is
+commute synthesis, rather than an architecture prescribed by Osmani:
+
+| Layer                    | Decision it supports                                      | Evidence to retain                                                                                                             |
+| ------------------------ | --------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| Fast implementation loop | Does the current edit violate a known constraint?         | Static checks, focused unit/property results, deterministic reproduction command                                               |
+| Behavioral verification  | Can a user complete the intended workflow?                | Maintained journey, observed frontend/backend outcome, screenshot or trace of failure                                          |
+| Integration gate         | Is the change safe to combine with the maintained system? | Broader regression, migration comparison, relevant security/performance evidence, independent review of requirements and tests |
+
+Before assigning work, record the expected user outcome, invariants, executable
+commands and evidence required for completion. A parser round trip, a repeated
+normalization that leaves the result unchanged, and a conserved account total
+illustrate different invariants; they should be selected because the system
+needs them, not mechanically added to every task. When a generator finds a
+failure, keep the small reproducer so a future agent cannot merely produce a
+different passing example.
+
+For a rewrite, distinguish compatibility from deliberate product change.
+Compare equivalent inputs, remove only differences known to lack semantic
+meaning, and review the approved changes separately. A replacement can satisfy
+its own tests while dropping behavior users relied on. The comparison harness
+is evidence of a defined compatibility boundary, not proof that the old system
+was correct in every respect.
+
+A passing generated test is useful only if it separates acceptable behavior
+from plausible mistakes. Humans should choose the important journeys and judge
+requirements; an independent reviewer can examine whether the implementation
+and its tests share the same misunderstanding. Slow or flaky checks deserve
+repair because repeated retries can conceal real failures and consume the
+reviewer's attention.
+
+The discussion's conclusion is a working hypothesis: investment in executable
+specifications, reliable feedback and useful diagnostics may matter more than
+switching to a larger model. This intake does not measure that causal effect.
+Apply the same evidence discipline to the
+{% include wiki-related-link.md slug="review-driven-software-factories" %}
+workflow: expose the verified behavior and remaining uncertainty in the review
+artifact, then preserve useful failure lessons as reusable controls.
+
+<!-- source-item-id: 20261015-tldr:general-006 -->
 
 ## Quality Gates as Distributed Back-Pressure
 

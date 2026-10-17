@@ -2,15 +2,15 @@
 type: concept
 title: 'Review-Driven Software Factories'
 # prettier-ignore
-aliases: ["Why Software Factories Fail","Human-in-the-loop software factories","Agentic documentation workflows","Foreman software factory","Hiring Agents Is the Easy Part","Warp Factories","Quality Assurance Agent","Stop being the code review bottleneck","How Uber built a software factory for agentic coding","When code is abundant","How to Write an Effective Software Design Document","MOLT Sinai","Harness engineering: leveraging Codex in an agent-first world"]
+aliases: ["Why Software Factories Fail","Human-in-the-loop software factories","Agentic documentation workflows","Foreman software factory","Hiring Agents Is the Easy Part","Warp Factories","Quality Assurance Agent","Stop being the code review bottleneck","How Uber built a software factory for agentic coding","When code is abundant","How to Write an Effective Software Design Document","MOLT Sinai","Harness engineering: leveraging Codex in an agent-first world","Pure UI in the Agentic Era"]
 # prettier-ignore
 tags: ["ai-agents","software-design","planning","code-review","context-management","documentation","workflow-automation","platform-engineering","governance","mcp"]
 wiki_slug: review-driven-software-factories
 created: 2026-07-25
-updated: 2026-10-15
+updated: 2026-10-16
 confidence: medium
 # prettier-ignore
-provenance: [{"source_item_id":"dev-20260724-01","url":"https://github.com/humanlayer/advanced-context-engineering-for-coding-agents/blob/main/wsff.md"},{"source_item_id":"19fd6c96b2d39a67-11","url":"https://github.blog/ai-and-ml/github-copilot/automating-cross-repo-documentation-with-github-agentic-workflows/?utm_source=tldrdev"},{"source_item_id":"19ffad638bac0403-02","url":"https://blog.cloudflare.com/astro-issue-triage/?utm_source=tldrdev"},{"source_item_id":"19ffffe9eeaeab99-06","url":"https://github.com/vercel-labs/eve-software-factory-template?utm_source=tldrnewsletter"},{"source_item_id":"19ffb53bd896ad92-11","url":"https://x.com/AlanaDLevin/status/2087526319999303784"},{"source_item_id":"1a01a57197aa438b-18","url":"https://techcrunch.com/2026/08/18/warps-new-system-is-an-out-of-the-box-software-factory-for-ai-development/?utm_source=tldrai"},{"source_item_id":"url_adf03cc09f382e8e","url":"https://www.warp.dev/factories/request-access"},{"source_item_id":"url_79e1f7b5ba46a169","url":"https://docs.warp.dev/factories/"},{"source_item_id":"url_80300d7978de226c","url":"https://docs.warp.dev/factories/infrastructure-and-security/"},{"source_item_id":"url_853c86ea5e82c5b4","url":"https://www.linkedin.com/blog/engineering/ai/qa-agent-reimagining-software-quality-with-ai-driven-autonomous-testing"},{"source_item_id":"url_f7ffc84157ac5d1c","url":"https://newsletter.posthog.com/p/code-review-tips"},{"source_item_id":"1a038ac5916976e5-05","url":"https://newsletter.port.io/p/how-uber-built-a-software-factory?utm_source=tldrnewsletter"},{"source_item_id":"1a03919a99717a24-09","url":"https://about.gitlab.com/blog/when-code-is-abundant/?utm_source=tldrai"},{"source_item_id":"url_74ac61e244043f10","url":"https://claude.com/blog/the-ai-native-sdlc-playbook"},{"source_item_id":"1a0a4ca47348bc23-04","url":"https://refactoringenglish.com/excerpts/write-an-effective-design-doc/"},{"source_item_id":"20261006-tldr-ai:ai-006","url":"https://www.theaithinker.com/p/how-to-build-an-ai-native-software"},{"source_item_id":"20261012-tldr-dev:dev-003","url":"https://www.cockroachlabs.com/blog/experiment-running-hospital-code/"},{"source_item_id":"url_293d0f9661696880","url":"https://openai.com/index/harness-engineering/"}]
+provenance: [{"source_item_id":"dev-20260724-01","url":"https://github.com/humanlayer/advanced-context-engineering-for-coding-agents/blob/main/wsff.md"},{"source_item_id":"19fd6c96b2d39a67-11","url":"https://github.blog/ai-and-ml/github-copilot/automating-cross-repo-documentation-with-github-agentic-workflows/?utm_source=tldrdev"},{"source_item_id":"19ffad638bac0403-02","url":"https://blog.cloudflare.com/astro-issue-triage/?utm_source=tldrdev"},{"source_item_id":"19ffffe9eeaeab99-06","url":"https://github.com/vercel-labs/eve-software-factory-template?utm_source=tldrnewsletter"},{"source_item_id":"19ffb53bd896ad92-11","url":"https://x.com/AlanaDLevin/status/2087526319999303784"},{"source_item_id":"1a01a57197aa438b-18","url":"https://techcrunch.com/2026/08/18/warps-new-system-is-an-out-of-the-box-software-factory-for-ai-development/?utm_source=tldrai"},{"source_item_id":"url_adf03cc09f382e8e","url":"https://www.warp.dev/factories/request-access"},{"source_item_id":"url_79e1f7b5ba46a169","url":"https://docs.warp.dev/factories/"},{"source_item_id":"url_80300d7978de226c","url":"https://docs.warp.dev/factories/infrastructure-and-security/"},{"source_item_id":"url_853c86ea5e82c5b4","url":"https://www.linkedin.com/blog/engineering/ai/qa-agent-reimagining-software-quality-with-ai-driven-autonomous-testing"},{"source_item_id":"url_f7ffc84157ac5d1c","url":"https://newsletter.posthog.com/p/code-review-tips"},{"source_item_id":"1a038ac5916976e5-05","url":"https://newsletter.port.io/p/how-uber-built-a-software-factory?utm_source=tldrnewsletter"},{"source_item_id":"1a03919a99717a24-09","url":"https://about.gitlab.com/blog/when-code-is-abundant/?utm_source=tldrai"},{"source_item_id":"url_74ac61e244043f10","url":"https://claude.com/blog/the-ai-native-sdlc-playbook"},{"source_item_id":"1a0a4ca47348bc23-04","url":"https://refactoringenglish.com/excerpts/write-an-effective-design-doc/"},{"source_item_id":"20261006-tldr-ai:ai-006","url":"https://www.theaithinker.com/p/how-to-build-an-ai-native-software"},{"source_item_id":"20261012-tldr-dev:dev-003","url":"https://www.cockroachlabs.com/blog/experiment-running-hospital-code/"},{"source_item_id":"url_293d0f9661696880","url":"https://openai.com/index/harness-engineering/"},{"source_item_id":"20261015-tldr-dev:dev-004","url":"https://mattrothenberg.com/notes/pure-ui-agentic-era/"}]
 ---
 
 # Review-Driven Software Factories
@@ -558,6 +558,46 @@ apprenticeship concerns. For this wiki's own workflow, these controls are evalua
 capture does not establish that implementing them here improves outcomes.
 
 <!-- source-item-id: 20261012-tldr-dev:dev-003 -->
+
+## Pure UI: Make the Review State Space Visible
+
+[Matt Rothenberg's October 5 article](https://mattrothenberg.com/notes/pure-ui-agentic-era/)
+shows why typechecking and inspecting one browser view can miss a UI defect.
+His constructed example adds Delete controls that look correct for an owner but
+also appear for viewers. Roles, plans, billing and flags can be scattered across
+hooks, providers and layouts, making the relevant combinations hard to see.
+
+Moving display-relevant state into explicit view inputs makes those combinations
+easier to enumerate and render. Four binary inputs produce sixteen demo screens;
+comparison exposes the viewer-role defect. Storybook can render selected states,
+while Playwright can test their reachability in the actual application. Neither
+tool decides which states matter. Explicit inputs improve visibility of the
+review space; selected tests do not establish exhaustive coverage or authorization
+security.
+
+**October 16 commute synthesis:** Brad explicitly requested this article in the
+Software Factory sections after discussing practical review of AI-written UI.
+The useful factory artifact is a declared state matrix beside the change: role,
+plan, billing status, feature flags and any other meaningful inputs, with the
+combinations actually inspected. The reviewer should be able to distinguish
+verified cases, intentionally excluded cases and unknown behavior.
+
+For a Delete control, checking the owner view is only one observation. Include
+read-only and other relevant roles, inspect the rendered controls, and separately
+verify the application's permission enforcement. A representative matrix can
+make omissions visible without claiming to test every possible combination.
+Require the agent to identify the states it checked and preserve enough rendered
+or test evidence for review. Human judgment chooses the important scenarios.
+
+This complements the executable feedback loops in
+{% include wiki-related-link.md slug="ai-native-software-engineering" %}:
+explicit state improves the specification of what to verify; meaningful tests
+and application observation establish what happened. It also complements the
+harness controls above by making UI coverage part of a reviewable completion
+claim. This is an application proposed in the commute, not measured evidence
+that a particular factory design improves productivity.
+
+<!-- source-item-id: 20261015-tldr-dev:dev-004 -->
 
 ## Related
 

@@ -8,6 +8,15 @@ found a queue as proof.
 
 ## Evidence Sources
 
+- October 16 processing: three October 16 exports, three sessions and 22 queue
+  items from October 14 AI and October 15 General/Dev. All three exact-row Safari
+  downloads pass structural validation and import as two explicit wiki saves,
+  three quality incidents and no unresolved captures. Private coverage contains
+  50 events, 23 nested discussion entries and three integrity notes. The three
+  supplied share URLs did not require recovery. Both saved public sources were
+  read; original-page indexed content recovered Pure UI after direct reading
+  failed. Native inventory/canonical reconciliation is recorded below.
+
 - October 15 processing: three October 15 exports representing three sessions,
   with snapshots for October 13 AI and October 14 General/Dev. Root-recursive
   native Library discovery exhausted three pages (200, 200, 144 rows), covering
@@ -3675,3 +3684,88 @@ The post-merge cleanup allowlist contains three bundle and six consumed canonica
 Library identities, plus nine matching Downloads files. The ten unconsumed
 canonical files and unrelated sources remain outside cleanup. Normalized private
 intake, provenance, coverage and retrieval/cleanup records are retained.
+
+## October 16: Verification Saves and Explicit UI State
+
+The last completed intake was October 15 (PRs #188/#189). The intervening
+weekend and weekday results since Friday October 9 are already recorded in
+PRs #182/#183/#184/#185/#186/#188/#189; this run checks remaining source dates through
+October 16 rather than treating the session date as the newsletter date.
+The three exact October 16 exports are
+`202610160736-morning-commute-session-bundle.txt`,
+`202610161802-evening-commute-session-bundle.txt` and
+`202610161829-evening-commute-session-bundle.txt`. Their queues are respectively
+October 14 AI, October 15 General and October 15 Dev, totaling 22 items.
+All three downloads pass structural validation and the importer accepts three
+distinct sessions, two maintenance candidates and no unresolved captures.
+
+The private evidence ledger contains 50 events, 23 nested discussion entries
+and three integrity notes (76 rows). Forty-five playback, navigation and session
+boundary events have an explicit exclusion from separate durable content action.
+Three quality incidents retain operational destinations. Both wiki saves include
+their surrounding discussion. No interest/depth correction or other classifier
+label is inferred. All bundles declare partial reconstruction; optional
+discussion fields cannot establish complete conversation coverage. None of the
+three supplied share URLs requires targeted recovery from the evidence at hand.
+
+The morning AI sweep stops after item three of seven, then incorrectly explains
+that instructions require pauses between items. Brad corrects it to the complete
+top-level sweep; the later sweep is reported complete. Dev records an unsupported
+Daniel Bashir attribution even though the canonical reference says author lookup
+failed; the assistant later acknowledges uncertainty. Dev item seven, OpenCode
+2.0, stops mid-sentence. These are recorded observations from reconstructed
+rendered turns, not independent audio-fidelity measurements. Canonical item
+metadata and ordinary navigation are not relabeled as defects.
+
+General explicitly saves Addy Osmani's Agentic Verification with a request for
+detailed original-source treatment. The article was read directly; the wiki
+retains its verification techniques, concrete tools and examples, and separately
+labels the discussion's three-layer implementation architecture and workflow
+hypothesis. The existing AI-Native Software Engineering page gains this material
+with exact source provenance. Dev explicitly saves Matt Rothenberg's Pure UI in
+the Agentic Era into Software Factory sections. Exact-URL reading failed, but an
+exact-title/domain search returned the original page's content; one direct HTTP
+attempt failed DNS. The Software Factory page adds explicit state, selected
+combinations, the owner/viewer Delete example and complementary Storybook and
+Playwright roles. The practical state-matrix review requirement remains labeled
+commute synthesis. Neither entry claims exhaustive coverage or measured
+productivity improvements.
+
+Playback observations route to #100/#153/#159; unsupported authorship to #169;
+reconstruction and capture retention to #95/#172; acquisition and routing friction
+to #178/#181; measurement to #96/#151/#155; exact cleanup to #179. Existing
+instructions already require literal playback, verified attribution and bounded
+retrieval, so no policy or code change is justified by these observations.
+Live Project instructions and source documents are unchanged; no replacement
+prompt or source upload is required.
+
+The runtime verifies GPT-6.1 Sol Low. Initial account meters were 0% five-hour
+and 6% weekly; acquisition checkpoint 7%/7%. Account deltas are shared readings,
+not isolated task bills. The private timeline separates source reads, native
+operations, local validation, edits, checks, publication and cleanup; parallel
+intervals count once. Available cumulative token traffic includes cached input;
+missing Work and individual tool counters remain unavailable. The isolated
+SafariDriver session needed sign-in. Automatic approval initially rejected
+messaging the named Work chat; Brad then explicitly authorized it. The request
+encountered a Continue in Work routing prompt before native execution. These
+are acquisition observations, not missing artifact evidence.
+
+Native recursive root discovery exhausted three pages (200, 200, 112), with
+512 entries and 75 files plus the Project folder. Eight canonical pairs cover
+October 14–16: October 14 AI, all four October 15 newsletters and October 16
+General/Dev/AI. October 16 Fintech is absent. No additional recent noncanonical
+bundle appears. The five unconsumed pairs remain candidates, not sessions.
+An initial readback showed a system-error status after inventory and omitted
+the comparison, prompting a grouped comparison retry. The later substantive
+response completed the original readback: all six independently opened canonical
+objects match the snapshots completely and pass the actual Project v4 schemas,
+preflight, key order and prescribed fingerprints. October 15 also passes the
+four-newsletter daily audit; October 14 is limited to the remaining AI pair.
+Normalized snapshot copies are reused with that provenance and locally validated;
+no fallback canonical downloads were needed. The Work executable is the Project
+preflight, not the repository validator.
+
+The post-merge allowlist contains three bundle and six consumed canonical
+Library identities, plus the three exact local bundle downloads. Ten unconsumed
+canonical files and 56 other Library files remain outside cleanup. Normalized
+private intake and the 76-row coverage ledger are retained.
