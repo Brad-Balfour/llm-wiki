@@ -8,6 +8,14 @@ found a queue as proof.
 
 ## Evidence Sources
 
+- October 17 processing: three Library exports representing two October 17
+  sessions on October 15 AI and Fintech queues (12 items). Two AI exports
+  contain the same semantic session. The private ledger covers 29 unique event
+  entries: three quality incidents, two URL/timing captures and 24 excluded
+  playback/navigation/boundary entries. A narrowly observed Fintech export-link
+  correction is retained separately. No wiki save or classifier correction is
+  inferred. Canonical reconciliation and exact cleanup are recorded below.
+
 - October 16 processing: three October 16 exports, three sessions and 22 queue
   items from October 14 AI and October 15 General/Dev. All three exact-row Safari
   downloads pass structural validation and import as two explicit wiki saves,
@@ -3769,3 +3777,76 @@ The post-merge allowlist contains three bundle and six consumed canonical
 Library identities, plus the three exact local bundle downloads. Ten unconsumed
 canonical files and 56 other Library files remain outside cleanup. Normalized
 private intake and the 76-row coverage ledger are retained.
+
+## October 17: Two Sessions, Duplicate Exports and Voice Playback
+
+Friday October 16 processing completed in PR #191, merged at 00:24 UTC on
+October 17 (Friday evening in New York). Its preserved manifest verifies cleanup
+of all nine Library targets and three Downloads copies. This intake therefore
+checks remaining October 15 source candidates and October 16–17 dates, including
+the Saturday calendar day, rather than reprocessing Friday's completed sessions.
+
+The October 17 AI and Fintech sessions both use October 15 source queues, six
+items each. The two acquired AI exports contain the same semantic object and session
+identity. The complete native root listing exhausted pages of 200, 200 and 123 entries
+(523 total). The exact Project path contains three bundle files and ten
+queue/reference files (five pairs). An additional same-name AI row appears in
+the main Library outside that exact path and is preserved. Repeated downloads
+of the unsuffixed name reused its Downloads filename; the two distinct AI
+artifacts are preserved privately. No session is inferred from
+unconsumed October 16 queue files.
+
+The private coverage ledger has 32 rows: 29 unique events, two integrity notes
+and one narrowly observed export correction. The two unique bundles contain 29 events: three quality incidents, two general
+captures and 24 playback/navigation/session-boundary events. The quality evidence
+records paraphrased or shortened AI playback, a user correction about omitted
+Jev 1.13 detail, and Fintech Voice failing to speak the preceding item-six
+response. These are reconstructed observations, not independent audio tests.
+The two captures request the Claude agent-observability URL at the end of the
+commute and clarify its timing; neither is a wiki-save or classifier correction.
+No wiki content or feedback label is invented from those requests. The URL is
+https://claude.com/resources/articles/agent-observability-on-the-claude-platform.
+
+Both bundles declare partial reconstruction. Their optional discussion fields
+cannot establish full conversation coverage; all 29 supplied event entries are
+covered, while discussions not present in the exports remain outside that claim.
+No ambiguous action or missing queue identity requires shared-chat recovery.
+
+Signed-in SafariDriver exact-row downloads work without ZIPs, numbered chunks,
+transport hashes or byte-fidelity requests. A specific Work-chat authorization
+was required after automatic approval rejected the initial native inventory
+message. Host GitHub authentication succeeds despite sandbox credential failure.
+Runtime verifies GPT-6.1 Sol Low. Timing excludes exclusive user waits; missing
+native Work and per-tool token counters remain unavailable. Account usage meters
+are shared observations, not isolated charges.
+
+The signed-in Fintech chat's export tail also shows a claimed download link
+that Brad could not see, followed by his question whether the file was actually
+built; a later response contains the visible file card. This narrow export
+observation is retained separately from the bundle's three quality events.
+The native inventory request took roughly two minutes; early message-only
+readbacks and a transient connection-interrupted banner did not establish
+failure. The eventual substantive response completed without a duplicate
+inventory request.
+
+No live prompt or Project source document changes are needed. Existing literal
+playback and export instructions already cover these observations; this run
+adds operational evidence rather than another policy or code change.
+
+All four independently opened canonical objects match all three bundle snapshots
+recursively and pass the actual Project schemas, preflight, key order and
+prescribed fingerprints. Work cannot run the complete October 15 daily check
+from the remaining Library pairs because General and Dev were consumed Friday;
+the available AI/Fintech cross-newsletter checks pass. Normalized snapshot
+copies are reused with that provenance and pass local queue/pair and bundle
+comparison checks. The importer accepts two sessions and rejects the identical
+AI duplicate session ID, with no unresolved captures.
+
+The complete native answer appeared in signed-in Work before the thread reader
+returned its full text. The reader initially exposed only the first comparison
+paragraphs; the complete rendered answer was preserved privately and used,
+without requesting retransmission. An analysis-error marker appeared during
+Work validation, but the completed answer explicitly reports successful
+independent schema, reconstruction, pair and fingerprint checks. No raw-file
+materialization was available for the AI bundle IDs; complete native text reads
+were sufficient for semantic validation.
