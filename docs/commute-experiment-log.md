@@ -8,6 +8,12 @@ found a queue as proof.
 
 ## Evidence Sources
 
+- October 19 processing: six Library bundle exports representing four underlying
+  commutes; four canonical playback/reference pairs (eight files), source dates
+  October 16 and 19. All six downloads retained privately. Four supplied shared
+  URLs; one targeted General recovery read, three unused. Private coverage:
+  112 raw events plus 21 nested discussion entries. Two explicit wiki saves.
+
 - October 17 processing: three Library exports representing two October 17
   sessions on October 15 AI and Fintech queues (12 items). Two AI exports
   contain the same semantic session. The private ledger covers 29 unique event
@@ -3850,3 +3856,90 @@ Work validation, but the completed answer explicitly reports successful
 independent schema, reconstruction, pair and fingerprint checks. No raw-file
 materialization was available for the AI bundle IDs; complete native text reads
 were sufficient for semantic validation.
+
+## October 19: Four Commutes, Alternate Exports and Two Wiki Saves
+
+The last completed intake is Saturday's PR #192, after Friday's PR #191.
+This run checks October 16–19 source dates, including both weekend days.
+Native recursive root discovery exhausted pages of 200, 200 and 152 entries:
+552 total, with 76 files plus the `/LLM-Wiki-Car` folder. Seven canonical pairs
+remain: October 16 General/Dev/AI and all four October 19 newsletters. No
+October 17–18 canonical queue or October 16 Fintech pair appears. Three
+October 19 pairs remain unconsumed candidates; their presence does not establish
+sessions.
+
+Six exact-row SafariDriver bundle downloads cover four underlying commutes:
+Sunday General and Monday Dev/AI/General. Their source queues are October 16
+General/Dev/AI and October 19 General respectively. The two Sunday 1200 exports
+are semantically identical. The 1201 export uses a different generated session
+ID but describes the same General commute and quality observations. It fails
+strict validation because a jump transition targets an already announced item.
+The valid Sunday export retains that commute; the malformed revision remains
+supplemental evidence, not another session. One targeted supplied shared-chat
+read confirms the numbered navigation, LED-candle substitution, correction and
+1201 export. Website reading and its cache retry failed; direct host HTTP
+retrieved the serialized conversation. The other three supplied share URLs
+were unnecessary and were not audited.
+
+Local validation accepts five exports. Import accepts four sessions, rejecting
+one exact duplicate and the malformed revision, and produces two wiki candidates,
+zero classifier feedback and zero unresolved captures. The private coverage
+ledger includes all 112 raw event rows across six exports plus 21 nested
+discussion entries, with duplicate provenance explicitly separated. The four
+accepted sessions contain 78 events: 14 quality incidents, two wiki saves,
+one general capture and 61 playback/navigation/boundary exclusions. The alternate
+Sunday export additionally preserves the internal-vibe-coding playback omission.
+All supplied evidence is dispositioned; optional or omitted discussion fields
+prevent a claim of complete conversation coverage.
+
+The Dev save creates Agent Work Metrics and links it to Review-Driven Software
+Factories. Michael Cutler's article is read directly and treated as a proposed
+protocol, not measured productivity evidence. The note retains human effort,
+failed attempts, accepted-task denominators, missingness and quality comparability.
+Workplace-specific material is excluded. The AI save adds Liquid d1-ultra to
+Structured Decision Models with the requested Jev/System One cross-links and
+pricing, calibration, API and latency questions. Liquid's announcement and docs
+support input-only pricing, image HTTP requests and text-only SDK support.
+Vendor benchmark claims remain attributed. The conversation's specific latency
+numbers and corporate-history claims are not independently established here;
+they remain clearly marked unverified rather than promoted to facts.
+
+Observed playback failures include an omitted opening sweep, paraphrased or
+truncated prepared strings, an invented Bronze Age scheduling explanation in
+place of leaky-bucket admission control, and the LED-candle substitution.
+Source-summary ambiguity is distinguished from model fabrication. General also
+records premature source-access claims corrected after public content was read.
+The Dev user explicitly limited that session's requested bug report to the
+complete hallucination, rather than minor inaccuracies. The AI feature request
+for visible Voice version numbering was withdrawn; no external request is sent.
+No interest/depth correction is inferred from ordinary article criticism.
+
+Existing issues receive the playback, reconstruction, capture retention,
+source-access, acquisition, cleanup and usage observations. Existing literal
+playback and source-retrieval instructions already cover these failures, so
+another instruction change is not justified. No live Project prompt or source
+replacement is required by this content-only diff. Private raw intake and audit
+records remain excluded from Git.
+
+Processing uses GPT-6.1 Sol Low, as requested. Initial account meters were 1%
+five-hour and 8% weekly; acquisition/validation checkpoint 8%/9%. Shared rounded
+meters are observations, not isolated task charges. Private timestamped tool and
+phase records retain available cumulative token traffic, including cached input;
+Work and individual-tool token counters remain unavailable. User-input waits are
+excluded from net elapsed time; concurrent source research counts once. The
+isolated SafariDriver needed sign-in; host GitHub credentials worked despite
+sandbox authentication failure. Automatic approval rejected the first Work
+message, then accepted it after Brad's explicit reply. No ZIP, numbered chunk,
+byte-accurate transport validation or repeated large-bundle transfer was used.
+
+The completed native canonical comparison independently reads all eight actual
+canonical files and matches both objects against every acquired bundle snapshot:
+six of six complete recursive comparisons pass. All four actual canonical pairs
+pass Project v4 schemas, required key order, complete playback reconstruction,
+preflight and prescribed fingerprints. Available cross-newsletter invariants
+pass; complete four-newsletter daily validation is not claimed for either date.
+Normalized snapshot copies are reused with that provenance and pass the local
+pair validators. The native operation takes 7m7s; its complete rendered answer
+arrives after misleading earlier completion/readback metadata. A bounded attempt
+to recover only the existing result receives “already responding”; no repeated
+canonical read is dispatched. This is readback latency, not inaccessible files.

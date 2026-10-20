@@ -7,10 +7,10 @@ aliases: ["System One Models", "Jev"]
 tags: ["ai-agents", "structured-output", "decision-making", "workflow-design"]
 wiki_slug: structured-decision-models
 created: 2026-09-16
-updated: 2026-10-12
+updated: 2026-10-19
 confidence: medium
 # prettier-ignore
-provenance: [{"source_item_id":"1a0aa73e4e492655-02","url":"https://typesafe.ai/blog/introducing-system-one-models-and-jev"},{"source_item_id":"20260922-tldr-dev:dev-01","url":"https://archerhume.com/posts/jevs-architecture-unmasked"},{"source_item_id":"dev-002","url":"https://magazine.sebastianraschka.com/p/classifier-history-and-jev"},{"source_item_id":"dev-011","url":"https://swapniltalekar.substack.com/p/jev-and-the-return-of-the-classifiers"},{"source_item_id":"ai-010","url":"https://strandsagents.com/blog/introducing-strands-decider/"},{"source_item_id":"20261007-tldr:general-007","url":"https://developers.openai.com/api/docs/guides/decisions"},{"source_item_id":"20261007-tldr:general-009","url":"https://swapniltalekar.substack.com/p/the-decision-model-gold-rush"},{"source_item_id":"20261009-tldr-dev:dev-003","url":"https://dejan.ai/blog/chrome-decisions-api-decisionmodel/"}]
+provenance: [{"source_item_id":"20261016-tldr-ai:ai-003","url":"https://www.liquid.ai/blog/d1-ultra"},{"source_item_id":"1a0aa73e4e492655-02","url":"https://typesafe.ai/blog/introducing-system-one-models-and-jev"},{"source_item_id":"20260922-tldr-dev:dev-01","url":"https://archerhume.com/posts/jevs-architecture-unmasked"},{"source_item_id":"dev-002","url":"https://magazine.sebastianraschka.com/p/classifier-history-and-jev"},{"source_item_id":"dev-011","url":"https://swapniltalekar.substack.com/p/jev-and-the-return-of-the-classifiers"},{"source_item_id":"ai-010","url":"https://strandsagents.com/blog/introducing-strands-decider/"},{"source_item_id":"20261007-tldr:general-007","url":"https://developers.openai.com/api/docs/guides/decisions"},{"source_item_id":"20261007-tldr:general-009","url":"https://swapniltalekar.substack.com/p/the-decision-model-gold-rush"},{"source_item_id":"20261009-tldr-dev:dev-003","url":"https://dejan.ai/blog/chrome-decisions-api-decisionmodel/"}]
 ---
 
 # Structured Decision Models
@@ -224,6 +224,49 @@ For a project trial, follow the existing representative-label and calibration ap
 The partial bundle preserves these questions and the explicit save request but declares omitted dialogue. The first supplied share failed the website read and one cache retry; no complete verbatim back-and-forth is claimed.
 
 <!-- source-item-id: 20261009-tldr-dev:dev-003 -->
+
+## Liquid d1-ultra: Comparison and Integration Questions
+
+The October 19 AI commute explicitly saved d1-ultra and the surrounding questions
+about vendor origin, Jev, calibration, pricing, latency and API compatibility.
+It belongs alongside Jev, Strands Decider and the System One discussion above.
+
+[Liquid AI's October 15 announcement](https://www.liquid.ai/blog/d1-ultra)
+describes a hosted model that accepts text and images and returns answer
+probabilities without generating tokens. Its stated price is $0.042 per million
+input tokens, with each question billed separately. Liquid reports higher
+accuracy and better calibration than Jev 1.14 across 112 evaluations at the same
+price. These are vendor results; this wiki has not reproduced the comparison.
+The announcement does not identify the larger open-weight base model by name.
+
+The [Liquid decision-model documentation](https://docs.liquid.ai/lfm/models/d1)
+uses the same endpoint, question types and response shape for d1 and d1-ultra;
+the request's model field selects the model. It demonstrates TypeSafe's Python
+and TypeScript SDKs for text, while explicitly directing image requests to
+HTTP through requests or fetch because the SDK does not yet support images.
+A shared SDK or similar state/question interface does not establish a formal
+standard or make every provider interchangeable. Preserve provider adapters and
+response semantics as described above. The hosted d1-ultra should also be
+separated from the open-weight d1 variants in the
+[model overview](https://docs.liquid.ai/lfm/models/decision-models).
+
+The saved discussion's calibration question has a practical answer: among
+comparable predictions assigned 80% confidence, roughly 80% should be correct.
+Accuracy measures the fraction correct; precision measures how often predicted
+positives are correct; recall measures how many actual positives were found.
+These metrics answer different questions and depend on the task and threshold.
+This explanation is discussion synthesis, not a new benchmark.
+
+The conversation also asserted 93 versus 78 ms and 196 versus 182 ms latency
+comparisons. The retrieved primary material did not establish these numbers or
+conditions; they remain unverified discussion claims. It also described Liquid
+as a US company founded by MIT researchers; this run did not independently verify
+that corporate-history detail. Neither omission justifies substituting a guess.
+For selection, use the same representative labels, quality targets, confidence
+buckets, measured latency and total cost for every provider. The desire for
+roughly 150 ms decisions is an evaluation question, not a measured guarantee.
+
+<!-- source-item-id: 20261016-tldr-ai:ai-003 -->
 
 ## Related
 
