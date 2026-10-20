@@ -614,11 +614,7 @@ that a particular factory design improves productivity.
 
 ## Measure Human Effort and Accepted Outcomes
 
-The October 19 saved discussion adds
-{% include wiki-related-link.md slug="agent-work-metrics" %}:
-track briefing, supervision, review, rework and verification across every attempt,
-then compare total human effort and agent spending per accepted task. Keep agent
-runtime and turnaround separate. Counting only successful generations conceals
-failed attempts and manual rescue; a cost-per-merged-PR metric also needs stable
-acceptance and quality criteria. Cutler's protocol is a proposal, not evidence
-that a particular software factory saves effort.
+The October 19 discussion links
+{% include wiki-related-link.md slug="agent-work-metrics" %}
+to factory evaluation: compare accepted outcomes with human attention, quality
+and spending. Apply the proposed protocol before claiming savings.

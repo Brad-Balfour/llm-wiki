@@ -16,23 +16,21 @@ provenance: [{"source_item_id":"20261016-tldr-dev:dev-004","url":"https://cutler
 # Agent Work Metrics
 
 Michael Cutler's [How to Measure the Human Cost of Agent Work](https://cutler.sg/blog/2026-10-measure-agent-review-time)
-(October 16, 2026) proposes a measurement protocol rather than reporting a
-completed experiment. Register tasks and acceptance criteria before work starts,
-and keep retries attached to the same task. Distinguish active human effort,
-agent runtime and delivery turnaround; human effort includes briefing,
-supervision, review, rework and verification.
+(October 16, 2026) proposes a protocol, not experimental findings. Register tasks
+and acceptance criteria first; attach every retry to its task. Separate human
+briefing, supervision, review, rework and verification from agent runtime and
+turnaround.
 
-Count rejected attempts, abandoned work, evaluator costs and manual rescue.
-Divide cohort effort and spending by accepted tasks, preserving the distinction
-between candidate acceptance, task completion and human takeover. The article's
-synthetic example totals 45 human minutes and $6 across three tasks with two
-accepted: 22.5 minutes and $3 per accepted task. With no accepted tasks, those
-unit ratios are undefined.
+Include rejected attempts, abandonment, evaluators and manual rescue. Divide
+cohort effort and spending by accepted tasks; distinguish acceptance, completion
+and human takeover. The synthetic example uses 45 human minutes and $6 across
+three tasks, two accepted: 22.5 minutes and $3 per acceptance. Zero acceptances
+make unit ratios undefined.
 
-Record missing measurements explicitly. Observed-only spending is a lower bound;
-a subscription does not determine precise marginal task cost. Preserve totals
-at the measurement cutoff and report later defect repairs separately. A claim
-of savings requires comparable tasks and equivalent quality requirements.
+Mark missing measurements; observed-only spending is a lower bound. Subscriptions
+do not establish marginal task cost. Preserve cutoff totals and report later
+repairs separately. Compare equivalent tasks and quality requirements before
+claiming savings.
 
 ## Saved Discussion and Software Factories
 
