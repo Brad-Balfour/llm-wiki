@@ -3931,3 +3931,15 @@ isolated SafariDriver needed sign-in; host GitHub credentials worked despite
 sandbox authentication failure. Automatic approval rejected the first Work
 message, then accepted it after Brad's explicit reply. No ZIP, numbered chunk,
 byte-accurate transport validation or repeated large-bundle transfer was used.
+
+The completed native canonical comparison independently reads all eight actual
+canonical files and matches both objects against every acquired bundle snapshot:
+six of six complete recursive comparisons pass. All four actual canonical pairs
+pass Project v4 schemas, required key order, complete playback reconstruction,
+preflight and prescribed fingerprints. Available cross-newsletter invariants
+pass; complete four-newsletter daily validation is not claimed for either date.
+Normalized snapshot copies are reused with that provenance and pass the local
+pair validators. The native operation takes 7m7s; its complete rendered answer
+arrives after misleading earlier completion/readback metadata. A bounded attempt
+to recover only the existing result receives “already responding”; no repeated
+canonical read is dispatched. This is readback latency, not inaccessible files.
