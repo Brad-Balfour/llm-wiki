@@ -4004,3 +4004,21 @@ downloads and validates the actual files rather than treating snapshots as
 independent canonical evidence. Private timestamped records retain available
 root token samples and shared rounded usage meters; individual tool, Work and
 collaborator token charges are unavailable.
+
+Native inventory subsequently completes: a recursive root listing exhausts all
+three pages (545 entries), finds 69 files in `/LLM-Wiki-Car`, and identifies
+12 October 19–20 source files (six pairs) plus exactly one session bundle.
+No plausible noncanonical export is found. October 19 General is absent after
+its completed prior intake; October 20 Fintech is absent. The remaining AI,
+Fintech and October 20 source pairs are unconsumed candidates, not evidence of
+additional sessions, and remain untouched. The exact Dev pair is independently
+downloaded and validated locally, so no delayed native comparison is needed to
+establish canonical validity. The Work UI delay is resolved, not a lasting
+Files access failure.
+
+Existing issues #95/#96 retain reconciliation and step evidence; #100/#153/#159
+retain playback failures and the existing mitigation boundary; #169 receives
+attribution evidence; #172 receives detailed capture/save semantics; #178 receives
+native acquisition/readback evidence; #181 receives bundle-size/coverage evidence.
+The private feedback matrix records exact comment URLs. A separate read-only
+coverage review finds no missing substantive discussion details or count errors.
