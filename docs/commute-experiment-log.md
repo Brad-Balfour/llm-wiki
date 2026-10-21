@@ -8,6 +8,12 @@ found a queue as proof.
 
 ## Evidence Sources
 
+- October 20 processing: one October 20 Library bundle for the October 19 Dev
+  queue, one independently downloaded canonical playback/reference pair, 27
+  event rows and 27 nested discussion entries. Two explicit wiki saves, nine
+  quality incidents, three general captures and no classifier corrections.
+  The supplied shared-chat URL was unnecessary and was not audited.
+
 - October 19 processing: six Library bundle exports representing four underlying
   commutes; four canonical playback/reference pairs (eight files), source dates
   October 16 and 19. All six downloads retained privately. Four supplied shared
@@ -3943,3 +3949,76 @@ pair validators. The native operation takes 7m7s; its complete rendered answer
 arrives after misleading earlier completion/readback metadata. A bounded attempt
 to recover only the existing result receives “already responding”; no repeated
 canonical read is dispatched. This is readback latency, not inaccessible files.
+
+## October 20: Intent Review and Explicit Nonrequirements
+
+The last completed run is PR #193, after Friday's #191 and Saturday's #192.
+This run therefore checks remaining October 19–20 source files rather than
+reprocessing those completed sessions. The export
+`202610200740-morning-commute-session-bundle.txt` represents one October 19–20
+Dev conversation, session `20261020-0740-tldr-dev-20261019`, using
+`20261019-tldr-dev.txt`. Its session/export date is October 20; its newsletter
+source date is October 19. Six of thirteen queue items were announced. Ending
+the commute does not imply that all items were visited.
+
+The bundle and independently downloaded canonical pair pass local validation;
+the complete snapshot matches the actual queue/reference objects. Import accepts
+one session with two wiki candidates, five navigation events, no classifier
+feedback and no unresolved captures. The integrity state is partial: the export
+reconstructs chat evidence rather than supplying a contemporaneous durable log.
+The private coverage ledger dispositions all 27 events and 27 nested discussion
+entries; 13 playback/navigation/boundary events need no durable action. This is
+coverage of the artifact, not proof that optional discussion fields capture the
+entire conversation.
+
+Both saves are reflected with context. Gittifacts extends Review-Driven Software
+Factories with human plan approval, deterministic conformance evidence,
+escalation and reversibility limits. Explicit Nonrequirements preserves the
+spec-driven-development discussion, the request for every substantive detail,
+Brad's observation of agents adding unnecessary requirements, organizational
+trust, the S3/StatsD/SQLite examples and the proposed human review of new
+guarantees. Direct reads of both exact article URLs succeeded immediately.
+The original Goedecke site verifies the author and the named examples. The
+60-second dashboard illustration and proposed new-guarantee approval rule remain
+clearly attributed to the commute discussion. Security and transaction integrity
+are not casually relaxed. No claim is made that a Voice save acknowledgement
+published a wiki page.
+
+Nine quality incidents cover invented prepared-context suffixes (items 1 and 4),
+unsupported attribution confidence, visible text not spoken, premature save
+acknowledgement, paraphrased Rails and DeepSeek playback, voice-style drift and
+an interrupted next command. Item 7 is not imputed as visited. These are playback,
+attribution and capture observations, not interest/depth classifier corrections.
+Existing issues own the observations; no additional wording-only instruction
+change is justified by failures already covered by literal playback and source
+verification requirements. This content-only change requires no live Project
+prompt replacement or source upload.
+
+Operationally, host GitHub credentials work after sandbox authentication fails.
+SafariDriver uses an isolated session and requires sign-in. The exact bundle,
+queue and reference row Download actions all succeed. No ZIP, chunking or
+transport-fidelity exercise is used. The first native inventory request stops
+at a Continue in Work prompt; two clicks do not advance it immediately. A bounded
+follow-up identifies that observed problem. Canonical recovery uses exact-row
+downloads and validates the actual files rather than treating snapshots as
+independent canonical evidence. Private timestamped records retain available
+root token samples and shared rounded usage meters; individual tool, Work and
+collaborator token charges are unavailable.
+
+Native inventory subsequently completes: a recursive root listing exhausts all
+three pages (545 entries), finds 69 files in `/LLM-Wiki-Car`, and identifies
+12 October 19–20 source files (six pairs) plus exactly one session bundle.
+No plausible noncanonical export is found. October 19 General is absent after
+its completed prior intake; October 20 Fintech is absent. The remaining AI,
+Fintech and October 20 source pairs are unconsumed candidates, not evidence of
+additional sessions, and remain untouched. The exact Dev pair is independently
+downloaded and validated locally, so no delayed native comparison is needed to
+establish canonical validity. The Work UI delay is resolved, not a lasting
+Files access failure.
+
+Existing issues #95/#96 retain reconciliation and step evidence; #100/#153/#159
+retain playback failures and the existing mitigation boundary; #169 receives
+attribution evidence; #172 receives detailed capture/save semantics; #178 receives
+native acquisition/readback evidence; #181 receives bundle-size/coverage evidence.
+The private feedback matrix records exact comment URLs. A separate read-only
+coverage review finds no missing substantive discussion details or count errors.

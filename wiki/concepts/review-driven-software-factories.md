@@ -7,10 +7,10 @@ aliases: ["Why Software Factories Fail","Human-in-the-loop software factories","
 tags: ["ai-agents","software-design","planning","code-review","context-management","documentation","workflow-automation","platform-engineering","governance","mcp"]
 wiki_slug: review-driven-software-factories
 created: 2026-07-25
-updated: 2026-10-19
+updated: 2026-10-20
 confidence: medium
 # prettier-ignore
-provenance: [{"source_item_id":"dev-20260724-01","url":"https://github.com/humanlayer/advanced-context-engineering-for-coding-agents/blob/main/wsff.md"},{"source_item_id":"19fd6c96b2d39a67-11","url":"https://github.blog/ai-and-ml/github-copilot/automating-cross-repo-documentation-with-github-agentic-workflows/?utm_source=tldrdev"},{"source_item_id":"19ffad638bac0403-02","url":"https://blog.cloudflare.com/astro-issue-triage/?utm_source=tldrdev"},{"source_item_id":"19ffffe9eeaeab99-06","url":"https://github.com/vercel-labs/eve-software-factory-template?utm_source=tldrnewsletter"},{"source_item_id":"19ffb53bd896ad92-11","url":"https://x.com/AlanaDLevin/status/2087526319999303784"},{"source_item_id":"1a01a57197aa438b-18","url":"https://techcrunch.com/2026/08/18/warps-new-system-is-an-out-of-the-box-software-factory-for-ai-development/?utm_source=tldrai"},{"source_item_id":"url_adf03cc09f382e8e","url":"https://www.warp.dev/factories/request-access"},{"source_item_id":"url_79e1f7b5ba46a169","url":"https://docs.warp.dev/factories/"},{"source_item_id":"url_80300d7978de226c","url":"https://docs.warp.dev/factories/infrastructure-and-security/"},{"source_item_id":"url_853c86ea5e82c5b4","url":"https://www.linkedin.com/blog/engineering/ai/qa-agent-reimagining-software-quality-with-ai-driven-autonomous-testing"},{"source_item_id":"url_f7ffc84157ac5d1c","url":"https://newsletter.posthog.com/p/code-review-tips"},{"source_item_id":"1a038ac5916976e5-05","url":"https://newsletter.port.io/p/how-uber-built-a-software-factory?utm_source=tldrnewsletter"},{"source_item_id":"1a03919a99717a24-09","url":"https://about.gitlab.com/blog/when-code-is-abundant/?utm_source=tldrai"},{"source_item_id":"url_74ac61e244043f10","url":"https://claude.com/blog/the-ai-native-sdlc-playbook"},{"source_item_id":"1a0a4ca47348bc23-04","url":"https://refactoringenglish.com/excerpts/write-an-effective-design-doc/"},{"source_item_id":"20261006-tldr-ai:ai-006","url":"https://www.theaithinker.com/p/how-to-build-an-ai-native-software"},{"source_item_id":"20261012-tldr-dev:dev-003","url":"https://www.cockroachlabs.com/blog/experiment-running-hospital-code/"},{"source_item_id":"url_293d0f9661696880","url":"https://openai.com/index/harness-engineering/"},{"source_item_id":"20261015-tldr-dev:dev-004","url":"https://mattrothenberg.com/notes/pure-ui-agentic-era/"}]
+provenance: [{"source_item_id":"20261019-tldr-dev:dev-005","url":"https://jovidecroock.com/blog/gittifacts/"},{"source_item_id":"dev-20260724-01","url":"https://github.com/humanlayer/advanced-context-engineering-for-coding-agents/blob/main/wsff.md"},{"source_item_id":"19fd6c96b2d39a67-11","url":"https://github.blog/ai-and-ml/github-copilot/automating-cross-repo-documentation-with-github-agentic-workflows/?utm_source=tldrdev"},{"source_item_id":"19ffad638bac0403-02","url":"https://blog.cloudflare.com/astro-issue-triage/?utm_source=tldrdev"},{"source_item_id":"19ffffe9eeaeab99-06","url":"https://github.com/vercel-labs/eve-software-factory-template?utm_source=tldrnewsletter"},{"source_item_id":"19ffb53bd896ad92-11","url":"https://x.com/AlanaDLevin/status/2087526319999303784"},{"source_item_id":"1a01a57197aa438b-18","url":"https://techcrunch.com/2026/08/18/warps-new-system-is-an-out-of-the-box-software-factory-for-ai-development/?utm_source=tldrai"},{"source_item_id":"url_adf03cc09f382e8e","url":"https://www.warp.dev/factories/request-access"},{"source_item_id":"url_79e1f7b5ba46a169","url":"https://docs.warp.dev/factories/"},{"source_item_id":"url_80300d7978de226c","url":"https://docs.warp.dev/factories/infrastructure-and-security/"},{"source_item_id":"url_853c86ea5e82c5b4","url":"https://www.linkedin.com/blog/engineering/ai/qa-agent-reimagining-software-quality-with-ai-driven-autonomous-testing"},{"source_item_id":"url_f7ffc84157ac5d1c","url":"https://newsletter.posthog.com/p/code-review-tips"},{"source_item_id":"1a038ac5916976e5-05","url":"https://newsletter.port.io/p/how-uber-built-a-software-factory?utm_source=tldrnewsletter"},{"source_item_id":"1a03919a99717a24-09","url":"https://about.gitlab.com/blog/when-code-is-abundant/?utm_source=tldrai"},{"source_item_id":"url_74ac61e244043f10","url":"https://claude.com/blog/the-ai-native-sdlc-playbook"},{"source_item_id":"1a0a4ca47348bc23-04","url":"https://refactoringenglish.com/excerpts/write-an-effective-design-doc/"},{"source_item_id":"20261006-tldr-ai:ai-006","url":"https://www.theaithinker.com/p/how-to-build-an-ai-native-software"},{"source_item_id":"20261012-tldr-dev:dev-003","url":"https://www.cockroachlabs.com/blog/experiment-running-hospital-code/"},{"source_item_id":"url_293d0f9661696880","url":"https://openai.com/index/harness-engineering/"},{"source_item_id":"20261015-tldr-dev:dev-004","url":"https://mattrothenberg.com/notes/pure-ui-agentic-era/"}]
 ---
 
 # Review-Driven Software Factories
@@ -618,3 +618,30 @@ The October 19 discussion links
 {% include wiki-related-link.md slug="agent-work-metrics" %}
 to factory evaluation: compare accepted outcomes with human attention, quality
 and spending. Apply the proposed protocol before claiming savings.
+
+## Humans Approve Intent, Machines Prove Conformance
+
+[Jovi De Croock's gittifacts proposal](https://jovidecroock.com/blog/gittifacts/)
+places human approval at the plan: intent, acceptance criteria, exclusions and
+anticipated paths. Agents implement in isolated forks. Pushes supply CI and
+review evidence such as regression tests, changed-line coverage and mutation
+results, API/dependency changes, sensitive-path signals and previews.
+Deterministic policy routes changes to automatic merge, quick review or full
+review. Missing evidence escalates review. Model judgments may demand more
+review but cannot lower the deterministic requirement. A separate agent builds
+the review walkthrough without relying on the implementer's summary.
+
+The proposal ties autonomy to reversibility: per-change flags, gradual rollout,
+repository-specific calibration and CI on the exact merged tree. Its limits
+matter: the test environment must be trusted, evidence can take 13–17 minutes
+per change, and an incorrect approved plan can produce the wrong result faster.
+This is an author's workflow proposal, not a measured universal productivity gain.
+
+**October 20 commute capture:** Brad explicitly saved this article and requested
+its URL for sharing. The useful connection is to review intent and acceptable
+compromises before implementation. Pair the evidence policy with
+{% include wiki-related-link.md slug="explicit-nonrequirements" %}: tests can
+show conformance to an unnecessary guarantee, so deciding whether that guarantee
+belongs in the plan remains a human responsibility.
+
+<!-- source-item-id: 20261019-tldr-dev:dev-005 -->
