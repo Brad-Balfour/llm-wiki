@@ -8,6 +8,14 @@ found a queue as proof.
 
 ## Evidence Sources
 
+- October 23 processing: three exact-row Library exports representing two
+  sessions on October 20 AI and October 21 General; the evening sibling is a
+  semantic duplicate. Private coverage retains 91 raw events, 60 unique events
+  and 17 nested save-discussion entries. One wiki save, thirteen quality
+  incidents and no classifier corrections or unresolved captures. Two supplied
+  shared-chat URLs did not require recovery. Four actual canonical files pass grouped independent Work validation and
+  match all snapshots; normalized copies pass local pair and bundle checks.
+
 - October 21–22 processing: six exact-row Library bundle downloads, four sessions
   and four canonical playback/reference pairs for October 19 AI/Fintech and
   October 20 General/Dev. Two semantically identical duplicate exports remain
@@ -4117,3 +4125,75 @@ Whole-bundle semantic equality of both duplicate pairs is established locally,
 without imposing byte-for-byte transport requirements. The native comparison
 takes 3m7s; a single existing-answer recovery returns its results after the initial
 answer renders blank. No canonical reread is dispatched.
+
+## October 23: Extraction, Sweep Boundaries and Wrong-Queue Completion
+
+The last completed intake is October 21–22 PR #195, rather than the earlier
+Friday run. Native recursive root discovery checks remaining October 19–23
+source dates across all newsletters: 557 rows, three exhausted pages, 81 files
+under `/LLM-Wiki-Car`, eleven canonical pairs and three exports. October 19
+sources and older residual bundles are absent. October 23 has General, Dev and
+AI pairs, with no Fintech pair. Nine unconsumed pairs remain candidates rather
+than evidence of additional commutes.
+
+All three bundles pass strict local schema/snapshot validation. The evening
+exports contain identical parsed objects and one session ID; import accepts
+two sessions and rejects that duplicate only. Morning uses October 20 AI and
+evening uses October 21 General. Morning integrity is partial; evening is
+recovered. Neither is evidence of a complete contemporaneous conversation log.
+The ledger covers 91 raw and 60 unique events, seventeen nested discussion
+entries, one wiki save and thirteen quality incidents. Forty-six event rows
+are playback/navigation/boundary records. Four of those also contain ordinary
+discussion references, separately preserved privately: an IPO timing question,
+humanoid cleaning effectiveness, an orchestrator discussion and fabricated
+statistics. None establishes an additional save or classifier correction.
+
+The Clairic save includes attribution, Cloudflare ownership/hosting, license,
+API/SDK access, pricing/free allowance, System One extraction, use cases,
+input formats, receipts and pay stubs. The wiki preserves those questions and
+Brad's extraction-rather-than-arithmetic preference. The exact article and
+three official documentation pages are read. The note separates announced
+capabilities from current documentation and application synthesis: a receipt
+example does not prove pay-stub accuracy; native PDF support, released weights
+and currently available self-hosting are not established. Model output still
+requires validation. No unsupported conversational product claim is published.
+
+AI incidents include a sweep stopping after four of ten, premature completion,
+added model-comparison names, additions to two headline-only items, paraphrased
+item-nine playback and an altered final filename. General includes a sweep
+stopping after four of eleven, a false explanation of the pause rule,
+unsolicited item-one/two playback after sweep continuation, another unsolicited
+advance, paraphrased prepared descriptions, and a cross-queue substitution for
+item eleven. The last valid General item is ten; the incorrect Tokyo headline
+and Dev filename do not establish a visit to General eleven. The instruction
+to resume at five and the explicit pause are normal navigation requests, not
+interest/depth feedback. Existing playback and prompt issues own these defects.
+The later correction directs comparison against the JSON return value; it does
+not establish successful replay of the missing item.
+
+The installed commute skill matches its repository copy. No instruction,
+schema or runtime change is needed to restate existing playback requirements;
+the prompt/state-machine proposal remains in existing issue #196. This
+content/evidence change requires no Project prompt replacement or source
+upload. Live-version documentation is not treated as proof of a new deployment.
+
+GitHub host authentication succeeds after the sandbox check fails. SafariDriver
+requires sign-in to its isolated session. Automatic approval rejects the first
+Work message; Brad explicitly authorizes that exact chat and messaging succeeds.
+The user-input wait is excluded from net time. Native discovery returns a
+content-reference placeholder to read_thread; its complete rendered answer is
+read in signed-in Safari without retransmission. All three exact-row downloads
+succeed, with no ZIPs, chunks or transport-fidelity requirements. Private timing
+and usage records distinguish root sampled token traffic from unavailable
+per-tool/Work charges and shared rounded quota observations.
+
+Grouped Work comparison independently opens all four actual canonical files
+and all three bundles. Both actual pairs pass schemas, main/item key order,
+playback/sweep reconstruction, positions/counts, selected source text,
+coverage/attribution and prescribed fingerprints. All nested snapshot objects
+and arrays match. Normalized snapshot copies are reused with that semantic
+provenance and pass local validators; this is not original-byte retrieval.
+The native operation takes 1m12s and overlaps synthesis/checks. Its completed
+answer is obtained by reloading the existing Work chat, with no second Files
+request. A separate read-only coverage review identifies one missing explicit
+extraction-versus-decision comparison; it is added before final checks.
