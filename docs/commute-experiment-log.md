@@ -4106,3 +4106,14 @@ intervals, model/effort, retries, available root token samples and usage reading
 User-input waits are excluded; overlapping source/audit work counts once. Exact
 Work, collaborator and per-tool token/quota charges are unavailable. Shared rounded
 account meters are observations rather than isolated task charges.
+
+The complete native canonical result confirms all eight actual files were
+independently read, parsed and compared recursively against all six bundle
+snapshots. Four actual pairs pass v4 schemas, key order, full reconstruction,
+item/coverage/attribution checks and prescribed fingerprints. Normalized snapshot
+copies reused with that semantic provenance pass local pair validation. Work
+does not rerun bundle-schema validation; all six bundles already pass it locally.
+Whole-bundle semantic equality of both duplicate pairs is established locally,
+without imposing byte-for-byte transport requirements. The native comparison
+takes 3m7s; a single existing-answer recovery returns its results after the initial
+answer renders blank. No canonical reread is dispatched.
