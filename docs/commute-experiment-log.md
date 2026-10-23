@@ -8,6 +8,14 @@ found a queue as proof.
 
 ## Evidence Sources
 
+- October 21–22 processing: six exact-row Library bundle downloads, four sessions
+  and four canonical playback/reference pairs for October 19 AI/Fintech and
+  October 20 General/Dev. Two semantically identical duplicate exports remain
+  private provenance. Coverage includes 141 raw event rows, 98 unique events
+  and 58 nested discussion entries; one explicit wiki save, thirteen quality
+  incidents, six general captures and zero classifier corrections. Four supplied
+  shared-chat URLs required no recovery reads.
+
 - October 20 processing: one October 20 Library bundle for the October 19 Dev
   queue, one independently downloaded canonical playback/reference pair, 27
   event rows and 27 nested discussion entries. Two explicit wiki saves, nine
@@ -4022,3 +4030,79 @@ attribution evidence; #172 receives detailed capture/save semantics; #178 receiv
 native acquisition/readback evidence; #181 receives bundle-size/coverage evidence.
 The private feedback matrix records exact comment URLs. A separate read-only
 coverage review finds no missing substantive discussion details or count errors.
+
+## October 21–22: Layered Review, Reversibility and Four Sessions
+
+The last completed intake is October 20 PR #194, following Friday’s #191 and
+weekend/Monday #192–193. Remaining October 19–22 source files are inventoried
+without reprocessing completed sessions. Native recursive root discovery exhausts
+three pages, 562 Library rows and 86 `/LLM-Wiki-Car` descendants. Twelve canonical
+pairs remain: October 19 AI/Fintech, October 20 General/Dev/AI, October 21
+General/Dev/AI and all four October 22 editions. No older residual bundle appears
+in that folder. Eight pairs are unconsumed candidates, not additional sessions.
+
+Six SafariDriver exact-row downloads represent Wednesday’s October 19 AI
+conversation and Thursday’s October 19 Fintech and October 20 General/Dev
+conversations. Morning and 1837 evening `(1)` uploads are semantically identical
+to their unsuffixed siblings. All six pass strict local bundle validation against
+their snapshots. Import accepts four sessions and rejects only the two duplicate
+session IDs; those are resolved duplicate provenance, not missing captures.
+The bundles are partial or recovered records, not contemporaneous complete logs.
+
+The coverage ledger dispositions all 141 raw events, including 98 unique events:
+one wiki save, one ordinary skip, thirteen quality incidents, six general
+captures and 77 playback/navigation/boundary exclusions. The AI save’s 22 narrative
+blocks, fourteen questions, ten conclusions, seven emphasis requests and five
+evidence entries receive a separate 58-entry discussion ledger. Optional fields
+do not prove full conversation coverage. No interest/depth correction follows
+from criticizing an article or saying “nothing new.”
+
+The explicit save creates _Anthropic’s Layered Code Review_ and links Software
+Factories. The exact original article is independently read. The note preserves
+author verification versus PR cadence, human-effort measurement limits, automated
+review/security/CI gates, risk tiers and overrides, integrated checks, staged
+rollout, incident evaluation, noise and costly agent loops. Three rounds trigger
+reassessment rather than an absolute stop. The 59% figure concerns code already
+present at first review, not false positives. Human judgment, shared understanding,
+accountability and the comparison to Weinberg’s egoless programming remain
+qualified. Brad’s impact/reversibility distinction includes architectural precedent
+that survives operational rollback. PostHog’s existing reviewability/reversibility
+source is cross-linked without claiming it is the unidentified Software Factory
+article remembered from the prior week. That exact remembered identity remains
+unresolved; it does not block the supported synthesis.
+
+AI playback stopped its sweep after five of seven and later confused source
+sections with queue articles. Network interruption, unwanted advancement,
+unexpected French and unexplained pauses affected detailed discussion. Article 7
+was announced in the sweep but not played in the resumed detailed sequence.
+Fintech’s sweep stopped after two of six; General repeatedly fragmented the sweep,
+confused item-one playback with another sweep, answered the wrong Waymo question
+and paraphrased prepared strings. These observations belong to existing playback
+and prompt issues. Already explicit literal-playback instructions cover these
+failures, so another wording-only policy change is not justified.
+
+Fintech captures preserve Mercury and Amex sharing-link requests, the correction
+to an ungrounded Amex chronology, questions about protection effective dates and
+agent enrollment, and criticism of the evidence behind an a16z prediction. These
+are discussion/questions rather than explicit wiki saves or classifier feedback.
+They remain private with exact provenance; no financial-policy claim is published
+without source verification. Dev has ordinary article discussion but no save or
+feedback capture. No shared-chat audit is needed.
+
+Host GitHub authentication works after the sandbox check fails. SafariDriver’s
+isolated session requires sign-in. Automatic approval initially rejects messaging
+the existing Work chat; Brad explicitly authorizes it and the next request succeeds.
+Native readback returns a content-reference placeholder; the complete inventory
+is read from its rendered Work answer without retransmission. No ZIP, numbered
+chunks, original-byte comparison or transport hash exercise is used. The existing
+site gate catches a missing source-item trace marker during local verification;
+the required marker is added before publication. No new guard is needed because
+the existing gate catches this mistake.
+
+This content/evidence-only diff changes no live Project prompt or source file.
+No Project replacement/upload is required. Private records retain the exact
+retrieval manifest, canonical reconciliation, coverage and issue matrices, tool
+intervals, model/effort, retries, available root token samples and usage readings.
+User-input waits are excluded; overlapping source/audit work counts once. Exact
+Work, collaborator and per-tool token/quota charges are unavailable. Shared rounded
+account meters are observations rather than isolated task charges.
