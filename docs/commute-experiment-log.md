@@ -8,6 +8,16 @@ found a queue as proof.
 
 ## Evidence Sources
 
+- October 24–27 processing: seven exact-row Library exports, five sessions,
+  and six independently identified queue/reference pairs from October 21–22.
+  Two pairs of exports contain identical parsed objects. The private coverage
+  ledger accounts for 189 raw event rows and 128 unique rows, including two
+  explicit wiki saves and their discussions. Four October 22 pairs fail strict validation; three match the independently
+  downloaded snapshots in four exports, while the fourth was identified from a
+  targeted shared-chat recovery. Originals and recovered observations are
+  retained without describing those sessions as validated imports. One targeted shared-chat read established a sixth session whose export failed;
+  the other five shares were not audited.
+
 - October 23 processing: three exact-row Library exports representing two
   sessions on October 20 AI and October 21 General; the evening sibling is a
   semantic duplicate. Private coverage retains 91 raw events, 60 unique events
@@ -4197,3 +4207,51 @@ The native operation takes 1m12s and overlaps synthesis/checks. Its completed
 answer is obtained by reloading the existing Work chat, with no second Files
 request. A separate read-only coverage review identifies one missing explicit
 extraction-versus-decision comparison; it is added before final checks.
+
+## October 24–27: Two Saves and Four Invalid October 22 Pairs
+
+The latest preceding publication was PR #197, merged October 23 at 7:01 p.m.
+Eastern. A recursive Library-root inventory covered October 20–27, including
+the weekend: 571 rows across three exhausted pages, 95 files under
+`/LLM-Wiki-Car`, fifteen dated queue/reference pairs, and seven exports. No
+October 24–25 source files or additional plausible exports appeared. The seven
+exports represent five sessions; a sixth October 22 AI session had no bundle; October 24 Dev and October 27 Fintech each
+have an identical parsed sibling. Queue dates are October 21 Dev and AI and
+October 22 General, Dev, and Fintech. Unbound queue files remain candidates,
+not proof of additional sessions.
+
+The October 24 save requests Giroux's layered GraphQL operation proposal and
+its surrounding discussion. The October 25 save requests Ramp Laminar and
+detailed discussion of its architecture, comparisons and evidence boundaries.
+Both saves are reflected in the wiki with source facts distinguished from
+conversation and inference. The Ramp article's main prose was readable through
+an official search-result rendering; its interactive diagram was not. The
+conversation's article-retrieval complaint remains an observation, not proof
+of which unavailable source a prior assistant actually read.
+
+Three October 22 queue pairs used by exported sessions were independently
+downloaded from their exact Library rows and each actual parsed object matches its bundle snapshot. All
+three fail strict pair validation because `main_sha256` does not match compact
+playback JSON. Their declared fingerprints match the indented playback JSON
+with its final newline. A diagnostic using the compact fingerprint exposes a
+second contract failure: uncertain coverage with no related retained item,
+whose explanations describe unresolved newsletter-link equivalence. No
+related identity was invented and no original was changed. The Fintech file
+also places in-depth items before later headline-only items, contrary to the
+queue-generation ordering instruction. Existing issue #147 owns the publication
+boundary. The four corresponding bundle exports are not strict-valid imports;
+limited observations from their recovered events are identified as such.
+
+Across five unique session event streams the exports contain eighteen quality
+incident records, including two network interruptions that are not attributed
+to the playback model. Other observations include interrupted or paraphrased
+sweeps, missing or added playback text, unsupported source attributions,
+acknowledgment-only navigation, and delays between prepared items. A request to
+move on without a URL is ordinary navigation, not classifier feedback. No
+interest or depth correction is inferred. Bundle discussion fields are not a
+complete transcript. One targeted shared-chat read recovered the missing October
+26 AI session: its export failed and no bundle was created. Its independently
+downloaded pair also fails the compact fingerprint check. Nineteen user turns
+include a network interruption, a source question, stalled navigation and an
+ordering correction; no additional save or classifier correction was found.
+The other five supplied shares were not audited.
