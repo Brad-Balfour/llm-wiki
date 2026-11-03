@@ -8,6 +8,11 @@ found a queue as proof.
 
 ## Evidence Sources
 
+- November 2 processing: one exact-row export and one independently downloaded
+  October 23 General queue/reference pair. The pair and bundle validate and
+  their snapshots match; the bundle declares partial integrity. One targeted
+  shared-chat read covers the visible conversation, including 24 user turns.
+
 - October 24–27 processing: seven exact-row Library exports, five sessions,
   and six independently identified queue/reference pairs from October 21–22.
   Two pairs of exports contain identical parsed objects. The private coverage
@@ -4255,3 +4260,40 @@ downloaded pair also fails the compact fingerprint check. Nineteen user turns
 include a network interruption, a source question, stalled navigation and an
 ordering correction; no additional save or classifier correction was found.
 The other five supplied shares were not audited.
+
+## November 2: October 23 General Catch-up
+
+Following PR #198, a recursive personal Library-root listing covered October 21
+through November 2, including the intervening weekend. Three pages contained
+582 entries; 105 files were under `/LLM-Wiki-Car`. The dated inventory contained
+24 queue/reference pairs and one export candidate, the November 2 evening
+bundle. Unsupported recursion into connected Google Drive and Dropbox does not
+limit the exact personal Library folder inventory. A narrower folder request
+returned fewer rows, so the exhausted root listing was used. Unbound queues
+remain candidates, not proof of other sessions.
+
+The exact Library downloads of `20261023-tldr.txt`, its reference, and
+`202611021814-evening-commute-session-bundle.txt` pass local pair and bundle
+validation; the independently downloaded pair matches the complete embedded
+snapshot. The importer accepts one session, eight items, no wiki candidates and
+no classifier feedback. The bundle records partial integrity because events
+were reconstructed from visible chat rather than a separate durable event log.
+
+The supplied shared chat was read to recover discussion omitted by the partial
+bundle. It contains 24 genuine user turns: fifteen substantive turns and nine
+selection, playback or navigation turns. Discussion included a question about
+whether a short reference description was complete, requests for attribution
+and senior-engineer context, an explicit correction to avoid guessing about the
+user's workplace, and questions about the evidence for claims connecting AI
+productivity and long working hours. These are conversation context, not an
+explicit save or a classifier correction. No unseen audio is claimed covered.
+The critical assessment of an article does not establish an interest label.
+There is no justified wiki save from this session.
+
+The signed-in SafariDriver session required sign-in. Exact-row downloads worked
+without chunking or archive transfer. Native root inventory completed while
+local validation proceeded; its initial readback showed only a heading until
+the existing response rendered in the signed-in chat. The worktree retains the
+private inventory, original downloads, normalized import, coverage ledger and
+cleanup manifest. This evidence-only change does not alter a live Project
+prompt or source.
