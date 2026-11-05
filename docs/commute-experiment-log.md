@@ -8,6 +8,14 @@ found a queue as proof.
 
 ## Evidence Sources
 
+- November 4 processing: two exact Library bundle exports and two independently
+  downloaded October 26 General and Dev queue/reference pairs. Both pairs
+  validate and match their snapshots; the Dev bundle validates with partial
+  integrity. General fails strict playback-cursor validation and is processed
+  through bounded supplied-queue recovery. The 62 recorded events include three
+  saves, thirteen quality incidents, and one general capture. Two supplied
+  shares were attempted for targeted recovery but did not yield readable content.
+
 - November 3 processing: two Library exports for October 23 Dev and AI, 57
   recorded event rows, three distinct wiki saves and four quality incidents.
   Both bundles report partial integrity; the two supplied shared chats were not
@@ -4310,3 +4318,32 @@ A folder-only Library inventory for October 23–November 3 returned 26 queue/re
 The two exact-row bundle downloads identify October 23 Dev and AI. Work independently read the canonical pairs and bundles, reported full object matches and v4 pair validation; normalized snapshot copies passed local repository pair and bundle checks. Both bundles declare partial integrity because their events were reconstructed from visible chat, not a separate durable event record. Their 57 event rows contain three distinct wiki saves: Stream's production-investigation agent, Imprint's small-change review policy, and 1Password for Agents. Two 1Password capture events refer to the same item. Discussion about evidence, identity provisioning, triage and review, developer integration, and the human-facing approval boundary accompanies the saves. The user also corrected a Pure UI explanation: a parent may obtain state using a hook and pass it as props, a familiar React pattern. No classifier correction is inferred. The two provided shared chats were not audited; no completeness claim extends beyond the bundle records or to unseen audio.
 
 Reported quality incidents include an interrupted headline sweep with invented narration, two unclear item summaries, and a delayed next-item transition. A premature GitHub PR during the 1Password Voice discussion was closed unmerged and is tracked in issue #201. In small-change, the source's literal frontend threshold conflicts with the bundle discussion; the wiki preserves the ambiguity rather than asserting a resolved cutoff.
+
+## November 4: October 26 General and Dev Catch-up
+
+The folder inventory reported 27 queue/reference pairs for October 23 through
+November 4 and two November 4 bundles. The direct listing omitted the bundles,
+which were present in a broader newest-first listing; its remaining cursor was
+not exhausted, although the oldest returned entry predates the intake window.
+Unbound queues remain candidates, not proof of additional sessions.
+
+Both downloaded canonical v4 pairs validate and match their bundle snapshots.
+The Dev bundle passes strict validation with partial integrity. The General
+bundle declares completed playback while its last verified item is 10 and it
+identifies item 11 as the resume target; strict validation rejects this
+contradiction. Supplied-queue recovery retained three item-bound wiki captures,
+quality incidents, and the general capture without asserting a valid original
+bundle. Item 11 was not correctly read, despite an erroneous completion claim.
+The recovered session and partial Dev bundle are not complete transcripts.
+
+The three saves preserve Drew Breunig's context-failure taxonomy, Dan Luu's
+argument for more ambitious but verifiable software, and Maggie Appleton's
+interactive planning interfaces, including the discussion of prototype-based
+decisions and human comprehension. Each original source was independently read.
+The conversation's description of poisoning as malicious input was narrower
+than Breunig's definition, which also includes ordinary errors. A decision not
+to save speculative future-prediction articles is recorded as a preference,
+not an item-level classifier correction. Thirteen recorded incidents cover
+nonverbatim playback, invented or substituted items, and false completion.
+The two shared URLs returned no readable conversation through both website
+readers and direct HTTP; no unseen conversation or audio coverage is claimed.
