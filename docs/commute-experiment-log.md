@@ -4412,3 +4412,9 @@ outer tool calls and nested operations, and retains interval token traffic and
 shared meter checkpoints. The correction analysis is separate from those
 original-run totals. Comparisons with prior models remain observational because
 workloads, tools and coverage differ.
+
+A later native Work readback verified all nine exact cleanup targets absent
+from the active folder. Its exhausted direct folder listing returned 60 files:
+30 queues and 30 references, including unrelated dated pairs that remained.
+The broader Library listing still had further pages, so this is folder-scoped
+verification, not a claim that the entire Library was exhausted.
