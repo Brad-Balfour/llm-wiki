@@ -8,6 +8,15 @@ found a queue as proof.
 
 ## Evidence Sources
 
+- November 5–7 processing: three Library bundle exports, three independently
+  downloaded October 26–27 queue/reference pairs and 56 event rows. All pairs
+  validate and match their snapshots. The November 5 recovered and November 7
+  partial bundles validate; the November 6 recovered bundle fails lifecycle
+  validation because a prior item is explicitly named after the next item was
+  announced. Its two explicit saves are treated as bounded recovered evidence,
+  not a valid original import. Three shared URLs yielded no conversation in two
+  website readers or direct HTTP; complete transcript coverage is not claimed.
+
 - November 4 processing: two exact Library bundle exports and two independently
   downloaded October 26 General and Dev queue/reference pairs. Both pairs
   validate and match their snapshots; the Dev bundle validates with partial
@@ -4347,3 +4356,28 @@ not an item-level classifier correction. Thirteen recorded incidents cover
 nonverbatim playback, invented or substituted items, and false completion.
 The two shared URLs returned no readable conversation through both website
 readers and direct HTTP; no unseen conversation or audio coverage is claimed.
+
+## November 5–7: October 26 AI and October 27 General and Dev
+
+Three exact Library exports and their three canonical v4 queue/reference pairs
+were downloaded. The pairs pass schema, order and fingerprint checks and match
+the embedded snapshots. The November 6 General bundle fails strict lifecycle
+validation at event 6: the user explicitly named the prior item after item 5
+was announced. Its supplied transcript excerpts identify the intended Counting
+House save and a separate Kiro save; no save is inferred for the subsequent
+item or an ordinary skip. The original is retained, not silently repaired.
+
+The Counting House note distinguishes customer-triggered cases, a stateless
+clerk, a judge and a mechanical transaction orchestrator from the discussion's
+proposed proactive extension. The source supports post-call transcript use,
+not the discussion's assumption of established live-voice use. The Kiro note
+retains the two requested posts, public review prompts, review-loop retrospective
+and conductor, and separates reported throughput from measured outcomes.
+
+Eight recorded quality incidents include repeated lookup instead of playback,
+a claimed export without a link, mistaken item marking, premature end, an
+accidental unmerged branch during the commute, and incomplete Dev playback.
+The cause of the Dev cutoff is unknown. The recovered and partial bundles are
+not complete transcripts. Website readers returned no conversation for the
+three supplied shares; direct HTTP returned only the share shell. No unseen
+conversation coverage is claimed.
