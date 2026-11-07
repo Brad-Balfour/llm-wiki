@@ -16,6 +16,8 @@ found a queue as proof.
   announced. Its two explicit saves are treated as bounded recovered evidence,
   not a valid original import. Three shared URLs yielded no conversation in two
   website readers or direct HTTP; complete transcript coverage is not claimed.
+  The original Codex session rollout supplies the corrected timing, meter and
+  root-token measurements recorded below.
 
 - November 4 processing: two exact Library bundle exports and two independently
   downloaded October 26 General and Dev queue/reference pairs. Both pairs
@@ -4381,3 +4383,38 @@ The cause of the Dev cutoff is unknown. The recovered and partial bundles are
 not complete transcripts. Website readers returned no conversation for the
 three supplied shares; direct HTTP returned only the share shell. No unseen
 conversation coverage is claimed.
+
+### November 7 performance correction
+
+The original handoff incorrectly said starting meters, token counters and net
+timing were unavailable. The session rollout records GPT-6.1 Terra Medium for
+all three original turns, from 20:27:50 to 20:46:01 UTC. Their recorded active
+durations sum to 908.464 seconds (15m 08s), or 302.82 seconds per bundle across
+three exports. The two gaps between turns total 182.376 seconds and are excluded.
+These include avoidable pauses caused by premature handoffs. Gross elapsed time
+was 1,090.837 seconds; the three-millisecond difference is timestamp rounding.
+
+The first available shared-account sample was 0% of the five-hour window and
+16% of the weekly window; the final token-count sample was 16% and 19%. Those
+rounded account-wide readings do not isolate this task. The earlier 15%/19%
+live reading was a prior checkpoint, not the final sample. Root model traffic
+through the final sample was 13,672,467 tokens: 13,653,234 input, of which
+13,471,232 was cached, and 19,233 output, including 2,153 reasoning tokens.
+Traffic includes repeated cached context and is not billed-new-token usage.
+Work-chat and nested-tool token attribution are unavailable.
+
+The largest recorded contiguous interval was Library cleanup (208 seconds),
+followed by PR, issue and review work (109 seconds) and the second turn's
+authentication and bundle retrieval (103.125 seconds). Downloads and Project
+source verification took 65 seconds. These are clock intervals, not isolated
+model compute. A private reconstruction partitions the original turns, lists
+outer tool calls and nested operations, and retains interval token traffic and
+shared meter checkpoints. The correction analysis is separate from those
+original-run totals. Comparisons with prior models remain observational because
+workloads, tools and coverage differ.
+
+A later native Work readback verified all nine exact cleanup targets absent
+from the active folder. Its exhausted direct folder listing returned 60 files:
+30 queues and 30 references, including unrelated dated pairs that remained.
+The broader Library listing still had further pages, so this is folder-scoped
+verification, not a claim that the entire Library was exhausted.
