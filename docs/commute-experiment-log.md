@@ -8,6 +8,13 @@ found a queue as proof.
 
 ## Evidence Sources
 
+- November 7–9 processing: four exact Library bundle exports, four independently
+  read October 27–28 queue/reference pairs and 97 event rows. Work compared
+  the complete canonical objects with their snapshots and validated the v4
+  pairs; normalized snapshot copies also passed local pair and bundle checks.
+  Two bundles are recovered and two partial, so coverage is limited to their
+  recorded evidence. Four supplied shared chats were not routinely audited.
+
 - November 5–7 processing: three Library bundle exports, three independently
   downloaded October 26–27 queue/reference pairs and 56 event rows. All pairs
   validate and match their snapshots. The November 5 recovered and November 7
@@ -4418,3 +4425,29 @@ from the active folder. Its exhausted direct folder listing returned 60 files:
 30 queues and 30 references, including unrelated dated pairs that remained.
 The broader Library listing still had further pages, so this is folder-scoped
 verification, not a claim that the entire Library was exhausted.
+
+## November 7–9: October 27 AI and October 28 General, Dev and AI
+
+Four Library exports contain 97 events across four sessions. Their exact
+canonical v4 pairs cover 40 queue items; a grouped independent Work read
+compared complete queue and reference objects to each bundle snapshot and
+reported four matches, correct key order and matching playback fingerprints.
+Local validators accepted the normalized pairs and bundles. Two exports are
+recovered and two partial; neither establishes complete conversation coverage.
+
+Two explicit saves preserve the discussion as well as the original sources:
+Entire's Git forge and LangChain's company harness. The latter distinguishes
+user and agent identities, the shared-channel email restriction, sandbox
+secrets, and user-created schedules from implementation details the article
+does not disclose. A request to provide the Hunger beats tenure article as a
+clickable link was a general capture, not a wiki save. No classifier correction
+is explicitly recorded.
+
+Fifteen recorded quality incidents include invented sweep items, substituted
+headlines and depths, a false or unnecessary file-access claim, delayed
+playback, incorrect or missing bylines, a thin newsletter summary, unrelated
+article searches, and a cut-off explanation. The cut-off's cause is unknown.
+The exports record the user's observations, not proof of the underlying tool
+state. Relevant existing issues track playback, instruction adherence, file
+access and summary quality. The four supplied shared chats were not audited;
+the bundles' discussion fields do not establish complete transcripts.
