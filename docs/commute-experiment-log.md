@@ -8,6 +8,13 @@ found a queue as proof.
 
 ## Evidence Sources
 
+- November 10 processing: seven exact Library bundle exports, including one
+  duplicate, and five independently downloaded October 29–30 queue/reference
+  pairs. All five pairs validate and all seven bundle snapshots match. The
+  exports contain 130 event rows including the duplicate; the earlier October
+  30 General export overlaps the later one. Partial and recovered integrity
+  limits coverage to recorded evidence. Three supplied shares were not audited.
+
 - November 7–9 processing: four exact Library bundle exports, four independently
   read October 27–28 queue/reference pairs and 97 event rows. Work compared
   the complete canonical objects with their snapshots and validated the v4
@@ -4451,3 +4458,30 @@ The exports record the user's observations, not proof of the underlying tool
 state. Relevant existing issues track playback, instruction adherence, file
 access and summary quality. The four supplied shared chats were not audited;
 the bundles' discussion fields do not establish complete transcripts.
+
+## November 10: October 29–30 catch-up commutes
+
+Seven exports cover five queue pairs and 44 queue items. The two October 29
+General exports are identical; the earlier October 30 General export is a
+partial record of the conversation represented by the later recovered export.
+All seven bundles and the five separately downloaded v4 pairs validate and
+their snapshots match. The seven exports contain 130 event rows; 105 remain
+after excluding the identical export, including overlapping October 30 rows.
+None is a complete transcript.
+
+Two explicit saves retain their discussion context: Slack's Code API as a
+shared interface for agents and people, and Daniel Miessler's evaluation loop,
+including the distinction between established methods and the article's
+fictional example. The original articles were read. No classifier correction
+is recorded. A request for summaries to retain important points is a quality
+preference, not an interest label.
+
+Sixteen distinct recorded quality incidents include duplicate or paraphrased
+playback, omitted reading times, a false explanation of duplicated playback,
+stalls and an unsupported lookup-failure diagnosis, a reported network
+interruption, speech missing from a visible response, a headline-only item
+ordered among in-depth items, and a substituted final item. The evidence
+records observations, not proof of the underlying tool or voice state. A
+request for a clickable link was met with spoken URL spelling. Relevant open
+issues track these playback, instruction, ordering, source-access and summary
+boundaries. Three supplied shared chats were not needed for targeted recovery.
