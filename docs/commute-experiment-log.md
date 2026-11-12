@@ -8,6 +8,12 @@ found a queue as proof.
 
 ## Evidence Sources
 
+- November 11 processing: two Library bundle exports and two independently
+  downloaded October 30 Dev and AI queue/reference pairs. Both pairs and both
+  partial bundles validate; each canonical pair matches its bundle snapshot.
+  The bundles contain 62 event rows. Two supplied shared chats were not needed
+  for targeted recovery; the partial bundles are not complete transcripts.
+
 - November 10 processing: seven exact Library bundle exports, including one
   duplicate, and five independently downloaded October 29–30 queue/reference
   pairs. All five pairs validate and all seven bundle snapshots match. The
@@ -4485,3 +4491,24 @@ records observations, not proof of the underlying tool or voice state. A
 request for a clickable link was met with spoken URL spelling. Relevant open
 issues track these playback, instruction, ordering, source-access and summary
 boundaries. Three supplied shared chats were not needed for targeted recovery.
+
+## November 11: October 30 Dev and AI commutes
+
+The two validated partial bundles record 27 Dev and 35 AI events against 12-item
+and 11-item canonical pairs. Four save actions identify three distinct AI
+articles: Factory's Droid harness, Meta's JiTTesting, and Natural Direct. The
+Droid request was repeated after a reported network error. The wiki entries
+retain the accompanying discussion, distinguish vendor reports and modeled
+comparisons from independent measurements, and verify Natural's byline on its
+announcement. The reference's failed author lookup remains unchanged.
+
+Eight quality incidents include a Dev item with added playback text; both queues
+placing headline-only items after in-depth items despite the generation rule;
+an altered and duplicated AI sweep; internal instructions and paraphrase spoken
+at item start; a reported stall with repeated status chatter; failed author
+lookup; and an unwanted premature Natural handoff. The latter is evidence of a
+file export, not evidence of a GitHub write. The user asked for the ordering
+bug to be sent to GitHub for later repair. The two bundles are partial and do
+not establish complete conversation coverage. An AI question about evidence of
+observed economic change, without a save request or recorded answer, is retained
+as discussion context rather than a new wiki claim.
