@@ -8,6 +8,17 @@ found a queue as proof.
 
 ## Evidence Sources
 
+- November 12 processing: five exact Library bundle rows represent four November 2
+  sessions; the two AI exports are identical. Four independently downloaded v4
+  queue/reference pairs validate and match the snapshots. Three distinct bundles
+  validate with partial integrity; General fails lifecycle validation on a next
+  request after the final item; supplied-queue recovery accepts the session as
+  recovered. The 69 unique recorded event rows include one
+  explicit Dev wiki save and 15 quality incidents, eight from the invalid General
+  bundle as bounded observations. A targeted General shared-chat read returned
+  no conversation; three other supplied shares were not audited. The partial
+  records do not establish complete conversation coverage.
+
 - November 11 processing: two Library bundle exports and two independently
   downloaded October 30 Dev and AI queue/reference pairs. Both pairs and both
   partial bundles validate; each canonical pair matches its bundle snapshot.
@@ -4512,3 +4523,19 @@ bug to be sent to GitHub for later repair. The two bundles are partial and do
 not establish complete conversation coverage. An AI question about evidence of
 observed economic change, without a save request or recorded answer, is retained
 as discussion context rather than a new wiki claim.
+
+## November 12: November 2 General, Dev, AI, and Fintech commutes
+
+The four queue pairs contain 35 items. Dev's explicit save requested both the
+Next Play employee-equity article and the surrounding discussion. The wiki
+retains its nine decision considerations, distinguishes the discussion's
+liquidity mechanisms from the article, and notes the missing byline and
+sponsorship. The bundle describes no classifier corrections.
+
+AI and Fintech recorded paraphrased or duplicated sweeps and altered item
+playback. General reported added playback text and repeated status-only
+navigation; its invalid final transition is retained as bounded evidence, not
+a valid import. A request to advance after the last item is recorded, but the
+validator rejects it; the supplied share did not yield readable conversation
+to independently resolve that boundary. All bundles are partial, so absent
+discussion and actions cannot be assumed not to have occurred.
