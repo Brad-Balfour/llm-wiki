@@ -8,6 +8,16 @@ found a queue as proof.
 
 ## Evidence Sources
 
+- November 15 processing: eight independently downloaded Library bundle rows
+  span November 12–15 sessions and eight November 3–5 queue/reference pairs.
+  Seven pairs validate; the November 5 Dev reference fails the failed-lookup
+  retry-count rule. All eight downloaded pairs match their embedded snapshots
+  as parsed objects. Six bundles validate; November 12 General fails the
+  completed-playback cursor rule, and November 5 Dev cannot validate against its
+  invalid pair. The eight records contain 215 events, including 44 recorded
+  quality incidents and no explicit wiki saves. All are partial or recovered;
+  the invalid records are bounded evidence and none is a complete transcript.
+
 - November 12 processing: five exact Library bundle rows represent four November 2
   sessions; the two AI exports are identical. Four independently downloaded v4
   queue/reference pairs validate and match the snapshots. Three distinct bundles
@@ -4539,3 +4549,30 @@ a valid import. A request to advance after the last item is recorded, but the
 validator rejects it; the supplied share did not yield readable conversation
 to independently resolve that boundary. All bundles are partial, so absent
 discussion and actions cannot be assumed not to have occurred.
+
+## November 15: November 3–5 catch-up commutes
+
+Eight exports cover eight sessions. Seven independently downloaded queue and
+reference pairs pass validation; November 5 Dev has a failed attribution lookup
+with an invalid retry count. All eight pairs match the embedded playback and
+reference objects. Six bundles pass; November 12 General fails completed-cursor
+validation, and November 5 Dev depends on the invalid pair. These failures do
+not establish that their recorded incidents occurred exactly as reconstructed.
+
+The 215 recorded events include 44 quality incidents, no explicit wiki saves,
+and one skip. A separate explicit request to promote an Apple home-robot item
+comes from the invalid November 12 General bundle; its classifier correction
+remains unresolved pending independent recovery. A reported item number for
+the djs repository conflicts with its queue position; the recorded skip is not
+an interest correction. All eight bundles are reconstructed or partial, so
+their missing discussion cannot establish a complete conversation audit.
+
+Recorded incidents include altered or repeated playback, early completion,
+navigation stalls, lookup repetition and inconsistent attribution. These are
+reported observations rather than established diagnoses of the voice system.
+A direct Project-chat Library listing returned no bundle rows while eight exact
+rows were visible and downloadable in the signed-in folder UI. An exhausted
+direct listing therefore did not establish bundle completeness in this run.
+A targeted shared-chat website read returned cache misses; the direct HTTP
+response contained only the share shell. It did not independently resolve the
+invalid-pair or lifecycle questions.
