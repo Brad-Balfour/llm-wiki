@@ -8,6 +8,15 @@ found a queue as proof.
 
 ## Evidence Sources
 
+- November 16 processing: six exact Library bundle rows represent five sessions
+  on November 5–6 queues; the two November 5 AI exports have identical parsed
+  contents. Five independently downloaded queue/reference pairs validate and
+  match every embedded snapshot. Four distinct partial bundles validate; the AI
+  duplicate pair fails lifecycle validation on a next request after the final
+  item. The five distinct records contain 108 events, including one explicit
+  wiki save and 23 quality incidents. The invalid bundle is bounded evidence;
+  reconstructed partial bundles do not establish complete conversation coverage.
+
 - November 15 processing: eight independently downloaded Library bundle rows
   span November 12–15 sessions and eight November 3–5 queue/reference pairs.
   Seven pairs validate; the November 5 Dev reference fails the failed-lookup
@@ -4576,3 +4585,21 @@ direct listing therefore did not establish bundle completeness in this run.
 A targeted shared-chat website read returned cache misses; the direct HTTP
 response contained only the share shell. It did not independently resolve the
 invalid-pair or lifecycle questions.
+
+## November 16: November 5–6 catch-up commutes
+
+Five sessions include one explicit save of Devin Review 2.0 and its surrounding
+discussion. The wiki entry distinguishes Cognition's reported review costs and
+features from the discussion's deployment and data-retention questions. The
+user also deferred a separate question about identity for an autonomous Slack
+agent using AWS Bedrock AgentCore; the capture is not itself a wiki save.
+
+The records report altered, omitted, duplicated or truncated playback and
+unsolicited lead-ins. General reports substantive text displayed but not spoken
+on three occasions. Dev reports a wrong completion date, pronunciation and
+interrupted speech. Fintech records an author attribution asserted despite a
+failed lookup; the invalid AI bundle records unsupported product attribution
+and a final next command rejected by the lifecycle validator. These are recorded
+observations, not established diagnoses of the Voice system. No classifier
+correction is recorded. The reconstructed exports do not provide a complete
+transcript. Five supplied shared-chat links were not routinely audited.
