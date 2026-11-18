@@ -8,6 +8,14 @@ found a queue as proof.
 
 ## Evidence Sources
 
+- November 17 processing: four exact Library exports cover three November 9
+  sessions, with one identical AI duplicate. Three independently downloaded v4
+  pairs and all four exports validate and match the canonical snapshots. The
+  three distinct records contain 68 events, including four save actions for
+  three articles, eight quality incidents and one general capture. Two supplied
+  shared chats were unnecessary for recovery. The reconstructed exports do not
+  establish complete conversation coverage.
+
 - November 16 processing: six exact Library bundle rows represent five sessions
   on November 5–6 queues; the two November 5 AI exports have identical parsed
   contents. Five independently downloaded queue/reference pairs validate and
@@ -4603,3 +4611,26 @@ and a final next command rejected by the lifecycle validator. These are recorded
 observations, not established diagnoses of the Voice system. No classifier
 correction is recorded. The reconstructed exports do not provide a complete
 transcript. Five supplied shared-chat links were not routinely audited.
+
+## November 17: November 9 General, Dev, and AI commutes
+
+The three queue pairs contain 31 items. The General save preserves Sergey
+Kuhne’s Git-backed task queue and the discussion of serial human decisions.
+The Dev save preserves Uber’s behavioral authorization controls and the
+discussion of workload identity and unattended authority. The AI save,
+recorded twice in the same session, preserves Anthropic’s experiments and the
+discussion of using Mastra observations, source verification, and shared
+knowledge pages together.
+
+The Dev capture confirms interest in in-depth Spec Kit coverage despite prior
+awareness. It affirms the existing classification and requires no label
+change. General records a reported network interruption, two article retrieval
+and source-selection incidents, and a modified and duplicated final
+announcement. Dev records an early finish notice, a truncated item, and two
+substitutions at the end of the queue. These are observations recorded in the
+exports. They do not establish the internal causes of Voice behavior.
+
+The Work requests were dispatched as grouped reads. The signed-in folder UI
+supplied the independently downloaded artifacts used for local validation.
+The folder’s November 9 Fintech pair had no matching export and remained an
+unconsumed candidate.
