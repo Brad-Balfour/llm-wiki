@@ -8,6 +8,13 @@ found a queue as proof.
 
 ## Evidence Sources
 
+- November 18 processing: five exact conversation exports use five independently
+  downloaded November 10–11 queue/reference pairs. All five pairs and all five
+  exports pass local validation and match their canonical snapshots. The 108
+  events include three wiki item actions, one additional standalone Gist request,
+  sixteen quality incidents, and explicit author-affinity feedback. The partial
+  and recovered exports do not establish full conversation coverage.
+
 - November 17 processing: four exact Library exports cover three November 9
   sessions, with one identical AI duplicate. Three independently downloaded v4
   pairs and all four exports validate and match the canonical snapshots. The
@@ -4634,3 +4641,33 @@ The Work requests were dispatched as grouped reads. The signed-in folder UI
 supplied the independently downloaded artifacts used for local validation.
 The folder’s November 9 Fintech pair had no matching export and remained an
 unconsumed candidate.
+
+## November 18: November 10–11 catch-up commutes
+
+Five sessions cover 44 queue items. The November 10 Dev session saves PostHog's
+decision-model production examples and John Nunemaker's Nunebot workflow. The
+user explicitly asks to retain the PostHog discussion and create a separate
+entry for the Nunebot Gist. The November 11 General session saves Modern Web
+Guidance and explicitly asks the classifier to retain affinity for Sean
+Goedecke in the context of “Glue work is still harmful in the age of AI.”
+This is author-affinity feedback. The user did not request a different item
+interest or depth label.
+
+Dev records two truncated headline sweeps, replay of the user's directions
+as dialogue, a truncated item, and later wrong-story substitutions and
+paraphrased items. General records a duplicate sweep, paraphrased playback,
+a save followed by no advance, and an incorrect completion filename. The
+November 11 AI export records two incomplete visible responses. The General
+and second Dev exports record unsupported initial author attributions when
+queue lookups had failed. The second Dev export also records selected-article
+discussion presented before full-source access had been established. Its
+questions about compiler comparisons, product availability, and organizational
+memory remain discussion without a save request.
+
+Work paginated the direct folder listing and reported zero bundles, then a
+targeted Library search also found zero. The signed-in Library folder displayed
+the five exact bundle rows and the ten canonical queue/reference rows. The
+bundle files used for validation came from the original conversation attachment
+downloads and the canonical pairs came from the Library. The supplied public
+shares were attempted while the bundle files were unresolved. Their website
+reads did not return evidence used in this intake.
