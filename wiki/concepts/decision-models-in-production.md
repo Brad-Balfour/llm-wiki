@@ -17,7 +17,8 @@ provenance: [{"source_item_id":"20261110-tldr-dev:dev-002","url":"https://newsle
 describes typed, probabilistic judgments inside otherwise deterministic
 pipelines. The same interface can answer yes/no questions, choose among
 options, or score one input. The thresholds depend on the cost of the error
-and need recalibration when the model or task changes.
+and need recalibration when the model or task changes. The queue links to
+the [newsletter edition](https://newsletter.posthog.com/p/decision-models).
 
 - **Privacy gate.** Replay Vision checks for a real name and for contact
   details or an identifier independently. If either score reaches 0.4,
