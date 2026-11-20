@@ -7,7 +7,7 @@ aliases: ["Why Software Factories Fail","Human-in-the-loop software factories","
 tags: ["ai-agents","software-design","planning","code-review","context-management","documentation","workflow-automation","platform-engineering","governance","mcp"]
 wiki_slug: review-driven-software-factories
 created: 2026-07-25
-updated: 2026-11-07
+updated: 2026-11-19
 confidence: medium
 # prettier-ignore
 provenance: [{"source_item_id":"20261027-tldr:general-014","url":"https://kiro.dev/blog/software-factory-stability/"},{"source_item_id":"url_kiro_factory_20260918","url":"https://kiro.dev/blog/software-factory-1000-prs/"},{"source_item_id":"20261023-tldr-dev:dev-006","url":"https://lethain.com/small-changes/"},{"source_item_id":"20261019-tldr-dev:dev-005","url":"https://jovidecroock.com/blog/gittifacts/"},{"source_item_id":"dev-20260724-01","url":"https://github.com/humanlayer/advanced-context-engineering-for-coding-agents/blob/main/wsff.md"},{"source_item_id":"19fd6c96b2d39a67-11","url":"https://github.blog/ai-and-ml/github-copilot/automating-cross-repo-documentation-with-github-agentic-workflows/?utm_source=tldrdev"},{"source_item_id":"19ffad638bac0403-02","url":"https://blog.cloudflare.com/astro-issue-triage/?utm_source=tldrdev"},{"source_item_id":"19ffffe9eeaeab99-06","url":"https://github.com/vercel-labs/eve-software-factory-template?utm_source=tldrnewsletter"},{"source_item_id":"19ffb53bd896ad92-11","url":"https://x.com/AlanaDLevin/status/2087526319999303784"},{"source_item_id":"1a01a57197aa438b-18","url":"https://techcrunch.com/2026/08/18/warps-new-system-is-an-out-of-the-box-software-factory-for-ai-development/?utm_source=tldrai"},{"source_item_id":"url_adf03cc09f382e8e","url":"https://www.warp.dev/factories/request-access"},{"source_item_id":"url_79e1f7b5ba46a169","url":"https://docs.warp.dev/factories/"},{"source_item_id":"url_80300d7978de226c","url":"https://docs.warp.dev/factories/infrastructure-and-security/"},{"source_item_id":"url_853c86ea5e82c5b4","url":"https://www.linkedin.com/blog/engineering/ai/qa-agent-reimagining-software-quality-with-ai-driven-autonomous-testing"},{"source_item_id":"url_f7ffc84157ac5d1c","url":"https://newsletter.posthog.com/p/code-review-tips"},{"source_item_id":"1a038ac5916976e5-05","url":"https://newsletter.port.io/p/how-uber-built-a-software-factory?utm_source=tldrnewsletter"},{"source_item_id":"1a03919a99717a24-09","url":"https://about.gitlab.com/blog/when-code-is-abundant/?utm_source=tldrai"},{"source_item_id":"url_74ac61e244043f10","url":"https://claude.com/blog/the-ai-native-sdlc-playbook"},{"source_item_id":"1a0a4ca47348bc23-04","url":"https://refactoringenglish.com/excerpts/write-an-effective-design-doc/"},{"source_item_id":"20261006-tldr-ai:ai-006","url":"https://www.theaithinker.com/p/how-to-build-an-ai-native-software"},{"source_item_id":"20261012-tldr-dev:dev-003","url":"https://www.cockroachlabs.com/blog/experiment-running-hospital-code/"},{"source_item_id":"url_293d0f9661696880","url":"https://openai.com/index/harness-engineering/"},{"source_item_id":"20261015-tldr-dev:dev-004","url":"https://mattrothenberg.com/notes/pure-ui-agentic-era/"}]
@@ -16,6 +16,10 @@ provenance: [{"source_item_id":"20261027-tldr:general-014","url":"https://kiro.d
 # Review-Driven Software Factories
 
 Reliable AI-assisted software development treats specifications, plans, and review decisions as durable source artifacts while using agents to accelerate bounded implementation work.
+
+[Agentic Engineering Maturity](agentic-engineering-maturity.md) describes how
+to find delivery bottlenecks by comparing a new prototype with a real change
+in an existing product.
 
 ## Kiro Crew: Factory and Review Loop
 

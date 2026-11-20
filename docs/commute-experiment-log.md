@@ -8,6 +8,12 @@ found a queue as proof.
 
 ## Evidence Sources
 
+- November 19 processing: three session bundles and three independently
+  downloaded November 12 General, Dev, and AI v4 queue/reference pairs pass
+  validation and match their canonical snapshots. The bundles contain 91
+  events across 35 queue items, including three saves, one reiteration of the
+  AI save with a link request, and 15 quality incidents.
+
 - November 18 processing: five exact conversation exports use five independently
   downloaded November 10–11 queue/reference pairs. All five pairs and all five
   exports pass local validation and match their canonical snapshots. The 108
@@ -4671,3 +4677,25 @@ bundle files used for validation came from the original conversation attachment
 downloads and the canonical pairs came from the Library. The supplied public
 shares were attempted while the bundle files were unresolved. Their website
 reads did not return evidence used in this intake.
+
+## November 19: November 12 General, Dev, and AI
+
+The General session saves Zach Wills's seven-stage maturity model with the
+discussion about factory comparisons, greenfield and established repository
+diagnostics, independent verification, and measuring outcomes after release.
+The Dev session saves Divya Santhanam's eval-driven development article. The
+AI session saves Google's A2UI 1.0 announcement and the discussion of
+registered component code, agent-supplied arguments, and host permissions.
+There were no exact classifier corrections in the recorded events.
+
+General records an unwanted spoken URL, two corrected misattributions,
+one premature abandonment of author verification, and two incidents around
+unsolicited advancement into an invented item. Dev records two advance
+requests answered without the next item and one truncated playback.
+AI records six incomplete item announcements, one with premature
+completion. Two recovered bundles and one partial bundle establish the
+events they contain. Conversation coverage beyond those events is unverified.
+
+The direct Library listing showed three November 19 bundles. The native
+Project chat received the inventory request, and row downloads supplied the
+bundles and all six canonical files after Safari authentication.
