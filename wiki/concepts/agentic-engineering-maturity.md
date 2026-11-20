@@ -44,3 +44,5 @@ outcome remains an open problem.
 - [Zach Wills, The levels of agentic engineering](https://zachwills.net/levels-of-agentic-engineering/)
 - [Review-Driven Software Factories](review-driven-software-factories.md)
 - [Eval-Driven Development for Agents](eval-driven-development-for-agents.md)
+
+<!-- source-item-id: 20261112-tldr:general-010 -->

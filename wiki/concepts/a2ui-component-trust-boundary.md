@@ -35,3 +35,5 @@ and still expose a powerful operation through a registered component.
 ## Source
 
 - [Google Developers Blog, A2UI 1.0](https://developers.googleblog.com/a2ui-10-build-delightful-fast-reliable-agentic-experiences/)
+
+<!-- source-item-id: 20261112-tldr-ai:ai-010 -->
