@@ -14,6 +14,7 @@ import {
   type MaintenanceCandidate,
   type MaintenanceAttemptInput,
   type DiscussionDisposition,
+  readSessionInputs,
   reconcileSessionBundles,
   recordMaintenanceAttempts,
 } from '../commute/import-session-bundles.js';
@@ -126,28 +127,7 @@ async function main(): Promise<void> {
   const outputDir = path.resolve(options.outputDir);
   await mkdir(outputDir, { recursive: true });
 
-  const bundleInputs = await Promise.all(
-    options.inputs.map(async (input) => ({
-      filename: path.basename(input.bundle),
-      text: await readFile(input.bundle, 'utf8'),
-      ...(input.recoveryQueue === undefined
-        ? {}
-        : {
-            recoveryQueue: {
-              filename: path.basename(input.recoveryQueue),
-              text: await readFile(input.recoveryQueue, 'utf8'),
-              ...(input.recoveryReference === undefined
-                ? {}
-                : {
-                    reference: {
-                      filename: path.basename(input.recoveryReference),
-                      text: await readFile(input.recoveryReference, 'utf8'),
-                    },
-                  }),
-            },
-          }),
-    }))
-  );
+  const bundleInputs = await readSessionInputs(options.inputs);
   let intake = reconcileSessionBundles(bundleInputs);
   if (options.priorIntake !== undefined) {
     ensurePrivatePath(options.priorIntake, '--prior-intake');
@@ -531,7 +511,7 @@ export function parseOptions(args: string[]): Options {
       if (!input) throw new Error('--input requires a bundle filename');
       inputs.push({ bundle: input });
       index += 1;
-    } else if (arg === '--recover-with') {
+    } else if (arg === '--queue' || arg === '--recover-with') {
       const queue = args[index + 1];
       const prior = inputs.at(-1);
       if (!queue || !prior) {
@@ -573,7 +553,7 @@ export function parseOptions(args: string[]): Options {
   }
   if (inputs.length === 0 || !outputDir) {
     throw new Error(
-      'Usage: maintain:commute -- --input <bundle.txt> [--recover-with <queue.txt> [--reference <reference.txt>]] [--input <bundle.txt> ...] --output-dir <private-directory> [--prior-intake <private-intake.json>], or --diagnose-launcher'
+      'Usage: maintain:commute -- --input <bundle.txt> [--queue <queue.txt> [--reference <reference.txt>]] [--input <bundle.txt> ...] --output-dir <private-directory> [--prior-intake <private-intake.json>], or --diagnose-launcher'
     );
   }
   return {
