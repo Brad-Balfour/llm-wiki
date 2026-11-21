@@ -13,24 +13,14 @@ behavioral evidence for those judgments.
 
 ## Inaccessible URL
 
-- Check that the maintainer tried distinct, targeted routes: the requested URL,
-  an exact-title and author/publisher lookup, the author's or publisher's
-  canonical page and its article link, and a credible alternate rendering when
-  available. Repeating the same failed request is not a fallback.
-- Confirm the private result records which routes worked, which failed, and
-  which parts of the source were readable. Search snippets are discovery leads,
-  not full-article evidence.
-- Accept a useful partial update when each claim is supported and attributed to
-  its actual basis: readable article text, an exact newsletter excerpt, or the
-  item's captured commute discussion. Keep those evidence types distinct and
-  state any remaining limitation in the page or result detail.
-- Reject detailed claims inferred only from a queue headline. A queue summary or
-  commute discussion can support a narrow, clearly attributed note, but it must
-  not be presented as the article's own claims.
-- Do not treat one failed URL as a reason for an automatic no-op. Use
-  `insufficient_source` only when fallback attempts and captured evidence still
-  cannot support a useful, accurate change; keep that candidate retryable and
-  record the next useful route.
+- Check whether the saved material already supports the requested note. A
+  newsletter excerpt can support an attributed summary and a captured
+  discussion can support Brad’s observation. A headline alone cannot establish
+  the article’s detailed claims.
+- If a material claim requires the article, check the result of the targeted
+  publisher or title lookup. Stop once the claim is supported, or narrow the
+  note and record the limitation. Use `insufficient_source` when the available
+  evidence cannot support a useful change.
 
 ## Duplicate Source Concept
 

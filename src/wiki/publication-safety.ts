@@ -20,6 +20,11 @@ const SOURCE_MARKER_PATTERN = /<!-- source-item-id: ([A-Za-z0-9][A-Za-z0-9._:-]*
 const RAW_HTML_PATTERN = /<\/?[A-Za-z!][^>]*>/;
 const MARKDOWN_LINK_PATTERN = /!?\[[^\]\n]*\]\(([^()\n]*)\)/g;
 const MARKDOWN_REFERENCE_PATTERN = /^ {0,3}\[[^\]\n]+\]:\s*(?:<([^>\n]+)>|(\S+))(?:\s+.*)?$/gm;
+const PUBLIC_URL_RULES = {
+  rejectCredentials: true,
+  markdownSafe: true,
+  rejectCredentialParams: true,
+};
 const CREDENTIAL_PATTERN =
   /(?:-----BEGIN [A-Z ]*PRIVATE KEY-----|\b(?:api[_ -]?key|access[_ -]?token|client[_ -]?secret|password)\s*[:=]\s*\S+)/i;
 
@@ -56,7 +61,7 @@ export function validatePublishedWikiDocuments(documents: PublishedWikiDocument[
     for (const [index, candidate] of provenance.entries()) {
       const field = `${document.path} frontmatter.provenance[${index}]`;
       const record = requireRecord(candidate, field);
-      rejectUnknownKeys(record, ['source_item_id', 'url'], field);
+      rejectUnknownKeys(record, ['source_item_id', 'url', 'final_url'], field);
       const sourceItemId = requireString(record.source_item_id, `${field}.source_item_id`);
       if (!SOURCE_ITEM_ID_PATTERN.test(sourceItemId)) {
         throw new Error(`${field}.source_item_id contains unsupported characters`);
@@ -65,11 +70,7 @@ export function validatePublishedWikiDocuments(documents: PublishedWikiDocument[
         throw new Error(`${document.path} repeats source_item_id ${sourceItemId}`);
       }
       documentSourceIds.add(sourceItemId);
-      const url = requireHttpUrl(record.url, `${field}.url`, {
-        rejectCredentials: true,
-        markdownSafe: true,
-        rejectCredentialParams: true,
-      });
+      const url = requireHttpUrl(record.url, `${field}.url`, PUBLIC_URL_RULES);
       const prior = sourceUrls.get(sourceItemId);
       if (prior && prior.url !== url) {
         throw new Error(
@@ -77,8 +78,26 @@ export function validatePublishedWikiDocuments(documents: PublishedWikiDocument[
         );
       }
       sourceUrls.set(sourceItemId, { path: document.path, url });
-      if (document.path !== 'wiki/ENTRY_TEMPLATE.md' && !evidence.linkDestinations.has(url)) {
-        throw new Error(`${document.path} does not link provenance URL ${url}`);
+      let citationUrl = url;
+      if (record.final_url !== undefined) {
+        citationUrl = requireHttpUrl(record.final_url, `${field}.final_url`, PUBLIC_URL_RULES);
+        const original = new URL(url);
+        const final = new URL(citationUrl);
+        if (
+          final.hostname !== `www.${original.hostname}` &&
+          original.hostname !== `www.${final.hostname}`
+        ) {
+          throw new Error(
+            `${field}.final_url must be the observed www redirect for the same article`
+          );
+        }
+        original.hostname = final.hostname;
+        if (original.href !== final.href) {
+          throw new Error(`${field}.final_url changes more than the www hostname`);
+        }
+      }
+      if (!evidence.linkDestinations.has(citationUrl)) {
+        throw new Error(`${document.path} does not link provenance URL ${citationUrl}`);
       }
     }
 
@@ -145,11 +164,7 @@ function validateLinkDestination(destination: string, path: string): void {
     throw new Error(`${path} contains an unsafe Markdown link destination`);
   }
   if (/^https?:\/\//i.test(destination)) {
-    requireHttpUrl(destination, `${path} Markdown link`, {
-      rejectCredentials: true,
-      markdownSafe: true,
-      rejectCredentialParams: true,
-    });
+    requireHttpUrl(destination, `${path} Markdown link`, PUBLIC_URL_RULES);
   } else if (/^(?:[A-Za-z][A-Za-z0-9+.-]*:|\/\/)/.test(destination)) {
     throw new Error(`${path} contains a non-HTTP(S) Markdown link`);
   }

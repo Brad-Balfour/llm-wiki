@@ -170,3 +170,46 @@ test('requires source ids and URLs to remain traceable in the page', () => {
     /does not link provenance URL/
   );
 });
+
+test('uses an observed www redirect as the citation and retains the original URL as identity', () => {
+  const original = 'https://example.com/article';
+  const observed = 'https://www.example.com/article';
+  const redirected = (url: string, finalUrl: string): PublishedWikiDocument => ({
+    ...safeDocument,
+    frontmatter: {
+      type: 'concept',
+      provenance: [{ source_item_id: 'source-1', url, final_url: finalUrl }],
+    },
+    markdown: safeDocument.markdown.replace(original, finalUrl),
+  });
+
+  assert.doesNotThrow(() =>
+    validatePublishedWikiDocuments([safeDocument, redirected(original, observed)])
+  );
+  assert.doesNotThrow(() => validatePublishedWikiDocuments([redirected(observed, original)]));
+  assert.throws(
+    () =>
+      validatePublishedWikiDocuments([
+        { ...safeDocument, markdown: safeDocument.markdown.replace(original, observed) },
+      ]),
+    /does not link provenance URL/
+  );
+  assert.throws(
+    () =>
+      validatePublishedWikiDocuments([
+        { ...redirected(original, observed), markdown: safeDocument.markdown },
+      ]),
+    /does not link provenance URL/
+  );
+  for (const invalid of [
+    'https://example.net/article',
+    'https://www.example.com/other',
+    'https://www.example.com/article?other=1',
+    'https://www.example.com/article#other',
+    'https://www.example.com:8080/article',
+    'http://www.example.com/article',
+    'https://user@www.example.com/article',
+  ]) {
+    assert.throws(() => validatePublishedWikiDocuments([redirected(original, invalid)]));
+  }
+});

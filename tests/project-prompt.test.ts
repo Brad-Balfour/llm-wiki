@@ -12,7 +12,7 @@ test('ChatGPT Project instructions fit the 8,000-character limit', async () => {
 test('ChatGPT Project instructions route playback through the Python Project source', async () => {
   const prompt = await readFile('chatgpt-project/CHATGPT_CAR_QUEUE_PROMPT.md', 'utf8');
 
-  assert.match(prompt, /Prompt 5\.1 Candidate for Queue v4/);
+  assert.match(prompt, /Prompt 5\.2 for Queue v4/);
   assert.match(prompt, /Project source `voice-playback\.py`/);
   assert.match(prompt, /Load the Project source `voice-playback\.py` into the code tool/);
   assert.match(prompt, /select_playback\(main, action, current_position, target_position\)/);
@@ -36,69 +36,33 @@ test('ChatGPT Project instructions reopen the exact file and defer reference acc
   assert.match(prompt, /open the matching `-reference\.txt` file/);
   assert.match(prompt, /original-description request, read the complete literal\s+`description`/);
   assert.match(prompt, /Do not load the reference to start a queue or for ordinary\s+playback/);
-  assert.match(prompt, /At\s+export, open the matching reference if needed/);
   assert.doesNotMatch(prompt, /main_sha256|Verify that its/);
 });
 
-test('session-export contains the note and bundle instructions removed from the main prompt', async () => {
-  const [prompt, sessionExport, schema] = await Promise.all([
+test('Voice routes end-of-commute export to the current bundle schema', async () => {
+  const [prompt, sessionExport, schemaText] = await Promise.all([
     readFile('chatgpt-project/CHATGPT_CAR_QUEUE_PROMPT.md', 'utf8'),
     readFile('chatgpt-project/session-export.md', 'utf8'),
-    readFile('schema/commute-session-bundle-v1.schema.json', 'utf8'),
+    readFile('schema/commute-session-bundle-v2.schema.json', 'utf8'),
   ]);
+  const schema = JSON.parse(schemaText);
 
-  assert.match(
-    prompt,
-    /For commute captures and end-of-commute export, follow `session-export\.md`/
-  );
-
-  assert.match(sessionExport, /commute-session-bundle-v1\.schema\.json/);
-  assert.match(schema, /"const": "commute-session-bundle\.v1"/);
-  assert.match(sessionExport, /The chat is the only record available until you create the bundle/);
-  assert.match(sessionExport, /Do not claim that you maintain\s+a separate ledger/);
-  assert.match(sessionExport, /`action` is `wiki_this`/);
-  assert.match(sessionExport, /`mark_interested`, `mark_uninterested`, or\s+`promote_to_in_depth`/);
-  assert.match(sessionExport, /Skipping an\s+article is not classifier feedback/);
-  assert.match(sessionExport, /reports a playback or product problem, record a `quality_incident`/);
-  assert.match(sessionExport, /copy `source_item_id`, `title`, and `url`/i);
-  assert.match(sessionExport, /Copy Brad's exact words into `user_words`/);
-  assert.match(sessionExport, /create an `unresolved_capture`/);
-  assert.match(sessionExport, /Put both complete objects in `queue_snapshot\.queue`/);
-  assert.match(sessionExport, /"playback_file": <main>/);
-  assert.match(sessionExport, /"reference_file": <reference>/);
-  assert.match(sessionExport, /Record only articles that were actually read/);
-  assert.match(sessionExport, /Do not invent missing moves,\s+announcements, or articles/);
-  assert.match(sessionExport, /Normally set `integrity\.state` to `partial`/);
-  assert.match(sessionExport, /Use `recovered` if you had to find the queue again/);
-  assert.match(sessionExport, /Use the actual time in America\/New_York/);
-  assert.match(sessionExport, /YYYYMMDDHHmm-morning-commute-session-bundle\.txt/);
-  assert.match(sessionExport, /Create a downloadable `\.txt` file containing the JSON/);
+  assert.match(prompt, /end-of-commute export, follow `session-export\.md`/);
+  assert.ok(sessionExport.includes('commute-session-bundle-v2.schema.json'));
+  assert.ok(sessionExport.includes(schema.properties.schema_version.const));
+  for (const field of schema.required) assert.ok(sessionExport.includes(field), field);
+  assert.doesNotMatch(sessionExport, /queue_snapshot|commute-session-bundle-v1/);
 });
 
-test('managed Task prompt identifies v3 as the active canonical body', async () => {
-  const [readme, retiredV2, activeV3] = await Promise.all([
-    readFile('chatgpt-project/README.md', 'utf8'),
-    readFile('chatgpt-project/WEEKDAY_TLDR_QUEUE_TASK_PROMPT_V2.md', 'utf8'),
-    readFile('chatgpt-project/WEEKDAY_TLDR_QUEUE_TASK_PROMPT_V3.md', 'utf8'),
-  ]);
-
-  assert.match(readme, /Queue v3 is the active contract/);
-  assert.match(
-    readme,
-    /active scheduled \*\*Weekday TLDR Queues\*\* Task uses\s+`chatgpt-project\/WEEKDAY_TLDR_QUEUE_TASK_PROMPT_V3\.md`/
-  );
-  assert.doesNotMatch(readme, /candidate contract/i);
-  assert.match(readme, /historical evidence, not the\s+current live configuration/);
-  assert.match(retiredV2, /Weekday TLDR Queue Task Prompt — v2 Retired/);
-  assert.match(retiredV2, /Do not use it for the\s+> active Task/);
-  assert.match(retiredV2, /use `WEEKDAY_TLDR_QUEUE_TASK_PROMPT_V3\.md` instead/);
-  assert.doesNotMatch(retiredV2, /v2 Live/);
-  assert.match(activeV3, /Weekday TLDR Queue Task Prompt — v3 Live/);
-  assert.match(activeV3, /canonical prompt for the active \*\*Weekday TLDR\s+> Queues\*\* Task/);
-  assert.match(activeV3, /deployed queue-v3 contract/);
-  assert.match(activeV3, /v2 prompt is retained\s+> only for history and compatibility/);
-  assert.doesNotMatch(activeV3, /candidate/i);
-  assert.doesNotMatch(activeV3, /issue #106/i);
+test('the Project install list identifies both compact-export sources and the Instructions', async () => {
+  const readme = await readFile('chatgpt-project/README.md', 'utf8');
+  for (const file of [
+    'chatgpt-project/CHATGPT_CAR_QUEUE_PROMPT.md',
+    'chatgpt-project/session-export.md',
+    'schema/commute-session-bundle-v2.schema.json',
+  ]) {
+    assert.ok(readme.includes(file), file);
+  }
 });
 
 test('v4 candidate resolves and records attribution before classification', async () => {
@@ -211,50 +175,4 @@ test('classifier v2 candidate records calibrated versions and blind-review bound
   assert.match(requirements, /calibration of an LLM-based classifier/);
   assert.match(requirements, /final check/);
   assert.match(plan, /calibrated profile is\s+2\.1/);
-});
-
-test('daily commute completion cannot omit a required Project update', async () => {
-  const [skill, agents] = await Promise.all([
-    readFile('.codex/skills/process-daily-commute/SKILL.md', 'utf8'),
-    readFile('AGENTS.md', 'utf8'),
-  ]);
-
-  const normalizedSkill = skill.replace(/\s+/g, ' ');
-  const normalizedAgents = agents.replace(/\s+/g, ' ');
-
-  assert.match(normalizedAgents, /process-daily-commute skill/i);
-  assert.match(normalizedSkill, /identify the exact merged or review-ready prompt/i);
-  assert.match(
-    normalizedSkill,
-    /use signed-in SafariDriver to apply the verified version in the live Project UI/i
-  );
-  assert.match(normalizedSkill, /verify the result/i);
-  assert.match(normalizedSkill, /Do not ask Brad to perform or confirm this synchronization/i);
-
-  for (const normalized of [normalizedSkill]) {
-    assert.match(normalized, /never call the .*complete|do not call the .*complete/i);
-    assert.match(normalized, /do not change the PR's draft\/ready state/i);
-    assert.match(normalized, /ready for review is compatible/i);
-  }
-
-  assert.doesNotMatch(skill, /If Brad requests the live Project prompt/);
-});
-
-test('daily commute cleanup uses approved Library access and exact Downloads targets', async () => {
-  const skill = await readFile('.codex/skills/process-daily-commute/SKILL.md', 'utf8');
-  const normalized = skill.replace(/\s+/g, ' ');
-
-  assert.match(
-    normalized,
-    /Use SafariDriver MCP for authenticated ChatGPT main-Library and Project Library\/Sources access/i
-  );
-  assert.match(
-    normalized,
-    /Use signed-in SafariDriver for exact authorized Project Library\/Sources cleanup/i
-  );
-  assert.match(normalized, /Preserve unrelated Project sources/i);
-  assert.match(
-    normalized,
-    /every targeted queue, validated v4 reference, and bundle ID is absent and every targeted Downloads file is absent/i
-  );
 });

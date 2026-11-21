@@ -1,0 +1,189 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://brad-balfour.github.io/llm-wiki/schema/commute-session-bundle-v2.schema.json",
+  "title": "Compact commute session bundle",
+  "description": "Session captures in order, bound by stable item IDs to the independently supplied canonical queue (main and reference for v4).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "session", "queue_filename", "events"],
+  "properties": {
+    "schema_version": {
+      "const": "commute-session-bundle.v2"
+    },
+    "session": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["session_id", "session_date", "artifact_filename", "voice_surface"],
+      "properties": {
+        "session_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "session_date": {
+          "type": "string",
+          "format": "date"
+        },
+        "artifact_filename": {
+          "type": "string",
+          "pattern": "^[0-9]{12}-(morning|evening)-commute-session-bundle( \\([1-9][0-9]*\\))?\\.txt$"
+        },
+        "voice_surface": {
+          "enum": ["chatgpt_live", "chatgpt_advanced", "chatgpt_standard", "other"]
+        }
+      }
+    },
+    "queue_filename": {
+      "type": "string",
+      "minLength": 1
+    },
+    "events": {
+      "type": "array",
+      "items": {
+        "oneOf": [
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["event_id", "kind", "action", "source_item_id", "user_words"],
+            "properties": {
+              "event_id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "kind": {
+                "const": "item_action"
+              },
+              "action": {
+                "enum": [
+                  "wiki_this",
+                  "mark_interested",
+                  "mark_uninterested",
+                  "promote_to_in_depth",
+                  "save_for_review",
+                  "skip"
+                ]
+              },
+              "source_item_id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "user_words": {
+                "type": "string",
+                "minLength": 1
+              },
+              "discussion": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["summary"],
+                "properties": {
+                  "summary": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "important_questions": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  },
+                  "conclusions": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  },
+                  "requested_emphasis": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  }
+                }
+              }
+            },
+            "if": {
+              "required": ["discussion"]
+            },
+            "then": {
+              "properties": {
+                "action": {
+                  "const": "wiki_this"
+                }
+              }
+            }
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["event_id", "kind", "observed_behavior", "boundary"],
+            "properties": {
+              "event_id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "kind": {
+                "const": "quality_incident"
+              },
+              "observed_behavior": {
+                "type": "string",
+                "minLength": 1
+              },
+              "boundary": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["event_id", "kind", "user_words"],
+            "properties": {
+              "event_id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "kind": {
+                "const": "general_capture"
+              },
+              "user_words": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["event_id", "kind", "capture_type", "user_words", "recovery_clues"],
+            "properties": {
+              "event_id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "kind": {
+                "const": "unresolved_capture"
+              },
+              "capture_type": {
+                "enum": ["wiki_this", "feedback", "general_save", "unknown"]
+              },
+              "user_words": {
+                "type": "string",
+                "minLength": 1
+              },
+              "recovery_clues": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            }
+          }
+        ]
+      }
+    }
+  }
+}

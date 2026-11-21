@@ -14,6 +14,7 @@ import {
   type MaintenanceCandidate,
   type MaintenanceAttemptInput,
   type DiscussionDisposition,
+  readSessionInputs,
   reconcileSessionBundles,
   recordMaintenanceAttempts,
 } from '../commute/import-session-bundles.js';
@@ -84,11 +85,11 @@ export function buildMaintainerPrompt(options: {
 }): string {
   return `You are the llm-wiki commute maintainer. You are already in an isolated Git worktree on branch ${options.branch}.
 
-Read the private intake record at ${options.intakePath} and initial source-retrieval record at ${options.retrievalPath}. Work only from exact wiki_this maintenance candidates. A failed direct fetch is the start of source discovery, not an automatic stop: try bounded alternatives before deciding what can be supported.
+Read the private intake record at ${options.intakePath} and initial source-retrieval record at ${options.retrievalPath}. Work only from exact wiki_this maintenance candidates.
 
-For an inaccessible source, try the strongest distinct targeted fallback routes that are readily available: search the exact title with the author or publisher; check the author's or publisher's canonical site and follow its link to the article; and consider a credible syndication, archive, or readable alternate rendering. Do not repeat the same failing request unchanged. Stop when useful content is readable or remaining routes are repetitive, unlikely to help, or disproportionate to the value of the candidate. Record the routes that worked or failed in the candidate detail or private retrieval record. Treat search snippets as leads, not full-article evidence. Use whatever portions are readable and limit claims to what those portions establish.
+Start with the saved discussion, reference URL and newsletter excerpt. If they support the requested note, write it with attribution and stop researching. Open the reference URL only for a requested detail those materials do not establish. If it fails and that detail matters, try a targeted publisher or exact-title lookup. Stop when the question is answered or the remaining routes are unlikely to help. Record any material limitation. Use search snippets only to locate readable sources.
 
-If the full article remains unavailable, an exact item-bound commute discussion or the candidate's \`newsletter_description\` may still support a useful partial note. Treat \`newsletter_description\` only as the newsletter's summary of the linked item: attribute it to the newsletter, preserve its scope, and do not expand it into unsupported article details. Another captured summary may also help when its source is clear. Attribute each point to the evidence it actually came from: distinguish article facts, newsletter summaries, and commute discussion. Never present discussion or a newsletter summary as the article's own text, and do not infer detailed claims from a headline alone. A partial, clearly scoped update is preferable to a no-op when it preserves useful supported information. Use "insufficient_source" only when the available evidence cannot support a useful, accurate update; record what was tried and what remains unknown so the item can be retried.
+Attribute article facts to the article, the candidate's \`newsletter_description\` to the newsletter, and Brad's observations to the item-bound discussion. A headline alone cannot support detailed article claims. Narrow the note to the evidence available. Use "insufficient_source" when that evidence cannot support a useful, accurate change.
 
 Some exact candidates include an item-bound discussion record. Use it when it materially improves the page, but distinguish commute-derived questions, conclusions, comparisons, and requested emphasis from retrieved-source facts. Do not infer or borrow discussion from another saved item, nearby general capture, or source text. For every candidate with a discussion record, its result detail must state whether the discussion was incorporated, omitted as unsupported, or left unresolved and why.
 
@@ -102,7 +103,7 @@ For each "pr_created" result, its "detail" must name every affected wiki path an
 
 There is no approval or intake-review gate. If useful changes result, run the relevant repository checks, commit the changes, push this branch to origin, and create one GitHub PR with gh. If no useful change is justified, do not create a filler page or PR.
 
-Write direct maintainer wiki output. Do not invent approval, public, reviewer, safety-review, or confirmation metadata. The exact wiki_this capture authorizes maintenance; the PR diff is the review point. Preserve the stable source item identity and article URL in wiki provenance.
+Write direct maintainer wiki output. Do not invent approval, public, reviewer, safety-review, or confirmation metadata. The exact wiki_this capture authorizes maintenance; the PR diff is the review point. Preserve the stable source item identity and queue URL in wiki provenance. Link that URL by default. If the source read followed a redirect that only added or removed www and you cite the destination, copy the observed destination into the same provenance record's optional final_url. Use the queue URL for other redirects. Reuse the source read already made for this article.
 
 Before finishing, write JSON to ${options.resultPath} with this shape:
 {
@@ -126,28 +127,7 @@ async function main(): Promise<void> {
   const outputDir = path.resolve(options.outputDir);
   await mkdir(outputDir, { recursive: true });
 
-  const bundleInputs = await Promise.all(
-    options.inputs.map(async (input) => ({
-      filename: path.basename(input.bundle),
-      text: await readFile(input.bundle, 'utf8'),
-      ...(input.recoveryQueue === undefined
-        ? {}
-        : {
-            recoveryQueue: {
-              filename: path.basename(input.recoveryQueue),
-              text: await readFile(input.recoveryQueue, 'utf8'),
-              ...(input.recoveryReference === undefined
-                ? {}
-                : {
-                    reference: {
-                      filename: path.basename(input.recoveryReference),
-                      text: await readFile(input.recoveryReference, 'utf8'),
-                    },
-                  }),
-            },
-          }),
-    }))
-  );
+  const bundleInputs = await readSessionInputs(options.inputs);
   let intake = reconcileSessionBundles(bundleInputs);
   if (options.priorIntake !== undefined) {
     ensurePrivatePath(options.priorIntake, '--prior-intake');
@@ -159,7 +139,11 @@ async function main(): Promise<void> {
   const intakePath = path.join(outputDir, 'intake.json');
   await writeJsonExclusive(intakePath, intake);
   const candidatesToAttempt = maintenanceCandidatesForAttempt(intake);
-  const retrieval = await retrieveMaintenanceSources(candidatesToAttempt);
+  const retrieval = await retrieveMaintenanceSources(
+    candidatesToAttempt.filter(
+      (candidate) => !candidate.newsletter_description && !candidate.discussion
+    )
+  );
   const retrievalPath = path.join(outputDir, 'sources.json');
   await writeJsonExclusive(retrievalPath, retrieval);
   intake = recordMaintenanceAttempts(intake, maintenanceAttemptsFromRetrieval(retrieval));
@@ -531,7 +515,7 @@ export function parseOptions(args: string[]): Options {
       if (!input) throw new Error('--input requires a bundle filename');
       inputs.push({ bundle: input });
       index += 1;
-    } else if (arg === '--recover-with') {
+    } else if (arg === '--queue' || arg === '--recover-with') {
       const queue = args[index + 1];
       const prior = inputs.at(-1);
       if (!queue || !prior) {
@@ -573,7 +557,7 @@ export function parseOptions(args: string[]): Options {
   }
   if (inputs.length === 0 || !outputDir) {
     throw new Error(
-      'Usage: maintain:commute -- --input <bundle.txt> [--recover-with <queue.txt> [--reference <reference.txt>]] [--input <bundle.txt> ...] --output-dir <private-directory> [--prior-intake <private-intake.json>], or --diagnose-launcher'
+      'Usage: maintain:commute -- --input <bundle.txt> [--queue <queue.txt> [--reference <reference.txt>]] [--input <bundle.txt> ...] --output-dir <private-directory> [--prior-intake <private-intake.json>], or --diagnose-launcher'
     );
   }
   return {

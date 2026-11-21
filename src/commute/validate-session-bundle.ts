@@ -5,9 +5,16 @@ import {
   bundleArtifactFilenameMatches,
   createQueueV4Snapshot,
   fileSha256,
-  parseCommuteSessionBundleText,
+  validateCommuteSessionBundle,
   queueSnapshotFingerprint,
 } from './session-bundle.js';
+
+import { parseJsonObject } from '../shared/json.js';
+import {
+  COMPACT_BUNDLE_VERSION,
+  readCanonicalQueue,
+  validateCompactSession,
+} from './compact-session.js';
 
 interface Options {
   input: string;
@@ -19,7 +26,24 @@ interface Options {
 async function main(): Promise<void> {
   const options = parseOptions(process.argv.slice(2));
   const text = await readFile(options.input, 'utf8');
-  const bundle = parseCommuteSessionBundleText(text);
+  const record = parseJsonObject(text, 'Commute session bundle');
+  const queue = {
+    filename: path.basename(options.queue),
+    text: await readFile(options.queue, 'utf8'),
+  };
+  const reference = options.reference
+    ? {
+        filename: path.basename(options.reference),
+        text: await readFile(options.reference, 'utf8'),
+      }
+    : undefined;
+  const bundle =
+    record.schema_version === COMPACT_BUNDLE_VERSION
+      ? validateCompactSession(
+          record,
+          readCanonicalQueue({ ...queue, ...(reference && { reference }) })
+        )
+      : validateCommuteSessionBundle(record);
   if (
     !bundleArtifactFilenameMatches(path.basename(options.input), bundle.session.artifact_filename)
   ) {
@@ -27,18 +51,24 @@ async function main(): Promise<void> {
       'Bundle filename does not match session.artifact_filename (except a Library-added numeric suffix)'
     );
   }
-  const selectedQueue = JSON.parse(await readFile(options.queue, 'utf8')) as unknown;
+  if (bundle.schema_version === COMPACT_BUNDLE_VERSION) {
+    process.stdout.write(
+      `Valid compact session bundle: ${bundle.session.session_id}\nQueue: ${bundle.queue_snapshot.filename}\n${bundle.events.length} capture(s)\n`
+    );
+    return;
+  }
+  const selectedQueue = JSON.parse(queue.text) as unknown;
   if (path.basename(options.queue) !== bundle.queue_snapshot.filename) {
     throw new Error('Embedded queue filename does not match --queue filename');
   }
   const selectedSnapshot =
-    options.reference === undefined
+    reference === undefined
       ? selectedQueue
       : createQueueV4Snapshot(
           selectedQueue,
-          JSON.parse(await readFile(options.reference, 'utf8')) as unknown,
+          JSON.parse(reference.text) as unknown,
           path.basename(options.queue),
-          path.basename(options.reference)
+          reference.filename
         );
   if (
     queueSnapshotFingerprint(selectedSnapshot) !==

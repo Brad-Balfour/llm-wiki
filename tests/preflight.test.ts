@@ -24,7 +24,7 @@ test('preflight writes one compact private deterministic intake record', async (
   assert.match(await readFile(output, 'utf8'), /commute-preflight.v1/);
 });
 
-test('preflight retains valid sessions when a supplied recovery queue is invalid or mismatched', async () => {
+test('preflight holds publication when supplied canonical files are invalid or mismatched', async () => {
   const directory = await mkdtemp(path.join(os.tmpdir(), 'llm-wiki-preflight-'));
   const bundle = path.join(directory, '20260720-commute-session-bundle.json');
   const secondBundle = path.join(directory, 'second-bundle.json');
@@ -59,7 +59,8 @@ test('preflight retains valid sessions when a supplied recovery queue is invalid
     },
     '2026-08-23T12:00:00.000Z'
   );
-  assert.equal(result.intake.sessions[0]?.status, 'accepted');
+  assert.equal(result.intake.sessions[0]?.status, 'rejected');
+  assert.equal(result.intake.maintenance_candidates.length, 0);
   assert.equal(result.queue_comparisons[0]?.status, 'mismatched');
   assert.equal(result.queue_comparisons[1]?.status, 'unverified');
 });
@@ -122,4 +123,58 @@ test('a rejected bundle is retained as an unresolved orchestration item', async 
   await writeFile(bundle, '{not json');
   const result = await runCommute({ inputs: [{ bundle }], sharedChats: [], output });
   assert.equal(result.unresolved_items[0]?.type, 'rejected_session');
+});
+
+test('compact saves from a single-file queue need no snapshot or routine chat recovery', async () => {
+  const legacy = JSON.parse(await readFile(fixture, 'utf8'));
+  const compact = {
+    schema_version: 'commute-session-bundle.v2',
+    session: legacy.session,
+    queue_filename: legacy.queue_snapshot.filename,
+    events: [
+      {
+        kind: 'item_action',
+        event_id: 'save',
+        source_item_id: 'tldr-demo-001',
+        action: 'wiki_this',
+        user_words: 'Wiki this',
+      },
+    ],
+  };
+  const directory = await mkdtemp(path.join(os.tmpdir(), 'single-file-queue-'));
+  const bundle = path.join(directory, compact.session.artifact_filename);
+  const queue = path.join(directory, compact.queue_filename);
+  await writeFile(bundle, JSON.stringify(compact));
+  await writeFile(queue, JSON.stringify(legacy.queue_snapshot.queue));
+  const cli = parsePreflightOptions([
+    '--input',
+    bundle,
+    '--queue',
+    queue,
+    '--shared-chat',
+    'https://chatgpt.com/share/example',
+    '--output',
+    '.private/unused.json',
+  ]);
+  const result = await runPreflight(cli, undefined, false);
+  assert.equal(result.intake.maintenance_candidates[0]?.title, 'First exact headline');
+  assert.equal(result.conversation_coverage[0]?.shared_chat_recovery_required, false);
+});
+
+test('a missing canonical file only holds its own bundle', async () => {
+  const directory = await mkdtemp(path.join(os.tmpdir(), 'missing-canonical-'));
+  const result = await runPreflight({
+    inputs: [
+      { bundle: fixture, recoveryQueue: path.join(directory, 'missing.txt') },
+      { bundle: fixture },
+    ],
+    sharedChats: [],
+    output: path.join(directory, 'run.json'),
+  });
+  assert.deepEqual(
+    result.intake.sessions.map((session) => session.status),
+    ['rejected', 'accepted']
+  );
+  assert.match(result.intake.sessions[0]?.error ?? '', /missing.txt/);
+  assert.equal(result.intake.maintenance_candidates.length, 1);
 });

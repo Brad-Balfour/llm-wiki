@@ -755,7 +755,7 @@ export function canonicalBundleArtifactFilename(filename: string): string {
   return filename.replace(/ ?\([1-9][0-9]*\)\.txt$/, '.txt');
 }
 
-function validateSession(
+export function validateSession(
   candidate: unknown,
   validateSessionArtifactFilename: boolean
 ): CommuteSessionBundle['session'] {

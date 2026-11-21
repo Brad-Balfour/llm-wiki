@@ -1,230 +1,69 @@
-# LLM-Wiki-Car Project Source Bundle
+# LLM-Wiki-Car Project
 
-> Status: `LLM-Wiki-Car` is the one live ChatGPT Project for both weekday queue
-> generation and Voice commute playback. Queue v3 is the active contract;
-> local validation and bundle import keep explicit queue-v2 compatibility for
-> already-downloaded artifacts.
-> Git history preserves the retired prompts, ledgers, handoffs, and approval
-> workflow for debugging; do not keep them as live Project sources.
+The `LLM-Wiki-Car` Project creates TLDR queues and plays them during Brad’s
+commute. Its Instructions control playback. The `session-export.md` source
+controls what the phone sends for nightly intake.
 
-## Project Instructions
+## Install the compact handoff
 
-Prompt 4.2 is live in ChatGPT. The September 4, 2026 commute-processing pass
-verified both required deployment steps directly in `LLM-Wiki-Car`:
+Prompt 5.2 uses the compact v2 handoff and the v4 playback/reference pair. Install from the merged revision.
 
-1. The Project's **Instructions** field begins `LLM-Wiki-Car Instructions —
-Prompt 4.2 for Queue v3` and matches the tracked prompt.
-2. `session-export.md` appears in the Project's **Sources**.
+1. In `LLM-Wiki-Car` Sources, upload
+   `schema/commute-session-bundle-v2.schema.json` and replace
+   `chatgpt-project/session-export.md` with the merged copy. Retire only the
+   old `commute-session-bundle-v1.schema.json` export schema from Sources.
+2. Replace the Project Instructions with the exact merged
+   `chatgpt-project/CHATGPT_CAR_QUEUE_PROMPT.md`.
+3. Reopen the Instructions and verify the saved text. Check that Sources has
+   one copy each of the v2 schema and updated `session-export.md`. Record the
+   installed versions and verification date on the PR. Keep the weekday queue Task,
+   generation instructions, classifier, profile, playback helper, and queue
+   schemas on their existing versions.
 
-Keep `schema/commute-session-bundle-v1.schema.json` in the Project. The new file
-uses that schema; it does not replace it.
+For rollback, restore the previous Instructions and `session-export.md`, and
+restore the v1 schema from the pre-change revision. Keep any pending v2 exports
+for intake. The [earlier installation record](https://github.com/Brad-Balfour/llm-wiki/blob/ad5c341/chatgpt-project/README.md)
+records the September 4 verification of Prompt 4.2 and the later Prompt 5.1
+Python playback candidate. The candidate’s installation was not recorded there.
 
-No Project update is pending for Prompt 4.2. Future repository edits still do
-not change the live Project automatically.
+## Weekday queue generation
 
-## Classifier v2 candidate (not installed)
+The scheduled Task and manual Project chat use the queue generation prompt for
+that queue version. For v4 the files are `WEEKDAY_TLDR_QUEUE_TASK_PROMPT_V4.md`
+and `queue-generation-v4.md`. The Project uses `tldr-commute-playback-v4.schema.json`
+and `tldr-commute-reference-v4.schema.json` for the pair, plus the classifier,
+interest profile, and routing rules in `schema/`. The Python playback prompt
+also uses `voice-playback.py` as a Project source. When the scheduled Task
+fails to create the files, use the same generation prompt in a manual Project
+chat. The [prior installation and rollback instructions](https://github.com/Brad-Balfour/llm-wiki/blob/ad5c341/chatgpt-project/README.md)
+cover the v3 and v4 queue configurations.
 
-The review stack prepares Queue v4, generation-instruction and weekday Task
-revisions 4.1, and Prompt 5.1 without changing the live Project. After the full
-stack is approved, replace the Project Instructions with
-`CHATGPT_CAR_QUEUE_PROMPT.md`; replace `queue-generation-v3.md` and the v3 queue
-schema with `queue-generation-v4.md` revision 4.1,
-`tldr-commute-playback-v4.schema.json`, and
-`tldr-commute-reference-v4.schema.json`; replace `session-export.md` and
-`commute-session-bundle-v1.schema.json`; and replace the existing weekday Task
-body with `WEEKDAY_TLDR_QUEUE_TASK_PROMPT_V4.md` revision 4.1. Later PRs in the
-stack name
-the candidate classifier/profile replacements: `interest-profile.md` version
-2.1 and `classifier-instructions.md` version `classifier-instructions.v2`. Keep
-the Task's weekday 11 a.m. America/New_York schedule and all unrelated working
-Project sources.
+## Nightly handoff format
 
-Prompt 5.1 is a draft playback experiment for #100/#153. Alongside the v4
-playback files and `session-export.md`, add `chatgpt-project/voice-playback.py` to Project
-Sources, then replace Project Instructions with the exact tracked
-`CHATGPT_CAR_QUEUE_PROMPT.md`. The Project source is Python code for the code
-tool to load and run; retrieval of a source file alone does not execute it.
-Test on iPhone Live that the code tool can read the complete source and exact
-playback file, reopen that same file for each playback command, return the
-selected string for begin, next, previous, repeat, and a numbered jump, and
-speak that string without changing it. Test a normal article discussion
-between playback turns and open the reference only for details or export. If any required file or the
-code tool is unavailable in Live, do not install Prompt 5.1 as the working
-playback procedure. The draft PR does not change the live Project. To roll
-back a later pilot from the non-Python v4 candidate, restore Prompt 5.0 from
-Git commit `b52d4f2` at `chatgpt-project/CHATGPT_CAR_QUEUE_PROMPT.md` and
-remove only `voice-playback.py` from Sources. If the pilot instead replaced
-live Prompt 4.2 directly, restore Prompt 4.2 from commit `6a505b9` and its
-matching v3 Project sources. Record the actual installed versions before any
-pilot so the rollback follows that exact starting state. Preserve unrelated
-Project files.
+The phone writes `commute-session-bundle.v2`. Its `queue_filename` selects the
+original v4 playback/reference pair. Each explicit item action names a
+`source_item_id`. The importer takes the article title, URL, and other metadata
+from those files. The phone sends the conversation-specific saves, discussion,
+feedback, problems, notes, and unresolved requests. A session with no captures
+has an empty `events` array.
 
-Until Brad confirms those replacements, Queue v3, Prompt 4.2, profile 1.4,
-classifier instructions v1, and the v3 Task body remain the live versions.
-
-`Queue v3` in the prompt title names the JSON structure. `Prompt 4.2` names this
-version of the instructions.
-
-## Files for Prompt 4.2
-
-After installing Prompt 4.2, `LLM-Wiki-Car` should have these source files:
-
-- `schema/tldr-commute-queue-v3.schema.json`
-- `schema/commute-session-bundle-v1.schema.json`
-- `chatgpt-project/session-export.md`
-- `chatgpt-project/queue-generation-v3.md`
-- `schema/interest-profile.md`
-- `schema/classifier-instructions.md`
-- `schema/routing-rules.md`
-
-The live Project has the complete source set listed above.
-
-The Instructions tell Voice how to read a queue. `session-export.md` tells it
-how to save notes and create the final bundle. It is a normal Project source,
-not a skill. We still need to test whether standalone iPhone Voice reads this
-source and reopens the queue file when instructed.
-
-To undo Prompt 4.2, copy Prompt 4.1 from Git commit `6a505b9` back into the
-Project's Instructions and remove only `session-export.md` from Sources. Leave
-the Queue v3 schema, bundle schema, queue-generation file, classifier files,
-and scheduled Task prompt unchanged.
-
-## Rollback-Aware Versioning
-
-A prompt is not always the only thing changing observable behavior. Tool
-schemas, retrieval and context policy, model/runtime settings, classifier
-instructions, routing, and the interest profile may also matter. When several
-of these change together—or when a change has enough risk to justify the
-overhead—recording the materially coupled versions makes a failed experiment
-easier to understand and roll back.
-
-This is a design heuristic, not a mandatory release manifest or a requirement
-to run the entire workflow for every edit. Use judgment and validation
-proportional to the change. The practical goal is simply to avoid a partial
-rollback that restores a prompt while leaving another behavior-changing
-dependency behind.
-
-The active scheduled **Weekday TLDR Queues** Task uses
-`chatgpt-project/WEEKDAY_TLDR_QUEUE_TASK_PROMPT_V3.md`. The Task remains
-Monday–Friday at 11:00 AM and is active. The v2 prompt is retained only for
-history and compatibility with already-downloaded v2 artifacts.
-
-Scheduled execution is currently unreliable at the artifact boundary. July
-21-24 and July 28 runs found the expected Gmail messages, then every
-file-generation path failed with the same generic
-`oai_http_clients.client.ClientError`. Manual July 24 and July 28 controls in
-this same Project created the expected queue files. Until issue #37 passes its
-acceptance runs, generate queues in a manual Project chat with the same prompt
-when the scheduled run does not produce real downloads. Do not rewrite queue
-logic or claim success from the Task's `Last ran` status. The July 26 workflow
-audit and the dated experiment-log entries describe the v2 configuration that
-was active when those failures occurred; they are historical evidence, not the
-current live configuration. See
-`docs/live-workflow-audit-2026-07-26.md` and
-`docs/commute-experiment-log.md`.
-
-Voice may start a queue by an exact filename or an unambiguous date plus
-newsletter name, such as `July 16 TLDR Dev`. The Project normalizes that request
-to the dated v3 filename in its Library; it must not guess a nearby queue.
-
-Do not restore retired handoff, ledger, wiki-approval, or compiler artifacts
-from Git history as live Project sources. They conflict with the supported v3
-single-queue/session-bundle path.
-
-The synonymous commute commands are "End commute" and "End the commute
-session." An exact `wiki this` capture is sufficient to nominate maintenance;
-there is no user-facing approval command in this path.
-
-## Bundle Validation
-
-The Voice output can be checked locally against the original downloaded queue
-with:
-
-```sh
-npm run validate:commute-session-bundle -- \
-  --input /path/to/session-bundle.txt \
-  --queue /path/to/selected-queue.txt
-```
-
-If an older malformed bundle names its queue but omitted its snapshot, recover
-its explicitly marked wiki saves and any independently well-formed non-item
-quality incidents or general captures by placing `--recover-with` immediately
-after that bundle's `--input`. The supplied queue must have exactly the filename
-the malformed bundle declares; local tools cannot read the private Project
-Library themselves. Unsupported non-item observations are warnings, not a reason
-to reject the recovered session.
-
-Bundle artifact filenames are not recovery identity. If an LLM emits a missing,
-noncanonical, contradictory, or differently downloaded bundle filename, local
-intake preserves that defect as a warning and continues when the supplied queue,
-item, and explicit wiki action remain exact. Strict bundle validation still
-reports the naming defect so generator quality does not become invisible.
-
-Queue-generation v4.1 removed embedded CR/LF characters from playback fields.
-When daily intake encounters a legacy v4 bundle and supplied pair from before
-that cutover, it replaces each contiguous newline run with one space, recomputes
-the main-file hash, and revalidates the complete pair before using any evidence.
-The repair is recorded as a warning and the downloaded files remain unchanged.
-The standalone strict validator continues to reject raw newline-bearing producer
-artifacts, so new regressions do not become silently valid.
-
-```sh
-npm run import:commute-session-bundles -- \
-  --input /path/to/malformed-bundle.txt \
-  --recover-with /path/to/named-queue.txt \
-  --output .private/commute-session-imports/recovered.json
-```
-
-The deliberately retired v1 queue prompt, schema, fixture, and separate-Project
-Pilot prompt are absent from this working tree. They are recoverable from Git
-history, but must not be uploaded alongside v3 sources. Existing downloaded v2
-queues remain valid local input and are not rewritten: v2 uses `summary` and has
-no `playback_text`; newly generated v3 queues use `description` and require the
-deterministic `playback_text`.
-
-After downloading a v3 queue, the home-side deterministic preflight is:
-
-```sh
-npm run validate:commute-queue -- /path/to/queue.txt
-```
-
-For a candidate v4 day, validate every pair together so cross-edition links and
-duplicate decisions are checked:
-
-```sh
-npm run validate:commute-queue -- /path/to/20260907-tldr.txt \
-  --reference /path/to/20260907-tldr-reference.txt \
-  --pair /path/to/20260907-tldr-dev.txt \
-  --reference /path/to/20260907-tldr-dev-reference.txt
-```
-
-Repeat `--pair <main> --reference <reference>` for AI and Fintech when present.
+Keep the original queue and reference in the Library until nightly intake and
+post-merge cleanup finish. Multiple exports can share the same pair.
 
 ## Post-Commute Bundle Intake
 
-The supported user workflow is chat-mediated: supply the original downloaded
-queue file(s) and session bundle(s) to a repository maintenance/debug chat and
-ask the agent to process them. Brad does not need to combine queues, bundles,
-or conversations. The agent starts with one deterministic orchestration command:
+Use the [daily commute skill](../.codex/skills/process-daily-commute/SKILL.md)
+for retrieval, wiki publication, issue updates, and cleanup. The agent retrieves
+the bundles and their matching queues. For an already downloaded compact export,
+pass the original main and reference files immediately after the bundle:
 
 ```sh
 npm run commute:run -- \
-  --input /path/to/morning-bundle.txt \
-  --recover-with /path/to/named-queue.txt \
-  --input /path/to/evening-bundle.txt \
-  --shared-chat https://chatgpt.com/share/example \
-  --output .private/commute-runs/20260720.json
+  --input /path/to/202611211609-evening-commute-session-bundle.txt \
+  --queue /path/to/20261118-tldr-dev.txt \
+  --reference /path/to/20261118-tldr-dev-reference.txt \
+  --output .private/commute-runs/20261121.json
 ```
-
-`commute:run` inventories and reconciles every supplied artifact, compares
-recovery queues to embedded snapshots, retains all normalized evidence in one
-private versioned record, and lists unresolved evidence without deciding its
-meaning. Add `--github-pr OWNER/REPO#NUMBER` to capture one batched PR-state
-snapshot, or also `--watch-seconds 1..900` for a bounded watcher. A GitHub
-failure is recorded in the private result and never discards validated local
-intake. The command does not retrieve a shared chat, make subjective
-wiki/classifier decisions, create a PR, or merge; those remain explicit agent
-work after the deterministic record is available.
 
 The importer keeps every valid session even when another is malformed and
 writes a private normalized intake record. Exact `wiki this` captures become
@@ -232,19 +71,7 @@ pending maintenance candidates without another approval step; classifier
 corrections, product-quality incidents, and unresolved captures stay in their
 separate private lists. When an exact `wiki this` capture has supported
 surrounding discussion, the bundle may include an optional item-bound discussion
-record with a concise summary, questions, conclusions, requested emphasis, and
-direct evidence. Do not infer this record from proximity to another save or
-general capture, and do not refuse the bundle when no such record is available.
-
-```sh
-npm run import:commute-session-bundles -- \
-  --input /path/to/morning-bundle.txt \
-  --input /path/to/evening-bundle.txt \
-  --output .private/commute-session-imports/20260720.json
-```
-
-The top-level maintainer accepts the same adjacent `--recover-with` form when
-you want recovery and wiki maintenance in one run.
+record with a concise summary, questions, conclusions, and requested emphasis. The phone ties this context to the explicit save.
 
 These commands are agent-invoked implementation stages and diagnostics, not
 user approval gates. Keep them available rather than combining or removing

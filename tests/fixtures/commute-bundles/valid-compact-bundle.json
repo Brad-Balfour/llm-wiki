@@ -1,0 +1,48 @@
+{
+  "schema_version": "commute-session-bundle.v2",
+  "session": {
+    "session_id": "2026-09-06-morning-tldr-dev",
+    "session_date": "2026-09-06",
+    "artifact_filename": "202609060745-morning-commute-session-bundle.txt",
+    "voice_surface": "chatgpt_standard"
+  },
+  "queue_filename": "20260906-tldr-dev.txt",
+  "events": [
+    {
+      "event_id": "save-1",
+      "kind": "item_action",
+      "action": "wiki_this",
+      "source_item_id": "example-2",
+      "user_words": "Save this for the wiki",
+      "discussion": {
+        "summary": "Keep the comparison with the first approach.",
+        "important_questions": ["How does cost scale?"]
+      }
+    },
+    {
+      "event_id": "feedback-1",
+      "kind": "item_action",
+      "action": "mark_interested",
+      "source_item_id": "example-1",
+      "user_words": "More on this topic please"
+    },
+    {
+      "event_id": "issue-1",
+      "kind": "quality_incident",
+      "observed_behavior": "Voice repeated the headline.",
+      "boundary": "playback"
+    },
+    {
+      "event_id": "capture-1",
+      "kind": "general_capture",
+      "user_words": "Remember the earlier design question"
+    },
+    {
+      "event_id": "unclear-1",
+      "kind": "unresolved_capture",
+      "capture_type": "wiki_this",
+      "user_words": "Save that other one",
+      "recovery_clues": ["Item was mentioned before the restart"]
+    }
+  ]
+}
