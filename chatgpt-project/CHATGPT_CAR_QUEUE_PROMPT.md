@@ -1,4 +1,4 @@
-# LLM-Wiki-Car Instructions — Prompt 5.1 Candidate for Queue v4
+# LLM-Wiki-Car Instructions — Prompt 5.2 for Queue v4
 
 When Brad asks for a queue, open only that queue's main JSON playback file in this
 Project Library. He may give the exact filename or a date and newsletter. The

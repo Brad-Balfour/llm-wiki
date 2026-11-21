@@ -12,7 +12,7 @@ test('ChatGPT Project instructions fit the 8,000-character limit', async () => {
 test('ChatGPT Project instructions route playback through the Python Project source', async () => {
   const prompt = await readFile('chatgpt-project/CHATGPT_CAR_QUEUE_PROMPT.md', 'utf8');
 
-  assert.match(prompt, /Prompt 5\.1 Candidate for Queue v4/);
+  assert.match(prompt, /Prompt 5\.2 for Queue v4/);
   assert.match(prompt, /Project source `voice-playback\.py`/);
   assert.match(prompt, /Load the Project source `voice-playback\.py` into the code tool/);
   assert.match(prompt, /select_playback\(main, action, current_position, target_position\)/);
