@@ -1,17 +1,8 @@
 import { createHash } from 'node:crypto';
-import { mkdir, readFile, writeFile } from 'node:fs/promises';
+import { mkdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 
-import { parseJsonObject } from '../shared/json.js';
-import { reconcileSessionBundles } from './import-session-bundles.js';
-import {
-  createRepairedQueueV4Snapshot,
-  parseCommuteSessionBundleText,
-  parseCommuteSessionBundleTextWithRelaxedArtifactFilename,
-  queueSnapshotFingerprint,
-  rawQueueV4PairMatchesSnapshot,
-  validateTldrCommuteQueueV2,
-} from './session-bundle.js';
+import { readSessionInputs, reconcileSessionBundles } from './import-session-bundles.js';
 
 const SCHEMA_VERSION = 'commute-preflight.v1';
 
@@ -32,48 +23,17 @@ export async function runPreflight(
   writeResult = true
 ) {
   const startedAt = new Date().toISOString();
-  const inputs = await Promise.all(
-    options.inputs.map(async (input) => {
-      const bundleText = await readFile(input.bundle, 'utf8');
-      const queueText =
-        input.recoveryQueue === undefined ? undefined : await readFile(input.recoveryQueue, 'utf8');
-      const referenceText =
-        input.recoveryReference === undefined
-          ? undefined
-          : await readFile(input.recoveryReference, 'utf8');
-      return {
-        filename: path.basename(input.bundle),
-        text: bundleText,
-        ...(input.recoveryQueue === undefined
-          ? {}
-          : {
-              recoveryQueue: {
-                filename: path.basename(input.recoveryQueue),
-                text: queueText!,
-                ...(input.recoveryReference === undefined
-                  ? {}
-                  : {
-                      reference: {
-                        filename: path.basename(input.recoveryReference),
-                        text: referenceText!,
-                      },
-                    }),
-              },
-            }),
-      };
-    })
-  );
+  const inputs = await readSessionInputs(options.inputs);
   const intake = reconcileSessionBundles(inputs, now);
-  const queueComparisons = inputs.flatMap((input) => {
-    if (input.recoveryQueue === undefined) return [];
-    return [compareRecoveryQueue({ ...input, recoveryQueue: input.recoveryQueue })];
-  });
   const result = {
     schema_version: SCHEMA_VERSION,
     generated_at: now,
     phases: { intake_started_at: startedAt, validation_completed_at: new Date().toISOString() },
     inventory: {
-      bundles: inputs.map((input) => ({ filename: input.filename, sha256: sha256(input.text) })),
+      bundles: inputs.map((input) => ({
+        filename: input.filename,
+        ...(input.readError ? { error: input.readError } : { sha256: sha256(input.text) }),
+      })),
       supplied_queues: inputs.flatMap((input) =>
         input.recoveryQueue === undefined
           ? []
@@ -87,6 +47,7 @@ export async function runPreflight(
           input_filename,
           status,
           session_id,
+          bundle_version,
           integrity_state,
           queue_filename,
           queue_fingerprint,
@@ -97,6 +58,7 @@ export async function runPreflight(
           input_filename,
           status,
           ...(session_id === undefined ? {} : { session_id }),
+          ...(bundle_version === undefined ? {} : { bundle_version }),
           ...(integrity_state === undefined ? {} : { integrity_state }),
           ...(queue_filename === undefined ? {} : { queue_filename }),
           ...(queue_fingerprint === undefined ? {} : { queue_fingerprint }),
@@ -117,9 +79,16 @@ export async function runPreflight(
       maintenance_key: candidate.maintenance_key,
       discussion_bound: candidate.discussion !== undefined,
       shared_chat_recovery_required:
-        options.sharedChats.length > 0 && candidate.discussion === undefined,
+        options.sharedChats.length > 0 &&
+        intake.quality_incidents.some(
+          (incident) =>
+            incident.session_id === candidate.session_id &&
+            incident.event.kind === 'quality_incident' &&
+            incident.event.boundary === 'optional discussion validation' &&
+            incident.event_id.startsWith(candidate.event_id + '-discussion-warning')
+        ),
     })),
-    queue_comparisons: queueComparisons,
+    queue_comparisons: intake.queue_comparisons,
   };
   if (writeResult) {
     await mkdir(path.dirname(options.output), { recursive: true });
@@ -132,80 +101,6 @@ function sha256(value: string): string {
   return `sha256:${createHash('sha256').update(value).digest('hex')}`;
 }
 
-function compareRecoveryQueue(input: {
-  filename: string;
-  text: string;
-  recoveryQueue: {
-    filename: string;
-    text: string;
-    reference?: { filename: string; text: string };
-  };
-}) {
-  try {
-    let bundle;
-    let embeddedRepairCount = 0;
-    try {
-      bundle = parseCommuteSessionBundleText(input.text);
-    } catch {
-      const relaxed = parseCommuteSessionBundleTextWithRelaxedArtifactFilename(
-        input.text,
-        input.filename
-      );
-      bundle = relaxed.bundle;
-      embeddedRepairCount = relaxed.repairedPlaybackFieldCount;
-    }
-    const rawSuppliedPlayback = parseJsonObject(input.recoveryQueue.text, 'Recovery queue');
-    const recoveryReference = input.recoveryQueue.reference;
-    const rawSuppliedReference =
-      recoveryReference === undefined
-        ? undefined
-        : parseJsonObject(recoveryReference.text, 'Recovery reference');
-    const repairedSupplied =
-      rawSuppliedReference === undefined
-        ? undefined
-        : createRepairedQueueV4Snapshot(
-            rawSuppliedPlayback,
-            rawSuppliedReference,
-            input.recoveryQueue.filename,
-            recoveryReference!.filename
-          );
-    const supplied = validateTldrCommuteQueueV2(
-      repairedSupplied === undefined ? rawSuppliedPlayback : repairedSupplied.queue
-    );
-    const suppliedFingerprint = queueSnapshotFingerprint(supplied);
-    const embeddedFingerprint = queueSnapshotFingerprint(bundle.queue_snapshot.queue);
-    const repairApplied =
-      embeddedRepairCount > 0 || (repairedSupplied?.repairedFieldCount ?? 0) > 0;
-    const rawPairMatches =
-      !repairApplied ||
-      (rawSuppliedReference !== undefined &&
-        rawQueueV4PairMatchesSnapshot(
-          parseJsonObject(input.text, 'bundle'),
-          rawSuppliedPlayback,
-          rawSuppliedReference
-        ));
-    const matches =
-      rawPairMatches &&
-      input.recoveryQueue.filename === bundle.queue_snapshot.filename &&
-      suppliedFingerprint === embeddedFingerprint;
-    return {
-      bundle_filename: input.filename,
-      queue_filename: input.recoveryQueue.filename,
-      expected_queue_filename: bundle.queue_snapshot.filename,
-      supplied_fingerprint: suppliedFingerprint,
-      embedded_fingerprint: embeddedFingerprint,
-      status: matches ? ('matched' as const) : ('mismatched' as const),
-    };
-  } catch (error) {
-    return {
-      bundle_filename: input.filename,
-      queue_filename: input.recoveryQueue.filename,
-      status: 'unverified' as const,
-      error: error instanceof Error ? error.message : String(error),
-    };
-  }
-}
-
 export function parsePreflightOptions(args: string[]): PreflightOptions {
   const inputs: PreflightInput[] = [];
   const sharedChats: string[] = [];
@@ -216,7 +111,7 @@ export function parsePreflightOptions(args: string[]): PreflightOptions {
     if (arg === '--input' && value) {
       inputs.push({ bundle: value });
       index += 1;
-    } else if (arg === '--recover-with' && value && inputs.at(-1)) {
+    } else if ((arg === '--queue' || arg === '--recover-with') && value && inputs.at(-1)) {
       if (inputs.at(-1)!.recoveryQueue !== undefined)
         throw new Error('--recover-with may appear only once for each --input');
       inputs.at(-1)!.recoveryQueue = value;
@@ -236,7 +131,7 @@ export function parsePreflightOptions(args: string[]): PreflightOptions {
   }
   if (inputs.length === 0 || !output)
     throw new Error(
-      'Usage: commute:run -- --input <bundle> [--recover-with <queue> [--reference <reference>]] [--shared-chat <url>] --output <private-result.json>'
+      'Usage: commute:run -- --input <bundle> [--queue <queue> [--reference <reference>]] [--shared-chat <url>] --output <private-result.json>'
     );
   if (!path.resolve(output).startsWith(`${path.resolve('.private')}${path.sep}`))
     throw new Error('--output must be inside the gitignored .private directory');

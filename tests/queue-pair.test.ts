@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
-import { mkdtemp, writeFile } from 'node:fs/promises';
+import { mkdtemp, readFile, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
@@ -12,6 +12,9 @@ import {
   validateTldrCommuteDailyPairs,
   validateTldrCommuteQueuePair,
 } from '../src/commute/session-bundle.js';
+
+import { runPreflight } from '../src/commute/preflight.js';
+import { reconcileSessionBundles } from '../src/commute/import-session-bundles.js';
 
 function pair(itemCount = 2) {
   const items = Array.from({ length: itemCount }, (_, index) => {
@@ -759,4 +762,160 @@ test('keeps useful-update text separate from quoted headline context', () => {
     () => validateTldrCommuteQueuePair(candidate.main, candidate.reference),
     /must not be represented as quoted headline context/
   );
+});
+
+test('compact intake joins actions to the canonical pair and retains each kind of capture', async () => {
+  const { main, reference } = pair();
+  const bundleText = await readFile(
+    'tests/fixtures/commute-bundles/valid-compact-bundle.json',
+    'utf8'
+  );
+  const bundle = JSON.parse(bundleText);
+  const directory = await mkdtemp(path.join(tmpdir(), 'compact-commute-'));
+  const input = {
+    bundle: path.join(directory, bundle.session.artifact_filename),
+    recoveryQueue: path.join(directory, reference.main_filename),
+    recoveryReference: path.join(directory, '20260906-tldr-dev-reference.txt'),
+  };
+  await Promise.all([
+    writeFile(input.bundle, bundleText),
+    writeFile(input.recoveryQueue, JSON.stringify(main)),
+    writeFile(input.recoveryReference, JSON.stringify(reference)),
+  ]);
+  const report = await runPreflight({
+    inputs: [input],
+    sharedChats: ['https://chatgpt.com/share/example'],
+    output: path.join(directory, 'report.json'),
+  });
+  assert.equal(report.intake.sessions[0]?.status, 'accepted');
+  const save = report.intake.maintenance_candidates[0]!;
+  assert.equal(save.title, reference.items[1]!.title);
+  assert.equal(save.url, reference.items[1]!.url);
+  assert.equal(save.newsletter_description, reference.items[1]!.description);
+  assert.deepEqual(save.discussion?.important_questions, ['How does cost scale?']);
+  assert.equal(report.intake.quality_incidents.length, 1);
+  assert.equal(report.intake.feedback_events.length, 1);
+  assert.equal(report.intake.general_captures.length, 1);
+  assert.equal(report.intake.unresolved_captures.length, 1);
+  assert.deepEqual(report.queue_comparisons, []);
+  assert.equal(report.conversation_coverage[0]?.shared_chat_recovery_required, false);
+  const verified = spawnSync(
+    process.execPath,
+    [
+      'dist/src/commute/validate-session-bundle.js',
+      '--input',
+      input.bundle,
+      '--queue',
+      input.recoveryQueue,
+      '--reference',
+      input.recoveryReference,
+    ],
+    { encoding: 'utf8' }
+  );
+  assert.equal(verified.status, 0, verified.stderr);
+  const supplied = {
+    filename: reference.main_filename,
+    text: JSON.stringify(main),
+    reference: {
+      filename: path.basename(input.recoveryReference),
+      text: JSON.stringify(reference),
+    },
+  };
+  const goodInput = {
+    filename: bundle.session.artifact_filename,
+    text: bundleText,
+    recoveryQueue: supplied,
+  };
+  const repeated = reconcileSessionBundles([goodInput, goodInput]);
+  assert.equal(repeated.maintenance_candidates.length, 1);
+  assert.match(repeated.sessions[1]?.error ?? '', /Duplicate session_id/);
+  for (const [bad, message] of [
+    [
+      { ...goodInput, recoveryQueue: { filename: supplied.filename, text: supplied.text } },
+      /reference/,
+    ],
+    [
+      {
+        ...goodInput,
+        recoveryQueue: {
+          ...supplied,
+          reference: {
+            ...supplied.reference,
+            text: JSON.stringify({ ...reference, main_sha256: 'sha256:' + '0'.repeat(64) }),
+          },
+        },
+      },
+      /main_sha256/,
+    ],
+    [
+      { ...goodInput, text: JSON.stringify({ ...bundle, queue_filename: 'different.txt' }) },
+      /queue_filename/,
+    ],
+    [
+      {
+        ...goodInput,
+        text: JSON.stringify({
+          ...bundle,
+          events: [{ ...bundle.events[0], source_item_id: 'missing' }],
+        }),
+      },
+      /missing/,
+    ],
+    [
+      {
+        ...goodInput,
+        text: JSON.stringify({ ...bundle, events: [bundle.events[0], bundle.events[0]] }),
+      },
+      /unique/,
+    ],
+    [
+      {
+        ...goodInput,
+        text: JSON.stringify({
+          ...bundle,
+          events: [{ ...bundle.events[0], title: 'copied title' }],
+        }),
+      },
+      /unsupported fields/,
+    ],
+  ] as const) {
+    const rejected = reconcileSessionBundles([bad]);
+    assert.equal(rejected.sessions[0]?.status, 'rejected');
+    assert.match(rejected.sessions[0]?.error ?? '', message);
+    assert.equal(rejected.maintenance_candidates.length, 0);
+  }
+});
+
+test('legacy comparison includes independently supplied v4 reference metadata', async () => {
+  const { main, reference } = pair();
+  const body = JSON.parse(
+    await readFile('tests/fixtures/commute-bundles/valid-compact-bundle.json', 'utf8')
+  );
+  const bundle = {
+    schema_version: 'commute-session-bundle.v1',
+    session: body.session,
+    queue_snapshot: {
+      filename: reference.main_filename,
+      queue: createQueueV4Snapshot(main, reference),
+    },
+    playback: { status: 'not_started' },
+    integrity: { state: 'partial', incomplete_reason: 'No playback', unresolved_event_ids: [] },
+    events: [],
+  };
+  const result = reconcileSessionBundles([
+    {
+      filename: body.session.artifact_filename,
+      text: JSON.stringify(bundle),
+      recoveryQueue: {
+        filename: reference.main_filename,
+        text: JSON.stringify(main),
+        reference: {
+          filename: '20260906-tldr-dev-reference.txt',
+          text: JSON.stringify({ ...reference, model: 'different' }),
+        },
+      },
+    },
+  ]);
+  assert.equal(result.sessions[0]?.status, 'rejected');
+  assert.equal(result.queue_comparisons[0]?.status, 'mismatched');
 });

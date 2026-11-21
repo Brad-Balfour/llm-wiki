@@ -10,6 +10,7 @@ import {
   bundleArtifactFilenameMatches,
   createRepairedQueueV4Snapshot,
   type CommuteSessionBundle,
+  validateCommuteSessionBundle,
   parseCommuteSessionBundleText,
   parseCommuteSessionBundleTextWithRelaxedArtifactFilename,
   queueMetadataRecord,
@@ -31,6 +32,13 @@ import {
   requireDiscussionDisposition,
   requireMaintenanceHttpUrl,
 } from './maintenance.js';
+import {
+  COMPACT_BUNDLE_VERSION,
+  readCanonicalQueue,
+  validateCompactSession,
+  type CompactSession,
+  type SuppliedQueue,
+} from './compact-session.js';
 import { requireIsoTimestamp } from '../shared/time.js';
 import { requireRecord, requireString } from '../shared/validate.js';
 
@@ -59,18 +67,16 @@ interface Options {
 
 export interface SessionBundleInput {
   filename: string;
+  readError?: string;
   text: string;
-  recoveryQueue?: {
-    filename: string;
-    text: string;
-    reference?: { filename: string; text: string };
-  };
+  recoveryQueue?: SuppliedQueue;
 }
 
 interface ImportedSession {
   input_filename: string;
   status: 'accepted' | 'rejected';
   session_id?: string;
+  bundle_version?: typeof COMPACT_BUNDLE_VERSION;
   integrity_state?: CommuteSessionBundle['integrity']['state'];
   queue_filename?: string;
   queue_fingerprint?: string;
@@ -98,6 +104,7 @@ export interface CommuteSessionImport {
   schema_version: typeof IMPORT_SCHEMA_VERSION;
   imported_at: string;
   sessions: ImportedSession[];
+  queue_comparisons: ReturnType<typeof compareRecoveryQueue>[];
   maintenance_candidates: MaintenanceCandidate[];
   maintenance_attempts: MaintenanceAttempt[];
   maintenance_results: MaintenanceLatestResult[];
@@ -117,6 +124,7 @@ export function reconcileSessionBundles(
     schema_version: IMPORT_SCHEMA_VERSION,
     imported_at: importedAt,
     sessions: [],
+    queue_comparisons: [],
     maintenance_candidates: [],
     maintenance_attempts: [],
     maintenance_results: [],
@@ -128,17 +136,35 @@ export function reconcileSessionBundles(
     event_conversions: [],
   };
   const sessionIds = new Set<string>();
-  const strictArtifactFilenames = collectStrictArtifactClaims(inputs);
+  const prepared = prepareSessionInputs(inputs);
+  const strictArtifactFilenames = collectStrictArtifactClaims(prepared);
   const acceptedStrictArtifactFilenames = new Map<string, string>();
   const recoveredArtifactFilenames = new Map<string, string>();
   const maintenanceKeys = new Set<string>();
 
-  for (const input of inputs) {
-    let bundle: CommuteSessionBundle | undefined;
+  for (const entry of prepared) {
+    const { input } = entry;
+    let bundle: CommuteSessionBundle | CompactSession | undefined;
+    if (!entry.compact && input.recoveryQueue) {
+      const comparison = compareRecoveryQueue(
+        { ...input, recoveryQueue: input.recoveryQueue },
+        entry.bundle?.schema_version === COMPACT_BUNDLE_VERSION ? undefined : entry.bundle
+      );
+      result.queue_comparisons.push(comparison);
+      if (entry.bundle && comparison.status !== 'matched') {
+        result.sessions.push({
+          input_filename: input.filename,
+          status: 'rejected',
+          error: comparison.error ?? 'Supplied canonical queue differs from the bundle snapshot',
+        });
+        continue;
+      }
+    }
     const strictRecoveryWarnings: string[] = [];
     let strictIdentityValidated = false;
     try {
-      bundle = parseCommuteSessionBundleText(input.text);
+      if (!entry.bundle) throw new Error(entry.error);
+      bundle = entry.bundle;
       if (!bundleArtifactFilenameMatches(input.filename, bundle.session.artifact_filename)) {
         strictRecoveryWarnings.push(
           `Downloaded bundle filename ${input.filename} does not match declared artifact filename ${bundle.session.artifact_filename}.`
@@ -155,10 +181,11 @@ export function reconcileSessionBundles(
       );
       sessionIds.add(bundle.session.session_id);
     } catch (error) {
-      if (strictIdentityValidated) {
+      if (strictIdentityValidated || entry.compact) {
         result.sessions.push({
           input_filename: input.filename,
           status: 'rejected',
+          ...(entry.compact ? { bundle_version: COMPACT_BUNDLE_VERSION } : {}),
           error: errorMessage(error),
         });
         continue;
@@ -415,7 +442,9 @@ export function reconcileSessionBundles(
       input_filename: input.filename,
       status: 'accepted',
       session_id: bundle.session.session_id,
-      integrity_state: bundle.integrity.state,
+      ...(bundle.schema_version === COMPACT_BUNDLE_VERSION
+        ? { bundle_version: COMPACT_BUNDLE_VERSION }
+        : { integrity_state: bundle.integrity.state }),
       queue_filename: bundle.queue_snapshot.filename,
       queue_fingerprint: queueSnapshotFingerprint(bundle.queue_snapshot.queue),
       ...(strictRecoveryWarnings.length === 0 ? {} : { recovery_warnings: strictRecoveryWarnings }),
@@ -574,13 +603,50 @@ function uniqueDiscussionWarningEventId(eventId: string, existingEventIds: Set<s
   return candidate;
 }
 
-function collectStrictArtifactClaims(inputs: SessionBundleInput[]): Map<string, string> {
-  const claims = new Map<string, string>();
-  for (const input of inputs) {
-    let bundle: CommuteSessionBundle;
+interface PreparedSession {
+  input: SessionBundleInput;
+  compact: boolean;
+  bundle?: CommuteSessionBundle | CompactSession;
+  error?: string;
+}
+
+function prepareSessionInputs(inputs: SessionBundleInput[]): PreparedSession[] {
+  const pairs = new Map<
+    string,
+    { supplied: SuppliedQueue; pair: ReturnType<typeof readCanonicalQueue> }
+  >();
+  return inputs.map((input) => {
+    let compact = false;
     try {
-      bundle = parseCommuteSessionBundleText(input.text);
-    } catch {
+      if (input.readError) throw new Error(input.readError);
+      const raw = parseJsonObject(input.text, 'Commute session bundle');
+      compact = raw.schema_version === COMPACT_BUNDLE_VERSION;
+      if (!compact) return { input, compact, bundle: validateCommuteSessionBundle(raw) };
+      const supplied = input.recoveryQueue;
+      if (!supplied) throw new Error('Compact bundle requires the canonical --queue file');
+      let cached = pairs.get(supplied.filename);
+      if (
+        !cached ||
+        cached.supplied.text !== supplied.text ||
+        cached.supplied.reference?.filename !== supplied.reference?.filename ||
+        cached.supplied.reference?.text !== supplied.reference?.text
+      ) {
+        cached = { supplied, pair: readCanonicalQueue(supplied) };
+        pairs.set(supplied.filename, cached);
+      }
+      return { input, compact, bundle: validateCompactSession(raw, cached.pair) };
+    } catch (error) {
+      return { input, compact, error: errorMessage(error) };
+    }
+  });
+}
+
+function collectStrictArtifactClaims(prepared: PreparedSession[]): Map<string, string> {
+  const claims = new Map<string, string>();
+  for (const { input, compact, bundle: parsed } of prepared) {
+    let bundle = parsed;
+    if (!bundle) {
+      if (compact) continue;
       if (!input.recoveryQueue) continue;
       try {
         const relaxed = parseCommuteSessionBundleTextWithRelaxedArtifactFilename(
@@ -600,6 +666,84 @@ function collectStrictArtifactClaims(inputs: SessionBundleInput[]): Map<string, 
     if (!claims.has(artifactKey)) claims.set(artifactKey, bundle.session.session_id);
   }
   return claims;
+}
+
+function compareRecoveryQueue(
+  input: {
+    filename: string;
+    text: string;
+    recoveryQueue: {
+      filename: string;
+      text: string;
+      reference?: { filename: string; text: string };
+    };
+  },
+  strictBundle?: CommuteSessionBundle
+) {
+  try {
+    let bundle;
+    let embeddedRepairCount = 0;
+    try {
+      bundle = strictBundle ?? parseCommuteSessionBundleText(input.text);
+    } catch {
+      const relaxed = parseCommuteSessionBundleTextWithRelaxedArtifactFilename(
+        input.text,
+        input.filename
+      );
+      bundle = relaxed.bundle;
+      embeddedRepairCount = relaxed.repairedPlaybackFieldCount;
+    }
+    const rawSuppliedPlayback = parseJsonObject(input.recoveryQueue.text, 'Recovery queue');
+    const recoveryReference = input.recoveryQueue.reference;
+    const rawSuppliedReference =
+      recoveryReference === undefined
+        ? undefined
+        : parseJsonObject(recoveryReference.text, 'Recovery reference');
+    const repairedSupplied =
+      rawSuppliedReference === undefined
+        ? undefined
+        : createRepairedQueueV4Snapshot(
+            rawSuppliedPlayback,
+            rawSuppliedReference,
+            input.recoveryQueue.filename,
+            recoveryReference!.filename
+          );
+    if (!recoveryReference && rawSuppliedPlayback.queue_version === 'tldr-commute-queue.v4') {
+      throw new Error('Canonical v4 comparison requires separate --queue and --reference files');
+    }
+    const supplied = repairedSupplied?.queue ?? validateTldrCommuteQueueV2(rawSuppliedPlayback);
+    const suppliedFingerprint = queueSnapshotFingerprint(supplied);
+    const embeddedFingerprint = queueSnapshotFingerprint(bundle.queue_snapshot.queue);
+    const repairApplied =
+      embeddedRepairCount > 0 || (repairedSupplied?.repairedFieldCount ?? 0) > 0;
+    const rawPairMatches =
+      !repairApplied ||
+      (rawSuppliedReference !== undefined &&
+        rawQueueV4PairMatchesSnapshot(
+          parseJsonObject(input.text, 'bundle'),
+          rawSuppliedPlayback,
+          rawSuppliedReference
+        ));
+    const matches =
+      rawPairMatches &&
+      input.recoveryQueue.filename === bundle.queue_snapshot.filename &&
+      suppliedFingerprint === embeddedFingerprint;
+    return {
+      bundle_filename: input.filename,
+      queue_filename: input.recoveryQueue.filename,
+      expected_queue_filename: bundle.queue_snapshot.filename,
+      supplied_fingerprint: suppliedFingerprint,
+      embedded_fingerprint: embeddedFingerprint,
+      status: matches ? ('matched' as const) : ('mismatched' as const),
+    };
+  } catch (error) {
+    return {
+      bundle_filename: input.filename,
+      queue_filename: input.recoveryQueue.filename,
+      status: 'unverified' as const,
+      error: error instanceof Error ? error.message : String(error),
+    };
+  }
 }
 
 function validateRawLegacyPairMatch(
@@ -874,7 +1018,7 @@ function maintenanceAttemptId(input: MaintenanceAttemptInput): string {
 }
 
 function queueItemConsumptionDepth(
-  bundle: CommuteSessionBundle,
+  bundle: Pick<CommuteSessionBundle, 'queue_snapshot'>,
   sourceItemId: string
 ): string | undefined {
   const items = queueMetadataRecord(bundle.queue_snapshot.queue).items;
@@ -890,7 +1034,7 @@ function queueItemConsumptionDepth(
 }
 
 function queueItemNewsletterDescription(
-  bundle: CommuteSessionBundle,
+  bundle: Pick<CommuteSessionBundle, 'queue_snapshot'>,
   sourceItemId: string
 ): string | undefined {
   const items = queueMetadataRecord(bundle.queue_snapshot.queue).items;
@@ -905,30 +1049,49 @@ function queueItemNewsletterDescription(
   return undefined;
 }
 
-async function main(): Promise<void> {
-  const options = parseOptions(process.argv.slice(2));
-  const inputs = await Promise.all(
-    options.inputs.map(async (input) => ({
-      filename: path.basename(input.bundle),
-      text: await readFile(input.bundle, 'utf8'),
-      ...(input.recoveryQueue === undefined
-        ? {}
-        : {
+export async function readSessionInputs(inputs: Options['inputs']): Promise<SessionBundleInput[]> {
+  const files = new Map<string, Promise<string>>();
+  function readOnce(filename: string) {
+    const key = path.resolve(filename);
+    let contents = files.get(key);
+    if (!contents) {
+      contents = readFile(key, 'utf8');
+      files.set(key, contents);
+    }
+    return contents;
+  }
+  return Promise.all(
+    inputs.map(async (input) => {
+      const filename = path.basename(input.bundle);
+      try {
+        const [text, queue, reference] = await Promise.all([
+          readOnce(input.bundle),
+          input.recoveryQueue && readOnce(input.recoveryQueue),
+          input.recoveryReference && readOnce(input.recoveryReference),
+        ]);
+        return {
+          filename,
+          text,
+          ...(input.recoveryQueue && {
             recoveryQueue: {
               filename: path.basename(input.recoveryQueue),
-              text: await readFile(input.recoveryQueue, 'utf8'),
-              ...(input.recoveryReference === undefined
-                ? {}
-                : {
-                    reference: {
-                      filename: path.basename(input.recoveryReference),
-                      text: await readFile(input.recoveryReference, 'utf8'),
-                    },
-                  }),
+              text: queue!,
+              ...(input.recoveryReference && {
+                reference: { filename: path.basename(input.recoveryReference), text: reference! },
+              }),
             },
           }),
-    }))
+        };
+      } catch (error) {
+        return { filename, text: '', readError: errorMessage(error) };
+      }
+    })
   );
+}
+
+async function main(): Promise<void> {
+  const options = parseOptions(process.argv.slice(2));
+  const inputs = await readSessionInputs(options.inputs);
   const result = reconcileSessionBundles(inputs);
   ensurePrivateOutput(options.output);
   await mkdir(path.dirname(options.output), { recursive: true });
@@ -957,7 +1120,7 @@ function parseOptions(args: string[]): Options {
       if (!input) throw new Error('--input requires a filename');
       inputs.push({ bundle: input });
       index += 1;
-    } else if (arg === '--recover-with') {
+    } else if (arg === '--queue' || arg === '--recover-with') {
       const queue = args[index + 1];
       const prior = inputs.at(-1);
       if (!queue || !prior) {
@@ -989,7 +1152,7 @@ function parseOptions(args: string[]): Options {
 
   if (inputs.length === 0 || !output) {
     throw new Error(
-      'Usage: import:commute-session-bundles -- --input <bundle.txt> [--recover-with <queue.txt> [--reference <reference.txt>]] [--input <bundle.txt> ...] --output <private-record.json>'
+      'Usage: import:commute-session-bundles -- --input <bundle.txt> [--queue <queue.txt> [--reference <reference.txt>]] [--input <bundle.txt> ...] --output <private-record.json>'
     );
   }
 
