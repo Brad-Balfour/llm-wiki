@@ -6,19 +6,17 @@ controls what the phone sends for nightly intake.
 
 ## Install the compact handoff
 
-On November 21, 2026, the signed-in Project Instructions matched the complete Prompt 5.1 at commit `ad5c341`. Prompt 5.2 introduces the compact v2 export and is pending installation. After the PR merges:
+Prompt 5.2 uses the compact v2 handoff and the v4 playback/reference pair. Install from the merged revision.
 
 1. In `LLM-Wiki-Car` Sources, upload
    `schema/commute-session-bundle-v2.schema.json` and replace
    `chatgpt-project/session-export.md` with the merged copy. Retire only the
    old `commute-session-bundle-v1.schema.json` export schema from Sources.
-   The repository retains the v1 reader for existing handoffs.
 2. Replace the Project Instructions with the exact merged
-   `chatgpt-project/CHATGPT_CAR_QUEUE_PROMPT.md`. Only the version heading and export paragraph
-   changes from the verified live playback prompt.
+   `chatgpt-project/CHATGPT_CAR_QUEUE_PROMPT.md`.
 3. Reopen the Instructions and verify the saved text. Check that Sources has
    one copy each of the v2 schema and updated `session-export.md`. Record the
-   installed versions and verification date here. Keep the weekday queue Task,
+   installed versions and verification date on the PR. Keep the weekday queue Task,
    generation instructions, classifier, profile, playback helper, and queue
    schemas on their existing versions.
 
@@ -43,15 +41,14 @@ cover the v3 and v4 queue configurations.
 ## Nightly handoff format
 
 The phone writes `commute-session-bundle.v2`. Its `queue_filename` selects the
-original v4 playback/reference pair or single v2/v3 queue. Each explicit item action names a
+original v4 playback/reference pair. Each explicit item action names a
 `source_item_id`. The importer takes the article title, URL, and other metadata
 from those files. The phone sends the conversation-specific saves, discussion,
 feedback, problems, notes, and unresolved requests. A session with no captures
 has an empty `events` array.
 
 Keep the original queue and reference in the Library until nightly intake and
-post-merge cleanup finish. Multiple exports can share the same pair. Pending v1
-exports still import through the existing snapshot and recovery paths.
+post-merge cleanup finish. Multiple exports can share the same pair.
 
 ## Post-Commute Bundle Intake
 
@@ -68,12 +65,6 @@ npm run commute:run -- \
   --output .private/commute-runs/20261121.json
 ```
 
-For a compact export from a single-file v2/v3 queue, supply `--queue` alone.
-For a legacy v1 bundle use `--input`. When recovery requires the original
-queue, supply `--recover-with` immediately after its `--input`, together with
-the matching reference for queue v4. See the daily commute skill for how to
-handle a malformed bundle or an unresolved item.
-
 The importer keeps every valid session even when another is malformed and
 writes a private normalized intake record. Exact `wiki this` captures become
 pending maintenance candidates without another approval step; classifier
@@ -81,16 +72,6 @@ corrections, product-quality incidents, and unresolved captures stay in their
 separate private lists. When an exact `wiki this` capture has supported
 surrounding discussion, the bundle may include an optional item-bound discussion
 record with a concise summary, questions, conclusions, and requested emphasis. The phone ties this context to the explicit save.
-
-```sh
-npm run import:commute-session-bundles -- \
-  --input /path/to/legacy-morning-bundle.txt \
-  --input /path/to/legacy-evening-bundle.txt \
-  --output .private/commute-session-imports/20260720.json
-```
-
-The top-level maintainer accepts the same adjacent `--recover-with` form when
-you want recovery and wiki maintenance in one run.
 
 These commands are agent-invoked implementation stages and diagnostics, not
 user approval gates. Keep them available rather than combining or removing

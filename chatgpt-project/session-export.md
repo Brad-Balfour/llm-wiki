@@ -38,8 +38,7 @@ Set `schema_version` to `commute-session-bundle.v2`. Put the exact selected
 main playback basename in `queue_filename`. For item actions, use the article
 Brad identified, including a numbered item if he named one. If you need item
 IDs, open the matching v4 `-reference.txt` file once, check its `main_filename`
-and use its positions to look up just those IDs. For a single-file v2 or v3
-queue, take `source_item_id` directly from its selected item. If the exact file or
+and use its positions to look up just those IDs. If the exact file or
 identity is uncertain, retain the request as an `unresolved_capture`. A commute
 with only general notes or problems needs no item lookup.
 

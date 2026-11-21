@@ -49,7 +49,7 @@ test('builds a maintainer prompt with no intermediate approval gate', () => {
   );
   assert.match(
     prompt,
-    /If the note needs a specific fact from the article, try a targeted publisher or exact-title lookup/
+    /Open the reference URL only for a requested detail those materials do not establish/
   );
   assert.match(prompt, /create one GitHub PR with gh/);
   assert.match(prompt, /\/private\/sources\.json/);

@@ -87,7 +87,7 @@ export function buildMaintainerPrompt(options: {
 
 Read the private intake record at ${options.intakePath} and initial source-retrieval record at ${options.retrievalPath}. Work only from exact wiki_this maintenance candidates.
 
-When the direct fetch fails, check what the saved discussion and newsletter excerpt already support. If they support the requested note, write it with attribution and stop researching. If the note needs a specific fact from the article, try a targeted publisher or exact-title lookup. Stop when the question is answered or the remaining routes are unlikely to help. Record any material limitation. Use search snippets only to locate readable sources.
+Start with the saved discussion, reference URL and newsletter excerpt. If they support the requested note, write it with attribution and stop researching. Open the reference URL only for a requested detail those materials do not establish. If it fails and that detail matters, try a targeted publisher or exact-title lookup. Stop when the question is answered or the remaining routes are unlikely to help. Record any material limitation. Use search snippets only to locate readable sources.
 
 Attribute article facts to the article, the candidate's \`newsletter_description\` to the newsletter, and Brad's observations to the item-bound discussion. A headline alone cannot support detailed article claims. Narrow the note to the evidence available. Use "insufficient_source" when that evidence cannot support a useful, accurate change.
 
@@ -139,7 +139,11 @@ async function main(): Promise<void> {
   const intakePath = path.join(outputDir, 'intake.json');
   await writeJsonExclusive(intakePath, intake);
   const candidatesToAttempt = maintenanceCandidatesForAttempt(intake);
-  const retrieval = await retrieveMaintenanceSources(candidatesToAttempt);
+  const retrieval = await retrieveMaintenanceSources(
+    candidatesToAttempt.filter(
+      (candidate) => !candidate.newsletter_description && !candidate.discussion
+    )
+  );
   const retrievalPath = path.join(outputDir, 'sources.json');
   await writeJsonExclusive(retrievalPath, retrieval);
   intake = recordMaintenanceAttempts(intake, maintenanceAttemptsFromRetrieval(retrieval));

@@ -11,9 +11,8 @@ This workspace has two layers:
   or copy its `codex-docs/`, `claude-docs/`, or `gemini-synthesis-docs/` trees
   into the implementation repository unless explicitly requested.
 
-For a daily commute intake, use an independent normal clone and a fresh branch as described in the commute skill. For other repository work, create a new isolated worktree inside `repo/worktrees/` before editing.
-Keep the primary `repo/` checkout clean on `main`; never implement work directly
-there. From `repo/`, use this pattern (replace `<task>` with a short slug):
+For daily commute intake, follow the [commute skill](.codex/skills/process-daily-commute/SKILL.md).
+For other repository work, leave the primary checkout on `main` and create a new isolated worktree before editing. From `repo/`, use this pattern (replace `<task>` with a short slug):
 
 ```bash
 git fetch origin
