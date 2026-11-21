@@ -11,7 +11,7 @@ This workspace has two layers:
   or copy its `codex-docs/`, `claude-docs/`, or `gemini-synthesis-docs/` trees
   into the implementation repository unless explicitly requested.
 
-Before making any write, create a new isolated worktree inside `repo/worktrees/`.
+For a daily commute intake, use an independent normal clone and a fresh branch as described in the commute skill. For other repository work, create a new isolated worktree inside `repo/worktrees/` before editing.
 Keep the primary `repo/` checkout clean on `main`; never implement work directly
 there. From `repo/`, use this pattern (replace `<task>` with a short slug):
 

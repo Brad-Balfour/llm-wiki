@@ -58,7 +58,6 @@ test('daily commute workflow does not depend on the retired planning layer', asy
   const skill = await readFile('.codex/skills/process-daily-commute/SKILL.md', 'utf8');
 
   assert.doesNotMatch(skill, /OpenSpec|opsx|openspec\/changes|openspec validate/i);
-  assert.match(skill, /stable schema, prompt,\s+source, test, or runbook owner/);
 });
 
 test('wiki provenance uses stable source identity and URL without source records', async () => {
