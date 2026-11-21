@@ -35,7 +35,7 @@
     "format:check": "prettier --check package.json tsconfig.json eslint.config.mjs .prettierrc README.md index.md _config.yml \".github/**/*.yml\" \"chatgpt-project/**/*.md\" \"docs/**/*.md\" \"schema/**/*.json\" \"scripts/**/*.mjs\" \"src/**/*.ts\" \"tests/**/*.ts\" \"tests/fixtures/**/*.json\" \"wiki/**/*.md\"",
     "format:write": "npm run format",
     "verify:publish": "npm run check",
-    "check": "npm run test && npm run lint && npm run format:check && npm run validate:site"
+    "check": "npm run test && npm run lint && npm run format:check && node scripts/validate-jekyll.mjs"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",

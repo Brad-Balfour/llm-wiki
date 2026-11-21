@@ -102,7 +102,7 @@ For each "pr_created" result, its "detail" must name every affected wiki path an
 
 There is no approval or intake-review gate. If useful changes result, run the relevant repository checks, commit the changes, push this branch to origin, and create one GitHub PR with gh. If no useful change is justified, do not create a filler page or PR.
 
-Write direct maintainer wiki output. Do not invent approval, public, reviewer, safety-review, or confirmation metadata. The exact wiki_this capture authorizes maintenance; the PR diff is the review point. Preserve the stable source item identity and article URL in wiki provenance.
+Write direct maintainer wiki output. Do not invent approval, public, reviewer, safety-review, or confirmation metadata. The exact wiki_this capture authorizes maintenance; the PR diff is the review point. Preserve the stable source item identity and queue URL in wiki provenance. Link that URL by default. If the source read followed a redirect that only added or removed www and you cite the destination, copy the observed destination into the same provenance record's optional final_url. Use the queue URL for other redirects. Reuse the source read already made for this article.
 
 Before finishing, write JSON to ${options.resultPath} with this shape:
 {
