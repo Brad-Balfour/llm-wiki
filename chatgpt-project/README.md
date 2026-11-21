@@ -6,18 +6,16 @@ controls what the phone sends for nightly intake.
 
 ## Install the compact handoff
 
-Installation is pending verification in the live Project. After the PR merges:
+On November 21, 2026, the signed-in Project Instructions matched the complete Prompt 5.1 at commit `ad5c341`. Compact export installation is pending. After the PR merges:
 
 1. In `LLM-Wiki-Car` Sources, upload
    `schema/commute-session-bundle-v2.schema.json` and replace
    `chatgpt-project/session-export.md` with the merged copy. Retire only the
    old `commute-session-bundle-v1.schema.json` export schema from Sources.
    The repository retains the v1 reader for existing handoffs.
-2. Compare the current Instructions with
-   `chatgpt-project/CHATGPT_CAR_QUEUE_PROMPT.md`. Install the exact merged
-   prompt when its playback procedure matches the live version. If the live
-   procedure differs, preserve its playback text in the tracked deployment
-   prompt and review that correction before replacing the Instructions.
+2. Replace the Project Instructions with the exact merged
+   `chatgpt-project/CHATGPT_CAR_QUEUE_PROMPT.md`. Only the export paragraph
+   changes from the verified live playback prompt.
 3. Reopen the Instructions and verify the saved text. Check that Sources has
    one copy each of the v2 schema and updated `session-export.md`. Record the
    installed versions and verification date here. Keep the weekday queue Task,
