@@ -3,7 +3,7 @@
   "cases": [
     {
       "id": "inaccessible-url",
-      "description": "An inaccessible saved URL gets fallback attempts and remains eligible for a useful, grounded partial update.",
+      "description": "A saved item can support an attributed note when its article is inaccessible.",
       "boundary": "retrieval",
       "maintenance_key": "fixture:inaccessible-url",
       "requested_url": "https://example.com/unavailable",
@@ -11,7 +11,7 @@
       "detail": "HTTP 404",
       "expected_attempt_status": "inaccessible_source",
       "review_checks": [
-        "The maintainer records distinct fallback routes and any readable excerpts.",
+        "Further research addresses a specific fact needed for the saved note.",
         "A useful partial update can use exact item discussion or newsletter text when it is attributed accurately.",
         "Detailed article claims are not inferred from the queue headline alone."
       ]
