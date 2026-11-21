@@ -8,6 +8,13 @@ found a queue as proof.
 
 ## Evidence Sources
 
+- November 20 processing: two November 20 session bundles and their two
+  independently downloaded November 13 General and Dev v4 playback/reference
+  pairs pass local validation and match their embedded snapshots. One recovered
+  and one partial bundle contain 46 events across 15 queue items, including two
+  wiki saves, two general captures and ten quality incidents. No shared chats
+  were required for the validated sessions.
+
 - November 19 processing: three session bundles and three independently
   downloaded November 12 General, Dev, and AI v4 queue/reference pairs pass
   validation and match their canonical snapshots. The bundles contain 91
@@ -4699,3 +4706,34 @@ events they contain. Conversation coverage beyond those events is unverified.
 The direct Library listing showed three November 19 bundles. The native
 Project chat received the inventory request, and row downloads supplied the
 bundles and all six canonical files after Safari authentication.
+
+## November 20: November 13 General and Dev
+
+General saved Gabriel Orlanski's study of library reuse and the investigation
+that located its actual benchmark prompt. General also saved Devon C. Estes's
+seven examples of practices worth reconsidering, including the requested
+earlier objections and changed costs for the four speculative practices.
+The wiki entries record the relevant discussion and distinguish its
+interpretation from the source findings. Neither export contains an exact
+classifier correction.
+
+General records a premature stop in the opening sweep, a network interruption
+during the library reuse discussion, and a shortened item announcement. Dev
+records seven incidents: a paraphrased or truncated sweep, a duplicate item,
+one response that joined two items, three missing item descriptions, and a
+truncated final item that triggered premature completion and a malformed
+filename. The two Dev captures asked for the Naftiko byline and why its
+architecture puts REST and MCP alongside shared application flows. The
+article confirms Jerome Louvel's byline and describes a ship-crew flow
+shared by both adapters, with forwarding for unmigrated routes. The
+discussion considered latency, incremental migration, elicitation and
+durable tasks. There was no Dev wiki-save request.
+
+Work's direct-folder inventory missed both session bundles. Both exact
+rows were present in the signed-in Library. Four exact row downloads
+supplied independent canonical files for local checks. The recovered and
+partial bundles establish the evidence they contain. Coverage of the
+full conversations remains unverified. An AI discussion-preservation
+request surfaced in the Project chat used for inventory, with no matching
+export in the direct folder. Its queue/reference pair remains available
+for a later intake.
