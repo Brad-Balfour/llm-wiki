@@ -33,6 +33,6 @@ requested value; for an original-description request, read the complete literal
 `description`. Do not load the reference to start a queue or for ordinary
 playback. Reopen the same main file for the next playback command.
 
-For commute captures and end-of-commute export, follow `session-export.md`. At
-export, open the matching reference if needed so the bundle contains exact item
-identities even when no details request occurred earlier.
+For commute captures and end-of-commute export, follow `session-export.md`.
+Include the selected queue filename, Brad’s saves and discussion, corrections,
+notes, and problems. Leave the queue contents in the Library.

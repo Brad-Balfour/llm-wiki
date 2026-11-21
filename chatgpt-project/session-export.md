@@ -1,102 +1,58 @@
-# Save Commute Notes and Create the Session Bundle
+# Save commute notes and export the handoff
 
-Use this file when Brad asks to save or correct something during a commute, or
-when he asks to end the commute and create the bundle. Create the bundle as JSON
-using the attached `commute-session-bundle-v1.schema.json` file.
+When Brad ends the commute, create a downloadable `.txt` file containing one
+JSON object that follows `commute-session-bundle-v2.schema.json`. The nightly
+importer already has access to the selected queue. Send what Brad wanted to
+keep and what went wrong during the commute.
 
-## During the commute
+## What to capture
 
-The chat is the only record available until you create the bundle. Saying that
-something was saved does not write it to a file. Do not claim that you maintain
-a separate ledger or write events to one during the commute.
+Use the conversation to interpret Brad’s words. Include problems and requests
+even when they came up during playback or navigation. Acknowledge a request briefly
+and keep the current article selected. At export, collect the following events
+in conversation order. Give each event its own `event_id`. Reuse the session
+and event IDs if Brad asks to export the same commute again.
 
-Use Brad's words to decide what to record:
+- For a wiki save, record an `item_action` with `action: "wiki_this"`, Brad’s
+  exact words in `user_words`, and the article’s `source_item_id`. Attach a
+  `discussion` to that save when the conversation supplies context worth
+  keeping. Put the main point in `summary` and include `important_questions`,
+  `conclusions`, or `requested_emphasis` when they add detail. Retain specific
+  examples, caveats, and corrections that explain why Brad wanted the save. Keep Brad’s
+  questions and hypotheses distinct from article claims. Omit absent fields.
+- For explicit interest or depth feedback, use `mark_interested`,
+  `mark_uninterested`, or `promote_to_in_depth`. An ordinary skip or a poor
+  rating of the writing alone does not change interest or depth. Record
+  `save_for_review` when Brad specifically asks to revisit an article.
+- For a playback, export, or product problem, use `quality_incident`. Describe
+  what happened in `observed_behavior` and when or where it happened in
+  `boundary`. Include the detail that would let someone recognize it again.
+- For other substantive observations or requests, use `general_capture` with
+  Brad’s `user_words`. For an unclear request or uncertain article, use
+  `unresolved_capture` with `capture_type`, `user_words`, and any known
+  `recovery_clues`. Keep an explicit save even if its target remains uncertain.
 
-- If he asks to add or save the current article to the wiki, record an
-  `item_action` whose `action` is `wiki_this`.
-- If he clearly changes the current article's interest or depth, use
-  `mark_interested`, `mark_uninterested`, or `promote_to_in_depth`. Skipping an
-  article is not classifier feedback.
-- If he reports a playback or product problem, record a `quality_incident`.
-- If he makes a note that is not about an article, record a `general_capture`.
+## How to build the file
 
-For a v4 article event, copy `source_item_id`, `title`, and `url` from the item
-at the current position in the matching reference file. For v2/v3, copy them
-from the current queue object. Copy Brad's exact words into `user_words`. Only connect an
-event to an article when the chat shows that article was current at the time.
-If the article or request is unclear, create an `unresolved_capture` with
-Brad's words and whatever clues are available. Do not guess the article, his
-intent, or events that are missing from the chat.
+Set `schema_version` to `commute-session-bundle.v2`. Put the exact selected
+main playback basename in `queue_filename`. For item actions, use the article
+Brad identified, including a numbered item if he named one. If you need item
+IDs, open the matching v4 `-reference.txt` file once, check its `main_filename`
+and use its positions to look up just those IDs. For a single-file v2 or v3
+queue, take `source_item_id` directly from its selected item. If the exact file or
+identity is uncertain, retain the request as an `unresolved_capture`. A commute
+with only general notes or problems needs no item lookup.
 
-Reply briefly when Brad records something, then leave the current article
-selected.
+Set `session.session_id`, `session.voice_surface`, `session.session_date`, and
+`session.artifact_filename`. Use the export date and time in America/New_York.
+Before noon name the file `YYYYMMDDHHmm-morning-commute-session-bundle.txt`.
+At or after noon use `YYYYMMDDHHmm-evening-commute-session-bundle.txt`. A
+Library-added numeric suffix is acceptable.
 
-## When Brad ends the commute
-
-When Brad clearly asks to end the commute or create the bundle, reopen the same
-main queue file in the Project Library. For v4, also open and verify the matching
-reference file. Put both complete objects in `queue_snapshot.queue` as
-`{ "queue_version": "tldr-commute-queue.v4", "playback_file": <main>,
-"reference_file": <reference> }`. Keep the main filename in
-`queue_snapshot.filename`. For v2/v3, keep putting the complete single queue
-object in `queue_snapshot.queue`.
-
-If either exact v4 file cannot be found, or the pair does not match, stop with an
-explicit export failure. For v2/v3 recovery, another filename may be used only
-if exactly one valid file has the original date and newsletter. Do not use a
-remembered queue or one with a similar topic.
-
-Create one JSON object that passes `commute-session-bundle-v1.schema.json`. The
-object will include:
-
-- `schema_version` and the required session fields;
-- the complete queue file;
-- the final playback state;
-- the integrity fields; and
-- every note, correction, reported problem, and unresolved request supported by
-  the chat.
-
-Record only articles that were actually read, in the order shown by the chat.
-The first `item_announced` may be any object in the queue. A
-`playback_transition` names the article that Brad was leaving; the next
-`item_announced` names the article he moved to. Do not invent missing moves,
-announcements, or articles between them.
-
-If the chat clearly shows a later article but not how Brad moved to it, keep the
-later `item_announced`. Explain the missing step in
-`integrity.incomplete_reason` and set `integrity.state` to `partial` or
-`recovered`. `playback.status` may be `completed` when Brad ended the commute;
-it does not mean that every article was read. If the bundle includes a final
-cursor, it must point to the last article that the chat shows was current.
-
-For each event, say where the information came from:
-
-- Use `selected_queue_snapshot` for fields copied from the queue.
-- Use `explicit_user_capture` for Brad's direct words.
-- Use `user_provided_chat_or_ui_observation` for events rebuilt from the visible
-  chat.
-- Use `durable_contemporaneous_record` only when a real separate record exists
-  and covers the listed events.
-
-Normally set `integrity.state` to `partial`, because the chat is not a separate
-event file. Use `recovered` if you had to find the queue again or rebuild the
-event order while creating the bundle. Use `complete` only when a real separate
-record covers every event and the bundle includes the record details required
-by the schema. Leave missing or conflicting information unresolved. Do not fill
-gaps by guessing.
-
-Use the actual time in America/New_York. Set `session.session_date` from that
-time and name the file:
-
-```text
-YYYYMMDDHHmm-morning-commute-session-bundle.txt
-YYYYMMDDHHmm-evening-commute-session-bundle.txt
-```
-
-Use `morning` before noon and `evening` at or after noon. Put the same name in
-`session.artifact_filename`. A numeric suffix added by the Library is okay.
-
-Create a downloadable `.txt` file containing the JSON. Say it is ready only
-after the file is available. If you cannot find one matching queue or create a
-downloadable file, say
+Put the captures in `events`. Use `[]` when the session had nothing to save or
+report. Leave article titles, URLs, descriptions, playback text, queue and
+reference objects, navigation history and evidence arrays out of the file.
+Check that it includes each requested save, its discussion, and each reported
+problem. Say the file is ready only after the download exists. If you cannot
+identify the selected queue or create the file, say
 `session export failed: no downloadable bundle was created`.

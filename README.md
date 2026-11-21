@@ -14,9 +14,10 @@ The daily TLDR commute-to-wiki loop is operational:
   maintenance, and publishing tests.
 - TLDR text-file ingestion is implemented for pasted/exported email bodies,
   including manual Gmail connector handoff via confirmed body text.
-- The live ChatGPT Project produces and plays queue-v2 files, exports
-  self-contained session bundles, and uses the repository maintainer to propose
-  source-grounded wiki changes in GitHub PRs.
+- The ChatGPT Project produces and plays TLDR queues. Nightly intake joins the
+  phone’s compact handoff to the original queue, proposes wiki saves in a
+  GitHub PR, and records commute problems in issues. Existing self-contained
+  handoffs remain supported.
 - GitHub Pages is the public read path. The retired handoff, approved-source,
   and compiler workflows are available only in Git history.
 
@@ -52,7 +53,7 @@ writes parsed item-level JSON and review records from the newsletter's editorial
 items. It does not persist the full email body or its delivery wrapper; this is
 input selection, not PII redaction.
 
-Validate and reconcile self-contained post-commute session bundles with the
+Validate and import post-commute session bundles with the
 current commands documented in `chatgpt-project/README.md`.
 
 Record one or more exact classifier corrections without changing the live
