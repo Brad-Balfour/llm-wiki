@@ -4737,3 +4737,39 @@ full conversations remains unverified. An AI discussion-preservation
 request surfaced in the Project chat used for inventory, with no matching
 export in the direct folder. Its queue/reference pair remains available
 for a later intake.
+
+## November 21: five sessions across November 12–16 editions
+
+The November 13 AI session saved Anthropic's self-hosted Claude Managed
+Agents announcement, including the comparison with Claude Code and Mastra,
+the walkthrough of hosting and security boundaries, and the discussion of
+agent identity at an MCP gateway. The November 16 General session saved
+William Hu's always-on agents guide and explicitly asked to include the
+comparison with Managed Agents. Two General capture events refer to the
+same article and are published as one save. The November 12 Fintech and
+November 16 Dev and AI sessions contain no explicit wiki saves. No exact
+classifier correction was recorded.
+
+The export reports include substituted or incomplete prepared item playback,
+extra narration, repeated sweeps and completion responses, and advance
+requests answered with an acknowledgment before playback resumed. General
+also records a request to omit spoken URLs and conflicting answers to a
+byline question after the reference lookup failed. Dev records a request to
+explain what the Console Framework was for. The four compact AI question
+captures concern article attribution, a summary, Amdahl's law, and an article
+interpretation. These questions were preserved with the intake.
+
+The signed-in Library supplied five exact exports and their five distinct
+canonical queue/reference pairs. Four exports use the legacy format and one
+uses the compact format. The compact export records 11 events and occupies
+3,595 bytes. The legacy exports range from 27,326 to 76,946 bytes and include
+queue snapshots and more event detail. They are different sessions and do
+not form a matched comparison. Two legacy exports mark themselves as
+recovered and two as partial.
+
+The importer accepted all five sessions and recorded 25 quality incidents and
+seven general captures. Its Dev queue comparison remained unverified because
+the final advance was encoded as a move beyond the last item. Both Dev
+snapshot objects independently matched the downloaded playback and reference
+objects. The invalid transition remains a playback and export issue. It
+supplies no wiki edit.
