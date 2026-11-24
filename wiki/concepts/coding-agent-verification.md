@@ -81,6 +81,8 @@ a check. Keeping the suite and instructions small works best when each
 retained check has a clear purpose and known evidence. The human owner's job
 is to define the acceptance criteria and assess the resulting evidence.
 
-See also [Agent Memory and Verification](./agent-memory-and-verification.md).
+## Related
+
+- {% include wiki-related-link.md slug="agent-memory-and-verification" %}
 
 <!-- source-item-id: 20261117-tldr-ai:ai-014 -->
