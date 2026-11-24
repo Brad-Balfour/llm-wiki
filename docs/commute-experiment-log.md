@@ -4773,3 +4773,31 @@ the final advance was encoded as a move beyond the last item. Both Dev
 snapshot objects independently matched the downloaded playback and reference
 objects. The invalid transition remains a playback and export issue. It
 supplies no wiki edit.
+
+## November 22–23: six compact sessions and three saves
+
+The November 23 Dev commute saved Modern Web Guidance 1.0 from the
+November 18 edition, a second reference to the existing wiki page. The
+November 17 AI session saved the Gemini Notebook interactive-sites
+announcement with a discussion about a URL-to-audio workflow, and Addy
+Osmani's account of how the Claude Code team verifies changes. The Notebook
+entry records desktop batch URL import, mobile Audio Overview generation
+and playback, and the documented Enterprise API. The verification entry
+preserves the questions about generated inputs, migration comparisons,
+review independence, commit gates and incident replay.
+
+Work and Safari agreed on six Library export IDs. The six compact exports
+contained 36 events and used six distinct queue/reference pairs. Two
+different November 23 morning sessions used the same minute-based name,
+with a suffix on one Library row. The grouped importer accepted five and
+rejected the other when it canonicalized the filenames. Running the
+rejected original separately with its own queue and reference recovered
+both AI saves. No raw exports were changed.
+
+Across the two validation results, the 36 events comprised three saves,
+nine general captures and 24 quality incidents. No classifier correction
+was recorded. Reported problems included shortened or substituted queue
+playback, extra or repeated narration, missing spoken output after source
+lookup, unsupported or conflicting author attributions, and a premature
+end-of-queue response. The AI discussion also records repeated drift back
+to interactive sites after the topic changed to audio.
