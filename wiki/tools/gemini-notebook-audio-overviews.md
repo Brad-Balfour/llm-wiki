@@ -1,8 +1,8 @@
 ---
 type: tool
 title: 'Gemini Notebook Audio Overviews'
-aliases: ["NotebookLM Audio Overviews"]
-tags: ["ai-agents", "research"]
+aliases: ['NotebookLM Audio Overviews']
+tags: ['ai-agents', 'research']
 wiki_slug: gemini-notebook-audio-overviews
 created: 2026-11-23
 updated: 2026-11-23

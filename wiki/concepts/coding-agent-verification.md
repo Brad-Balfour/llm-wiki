@@ -2,7 +2,7 @@
 type: concept
 title: 'Coding Agent Verification'
 aliases: []
-tags: ["ai-agents", "developer-tools"]
+tags: ['ai-agents', 'developer-tools']
 wiki_slug: coding-agent-verification
 created: 2026-11-23
 updated: 2026-11-23
