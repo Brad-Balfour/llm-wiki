@@ -4801,3 +4801,23 @@ playback, extra or repeated narration, missing spoken output after source
 lookup, unsupported or conflicting author attributions, and a premature
 end-of-queue response. The AI discussion also records repeated drift back
 to interactive sites after the topic changed to audio.
+
+## November 23–24: three compact sessions and one save
+
+Two late November 23 exports and one November 24 morning export used the
+November 19 General, Dev, and AI queues. The Dev session saved Mastra Factory.
+The importer accepted all three sessions and found one save, 18 quality
+incidents, and zero unresolved captures or classifier corrections.
+
+All three sessions reported a problem starting or completing the initial
+sweep. Later incidents included shortened or paraphrased item playback,
+playback of the next headline without a navigation command, and an advance
+command that received an acknowledgment without playback. The General
+session also reports source and attribution claims that the conversation
+did not substantiate. The AI session records a discussion that needed a
+clarification before it addressed the requested examples. The evidence
+establishes what was observed in the responses. The audio handoff and the
+underlying cause remain unverified.
+
+Work and Safari matched all three export IDs. Work also listed a July
+handoff document outside the intake window.
