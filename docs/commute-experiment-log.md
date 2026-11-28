@@ -4821,3 +4821,24 @@ underlying cause remain unverified.
 
 Work and Safari matched all three export IDs. Work also listed a July
 handoff document outside the intake window.
+
+## November 25–27: nine compact sessions and three saves
+
+Safari and Work matched nine export IDs. The importer accepted all nine
+sessions, covering nine queues from four newsletter dates. It recovered three
+wiki saves, one explicit classifier correction, three general captures and
+44 reported quality incidents, with zero unresolved captures.
+
+The recurring playback problems were duplicate or paraphrased sweeps, extra
+lead-ins, omitted or substituted prepared descriptions, and advance commands
+that received an acknowledgment without playback. In the November 26 General
+session, the latter happened on three consecutive advances. In the November 27
+General session, the export records substituted prepared descriptions from
+positions 4 through 11. The exports record response behavior. They do not
+establish the audio handoff, the runtime cause, or measured Voice latency.
+
+The explicit classifier correction promoted the November 20 General item about
+Apple device-control agents to in-depth. A separate Fintech discussion clarified
+that reading a useful prepared summary and investigating the source are distinct
+actions. The item's existing in-depth classification was retained. Two general
+captures were playback directions.
