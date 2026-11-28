@@ -7,10 +7,10 @@ aliases: ["Treat prompt changes like code deploys","Prompt CI/CD"]
 tags: ["ai-engineering","prompts","evaluation","quality-gates","deployment","observability"]
 wiki_slug: prompt-deployment-gates
 created: 2026-07-31
-updated: 2026-07-31
+updated: 2026-11-27
 confidence: high
 # prettier-ignore
-provenance: [{"source_item_id":"19fb2b55e8becbaa-06","url":"https://luke.geek.nz/azure/eval-gates-for-prompts/"}]
+provenance: [{"source_item_id":"19fb2b55e8becbaa-06","url":"https://luke.geek.nz/azure/eval-gates-for-prompts/"},{"source_item_id":"20261120-tldr-dev:dev-004","url":"https://engineering.atspotify.com/2026/11/when-can-you-ship-on-offline-evals-alone"}]
 ---
 
 # Prompt Deployment Gates
@@ -53,6 +53,14 @@ The commute discussion used this implementation guide as a second reference.
 It distinguishes native prompt versioning and evaluation features from approval
 and traffic-splitting behavior that the surrounding delivery system must
 compose.
+
+### [When Can You Ship on Offline Evals Alone?](https://engineering.atspotify.com/2026/11/when-can-you-ship-on-offline-evals-alone)
+
+<!-- source-item-id: 20261120-tldr-dev:dev-004 -->
+
+Spotify proposes learning the relationship between offline evaluation results and online treatment effects from paired experiments on comparable changes. An offline result strong enough to bound the risk of harming the online metric can support shipping. Borderline results still go to A/B testing, and random audits preserve online evidence for detecting drift after the gate is in use.
+
+In the paper's working example, measurement noise lowered a naive estimate of explained variance from a modeled 60% to 24%. Those figures illustrate the effect of ignoring measurement error. The gate also depends on the historical relationship applying to future changes and on judge errors behaving comparably across treatment arms.
 
 ## Related
 
